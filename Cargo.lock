@@ -398,6 +398,12 @@ dependencies = [
 ]
 
 [[package]]
+name = "dotenvy"
+version = "0.15.7"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "1aaf95b3e5c8f23aa320147307562d361db0ae0d51242340f558153b4eb2439b"
+
+[[package]]
 name = "dyn-clone"
 version = "1.0.17"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -839,7 +845,7 @@ checksum = "01cda141df6706de531b6c46c3a33ecca755538219bd484262fa09410c13539c"
 [[package]]
 name = "listenbrainz"
 version = "0.7.0"
-source = "git+https://github.com/RustyNova016/listenbrainz-rs.git?branch=main#30f02a77097401dc211b7b1e25857713a68f12b0"
+source = "git+https://github.com/RustyNova016/listenbrainz-rs.git?branch=main#9392a714c1c3212ad103595096aa37b97b2d039d"
 dependencies = [
  "attohttpc",
  "serde",
@@ -856,9 +862,21 @@ dependencies = [
  "inquire",
  "itertools",
  "listenbrainz",
+ "listenbrainz-utils",
  "musicbrainz_rs",
  "prettytable-rs",
  "rust_decimal",
+]
+
+[[package]]
+name = "listenbrainz-utils"
+version = "0.1.0"
+source = "git+https://github.com/RustyNova016/listenbrainz_rs_utils.git?branch=master#37155baaccc411c50ace9e7836fd454c29397b70"
+dependencies = [
+ "derive_builder",
+ "dotenvy",
+ "listenbrainz",
+ "musicbrainz_rs",
 ]
 
 [[package]]
