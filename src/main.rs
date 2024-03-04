@@ -9,5 +9,5 @@ fn main() -> color_eyre::Result<()> {
 
     println!("Hello, world!");
 
-    return Ok(());
+    Ok(())
 }

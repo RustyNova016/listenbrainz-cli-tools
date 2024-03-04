@@ -26,5 +26,5 @@ pub fn get_all_unlinked_of_user(username: &str) -> Vec<UserListensListen> {
             break;
         }
     }
-    return unlinked;
+    unlinked
 }
