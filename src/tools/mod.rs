@@ -1,8 +1,6 @@
 use listenbrainz::raw::{response::UserListensListen, Client};
 use listenbrainz_utils::readers::ListenReaderBuilder;
 
-
-
 /// Fetch an user's listens and extract the unlinked ones
 pub fn get_all_unlinked_of_user(username: &str) -> Vec<UserListensListen> {
     let client = Client::new();
