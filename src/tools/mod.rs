@@ -1,3 +1,4 @@
+use color_eyre::eyre::Context;
 use listenbrainz::raw::{response::UserListensListen, Client};
 use listenbrainz_utils::readers::ListenReaderBuilder;
 
@@ -7,7 +8,7 @@ pub fn get_all_unlinked_of_user(username: &str) -> Vec<UserListensListen> {
 
     let mut builder = ListenReaderBuilder::default();
     builder.user_name(username.to_string());
-    let mut reader = builder.build().unwrap();
+    let mut reader = builder.build().context("Couldn't create ListenReader").unwrap();
 
     let mut unlinked = vec![];
     let mut i = 1;
