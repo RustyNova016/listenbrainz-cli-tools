@@ -1,5 +1,8 @@
 use clap::{Parser, Subcommand};
+
 use listenbrainz::raw::response::UserListensListen;
+
+use crate::tools::unlinked::unlinked_command;
 
 pub struct UnlinkedListenCollection(Vec<UserListensListen>);
 
@@ -8,6 +11,12 @@ impl UnlinkedListenCollection {
         if item.track_metadata.mbid_mapping.is_none() {
             self.0.push(item)
         }
+    }
+}
+
+impl Extend<UserListensListen> for UnlinkedListenCollection {
+    fn extend<T: IntoIterator<Item = UserListensListen>>(&mut self, iter: T) {
+        self.0.extend(iter)
     }
 }
 
@@ -27,4 +36,12 @@ pub enum Commands {
         #[arg(short, long)]
         username: String,
     },
+}
+
+impl Commands {
+    pub fn run(&self) {
+        match self {
+            Commands::Unlinked { username } => unlinked_command(username),
+        }
+    }
 }
