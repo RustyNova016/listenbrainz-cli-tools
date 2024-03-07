@@ -3,7 +3,7 @@ use color_eyre::eyre::Context;
 use listenbrainz::raw::{response::UserListensListen, Client};
 use listenbrainz_utils::readers::ListenReaderBuilder;
 
-use crate::models::messy_recording::{self, MessyRecording};
+use crate::models::messy_recording::{MessyRecording};
 
 pub fn unlinked_command(username: &str) {
     println!("Fetching unlinkeds for user {}", username);
@@ -20,7 +20,7 @@ pub fn unlinked_command(username: &str) {
             listen.recording_msid
         );
 
-        let mut messy_recording = messy_recordings
+        let messy_recording = messy_recordings
             .iter_mut()
             .find(|record| record.id == listen.recording_msid);
 
