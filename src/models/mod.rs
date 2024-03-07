@@ -4,6 +4,8 @@ use listenbrainz::raw::response::UserListensListen;
 
 use crate::tools::unlinked::unlinked_command;
 
+pub mod messy_recording;
+
 pub struct UnlinkedListenCollection(Vec<UserListensListen>);
 
 impl UnlinkedListenCollection {

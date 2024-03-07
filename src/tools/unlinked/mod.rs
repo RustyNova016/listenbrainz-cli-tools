@@ -3,15 +3,46 @@ use color_eyre::eyre::Context;
 use listenbrainz::raw::{response::UserListensListen, Client};
 use listenbrainz_utils::readers::ListenReaderBuilder;
 
+use crate::models::messy_recording::{self, MessyRecording};
+
 pub fn unlinked_command(username: &str) {
     println!("Fetching unlinkeds for user {}", username);
     let unlinked = get_all_unlinked_of_user(username);
-    for ele in unlinked {
+
+    let mut messy_recordings: Vec<MessyRecording> = vec![];
+
+    // We put all the listens in a MessyBrain recordings
+    for listen in unlinked {
         println!(
             "{:#?} - {} [{}]",
-            ele.track_metadata.release_name, ele.track_metadata.artist_name, ele.recording_msid
-        )
+            listen.track_metadata.release_name,
+            listen.track_metadata.artist_name,
+            listen.recording_msid
+        );
+
+        let mut messy_recording = messy_recordings
+            .iter_mut()
+            .find(|record| record.id == listen.recording_msid);
+
+        if let Some(messy_recording) = messy_recording {
+            messy_recording.add_listen(listen)
+        } else {
+            let mut messy_recording = MessyRecording::new(listen.recording_msid.clone());
+            messy_recording.add_listen(listen);
+            messy_recordings.push(messy_recording)
+        }
     }
+
+    messy_recordings.sort_by_key(|recording| recording.associated_listens.len());
+
+    messy_recordings.iter().for_each(|record| {
+        println!(
+            "({}) {} - {}",
+            record.associated_listens.len(),
+            record.get_recording_name().unwrap_or_default(),
+            record.get_artist_name().unwrap_or_default()
+        )
+    })
 }
 
 /// Fetch an user's listens and extract the unlinked ones
