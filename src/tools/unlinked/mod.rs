@@ -3,23 +3,17 @@ use color_eyre::eyre::Context;
 use listenbrainz::raw::{response::UserListensListen, Client};
 use listenbrainz_utils::readers::ListenReaderBuilder;
 
-use crate::models::messy_recording::{MessyRecording};
+use crate::models::messy_recording::MessyRecording;
 
 pub fn unlinked_command(username: &str) {
     println!("Fetching unlinkeds for user {}", username);
     let unlinked = get_all_unlinked_of_user(username);
 
     let mut messy_recordings: Vec<MessyRecording> = vec![];
+    let unlinked_count = unlinked.len();
 
     // We put all the listens in a MessyBrain recordings
     for listen in unlinked {
-        println!(
-            "{:#?} - {} [{}]",
-            listen.track_metadata.release_name,
-            listen.track_metadata.artist_name,
-            listen.recording_msid
-        );
-
         let messy_recording = messy_recordings
             .iter_mut()
             .find(|record| record.id == listen.recording_msid);
@@ -41,8 +35,22 @@ pub fn unlinked_command(username: &str) {
             record.associated_listens.len(),
             record.get_recording_name().unwrap_or_default(),
             record.get_artist_name().unwrap_or_default()
+        );
+
+        let latest_listen = record.get_latest_listen();
+
+        println!(
+            "    -> https://listenbrainz.org/user/RustyNova/?min_ts={}&max_ts={}",
+            latest_listen
+                .map(|listen| listen.listened_at - 1)
+                .unwrap_or(0),
+            latest_listen
+                .map(|listen| listen.listened_at + 1)
+                .unwrap_or(0)
         )
-    })
+    });
+
+    println!("Total: {} unlinked recording", unlinked_count)
 }
 
 /// Fetch an user's listens and extract the unlinked ones

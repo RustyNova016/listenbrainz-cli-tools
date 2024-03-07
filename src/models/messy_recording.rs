@@ -33,4 +33,10 @@ impl MessyRecording {
             .find(|listen| !listen.track_metadata.artist_name.is_empty())
             .map(|listen| listen.track_metadata.artist_name.clone())
     }
+
+    pub fn get_latest_listen(&self) -> Option<&UserListensListen> {
+        self.associated_listens
+            .iter()
+            .max_by_key(|listen| listen.listened_at)
+    }
 }
