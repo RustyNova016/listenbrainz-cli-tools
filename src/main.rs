@@ -1,7 +1,7 @@
 use clap::Parser;
 use color_eyre::eyre::Ok;
 
-use crate::models::Cli;
+use models::cli::Cli;
 
 pub mod models;
 pub mod tools;
