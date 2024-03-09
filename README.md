@@ -28,6 +28,7 @@ It also gives a link to quickly look up the listen in listenbrainz, and go link 
     -> https://listenbrainz.org/user/user/?min_ts=1709228551&max_ts=1709228553
 (7) Raise Your Weapon - KLOUD
     -> https://listenbrainz.org/user/user/?min_ts=1709824520&max_ts=1709824522
+Total: 8 unlinked recordings
 ```
 
 > Note: Listens are grouped by "Messybrainz ID" (MSID). This is the way Listenbrainz recognize similar listens 

@@ -29,6 +29,8 @@ pub fn unlinked_command(username: &str) {
 
     messy_recordings.sort_by_key(|recording| recording.associated_listens.len());
 
+    println!("Done! Here are {}'s unlinked listens:", username);
+
     messy_recordings.iter().for_each(|record| {
         println!(
             "({}) {} - {}",
@@ -51,7 +53,7 @@ pub fn unlinked_command(username: &str) {
         )
     });
 
-    println!("Total: {} unlinked recording", unlinked_count)
+    println!("Total: {} unlinked recordings", unlinked_count)
 }
 
 /// Fetch an user's listens and extract the unlinked ones
