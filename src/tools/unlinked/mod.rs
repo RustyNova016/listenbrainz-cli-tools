@@ -40,7 +40,8 @@ pub fn unlinked_command(username: &str) {
         let latest_listen = record.get_latest_listen();
 
         println!(
-            "    -> https://listenbrainz.org/user/RustyNova/?min_ts={}&max_ts={}",
+            "    -> https://listenbrainz.org/user/{}/?min_ts={}&max_ts={}",
+            username,
             latest_listen
                 .map(|listen| listen.listened_at - 1)
                 .unwrap_or(0),
