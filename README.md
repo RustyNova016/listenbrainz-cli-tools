@@ -10,11 +10,11 @@ The latest build can be found in the [release](https://github.com/RustyNova016/l
 ```shell
 git clone https://github.com/RustyNova016/listenbrainz-cli-tools.git
 cd ./listenbrainz-cli-tools
-cargo build --target
+cargo build --release
 ```
 
 # Tools
-## Unlinked listens
+## Unlinked listens 
 To search for your unlinked listens, use:
 ```shell
 listenbrainz-cli-tools unlinked -u <username>
