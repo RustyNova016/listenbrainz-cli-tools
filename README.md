@@ -14,7 +14,7 @@ cargo build --release
 ```
 
 # Tools
-## Unlinked listens
+## Unlinked listens 
 To search for your unlinked listens, use:
 ```shell
 listenbrainz-cli-tools unlinked -u <username>
