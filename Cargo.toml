@@ -2,7 +2,7 @@
 name = "listenbrainz-cli-tools"
 version = "0.1.0"
 edition = "2021"
-repository = "https://github.com/RustyNova016/listenbrainz-cli-tools.git"
+repository = "https://github.com/RustyNova016/listenbrainz-cli-tools"
 publish = true
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
