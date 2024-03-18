@@ -957,7 +957,7 @@ checksum = "01cda141df6706de531b6c46c3a33ecca755538219bd484262fa09410c13539c"
 [[package]]
 name = "listenbrainz"
 version = "0.7.0"
-source = "git+https://github.com/RustyNova016/listenbrainz-rs.git?branch=main#9392a714c1c3212ad103595096aa37b97b2d039d"
+source = "git+https://github.com/RustyNova016/listenbrainz-rs.git?branch=main#853817feca679a019d39ce8d729bbfc765446f34"
 dependencies = [
  "attohttpc",
  "serde",
