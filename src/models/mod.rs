@@ -3,6 +3,7 @@ use listenbrainz::raw::response::UserListensListen;
 pub mod cli;
 pub mod data;
 pub mod messy_recording;
+pub mod musicbrainz;
 
 pub struct UnlinkedListenCollection(Vec<UserListensListen>);
 
