@@ -3,6 +3,7 @@ use listenbrainz::raw::response::{UserListensListen, UserListensMBIDMapping};
 
 pub mod collection;
 
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub struct UserListen {
     /// Time of when the listen happened
     listened_at: DateTime<Utc>,
@@ -32,14 +33,12 @@ impl TryFrom<UserListensListen> for UserListen {
         Ok(Self {
             listened_at,
             messybrainz_data: MessyBrainzData::from(value.clone()),
-            mapping_data: value
-                .track_metadata
-                .mbid_mapping
-                .map(MappingData::from),
+            mapping_data: value.track_metadata.mbid_mapping.map(MappingData::from),
         })
     }
 }
 
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub struct MessyBrainzData {}
 
 impl From<UserListensListen> for MessyBrainzData {
@@ -48,6 +47,7 @@ impl From<UserListensListen> for MessyBrainzData {
     }
 }
 
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub struct MappingData {
     /// The MBID of the recordings
     recording_mbid: String,

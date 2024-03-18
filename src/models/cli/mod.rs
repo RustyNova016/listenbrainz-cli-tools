@@ -1,4 +1,4 @@
-use crate::tools::unlinked::unlinked_command;
+use crate::tools::{stats::stats, unlinked::unlinked_command};
 use clap::{Parser, Subcommand};
 
 /// Tools for Listenbrainz
@@ -17,12 +17,20 @@ pub enum Commands {
         #[arg(short, long)]
         username: String,
     },
+
+    /// Live and accurate statistics
+    Stats {
+        /// Name of the user to fetch stats listen from
+        #[arg(short, long)]
+        username: String,
+    },
 }
 
 impl Commands {
     pub fn run(&self) {
         match self {
             Commands::Unlinked { username } => unlinked_command(username),
+            Commands::Stats { username } => stats(username),
         }
     }
 }
