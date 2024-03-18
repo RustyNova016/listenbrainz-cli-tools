@@ -1,9 +1,8 @@
 //! Contain the code for the "unlisted" command
 use color_eyre::eyre::Context;
 use listenbrainz::raw::{response::UserListensListen, Client};
-use listenbrainz_utils::readers::ListenReaderBuilder;
 
-use crate::models::messy_recording::MessyRecording;
+use crate::{models::messy_recording::MessyRecording, utils::ListenReaderBuilder};
 
 pub fn unlinked_command(username: &str) {
     println!("Fetching unlinkeds for user {}", username);

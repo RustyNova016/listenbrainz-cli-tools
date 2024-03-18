@@ -5,6 +5,7 @@ use models::cli::Cli;
 
 pub mod models;
 pub mod tools;
+pub mod utils;
 
 fn main() -> color_eyre::Result<()> {
     color_eyre::install()?;
