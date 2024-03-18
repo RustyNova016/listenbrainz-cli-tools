@@ -8,7 +8,7 @@ publish = true
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-listenbrainz = { version = "0.7.0", git = "https://github.com/RustyNova016/listenbrainz-rs.git", branch = "main"}
+listenbrainz = { version = "0.7.1", package = "listenbrainz_rs_nova"} # Upstream version of the listenbrainz crate
 musicbrainz_rs = { version = "0.5.0", features = ["blocking"], default-features = false }
 derive_builder = "0.20.0"
 inquire = "0.7.0"
@@ -18,6 +18,7 @@ color-eyre = "0.6.2"
 rust_decimal = "1.33.1"
 clap = { version = "4.5.2", features = ["unicode", "wrap_help", "derive"]}
 clap_complete = "4.5.1"
+chrono = "0.4.35"
 
 # The profile that 'cargo dist' will build with
 [profile.dist]

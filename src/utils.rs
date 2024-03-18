@@ -1,5 +1,5 @@
-use listenbrainz::raw::{response::UserListensResponse, Client};
 use derive_builder::Builder;
+use listenbrainz::raw::{response::UserListensResponse, Client};
 
 #[derive(Clone, Debug, PartialEq, Eq, Builder)]
 #[allow(missing_docs)]
@@ -9,7 +9,7 @@ pub struct ListenReader {
     /// The name of the target user
     user_name: String,
 
-    #[ builder(setter(into, strip_option), default)]
+    #[builder(setter(into, strip_option), default)]
     /// The UNIX timestamp of the earliest listen to retreive
     min_ts: Option<i64>,
 
@@ -17,8 +17,7 @@ pub struct ListenReader {
     /// The UNIX timestamp of the latest listen to retreive
     max_ts: Option<i64>,
 
-    #[builder(setter(into, strip_option), default = "Some(999)")
-    ]
+    #[builder(setter(into, strip_option), default = "Some(999)")]
     /// The number of listen to retreive from the API.
     count: Option<u64>,
 
