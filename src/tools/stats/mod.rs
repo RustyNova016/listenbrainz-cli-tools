@@ -1,2 +1,1 @@
-pub fn stats(username: &str) {
-}
+pub fn stats(username: &str) {}

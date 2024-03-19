@@ -77,3 +77,13 @@ impl FromIterator<UserListen> for UserListenCollection {
         coll
     }
 }
+
+impl IntoIterator for UserListenCollection {
+    type Item = Rc<UserListen>;
+
+    type IntoIter = std::vec::IntoIter<Self::Item>;
+
+    fn into_iter(self) -> Self::IntoIter {
+        self.data.into_iter()
+    }
+}

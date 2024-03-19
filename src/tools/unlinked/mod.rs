@@ -2,7 +2,7 @@
 use color_eyre::eyre::Context;
 use listenbrainz::raw::{response::UserListensListen, Client};
 
-use crate::{models::messy_recording::MessyRecording, utils::ListenReaderBuilder};
+use crate::{models::messy_recording::MessyRecording, utils::ListenAPIPaginatorBuilder};
 
 pub fn unlinked_command(username: &str) {
     println!("Fetching unlinkeds for user {}", username);
@@ -59,7 +59,7 @@ pub fn unlinked_command(username: &str) {
 pub fn get_all_unlinked_of_user(username: &str) -> Vec<UserListensListen> {
     let client = Client::new();
 
-    let mut builder = ListenReaderBuilder::default();
+    let mut builder = ListenAPIPaginatorBuilder::default();
     builder.user_name(username.to_string());
     let mut reader = builder
         .build()
