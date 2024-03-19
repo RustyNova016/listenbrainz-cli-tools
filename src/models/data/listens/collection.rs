@@ -32,6 +32,7 @@ impl UserListenCollection {
     ) -> Vec<Rc<UserListen>> {
         match mbid_type {
             MBIDType::Recording => self.get_listen_with_recording(mbid),
+            MBIDType::Artist => todo!(),
         }
     }
 

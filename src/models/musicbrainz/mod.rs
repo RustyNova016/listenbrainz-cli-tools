@@ -2,4 +2,5 @@
 #[derive(Debug, Clone, Copy)]
 pub enum MBIDType {
     Recording,
+    Artist,
 }

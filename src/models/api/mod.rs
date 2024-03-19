@@ -1,5 +1,4 @@
 use color_eyre::eyre::Context;
-use listenbrainz::raw;
 
 use crate::utils::ListenAPIPaginatorBuilder;
 

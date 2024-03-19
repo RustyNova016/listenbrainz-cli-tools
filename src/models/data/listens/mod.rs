@@ -1,4 +1,6 @@
 use chrono::{DateTime, TimeZone, Utc};
+
+use clap::builder::Str;
 use listenbrainz::raw::response::{UserListensListen, UserListensMBIDMapping};
 
 pub mod collection;
@@ -55,18 +57,36 @@ impl From<UserListensListen> for MessyBrainzData {
 pub struct MappingData {
     /// The MBID of the recordings
     recording_mbid: String,
+
+    /// Name of the recording
+    recording_name: String,
+
+    /// Artists MBID
+    artist_mbid: Vec<String>,
 }
 
 impl MappingData {
     pub fn get_recording_id(&self) -> &String {
         &self.recording_mbid
     }
+
+    pub fn get_recording_name(&self) -> &String {
+        &self.recording_name
+    }
+
+    pub fn get_artists_mbids(&self) -> &Vec<String> {
+        &self.artist_mbid
+    }
 }
 
 impl From<UserListensMBIDMapping> for MappingData {
     fn from(value: UserListensMBIDMapping) -> Self {
         Self {
-            recording_mbid: value.recording_mbid,
+            recording_mbid: value.recording_mbid.clone(),
+            recording_name: value
+                .recording_name
+                .unwrap_or(format!("Unknown Track ({})", value.recording_mbid)),
+            artist_mbid: value.artist_mbids.unwrap_or_default(),
         }
     }
 }
