@@ -1,3 +1,5 @@
+use std::rc::Rc;
+
 use listenbrainz::raw::response::UserListensListen;
 
 use crate::models::musicbrainz::MBIDType;
@@ -7,32 +9,35 @@ use super::UserListen;
 /// Collection of listens
 #[derive(Debug, Clone, PartialEq, Eq, Default)]
 pub struct UserListenCollection {
-    data: Vec<UserListen>,
+    data: Vec<Rc<UserListen>>,
 }
 
 impl UserListenCollection {
     pub fn new() -> Self {
-        Self {
-            data: Vec::new()
-        }
+        Self { data: Vec::new() }
     }
 
-    pub fn get_mapped_listens(&self) -> impl Iterator<Item = &UserListen> {
-        self.data.iter().filter(|element| element.is_mapped())
+    pub fn get_mapped_listens(&self) -> Vec<Rc<UserListen>> {
+        self.data
+            .iter()
+            .filter(|element| element.is_mapped())
+            .cloned()
+            .collect()
     }
 
     pub fn get_listens_for_mbid<'a>(
         &'a self,
         mbid: &'a str,
         mbid_type: MBIDType,
-    ) -> Vec<&UserListen> {
+    ) -> Vec<Rc<UserListen>> {
         match mbid_type {
             MBIDType::Recording => self.get_listen_with_recording(mbid),
         }
     }
 
-    fn get_listen_with_recording<'a, 'b>(&'a self, recording_mbid: &'a str) -> Vec<&UserListen> {
+    fn get_listen_with_recording<'a, 'b>(&'a self, recording_mbid: &'a str) -> Vec<Rc<UserListen>> {
         self.get_mapped_listens()
+            .into_iter()
             .filter(|listen| {
                 listen
                     .mapping_data
@@ -43,7 +48,7 @@ impl UserListenCollection {
     }
 
     pub fn push(&mut self, item: UserListen) {
-        self.data.push(item)
+        self.data.push(Rc::new(item))
     }
 }
 
@@ -51,10 +56,10 @@ impl TryFrom<Vec<UserListensListen>> for UserListenCollection {
     type Error = &'static str;
 
     fn try_from(value: Vec<UserListensListen>) -> Result<Self, Self::Error> {
-        let mut data: Vec<UserListen> = Vec::new();
+        let mut data: Vec<Rc<UserListen>> = Vec::new();
 
         for listen in value.into_iter() {
-            data.push(listen.try_into()?)
+            data.push(Rc::new(listen.try_into()?))
         }
 
         Ok(Self { data })

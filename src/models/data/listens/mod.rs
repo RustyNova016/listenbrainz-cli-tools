@@ -19,6 +19,10 @@ impl UserListen {
     pub fn is_mapped(&self) -> bool {
         self.mapping_data.is_some()
     }
+
+    pub fn get_mapping_data(&self) -> &Option<MappingData> {
+        &self.mapping_data
+    }
 }
 
 impl TryFrom<UserListensListen> for UserListen {
@@ -51,6 +55,12 @@ impl From<UserListensListen> for MessyBrainzData {
 pub struct MappingData {
     /// The MBID of the recordings
     recording_mbid: String,
+}
+
+impl MappingData {
+    pub fn get_recording_id(&self) -> &String {
+        &self.recording_mbid
+    }
 }
 
 impl From<UserListensMBIDMapping> for MappingData {
