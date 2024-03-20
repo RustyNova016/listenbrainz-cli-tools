@@ -20,6 +20,7 @@ clap = { version = "4.5.2", features = ["unicode", "wrap_help", "derive"]}
 clap_complete = "4.5.1"
 chrono = "0.4.35"
 cached = "0.49.2"
+colored = "2.1.0"
 
 # The profile that 'cargo dist' will build with
 [profile.dist]

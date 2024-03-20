@@ -11,14 +11,20 @@ pub struct RecordingStats {
 
 impl StatStruct for RecordingStats {
     fn push(&mut self, value: Rc<UserListen>) {
-        todo!()
+        if value.is_mapped_to_recording(&self.mbid) {
+            self.push(value)
+        }
     }
 
     fn get_mbid(&self) -> &str {
-        todo!()
+        &self.mbid
     }
 
     fn new(mbid: String) -> Self {
-        todo!()
+        Self { mbid, listens: Vec::new()}
     }
+}
+
+pub struct RecordingStatsSorter {
+    mbid: String
 }

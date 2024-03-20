@@ -1,10 +1,10 @@
-use std::rc::Rc;
+use std::{collections::HashMap, rc::Rc};
 
 use musicbrainz_rs::{entity::artist::Artist, Fetch};
 
 use crate::models::data::listens::UserListen;
 
-use super::stat_struct::StatStruct;
+use super::{stat_struct::StatStruct, StatSorter};
 
 pub struct ArtistStats {
     mbid: String,
@@ -38,5 +38,30 @@ impl StatStruct for ArtistStats {
         {
             self.listens.push(item)
         }
+    }
+}
+
+pub struct ArtistStatsSorter {
+    listens: HashMap<String, Vec<Rc<UserListen>>>,
+}
+
+impl StatSorter for ArtistStatsSorter {
+    fn get_map_mut(&mut self) -> &mut HashMap<String, Vec<Rc<UserListen>>> {
+        &mut self.listens
+    }
+
+    fn push(&mut self, value: Rc<UserListen>) {
+        let Some(recording_data) = value.get_recording_data() else {return};
+
+        for artist_credited in recording_data.artist_credit.unwrap_or(Vec::new()) {
+            self.get_mut(&artist_credited.artist.id).push(value.clone());
+        }
+    }
+    
+    fn into_sorted(self) -> Vec<Vec<Rc<UserListen>>> {
+        let mut out = Vec::new();
+        out.extend(self.listens.into_values());
+        out.sort_unstable_by_key(|item| item.len());
+        out
     }
 }

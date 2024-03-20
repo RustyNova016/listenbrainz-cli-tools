@@ -1,12 +1,23 @@
-use crate::models::{api::fetch_listens, musicbrainz::MBIDType, stats::MBIDStatCounter};
+use color_eyre::owo_colors::OwoColorize;
 
-pub fn recording_stats(username: &str) {
-    println!("Getting the listens...");
+use crate::models::{api::fetch_listens, cli::stats::GroupByTarget, musicbrainz::MBIDType, stats::{stat_struct::EntityStats, MBIDStatCounter}};
+
+pub fn stats_command(username: &str, target: GroupByTarget) {
+    println!("{} Getting the listens...", "[CLI Tools]".green());
     let listens = fetch_listens(username).unwrap();
-    println!("Calculating stats...");
-    let mut sorter = MBIDStatCounter::new(MBIDType::Recording);
+    println!("{} Calculating stats...", "[CLI Tools]".green());
+    let mut sorter = EntityStats::new(target);
     sorter.extend(listens.get_mapped_listens());
 
+
+    match target {
+        GroupByTarget::Recording => {print_recording_stats(sorter);}
+        GroupByTarget::Artist => {print_artist_stats(sorter);}
+    }
+    
+}
+
+pub fn print_recording_stats(sorter: EntityStats) {
     for key in sorter.into_sorted() {
         println!(
             "[{}] - {}",
@@ -21,14 +32,7 @@ pub fn recording_stats(username: &str) {
     }
 }
 
-pub fn artist_stats(username: &str) {
-    println!("Getting the listens...");
-    let listens = fetch_listens(username).unwrap();
-    println!("Calculating stats...");
-
-    let mut sorter = MBIDStatCounter::new(MBIDType::Artist);
-    sorter.extend(listens.get_mapped_listens());
-
+pub fn print_artist_stats(sorter: EntityStats) {
     for key in sorter.into_sorted() {
         println!(
             "[{}] - {}",
