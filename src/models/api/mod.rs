@@ -4,6 +4,8 @@ use crate::utils::ListenAPIPaginatorBuilder;
 
 use super::data::listens::{collection::UserListenCollection, UserListen};
 
+pub mod musicbrainz;
+
 pub fn fetch_listens(username: &str) -> color_eyre::Result<UserListenCollection> {
     let mut builder = ListenAPIPaginatorBuilder::default();
     builder.user_name(username);

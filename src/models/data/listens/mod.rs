@@ -1,6 +1,5 @@
 use chrono::{DateTime, TimeZone, Utc};
 
-use clap::builder::Str;
 use listenbrainz::raw::response::{UserListensListen, UserListensMBIDMapping};
 
 pub mod collection;
@@ -24,6 +23,13 @@ impl UserListen {
 
     pub fn get_mapping_data(&self) -> &Option<MappingData> {
         &self.mapping_data
+    }
+
+    /// Return true if the listen is mapped to this recording MBID
+    pub fn is_mapped_to_recording(&self, mbid: String) -> bool {
+        self.mapping_data
+            .as_ref()
+            .is_some_and(|mapping| mapping.recording_mbid == mbid)
     }
 }
 

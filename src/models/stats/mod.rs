@@ -6,6 +6,8 @@ use std::{
 use super::{data::listens::UserListen, musicbrainz::MBIDType};
 
 pub mod artist_stats;
+pub mod recording_stats;
+pub mod stat_struct;
 
 pub struct MBIDStatCounter {
     data: HashMap<String, Vec<Rc<UserListen>>>,
