@@ -1,8 +1,13 @@
 //! Contain the code for the "unlisted" command
+use std::cmp::Reverse;
+
 use color_eyre::eyre::Context;
 use listenbrainz::raw::{response::UserListensListen, Client};
 
-use crate::{models::messy_recording::MessyRecording, utils::ListenReaderBuilder};
+use crate::{
+    models::messy_recording::MessyRecording,
+    utils::{cli_paging::CLIPager, ListenReaderBuilder},
+};
 
 pub fn unlinked_command(username: &str) {
     println!("Fetching unlinkeds for user {}", username);
@@ -26,31 +31,37 @@ pub fn unlinked_command(username: &str) {
         }
     }
 
-    messy_recordings.sort_by_key(|recording| recording.associated_listens.len());
+    messy_recordings.sort_by_key(|recording| Reverse(recording.associated_listens.len()));
 
-    println!("Done! Here are {}'s unlinked listens:", username);
+    println!("Done! Here are {}'s top unlinked listens:", username);
 
-    messy_recordings.iter().for_each(|record| {
-        println!(
-            "({}) {} - {}",
-            record.associated_listens.len(),
-            record.get_recording_name().unwrap_or_default(),
-            record.get_artist_name().unwrap_or_default()
-        );
+    let mut pager = CLIPager::new(5);
 
-        let latest_listen = record.get_latest_listen();
+    for record in messy_recordings.iter() {
+        if !pager.execute(|| {
+            println!(
+                "({}) {} - {}",
+                record.associated_listens.len(),
+                record.get_recording_name().unwrap_or_default(),
+                record.get_artist_name().unwrap_or_default()
+            );
 
-        println!(
-            "    -> https://listenbrainz.org/user/{}/?min_ts={}&max_ts={}",
-            username,
-            latest_listen
-                .map(|listen| listen.listened_at - 1)
-                .unwrap_or(0),
-            latest_listen
-                .map(|listen| listen.listened_at + 1)
-                .unwrap_or(0)
-        )
-    });
+            let latest_listen = record.get_latest_listen();
+
+            println!(
+                "    -> https://listenbrainz.org/user/{}/?min_ts={}&max_ts={}",
+                username,
+                latest_listen
+                    .map(|listen| listen.listened_at - 1)
+                    .unwrap_or(0),
+                latest_listen
+                    .map(|listen| listen.listened_at + 1)
+                    .unwrap_or(0)
+            );
+        }) {
+            return;
+        }
+    }
 
     println!("Total: {} unlinked recordings", unlinked_count)
 }

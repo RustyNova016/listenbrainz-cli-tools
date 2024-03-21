@@ -1,5 +1,5 @@
-use clap::{Parser, Subcommand};
 use crate::tools::unlinked::unlinked_command;
+use clap::{Parser, Subcommand};
 
 /// Tools for Listenbrainz
 #[derive(Parser, Debug, Clone)]
