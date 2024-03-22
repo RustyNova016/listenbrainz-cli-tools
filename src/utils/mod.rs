@@ -1,5 +1,4 @@
-use derive_builder::Builder;
-use listenbrainz::raw::{response::UserListensResponse, Client};
+use listenbrainz::raw::{response::UserListensListen, Client};
 
 pub mod cli_paging;
 
@@ -44,5 +43,38 @@ impl ListenReader {
             client.user_listens(&self.user_name, self.min_ts, self.max_ts, self.count)?;
         self.update_max_ts(&response);
         Ok(response)
+    }
+
+    pub fn into_reader(self) -> ListenAPIReader {
+        ListenAPIReader::new(self)
+    }
+}
+
+
+pub struct ListenAPIReader {
+    paginator: ListenAPIPaginator,
+    page: Vec<UserListensListen>,
+}
+
+impl ListenAPIReader {
+    pub fn new(paginator: ListenAPIPaginator) -> Self {
+        Self {
+            page: Vec::new(),
+            paginator,
+        }
+    }
+}
+
+impl Iterator for ListenAPIReader {
+    type Item = UserListensListen;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        if self.page.is_empty() {
+            let client = Client::new();
+            let page = self.paginator.next(&client).unwrap();
+            self.page.extend(page.payload.listens);
+        }
+
+        self.page.pop()
     }
 }

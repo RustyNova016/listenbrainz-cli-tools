@@ -1,6 +1,6 @@
 use color_eyre::owo_colors::OwoColorize;
 
-use crate::models::{api::fetch_listens, cli::stats::GroupByTarget, musicbrainz::MBIDType, stats::{stat_struct::EntityStats, MBIDStatCounter}};
+use crate::models::{api::fetch_listens, cli::stats::GroupByTarget, stats::stat_struct::EntityStats};
 
 pub fn stats_command(username: &str, target: GroupByTarget) {
     println!("{} Getting the listens...", "[CLI Tools]".green());
