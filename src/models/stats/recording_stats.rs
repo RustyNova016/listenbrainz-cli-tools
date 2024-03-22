@@ -21,10 +21,13 @@ impl StatStruct for RecordingStats {
     }
 
     fn new(mbid: String) -> Self {
-        Self { mbid, listens: Vec::new()}
+        Self {
+            mbid,
+            listens: Vec::new(),
+        }
     }
 }
 
 pub struct RecordingStatsSorter {
-    mbid: String
+    mbid: String,
 }

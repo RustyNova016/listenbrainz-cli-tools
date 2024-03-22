@@ -7,14 +7,14 @@ use crate::models::{cli::stats::GroupByTarget, data::listens::UserListen, musicb
 pub struct EntityStats {
     mbid: String,
     entity_type: GroupByTarget,
-    listens: Vec<Rc<UserListen>>
+    listens: Vec<Rc<UserListen>>,
 }
 
 impl EntityStats {
     pub fn push(&mut self, value: Rc<UserListen>) {
         match self.entity_type {
-            GroupByTarget::Recording => {self.push_recording(value)}
-            GroupByTarget::Artist => {self.push_artist(value)}
+            GroupByTarget::Recording => self.push_recording(value),
+            GroupByTarget::Artist => self.push_artist(value),
         }
     }
 
@@ -25,9 +25,14 @@ impl EntityStats {
     }
 
     fn push_artist(&mut self, value: Rc<UserListen>) {
-        let Some(recording) = value.get_recording_data() else {return};
+        let Some(recording) = value.get_recording_data() else {
+            return;
+        };
 
-        if recording.artist_credit.is_some_and(|credit| credit.iter().any(|artist| artist.artist.id == self.mbid)) {
+        if recording
+            .artist_credit
+            .is_some_and(|credit| credit.iter().any(|artist| artist.artist.id == self.mbid))
+        {
             self.listens.push(value)
         }
     }
@@ -37,7 +42,11 @@ impl EntityStats {
     }
 
     pub fn new(mbid: String, entity_type: GroupByTarget) -> Self {
-        Self { mbid, entity_type, listens: Vec::new()}
+        Self {
+            mbid,
+            entity_type,
+            listens: Vec::new(),
+        }
     }
 }
 

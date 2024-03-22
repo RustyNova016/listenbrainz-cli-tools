@@ -1,4 +1,4 @@
-use std::{collections::HashMap, rc::Rc};
+use std::{cmp::Reverse, collections::HashMap, rc::Rc};
 
 use musicbrainz_rs::{entity::artist::Artist, Fetch};
 
@@ -45,23 +45,33 @@ pub struct ArtistStatsSorter {
     listens: HashMap<String, Vec<Rc<UserListen>>>,
 }
 
+impl ArtistStatsSorter {
+    pub fn new() -> Self {
+        Self {
+            listens: HashMap::new(),
+        }
+    }
+}
+
 impl StatSorter for ArtistStatsSorter {
     fn get_map_mut(&mut self) -> &mut HashMap<String, Vec<Rc<UserListen>>> {
         &mut self.listens
     }
 
     fn push(&mut self, value: Rc<UserListen>) {
-        let Some(recording_data) = value.get_recording_data() else {return};
+        let Some(recording_data) = value.get_recording_data() else {
+            return;
+        };
 
         for artist_credited in recording_data.artist_credit.unwrap_or(Vec::new()) {
             self.get_mut(&artist_credited.artist.id).push(value.clone());
         }
     }
-    
+
     fn into_sorted(self) -> Vec<Vec<Rc<UserListen>>> {
         let mut out = Vec::new();
         out.extend(self.listens.into_values());
-        out.sort_unstable_by_key(|item| item.len());
+        out.sort_unstable_by_key(|item| Reverse(item.len()));
         out
     }
 }

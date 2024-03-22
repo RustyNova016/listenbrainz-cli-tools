@@ -1,7 +1,4 @@
-use crate::tools::{
-    stats::{stats_command},
-    unlinked::unlinked_command,
-};
+use crate::tools::{stats::stats_command, unlinked::unlinked_command};
 use clap::{Parser, Subcommand};
 
 use self::stats::GroupByTarget;
@@ -29,14 +26,13 @@ pub enum Commands {
     Stats {
         //#[command(subcommand)]
         //command: StatsCommand,
-
         /// The type of entity to sort by.
         #[arg(short, long)]
         target: GroupByTarget,
 
-                /// Name of the user to fetch stats listen from
-                #[arg(short, long)]
-                username: String,
+        /// Name of the user to fetch stats listen from
+        #[arg(short, long)]
+        username: String,
     },
 }
 

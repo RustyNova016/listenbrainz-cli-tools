@@ -1,11 +1,15 @@
-use listenbrainz::raw::{response::UserListensListen, Client};
+use derive_builder::Builder;
+use listenbrainz::raw::{
+    response::{UserListensListen, UserListensResponse},
+    Client,
+};
 
 pub mod cli_paging;
 
 #[derive(Clone, Debug, PartialEq, Eq, Builder)]
 #[allow(missing_docs)]
 /// Reader for the the User Listens endpoint
-pub struct ListenReader {
+pub struct ListenAPIPaginator {
     #[builder(setter(into, strip_option))]
     /// The name of the target user
     user_name: String,
@@ -26,7 +30,7 @@ pub struct ListenReader {
     time_range: Option<u64>,
 }
 
-impl ListenReader {
+impl ListenAPIPaginator {
     /// Update [`Self::max_ts`] for the latest listen in the response
     fn update_max_ts(&mut self, responce: &UserListensResponse) {
         self.max_ts = responce
@@ -49,7 +53,6 @@ impl ListenReader {
         ListenAPIReader::new(self)
     }
 }
-
 
 pub struct ListenAPIReader {
     paginator: ListenAPIPaginator,

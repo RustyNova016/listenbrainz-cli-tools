@@ -5,7 +5,7 @@ use std::{
 
 use self::stat_struct::EntityStats;
 
-use super::{data::listens::UserListen};
+use super::data::listens::UserListen;
 
 pub mod artist_stats;
 pub mod recording_stats;

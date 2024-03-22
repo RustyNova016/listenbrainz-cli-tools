@@ -30,8 +30,10 @@ impl UserListen {
     }
 
     /// If mapped, return the recording MBID
-    pub fn get_recording_mbid(&self) -> Option<String> {
-        self.mapping_data.map(|mapping| mapping.recording_mbid)
+    pub fn get_recording_mbid(&self) -> Option<&String> {
+        self.mapping_data
+            .as_ref()
+            .map(|mapping| &mapping.recording_mbid)
     }
 
     /// Return true if the listen is mapped to this recording MBID
@@ -43,7 +45,9 @@ impl UserListen {
 
     /// Return the recording's data from Musicbrainz if it is mapped
     pub fn get_recording_data(&self) -> Option<Recording> {
-        self.mapping_data.as_ref().map(|mapping| musicbrainz::get_recording_data(mapping.recording_mbid.to_string()))
+        self.mapping_data
+            .as_ref()
+            .map(|mapping| musicbrainz::get_recording_data(mapping.recording_mbid.to_string()))
     }
 }
 

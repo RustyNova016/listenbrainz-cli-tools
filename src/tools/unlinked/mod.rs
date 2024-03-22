@@ -4,9 +4,9 @@ use std::cmp::Reverse;
 use color_eyre::eyre::Context;
 use listenbrainz::raw::{response::UserListensListen, Client};
 
-use crate::{{
-    models::messy_recording::MessyRecording, utils::ListenAPIPaginatorBuilder},
-    utils::{cli_paging::CLIPager, ListenReaderBuilder},
+use crate::{
+    models::messy_recording::MessyRecording,
+    utils::{cli_paging::CLIPager, ListenAPIPaginatorBuilder},
 };
 
 pub fn unlinked_command(username: &str) {
