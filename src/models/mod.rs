@@ -23,3 +23,19 @@ impl Extend<UserListensListen> for UnlinkedListenCollection {
         self.0.extend(iter)
     }
 }
+
+#[derive(Debug, Clone, Copy)]
+pub enum Verbosity {
+    None,
+    Info,
+}
+
+impl Verbosity {
+    /// Return true if the verbosity level is at least "info"
+    fn at_least_info(&self) -> bool {
+        match self {
+            Verbosity::None => false,
+            _ => true,
+        }
+    }
+}

@@ -1,5 +1,5 @@
 use moka::sync::Cache;
-use musicbrainz_rs::{entity, Fetch};
+
 use std::fs::File;
 
 use crate::{models::data::recording::Artist, utils::println_cli};
@@ -37,6 +37,11 @@ impl<'de> DiskCache<'de, String, Artist> for ArtistCache {
         for (key, value) in cache_vec {
             self.cache.insert(key, value);
         }
+
+        println_cli(&format!(
+            "Loaded {} artists from cache",
+            self.cache.entry_count()
+        ));
 
         Ok(())
     }

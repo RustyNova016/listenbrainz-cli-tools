@@ -46,6 +46,12 @@ pub struct ArtistStatsSorter {
     listens: HashMap<String, Vec<Rc<UserListen>>>,
 }
 
+impl Default for ArtistStatsSorter {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl ArtistStatsSorter {
     pub fn new() -> Self {
         Self {
@@ -70,8 +76,8 @@ impl StatSorter for ArtistStatsSorter {
     }
 
     fn into_sorted(self) -> Vec<(String, Vec<Rc<UserListen>>)> {
-        let mut out:  Vec<(String, Vec<Rc<UserListen>>)> = Vec::new();
-        out.extend(self.listens.into_iter());
+        let mut out: Vec<(String, Vec<Rc<UserListen>>)> = Vec::new();
+        out.extend(self.listens);
         out.sort_unstable_by_key(|item| Reverse(item.1.len()));
         out
     }

@@ -9,6 +9,12 @@ pub struct RecordingCache {
     cache: Cache<String, Recording>,
 }
 
+impl Default for RecordingCache {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl RecordingCache {
     pub fn new() -> Self {
         RecordingCache {
@@ -20,7 +26,7 @@ impl RecordingCache {
         let cache_vec: Vec<(String, Recording)> = self
             .cache
             .iter()
-            .map(|(key, value)| (key.to_string(), value.into()))
+            .map(|(key, value)| (key.to_string(), value))
             .collect();
 
         let file = File::create("C:\\test\\recordings.json")?;
@@ -46,10 +52,9 @@ impl RecordingCache {
     }
 
     pub fn load_from_disk_or_new() -> Self {
-        let mut cache = Self::new();
+        let cache = Self::new();
         let res = cache.load_from_disk();
 
-        
         if res.is_err() {
             println_cli("Couldn't load the recording cache file. Creating a new one");
             Self::new()

@@ -40,13 +40,7 @@ impl CLIPager {
             let ans: Result<&str, InquireError> = Select::new("", options).prompt();
 
             match ans {
-                Ok(choice) => {
-                    if choice == "Next" {
-                        return true;
-                    } else {
-                        return false;
-                    }
-                }
+                Ok(choice) => return choice == "Next",
                 _ => println!("There was an error, please try again"),
             }
         }
