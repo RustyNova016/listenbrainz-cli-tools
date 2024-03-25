@@ -1,5 +1,6 @@
 use std::{cmp::Reverse, collections::HashMap, rc::Rc};
 
+use crate::models::api::musicbrainz::MusicBrainzAPI;
 use musicbrainz_rs::{entity::artist::Artist, Fetch};
 
 use crate::models::data::listens::UserListen;
@@ -58,8 +59,8 @@ impl StatSorter for ArtistStatsSorter {
         &mut self.listens
     }
 
-    fn push(&mut self, value: Rc<UserListen>) {
-        let Some(recording_data) = value.get_recording_data() else {
+    fn push(&mut self, value: Rc<UserListen>, mb_client: &mut MusicBrainzAPI) {
+        let Some(recording_data) = value.get_recording_data(mb_client) else {
             return;
         };
 
