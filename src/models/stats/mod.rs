@@ -34,5 +34,5 @@ pub trait StatSorter {
         }
     }
 
-    fn into_sorted(self) -> Vec<Vec<Rc<UserListen>>>;
+    fn into_sorted(self) -> Vec<(String, Vec<Rc<UserListen>>)>;
 }

@@ -53,20 +53,18 @@ pub fn stats_artist(listens: UserListenCollection) {
 
     mb_api.save_cache();
 
-    for key in sorter.into_sorted() {
-        let mut pager = CLIPager::new(5);
+    let mut pager = CLIPager::new(5);
+    for (key, data) in sorter.into_sorted() {
+        let artist = mb_api.get_artist(key.clone());
 
-        pager.execute(|| {
+        if !pager.execute(|| {
             println!(
                 "[{}] - {}",
-                key.len(),
-                key.first()
-                    .unwrap()
-                    .get_mapping_data()
-                    .as_ref()
-                    .unwrap()
-                    .get_recording_name()
+                data.len(),
+                artist.name
             );
-        });
+        }) {
+            return;
+        };
     }
 }

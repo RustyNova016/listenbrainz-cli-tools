@@ -37,6 +37,7 @@ pub fn unlinked_command(username: &str) {
 
     let mut pager = CLIPager::new(5);
 
+    println!("Total: {} unlinked recordings", unlinked_count);
     for record in messy_recordings.iter() {
         if !pager.execute(|| {
             println!(
@@ -62,8 +63,6 @@ pub fn unlinked_command(username: &str) {
             return;
         }
     }
-
-    println!("Total: {} unlinked recordings", unlinked_count)
 }
 
 /// Fetch an user's listens and extract the unlinked ones
