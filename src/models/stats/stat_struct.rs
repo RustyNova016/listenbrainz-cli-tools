@@ -1,8 +1,7 @@
-use std::{any::Any, rc::Rc};
+use std::rc::Rc;
 
-use musicbrainz_rs::entity::{artist, recording};
-
-use crate::models::{cli::stats::GroupByTarget, data::listens::UserListen, musicbrainz::MBIDType};
+use crate::models::api::musicbrainz::MusicBrainzAPI;
+use crate::models::{cli::stats::GroupByTarget, data::listens::UserListen};
 
 pub struct EntityStats {
     mbid: String,
@@ -11,10 +10,10 @@ pub struct EntityStats {
 }
 
 impl EntityStats {
-    pub fn push(&mut self, value: Rc<UserListen>) {
+    pub fn push(&mut self, value: Rc<UserListen>, mb_client: &mut MusicBrainzAPI) {
         match self.entity_type {
             GroupByTarget::Recording => self.push_recording(value),
-            GroupByTarget::Artist => self.push_artist(value),
+            GroupByTarget::Artist => self.push_artist(value, mb_client),
         }
     }
 
@@ -24,8 +23,8 @@ impl EntityStats {
         }
     }
 
-    fn push_artist(&mut self, value: Rc<UserListen>) {
-        let Some(recording) = value.get_recording_data() else {
+    fn push_artist(&mut self, value: Rc<UserListen>, mb_client: &mut MusicBrainzAPI) {
+        let Some(recording) = value.get_recording_data(mb_client) else {
             return;
         };
 

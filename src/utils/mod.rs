@@ -1,3 +1,4 @@
+use colored::Colorize;
 use derive_builder::Builder;
 use listenbrainz::raw::{
     response::{UserListensListen, UserListensResponse},
@@ -80,4 +81,8 @@ impl Iterator for ListenAPIReader {
 
         self.page.pop()
     }
+}
+
+pub fn println_cli(string: &str) {
+    println!("{} {}", "[CLI Tools]".green(), string);
 }

@@ -1,10 +1,8 @@
 use chrono::{DateTime, TimeZone, Utc};
-
-use clap::builder::Str;
 use listenbrainz::raw::response::{UserListensListen, UserListensMBIDMapping};
-use musicbrainz_rs::entity::recording::Recording;
 
-use crate::models::api::musicbrainz;
+use crate::models::api::musicbrainz::MusicBrainzAPI;
+use crate::models::data::recording::Recording;
 
 pub mod collection;
 
@@ -44,10 +42,10 @@ impl UserListen {
     }
 
     /// Return the recording's data from Musicbrainz if it is mapped
-    pub fn get_recording_data(&self) -> Option<Recording> {
+    pub fn get_recording_data(&self, mb_client: &mut MusicBrainzAPI) -> Option<Recording> {
         self.mapping_data
             .as_ref()
-            .map(|mapping| musicbrainz::get_recording_data(mapping.recording_mbid.to_string()))
+            .map(|mapping| mb_client.get_recording_data(&mapping.recording_mbid))
     }
 }
 

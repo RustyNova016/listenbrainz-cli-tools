@@ -1,7 +1,6 @@
 use clap::Parser;
 use color_eyre::eyre::Ok;
 
-use colored::*;
 use models::cli::Cli;
 
 pub mod models;

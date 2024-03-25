@@ -1,15 +1,12 @@
 use color_eyre::owo_colors::OwoColorize;
 
+use crate::models::api::musicbrainz::MusicBrainzAPI;
 use crate::{
     models::{
         api::fetch_listens,
         cli::stats::GroupByTarget,
-        data::listens::{collection::UserListenCollection, UserListen},
-        stats::{
-            artist_stats::{ArtistStats, ArtistStatsSorter},
-            stat_struct::EntityStats,
-            StatSorter,
-        },
+        data::listens::collection::UserListenCollection,
+        stats::{artist_stats::ArtistStatsSorter, StatSorter},
     },
     utils::cli_paging::CLIPager,
 };
@@ -49,22 +46,25 @@ pub fn stats_command(username: &str, target: GroupByTarget) {
 
 pub fn stats_artist(listens: UserListenCollection) {
     let mut sorter = ArtistStatsSorter::new();
-    sorter.extend(listens.get_mapped_listens());
+    let mut mb_api = MusicBrainzAPI::new();
+    mb_api.save_cache();
 
-    for key in sorter.into_sorted() {
-        let mut pager = CLIPager::new(5);
+    sorter.extend(listens.get_mapped_listens(), &mut mb_api);
 
-        pager.execute(|| {
+    mb_api.save_cache();
+
+    let mut pager = CLIPager::new(5);
+    for (key, data) in sorter.into_sorted() {
+        let artist = mb_api.get_artist(key.clone());
+
+        if !pager.execute(|| {
             println!(
                 "[{}] - {}",
-                key.len(),
-                key.first()
-                    .unwrap()
-                    .get_mapping_data()
-                    .as_ref()
-                    .unwrap()
-                    .get_recording_name()
+                data.len(),
+                artist.name
             );
-        });
+        }) {
+            return;
+        };
     }
 }
