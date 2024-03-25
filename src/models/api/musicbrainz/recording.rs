@@ -16,7 +16,7 @@ impl MusicBrainzAPI {
             self.fetch_recording(mbid)
         }
     }
-    
+
     fn fetch_recording(&mut self, mbid: &str) -> Recording {
         println!(
             "{} Getting data for recording MBID: {}",

@@ -49,7 +49,6 @@ impl RecordingCache {
         let mut cache = Self::new();
         let res = cache.load_from_disk();
 
-        
         if res.is_err() {
             println_cli("Couldn't load the recording cache file. Creating a new one");
             Self::new()

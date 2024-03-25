@@ -58,11 +58,7 @@ pub fn stats_artist(listens: UserListenCollection) {
         let artist = mb_api.get_artist(key.clone());
 
         if !pager.execute(|| {
-            println!(
-                "[{}] - {}",
-                data.len(),
-                artist.name
-            );
+            println!("[{}] - {}", data.len(), artist.name);
         }) {
             return;
         };

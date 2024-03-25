@@ -1,21 +1,25 @@
 use chrono::{DateTime, TimeZone, Utc};
 use listenbrainz::raw::response::{UserListensListen, UserListensMBIDMapping};
+use serde::{Deserialize, Serialize};
 
 use crate::models::api::musicbrainz::MusicBrainzAPI;
 use crate::models::data::recording::Recording;
 
 pub mod collection;
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub struct UserListen {
+    /// The username of the user who listened to it
+    pub user: String,
+
     /// Time of when the listen happened
-    listened_at: DateTime<Utc>,
+    pub listened_at: DateTime<Utc>,
 
     /// Data that have been sent to listenbrainz durring listen submition
-    messybrainz_data: MessyBrainzData,
+    pub messybrainz_data: MessyBrainzData,
 
     /// Data of the mapping
-    mapping_data: Option<MappingData>,
+    pub mapping_data: Option<MappingData>,
 }
 
 impl UserListen {
@@ -59,6 +63,7 @@ impl TryFrom<UserListensListen> for UserListen {
             .ok_or("Cannot convert listened_at timestamp")?;
 
         Ok(Self {
+            user: value.user_name.clone(),
             listened_at,
             messybrainz_data: MessyBrainzData::from(value.clone()),
             mapping_data: value.track_metadata.mbid_mapping.map(MappingData::from),
@@ -66,7 +71,7 @@ impl TryFrom<UserListensListen> for UserListen {
     }
 }
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub struct MessyBrainzData {}
 
 impl From<UserListensListen> for MessyBrainzData {
@@ -75,7 +80,7 @@ impl From<UserListensListen> for MessyBrainzData {
     }
 }
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub struct MappingData {
     /// The MBID of the recordings
     recording_mbid: String,

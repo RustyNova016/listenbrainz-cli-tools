@@ -70,7 +70,7 @@ impl StatSorter for ArtistStatsSorter {
     }
 
     fn into_sorted(self) -> Vec<(String, Vec<Rc<UserListen>>)> {
-        let mut out:  Vec<(String, Vec<Rc<UserListen>>)> = Vec::new();
+        let mut out: Vec<(String, Vec<Rc<UserListen>>)> = Vec::new();
         out.extend(self.listens.into_iter());
         out.sort_unstable_by_key(|item| Reverse(item.1.len()));
         out

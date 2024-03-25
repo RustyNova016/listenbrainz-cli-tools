@@ -6,6 +6,7 @@ use listenbrainz::raw::{
 };
 
 pub mod cli_paging;
+pub mod extensions;
 
 #[derive(Clone, Debug, PartialEq, Eq, Builder)]
 #[allow(missing_docs)]
