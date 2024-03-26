@@ -1,13 +1,8 @@
-use color_eyre::eyre::Context;
-use color_eyre::owo_colors::OwoColorize;
-
 use crate::models::api::listenbrainz::ListenBrainzAPI;
 use crate::models::api::musicbrainz::MusicBrainzAPI;
 use crate::{
     models::{
-        api::fetch_listens,
         cli::stats::GroupByTarget,
-        data::listens::collection::UserListenCollection,
         stats::{artist_stats::ArtistStatsSorter, StatSorter},
     },
     utils::cli_paging::CLIPager,
