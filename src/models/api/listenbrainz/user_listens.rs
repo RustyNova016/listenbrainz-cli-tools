@@ -1,33 +1,34 @@
 use chrono::{DateTime, Utc};
 use derive_builder::Builder;
-use listenbrainz::raw::{response::UserListensResponse, Client};
+use listenbrainz::raw::response::UserListensResponse;
 
 use crate::{
     models::{cache::listen_cache::ListenCache, data::listens::collection::UserListenCollection},
-    utils::{extensions::{UserListensListenExt, UserListensPayloadExt}, println_cli, println_lis},
+    utils::{extensions::UserListensPayloadExt, println_lis},
 };
 
 use super::ListenBrainzAPI;
 
 impl ListenBrainzAPI {
     // Fetch the most listens it can, that have been listened before the provided date. Additionally save them to the cache
-    fn fetch_before(&mut self, user: &str, before_date: DateTime<Utc>) -> color_eyre::Result<UserListensResponse> {
-        println_lis( &format!(
+    fn fetch_before(
+        &mut self,
+        user: &str,
+        before_date: DateTime<Utc>,
+    ) -> color_eyre::Result<UserListensResponse> {
+        println_lis(&format!(
             "Getting Listens from: {} ({})",
             before_date,
             before_date.timestamp()
         ));
 
-        let result = self.api_client.user_listens(
-            &user,
-            None,
-            Some(before_date.timestamp()),
-            Some(999),
-        )?;
+        let result =
+            self.api_client
+                .user_listens(user, None, Some(before_date.timestamp()), Some(999))?;
 
         self.listen_cache
-                .get_or_new_mut(&user)
-                .insert_api_return(result.payload.clone());
+            .get_or_new_mut(user)
+            .insert_api_return(result.payload.clone());
 
         Ok(result)
     }
@@ -37,14 +38,18 @@ impl ListenBrainzAPI {
         let operation_start = Utc::now();
 
         // We get the date of the latest listen
-        let latest_cached_listen_date = cache_of_user.get_latest_cached_listen().map(|cached_listen| cached_listen.listen_data.listened_at);
+        let latest_cached_listen_date = cache_of_user
+            .get_latest_cached_listen()
+            .map(|cached_listen| cached_listen.listen_data.listened_at);
 
         // Prepare the loop variables
         let mut last_count = 1;
-        let mut before_date = operation_start.clone();
+        let mut before_date = operation_start;
 
         // While we have still items, and that we aren't already reached the cached listens
-        while last_count != 0 && !latest_cached_listen_date.is_some_and(|cache_date| cache_date > before_date) {
+        while last_count != 0
+            && !latest_cached_listen_date.is_some_and(|cache_date| cache_date > before_date)
+        {
             // We fetch a page of listens
             let result = self.fetch_before(user, before_date)?;
 
@@ -52,7 +57,7 @@ impl ListenBrainzAPI {
             before_date = result
                 .payload
                 .get_date_of_oldest_listen_of_payload()
-                .unwrap_or(operation_start.clone());
+                .unwrap_or(operation_start);
             last_count = result.payload.listens.len();
         }
 

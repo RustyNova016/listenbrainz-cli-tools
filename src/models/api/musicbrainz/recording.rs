@@ -8,7 +8,7 @@ impl MusicBrainzAPI {
     pub fn get_recording_data(&mut self, mbid: &str) -> Recording {
         //self.recording_cache.get(&mbid).unwrap_or(self.fetch_recording(mbid))
 
-        let cached = self.recording_cache.get(&mbid);
+        let cached = self.recording_cache.get(mbid);
 
         if let Some(cach) = cached {
             cach
@@ -23,7 +23,7 @@ impl MusicBrainzAPI {
             "[MusicBrainz]".bright_magenta(),
             &mbid
         );
-        let response = Recording::fetch().id(&mbid).with_artists().execute();
+        let response = Recording::fetch().id(mbid).with_artists().execute();
 
         if let Ok(msrecord) = response {
             let record = Recording::from(msrecord);
@@ -39,7 +39,7 @@ impl MusicBrainzAPI {
             self.autosave();
 
             self.recording_cache
-                .get(&mbid)
+                .get(mbid)
                 .expect("Failed to get record from cache after insertion")
         } else {
             panic!("Failed to fetch recording from MusicBrainz")
@@ -47,7 +47,7 @@ impl MusicBrainzAPI {
     }
 
     fn insert_recording(&self, mbid: String, value: Recording) {
-        self.recording_cache.insert(value.id.clone(), value.clone());
+        self.recording_cache.insert(mbid.clone(), value.clone());
 
         if let Some(artist_credit_vec) = value.artist_credit {
             self.insert_artist_credits(artist_credit_vec);

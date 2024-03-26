@@ -11,6 +11,12 @@ pub struct ListenBrainzAPI {
     api_client: Client,
 }
 
+impl Default for ListenBrainzAPI {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl ListenBrainzAPI {
     pub fn new() -> Self {
         Self {

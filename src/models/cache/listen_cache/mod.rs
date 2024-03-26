@@ -1,13 +1,13 @@
 use std::{collections::HashMap, fs::File, rc::Rc};
 
 use chrono::{DateTime, Utc};
-use clap::builder::Str;
+
 use listenbrainz::raw::response::{UserListensListen, UserListensPayload};
-use moka::sync::Cache;
+
 use serde::{Deserialize, Serialize};
 
 use crate::{
-    models::{api::listenbrainz::user_listens, data::listens::{collection::UserListenCollection, UserListen}},
+    models::data::listens::{collection::UserListenCollection, UserListen},
     utils::{extensions::UserListensPayloadExt, println_cli},
 };
 
@@ -46,7 +46,10 @@ impl ListenCache {
     }
 
     pub fn listen_count(&self) -> usize {
-        self.cache.values().map(|user_listens| user_listens.listens.len()).sum()
+        self.cache
+            .values()
+            .map(|user_listens| user_listens.listens.len())
+            .sum()
     }
 }
 

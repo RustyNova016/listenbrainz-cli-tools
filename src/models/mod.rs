@@ -35,7 +35,7 @@ impl Verbosity {
     fn at_least_info(&self) -> bool {
         match self {
             Verbosity::None => false,
-            _ => true 
+            _ => true,
         }
     }
 }
