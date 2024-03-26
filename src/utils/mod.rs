@@ -1,3 +1,4 @@
+use color_eyre::owo_colors::OwoColorize;
 use colored::Colorize;
 use derive_builder::Builder;
 use listenbrainz::raw::{
@@ -86,4 +87,8 @@ impl Iterator for ListenAPIReader {
 
 pub fn println_cli(string: &str) {
     println!("{} {}", "[CLI Tools]".green(), string);
+}
+
+pub fn println_lis(string: &str) {
+    println!("{} {}", "[Listenbrainz]".bright_purple(), string);
 }

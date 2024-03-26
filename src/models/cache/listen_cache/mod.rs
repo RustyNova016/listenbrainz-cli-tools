@@ -1,4 +1,4 @@
-use std::{collections::HashMap, fs::File};
+use std::{collections::HashMap, fs::File, rc::Rc};
 
 use chrono::{DateTime, Utc};
 use clap::builder::Str;
@@ -7,13 +7,13 @@ use moka::sync::Cache;
 use serde::{Deserialize, Serialize};
 
 use crate::{
-    models::data::listens::UserListen,
+    models::{api::listenbrainz::user_listens, data::listens::{collection::UserListenCollection, UserListen}},
     utils::{extensions::UserListensPayloadExt, println_cli},
 };
 
 use super::{CacheWrapper, DiskCache};
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Default)]
 pub struct ListenCache {
     cache: HashMap<String, UserListens>,
 }
@@ -29,6 +29,24 @@ impl ListenCache {
 
     pub fn get(&self, key: &str) -> Option<&UserListens> {
         self.cache.get(key)
+    }
+
+    pub fn get_mut(&mut self, key: &str) -> Option<&mut UserListens> {
+        self.cache.get_mut(key)
+    }
+
+    pub fn get_or_new_mut(&mut self, key: &str) -> &mut UserListens {
+        if self.cache.get(key).is_none() {
+            self.cache
+                .insert(key.to_string(), UserListens::new(key.to_string()));
+        }
+
+        self.get_mut(key)
+            .expect("Could not get UserListens after insertion")
+    }
+
+    pub fn listen_count(&self) -> usize {
+        self.cache.values().map(|user_listens| user_listens.listens.len()).sum()
     }
 }
 
@@ -54,6 +72,11 @@ impl<'de> DiskCache<'de, String, UserListens> for ListenCache {
         for (key, value) in cache_vec {
             self.cache.insert(key, value);
         }
+
+        println_cli(&format!(
+            "Loaded {} listens from cache",
+            self.listen_count()
+        ));
 
         Ok(())
     }
@@ -86,15 +109,27 @@ pub struct UserListens {
 }
 
 impl UserListens {
+    pub fn new(username: String) -> Self {
+        Self {
+            username,
+            listens: Vec::new(),
+        }
+    }
+
     /// Remove all the listens in a specific timerange
     fn invalidate_timerange(&mut self, start: DateTime<Utc>, end: DateTime<Utc>) {
         self.listens.retain(|listen| {
             listen.listen_data.listened_at < start || end < listen.listen_data.listened_at
-        })
+        });
     }
 
     pub fn insert_api_return(&mut self, data: UserListensPayload) {
-        self.invalidate_timerange(data.get_oldest_listen_date(), data.get_latest_listen_date());
+        self.invalidate_timerange(
+            data.get_date_of_oldest_listen_of_payload()
+                .unwrap_or(Utc::now()),
+            data.get_date_of_latest_listen_of_payload()
+                .unwrap_or(Utc::now()),
+        );
 
         for new_listen in data.listens {
             self.listens.push(new_listen.into())
@@ -103,19 +138,29 @@ impl UserListens {
 
     /// Return the listen with the latest listen date from the cache
     pub fn get_latest_cached_listen(&self) -> Option<&UserListenCache> {
-        self.listens.iter().max_by_key(|listen| listen.listen_data.listened_at)
+        self.listens
+            .iter()
+            .max_by_key(|listen| listen.listen_data.listened_at)
+    }
+
+    pub fn get_listens(&self) -> UserListenCollection {
+        UserListenCollection::from_iter(
+            self.listens
+                .iter()
+                .map(|cached_listen| cached_listen.listen_data.clone()),
+        )
     }
 }
 
 /// An holder for a Listen with caching info
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct UserListenCache {
-    pub listen_data: UserListen,
+    pub listen_data: Rc<UserListen>,
     pub updated_at: DateTime<Utc>,
 }
 
 impl UserListenCache {
-    pub fn new(listen_data: UserListen) -> Self {
+    pub fn new(listen_data: Rc<UserListen>) -> Self {
         Self {
             listen_data,
             updated_at: chrono::offset::Utc::now(),
@@ -125,10 +170,8 @@ impl UserListenCache {
 
 impl From<UserListensListen> for UserListenCache {
     fn from(value: UserListensListen) -> Self {
-        Self::new(
-            value
-                .try_into()
-                .expect("Couldn't parse timestamp of listen"),
-        )
+        Self::new(Rc::new(
+            UserListen::try_from(value).expect("Couldn't parse timestamp of listen"),
+        ))
     }
 }

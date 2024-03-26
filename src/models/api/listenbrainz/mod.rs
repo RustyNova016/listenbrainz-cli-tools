@@ -1,30 +1,27 @@
-use derive_builder::Builder;
+use color_eyre::eyre::Context;
+use listenbrainz::raw::Client;
 
-use crate::models::cache::listen_cache::ListenCache;
+use crate::models::cache::{listen_cache::ListenCache, DiskCache};
 
 pub mod user_listens;
 
+#[derive(Debug)]
 pub struct ListenBrainzAPI {
     listen_cache: ListenCache,
+    api_client: Client,
 }
 
+impl ListenBrainzAPI {
+    pub fn new() -> Self {
+        Self {
+            listen_cache: ListenCache::load_from_disk_or_new(),
+            api_client: Client::new(),
+        }
+    }
 
-#[derive(Debug, Builder)]
-pub struct ListenFetchRequest {
-    #[builder(setter(into))]
-    client: ListenCache,
-
-    #[builder(setter(into))]
-    users: Vec<String>,
-
-    #[builder(setter(into, strip_option), default = "true")]
-    fetch_new: bool,
-
-    #[builder(setter(into, strip_option), default = "false")]
-    refresh_unlinked: bool,
-
-    #[builder(setter(into, strip_option), default = "false")]
-    refresh_all: bool,
+    pub fn save_cache(&self) -> color_eyre::Result<()> {
+        self.listen_cache
+            .save_cache()
+            .context("Couldn't save Listens cache")
+    }
 }
-
-impl ListenFetchRequest {}

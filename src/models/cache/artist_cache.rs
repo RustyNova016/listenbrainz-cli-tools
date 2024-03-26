@@ -38,6 +38,11 @@ impl<'de> DiskCache<'de, String, Artist> for ArtistCache {
             self.cache.insert(key, value);
         }
 
+        println_cli(&format!(
+            "Loaded {} artists from cache",
+            self.cache.entry_count()
+        ));
+
         Ok(())
     }
 

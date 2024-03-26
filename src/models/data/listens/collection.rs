@@ -79,6 +79,18 @@ impl FromIterator<UserListen> for UserListenCollection {
     }
 }
 
+impl FromIterator<Rc<UserListen>> for UserListenCollection {
+    fn from_iter<T: IntoIterator<Item = Rc<UserListen>>>(iter: T) -> Self {
+        let mut coll = Self::new();
+
+        for ele in iter {
+            coll.data.push(ele)
+        }
+
+        coll
+    }
+}
+
 impl IntoIterator for UserListenCollection {
     type Item = Rc<UserListen>;
 

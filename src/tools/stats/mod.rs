@@ -1,5 +1,7 @@
+use color_eyre::eyre::Context;
 use color_eyre::owo_colors::OwoColorize;
 
+use crate::models::api::listenbrainz::ListenBrainzAPI;
 use crate::models::api::musicbrainz::MusicBrainzAPI;
 use crate::{
     models::{
@@ -12,16 +14,16 @@ use crate::{
 };
 
 pub fn stats_command(username: &str, target: GroupByTarget) {
-    println!("{} Getting the listens...", "[CLI Tools]".green());
-    let listens = fetch_listens(username).unwrap();
-    println!("{} Calculating stats...", "[CLI Tools]".green());
+    //println!("{} Getting the listens...", "[CLI Tools]".green());
+    //let listens = fetch_listens(username).unwrap();
+    //println!("{} Calculating stats...", "[CLI Tools]".green());
 
     match target {
         GroupByTarget::Recording => {
             //stats_recording(listens);
         }
         GroupByTarget::Artist => {
-            stats_artist(listens);
+            stats_artist(username);
         }
     }
 }
@@ -44,12 +46,23 @@ pub fn stats_command(username: &str, target: GroupByTarget) {
 //    }
 //}
 
-pub fn stats_artist(listens: UserListenCollection) {
+pub fn stats_artist(username: &str) {
     let mut sorter = ArtistStatsSorter::new();
     let mut mb_api = MusicBrainzAPI::new();
-    mb_api.save_cache();
 
-    sorter.extend(listens.get_mapped_listens(), &mut mb_api);
+    // Get the listens
+    let mut lb_api = ListenBrainzAPI::new();
+    lb_api
+        .fetch_lastest_listens(username)
+        .expect("Couldn't fetch the new listens");
+
+    lb_api
+        .save_cache()
+        .expect("Couldn't save ListenBrainz cache");
+    let user_listens = lb_api.get_cached_listens_of_user(username);
+
+    // Data sorting
+    sorter.extend(user_listens.get_mapped_listens(), &mut mb_api);
 
     mb_api.save_cache();
 
@@ -63,4 +76,6 @@ pub fn stats_artist(listens: UserListenCollection) {
             return;
         };
     }
+
+    mb_api.save_cache();
 }
