@@ -1,11 +1,10 @@
 use chrono::{DateTime, TimeDelta, Utc};
 use color_eyre::eyre::Ok;
-use derive_builder::Builder;
-use inquire::set_global_render_config;
+
 use listenbrainz::raw::response::UserListensResponse;
 
 use crate::{
-    models::{cache::listen_cache::ListenCache, data::listens::collection::UserListenCollection},
+    models::data::listens::collection::UserListenCollection,
     utils::{extensions::UserListensPayloadExt, println_cli, println_lis, traits::VecWrapper},
 };
 
@@ -87,10 +86,17 @@ impl ListenBrainzAPI {
             .get_unmapped_listens();
 
         while unlinkeds.len() > 0 {
-            let refresh_target = unlinkeds.get_latest_listen().expect("Couldn't fetch listen");
+            let refresh_target = unlinkeds
+                .get_latest_listen()
+                .expect("Couldn't fetch listen");
 
-            let result = self.fetch_before(username, refresh_target.listened_at + TimeDelta::new(1, 0).unwrap())?.payload;
-                
+            let result = self
+                .fetch_before(
+                    username,
+                    refresh_target.listened_at + TimeDelta::new(1, 0).unwrap(),
+                )?
+                .payload;
+
             unlinkeds.remove_period(
                 result
                     .get_date_of_oldest_listen_of_payload()

@@ -2,7 +2,6 @@ use std::rc::Rc;
 
 use chrono::{DateTime, Utc};
 use listenbrainz::raw::response::UserListensListen;
-use moka::ops::compute::Op;
 
 use crate::{models::musicbrainz::MBIDType, utils::traits::VecWrapper};
 
@@ -47,7 +46,10 @@ impl UserListenCollection {
     }
 
     pub fn get_latest_listen(&self) -> Option<Rc<UserListen>> {
-        self.data.iter().max_by_key(|listen| listen.listened_at).cloned()
+        self.data
+            .iter()
+            .max_by_key(|listen| listen.listened_at)
+            .cloned()
     }
 
     pub fn get_listens_for_mbid<'a>(
@@ -61,7 +63,7 @@ impl UserListenCollection {
         }
     }
 
-    fn get_listen_with_recording<'a, 'b>(&'a self, recording_mbid: &'a str) -> Vec<Rc<UserListen>> {
+    fn get_listen_with_recording<'a>(&'a self, recording_mbid: &'a str) -> Vec<Rc<UserListen>> {
         self.get_mapped_listens()
             .into_iter()
             .filter(|listen| {

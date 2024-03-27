@@ -11,7 +11,7 @@ use crate::{
     utils::{extensions::UserListensPayloadExt, println_cli},
 };
 
-use super::{CacheWrapper, DiskCache};
+use super::DiskCache;
 
 #[derive(Debug, Clone, Default)]
 pub struct ListenCache {

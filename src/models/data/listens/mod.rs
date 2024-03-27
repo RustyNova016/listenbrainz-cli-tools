@@ -75,7 +75,7 @@ impl TryFrom<UserListensListen> for UserListen {
 pub struct MessyBrainzData {
     pub msid: String,
     pub track_name: String,
-    pub artist_name: String
+    pub artist_name: String,
 }
 
 impl From<UserListensListen> for MessyBrainzData {
@@ -83,7 +83,7 @@ impl From<UserListensListen> for MessyBrainzData {
         Self {
             msid: value.recording_msid,
             track_name: value.track_metadata.track_name,
-            artist_name: value.track_metadata.artist_name
+            artist_name: value.track_metadata.artist_name,
         }
     }
 }
