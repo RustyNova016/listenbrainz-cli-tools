@@ -10,7 +10,7 @@ use crate::{
 };
 
 pub fn unlinked_command(username: &str) {
-    println_cli(&format!("Fetching unlinkeds for user {}", username));
+    println_cli(format!("Fetching unlinkeds for user {}", username));
     let mut lb_api = ListenBrainzAPI::new();
     let unlinked = lb_api
         .fetch_unlinked_of_user(username)
@@ -42,7 +42,7 @@ pub fn unlinked_command(username: &str) {
 
     println!("Total: {} unlinked recordings", unlinked_count);
     for record in messy_recordings.iter() {
-        if !pager.execute(|| {
+        let pager_result = pager.execute(|| {
             println!(
                 "({}) {} - {}",
                 record.associated_listens.len(),
@@ -62,7 +62,9 @@ pub fn unlinked_command(username: &str) {
                     .map(|listen| listen.listened_at.timestamp() + 1)
                     .unwrap_or(0)
             );
-        }) {
+        });
+
+        if !pager_result {
             return;
         }
     }

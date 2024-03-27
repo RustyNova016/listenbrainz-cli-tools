@@ -1,4 +1,4 @@
-use std::rc::Rc;
+use std::sync::Arc;
 
 use chrono::{DateTime, Utc};
 use listenbrainz::raw::response::UserListensListen;
@@ -10,7 +10,7 @@ use super::UserListen;
 /// Collection of listens
 #[derive(Debug, Clone, PartialEq, Eq, Default)]
 pub struct UserListenCollection {
-    data: Vec<Rc<UserListen>>,
+    data: Vec<Arc<UserListen>>,
 }
 
 impl UserListenCollection {
@@ -45,7 +45,7 @@ impl UserListenCollection {
         })
     }
 
-    pub fn get_latest_listen(&self) -> Option<Rc<UserListen>> {
+    pub fn get_latest_listen(&self) -> Option<Arc<UserListen>> {
         self.data
             .iter()
             .max_by_key(|listen| listen.listened_at)
@@ -56,14 +56,14 @@ impl UserListenCollection {
         &'a self,
         mbid: &'a str,
         mbid_type: MBIDType,
-    ) -> Vec<Rc<UserListen>> {
+    ) -> Vec<Arc<UserListen>> {
         match mbid_type {
             MBIDType::Recording => self.get_listen_with_recording(mbid),
             MBIDType::Artist => todo!(),
         }
     }
 
-    fn get_listen_with_recording<'a>(&'a self, recording_mbid: &'a str) -> Vec<Rc<UserListen>> {
+    fn get_listen_with_recording<'a>(&'a self, recording_mbid: &'a str) -> Vec<Arc<UserListen>> {
         self.get_mapped_listens()
             .into_iter()
             .filter(|listen| {
@@ -75,17 +75,20 @@ impl UserListenCollection {
             .collect()
     }
 
-    pub fn push(&mut self, item: UserListen) {
-        self.data.push(Rc::new(item))
+    pub fn push<T>(&mut self, item: T)
+    where
+        T: Into<Arc<UserListen>>,
+    {
+        self.data.push(item.into())
     }
 
-    pub fn get(&self, index: usize) -> Option<Rc<UserListen>> {
+    pub fn get(&self, index: usize) -> Option<Arc<UserListen>> {
         self.data.get(index).cloned()
     }
 }
 
-impl VecWrapper<Rc<UserListen>> for UserListenCollection {
-    fn get_vec(&self) -> &Vec<Rc<UserListen>> {
+impl VecWrapper<Arc<UserListen>> for UserListenCollection {
+    fn get_vec(&self) -> &Vec<Arc<UserListen>> {
         &self.data
     }
 }
@@ -94,10 +97,10 @@ impl TryFrom<Vec<UserListensListen>> for UserListenCollection {
     type Error = &'static str;
 
     fn try_from(value: Vec<UserListensListen>) -> Result<Self, Self::Error> {
-        let mut data: Vec<Rc<UserListen>> = Vec::new();
+        let mut data: Vec<Arc<UserListen>> = Vec::new();
 
         for listen in value.into_iter() {
-            data.push(Rc::new(listen.try_into()?))
+            data.push(Arc::new(listen.try_into()?))
         }
 
         Ok(Self { data })
@@ -116,8 +119,8 @@ impl FromIterator<UserListen> for UserListenCollection {
     }
 }
 
-impl FromIterator<Rc<UserListen>> for UserListenCollection {
-    fn from_iter<T: IntoIterator<Item = Rc<UserListen>>>(iter: T) -> Self {
+impl FromIterator<Arc<UserListen>> for UserListenCollection {
+    fn from_iter<T: IntoIterator<Item = Arc<UserListen>>>(iter: T) -> Self {
         let mut coll = Self::new();
 
         for ele in iter {
@@ -129,7 +132,7 @@ impl FromIterator<Rc<UserListen>> for UserListenCollection {
 }
 
 impl IntoIterator for UserListenCollection {
-    type Item = Rc<UserListen>;
+    type Item = Arc<UserListen>;
 
     type IntoIter = std::vec::IntoIter<Self::Item>;
 

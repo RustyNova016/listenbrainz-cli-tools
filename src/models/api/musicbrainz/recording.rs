@@ -5,6 +5,7 @@ use crate::models::data::recording::Recording;
 use super::MusicBrainzAPI;
 
 impl MusicBrainzAPI {
+    /// Return the data about a recording from musicbrainz. It will try to get it from the cache first
     pub fn get_recording_data(&mut self, mbid: &str) -> Recording {
         //self.recording_cache.get(&mbid).unwrap_or(self.fetch_recording(mbid))
 

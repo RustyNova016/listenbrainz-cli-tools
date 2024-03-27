@@ -1,7 +1,7 @@
 use color_eyre::owo_colors::OwoColorize;
 use musicbrainz_rs::{entity, Fetch};
 
-use crate::models::{cache::CacheWrapper, data::recording::Artist};
+use crate::models::data::recording::Artist;
 
 use super::MusicBrainzAPI;
 

@@ -39,8 +39,10 @@ pub enum Commands {
 impl Commands {
     pub fn run(&self) {
         match self {
-            Commands::Unlinked { username } => unlinked_command(username),
-            Commands::Stats { username, target } => stats_command(username, *target),
+            Commands::Unlinked { username } => unlinked_command(&username.to_lowercase()),
+            Commands::Stats { username, target } => {
+                stats_command(&username.to_lowercase(), *target)
+            }
         }
     }
 }

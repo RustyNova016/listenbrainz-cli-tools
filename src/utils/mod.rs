@@ -4,6 +4,7 @@ use listenbrainz::raw::{
     response::{UserListensListen, UserListensResponse},
     Client,
 };
+use std::fmt::Display;
 
 pub mod cli_paging;
 pub mod extensions;
@@ -85,10 +86,10 @@ impl Iterator for ListenAPIReader {
     }
 }
 
-pub fn println_cli(string: &str) {
+pub fn println_cli<T: Display>(string: T) {
     println!("{} {}", "[CLI Tools]".green(), string);
 }
 
-pub fn println_lis(string: &str) {
+pub fn println_lis<T: Display>(string: T) {
     println!("{} {}", "[Listenbrainz]".blue(), string);
 }

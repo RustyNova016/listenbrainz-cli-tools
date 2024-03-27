@@ -1,6 +1,6 @@
 use chrono::{DateTime, TimeZone, Utc};
 use extend::ext;
-use listenbrainz::raw::response::{UserListensListen, UserListensPayload};
+use listenbrainz::raw::response::{UserListensListen, UserListensMBIDMapping, UserListensPayload};
 
 #[ext]
 pub impl UserListensPayload {
@@ -42,5 +42,21 @@ pub impl UserListensListen {
         Utc.timestamp_opt(self.listened_at, 0)
             .single()
             .expect("Error: Could not parse listen's timestamp")
+    }
+}
+
+#[ext]
+pub impl UserListensMBIDMapping {
+    /// Return the artist credit as a string from the artist name and join phrases
+    fn get_artist_credit_as_string(&self) -> Option<String> {
+        let artist_credits = self.artists.as_ref()?;
+
+        let mut credit_string = String::new();
+        for artist_credit in artist_credits {
+            credit_string.push_str(&artist_credit.artist_credit_name);
+            credit_string.push_str(&artist_credit.join_phrase);
+        }
+
+        Some(credit_string)
     }
 }

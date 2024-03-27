@@ -1,33 +1,36 @@
-use std::rc::Rc;
+use std::{collections::HashMap, sync::Arc};
 
-use crate::models::data::listens::UserListen;
+use itertools::Itertools;
 
-use super::stat_struct::StatStruct;
+use crate::models::data::listens::{collection::UserListenCollection, UserListen};
 
-pub struct RecordingStats {
-    mbid: String,
-    listens: Vec<Rc<UserListen>>,
-}
+use super::StatSorter;
 
-impl StatStruct for RecordingStats {
-    fn push(&mut self, value: Rc<UserListen>) {
-        if value.is_mapped_to_recording(&self.mbid) {
-            self.push(value)
-        }
-    }
-
-    fn get_mbid(&self) -> &str {
-        &self.mbid
-    }
-
-    fn new(mbid: String) -> Self {
-        Self {
-            mbid,
-            listens: Vec::new(),
-        }
-    }
-}
-
+#[derive(Debug, Default, Eq, PartialEq, Clone)]
 pub struct RecordingStatsSorter {
-    mbid: String,
+    listens: HashMap<String, UserListenCollection>,
+}
+
+impl RecordingStatsSorter {
+    pub fn new() -> Self {
+        Self {
+            listens: HashMap::new(),
+        }
+    }
+}
+
+impl StatSorter for RecordingStatsSorter {
+    fn get_map_mut(&mut self) -> &mut HashMap<String, UserListenCollection> {
+        &mut self.listens
+    }
+
+    fn push(&mut self, value: Arc<UserListen>) {
+        if let Some(mapping_info) = &value.mapping_data {
+            self.get_mut(&mapping_info.recording_mbid).push(value)
+        }
+    }
+
+    fn into_vec(self) -> Vec<(String, UserListenCollection)> {
+        self.listens.into_iter().collect_vec()
+    }
 }

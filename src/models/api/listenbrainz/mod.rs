@@ -1,7 +1,7 @@
 use color_eyre::eyre::Context;
 use listenbrainz::raw::Client;
 
-use crate::models::cache::{listen_cache::ListenCache, DiskCache};
+use crate::models::cache::{listen_cache::cache::ListenCache, DiskCache};
 
 pub mod user_listens;
 
@@ -20,7 +20,7 @@ impl Default for ListenBrainzAPI {
 impl ListenBrainzAPI {
     pub fn new() -> Self {
         Self {
-            listen_cache: ListenCache::load_from_disk_or_new(),
+            listen_cache: ListenCache::new(),
             api_client: Client::new(),
         }
     }

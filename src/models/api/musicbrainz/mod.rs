@@ -1,23 +1,18 @@
 use once_cell::sync::Lazy;
-use std::sync::Mutex;
 
 use crate::models::cache::artist_cache::ArtistCache;
 use crate::models::cache::recording_cache::RecordingCache;
 use crate::models::cache::DiskCache;
-
 use crate::utils::println_cli;
 
 pub mod artist;
 pub mod artist_credit;
 pub mod recording;
 
-pub(crate) static mut MUSICBRAINZ_API: Lazy<Mutex<MusicBrainzAPI>> =
-    Lazy::new(|| Mutex::new(MusicBrainzAPI::new()));
-
 #[derive(Debug)]
 pub struct MusicBrainzAPI {
-    recording_cache: RecordingCache,
-    artist_cache: ArtistCache,
+    recording_cache: Lazy<RecordingCache>,
+    artist_cache: Lazy<ArtistCache>,
     fetch_count: u32,
 }
 
@@ -31,8 +26,8 @@ impl MusicBrainzAPI {
     pub fn new() -> Self {
         Self {
             fetch_count: 0,
-            recording_cache: RecordingCache::load_from_disk_or_new(),
-            artist_cache: ArtistCache::load_from_disk_or_new(),
+            recording_cache: Lazy::new(RecordingCache::new),
+            artist_cache: Lazy::new(ArtistCache::new),
         }
     }
 

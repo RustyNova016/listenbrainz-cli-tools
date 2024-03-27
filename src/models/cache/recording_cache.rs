@@ -1,9 +1,32 @@
+use super::{CacheWrapper, DiskCache};
 use crate::models::data::recording::Recording;
 use crate::utils::println_cli;
+use color_eyre::owo_colors::OwoColorize;
 use moka::sync::Cache;
-use std::fs::File;
+use once_cell::sync::Lazy;
+use std::ops::Deref;
+use std::path::Path;
 
-#[derive(Debug)]
+pub(crate) static RECORDING_CACHE: Lazy<Cache<String, Recording>> =
+    Lazy::new(create_recording_cache);
+
+fn create_recording_cache() -> Cache<String, Recording> {
+    let Ok(cache) = RecordingCache::try_load_new_cache() else {
+        println_cli("Failed to load recordings cache. A new one will get created".red());
+
+        return RecordingCache::get_base_cache();
+    };
+
+    cache.run_pending_tasks();
+    println_cli(format!(
+        "Loaded {} recordings from cache",
+        cache.entry_count()
+    ));
+
+    cache
+}
+
+#[derive(Debug, Clone)]
 pub struct RecordingCache {
     cache: Cache<String, Recording>,
 }
@@ -14,63 +37,28 @@ impl Default for RecordingCache {
     }
 }
 
-impl RecordingCache {
-    pub fn new() -> Self {
-        RecordingCache {
-            cache: Cache::builder().max_capacity(100000).build(),
-        }
-    }
+impl Deref for RecordingCache {
+    type Target = Cache<String, Recording>;
 
-    pub fn save_cache(&self) -> color_eyre::Result<()> {
-        let cache_vec: Vec<(String, Recording)> = self
-            .cache
-            .iter()
-            .map(|(key, value)| (key.to_string(), value))
-            .collect();
-
-        let file = File::create("C:\\test\\recordings.json")?;
-
-        serde_json::to_writer(file, &cache_vec)?;
-
-        Ok(())
-    }
-
-    pub fn load_from_disk(&self) -> color_eyre::Result<()> {
-        let file = File::open("C:\\test\\recordings.json")?;
-        let cache_vec: Vec<(String, Recording)> = serde_json::from_reader(file)?;
-
-        for (key, value) in cache_vec {
-            self.cache.insert(key, value);
-        }
-
-        println_cli(&format!(
-            "Loaded {} recordings from cache",
-            self.cache.entry_count()
-        ));
-        Ok(())
-    }
-
-    pub fn load_from_disk_or_new() -> Self {
-        let cache = Self::new();
-        let res = cache.load_from_disk();
-
-        if res.is_err() {
-            println_cli("Couldn't load the recording cache file. Creating a new one");
-            Self::new()
-        } else {
-            cache
-        }
-    }
-
-    pub fn insert(&self, key: String, value: Recording) {
-        self.cache.insert(key, value);
-    }
-
-    pub fn get(&self, key: &str) -> Option<Recording> {
-        self.cache.get(key)
-    }
-
-    pub fn cache(&self) -> &Cache<String, Recording> {
+    fn deref(&self) -> &Self::Target {
         &self.cache
+    }
+}
+
+impl CacheWrapper<String, Recording> for RecordingCache {}
+
+impl DiskCache<String, Recording> for RecordingCache {
+    fn new() -> Self {
+        RecordingCache {
+            cache: RECORDING_CACHE.clone(),
+        }
+    }
+
+    fn get_filename() -> &'static Path {
+        Path::new("recordings.json")
+    }
+
+    fn get_static_cache() -> &'static Lazy<Cache<String, Recording>> {
+        &RECORDING_CACHE
     }
 }

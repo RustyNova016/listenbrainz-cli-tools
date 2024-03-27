@@ -1,117 +1,22 @@
-use std::{collections::HashMap, fs::File, rc::Rc};
-
-use chrono::{DateTime, Utc};
-
-use listenbrainz::raw::response::{UserListensListen, UserListensPayload};
-
-use serde::{Deserialize, Serialize};
-
 use crate::{
     models::data::listens::{collection::UserListenCollection, UserListen},
-    utils::{extensions::UserListensPayloadExt, println_cli},
+    utils::extensions::UserListensPayloadExt,
 };
+use chrono::{DateTime, Utc};
+use listenbrainz::raw::response::{UserListensListen, UserListensPayload};
+use serde::{Deserialize, Serialize};
+use std::sync::Arc;
 
-use super::DiskCache;
-
-#[derive(Debug, Clone, Default)]
-pub struct ListenCache {
-    cache: HashMap<String, UserListens>,
-}
-
-impl ListenCache {
-    fn to_json_vec(&self) -> Vec<(String, UserListens)> {
-        self.cache
-            .clone()
-            .into_iter()
-            .map(|(key, value)| (key.to_string(), value))
-            .collect::<Vec<_>>()
-    }
-
-    pub fn get(&self, key: &str) -> Option<&UserListens> {
-        self.cache.get(key)
-    }
-
-    pub fn get_mut(&mut self, key: &str) -> Option<&mut UserListens> {
-        self.cache.get_mut(key)
-    }
-
-    pub fn get_or_new_mut(&mut self, key: &str) -> &mut UserListens {
-        if self.cache.get(key).is_none() {
-            self.cache
-                .insert(key.to_string(), UserListens::new(key.to_string()));
-        }
-
-        self.get_mut(key)
-            .expect("Could not get UserListens after insertion")
-    }
-
-    pub fn listen_count(&self) -> usize {
-        self.cache
-            .values()
-            .map(|user_listens| user_listens.listens.len())
-            .sum()
-    }
-}
-
-impl<'de> DiskCache<'de, String, UserListens> for ListenCache {
-    fn new() -> Self {
-        Self {
-            cache: HashMap::new(),
-        }
-    }
-
-    fn save_cache(&self) -> color_eyre::Result<()> {
-        let file = File::create(Self::get_file_path())?;
-
-        serde_json::to_writer(file, &self.to_json_vec())?;
-
-        Ok(())
-    }
-
-    fn load_cache(&mut self) -> color_eyre::Result<()> {
-        let file = File::open(Self::get_file_path())?;
-        let cache_vec: Vec<(String, UserListens)> = serde_json::from_reader(file)?;
-
-        for (key, value) in cache_vec {
-            self.cache.insert(key, value);
-        }
-
-        println_cli(&format!(
-            "Loaded {} listens from cache",
-            self.listen_count()
-        ));
-
-        Ok(())
-    }
-
-    fn get_filename() -> &'static str {
-        todo!()
-    }
-
-    fn get_file_path() -> std::path::PathBuf {
-        "C:\\test\\listens.json".into()
-    }
-
-    fn load_from_disk_or_new() -> Self {
-        let mut cache = Self::new();
-        let res = cache.load_cache();
-        if res.is_err() {
-            println_cli("Couldn't load the listen cache file. Creating a new one");
-            Self::new()
-        } else {
-            cache
-        }
-    }
-}
+pub mod cache;
 
 /// All of a user's listens
 #[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct UserListens {
+pub struct UserListensCache {
     username: String,
     listens: Vec<UserListenCache>,
 }
 
-impl UserListens {
+impl UserListensCache {
     pub fn new(username: String) -> Self {
         Self {
             username,
@@ -158,12 +63,12 @@ impl UserListens {
 /// An holder for a Listen with caching info
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct UserListenCache {
-    pub listen_data: Rc<UserListen>,
+    pub listen_data: Arc<UserListen>,
     pub updated_at: DateTime<Utc>,
 }
 
 impl UserListenCache {
-    pub fn new(listen_data: Rc<UserListen>) -> Self {
+    pub fn new(listen_data: Arc<UserListen>) -> Self {
         Self {
             listen_data,
             updated_at: chrono::offset::Utc::now(),
@@ -173,7 +78,7 @@ impl UserListenCache {
 
 impl From<UserListensListen> for UserListenCache {
     fn from(value: UserListensListen) -> Self {
-        Self::new(Rc::new(
+        Self::new(Arc::new(
             UserListen::try_from(value).expect("Couldn't parse timestamp of listen"),
         ))
     }

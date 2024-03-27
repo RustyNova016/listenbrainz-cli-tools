@@ -4,6 +4,7 @@ use serde::{Deserialize, Serialize};
 
 use crate::models::api::musicbrainz::MusicBrainzAPI;
 use crate::models::data::recording::Recording;
+use crate::utils::extensions::UserListensMBIDMappingExt;
 
 pub mod collection;
 
@@ -45,11 +46,11 @@ impl UserListen {
             .is_some_and(|mapping| mapping.recording_mbid == mbid)
     }
 
-    /// Return the recording's data from Musicbrainz if it is mapped
-    pub fn get_recording_data(&self, mb_client: &mut MusicBrainzAPI) -> Option<Recording> {
+    /// Return the recording's data from Musicbrainz from its mapping
+    pub fn get_recording_data(&self) -> Option<Recording> {
         self.mapping_data
             .as_ref()
-            .map(|mapping| mb_client.get_recording_data(&mapping.recording_mbid))
+            .map(|mapping| MusicBrainzAPI::new().get_recording_data(&mapping.recording_mbid))
     }
 }
 
@@ -91,13 +92,16 @@ impl From<UserListensListen> for MessyBrainzData {
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub struct MappingData {
     /// The MBID of the recordings
-    recording_mbid: String,
+    pub recording_mbid: String,
 
     /// Name of the recording
-    recording_name: String,
+    pub recording_name: String,
 
     /// Artists MBID
-    artist_mbid: Vec<String>,
+    pub artist_mbid: Vec<String>,
+
+    /// Artist credits:
+    pub artist_credit: Option<String>,
 }
 
 impl MappingData {
@@ -120,8 +124,10 @@ impl From<UserListensMBIDMapping> for MappingData {
             recording_mbid: value.recording_mbid.clone(),
             recording_name: value
                 .recording_name
+                .clone()
                 .unwrap_or(format!("Unknown Track ({})", value.recording_mbid)),
-            artist_mbid: value.artist_mbids.unwrap_or_default(),
+            artist_mbid: value.artist_mbids.clone().unwrap_or_default(),
+            artist_credit: value.get_artist_credit_as_string(),
         }
     }
 }

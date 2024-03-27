@@ -1,5 +1,7 @@
 use crate::models::api::listenbrainz::ListenBrainzAPI;
 use crate::models::api::musicbrainz::MusicBrainzAPI;
+use crate::models::stats::recording_stats::RecordingStatsSorter;
+use crate::utils::traits::VecWrapper;
 use crate::{
     models::{
         cli::stats::GroupByTarget,
@@ -9,13 +11,9 @@ use crate::{
 };
 
 pub fn stats_command(username: &str, target: GroupByTarget) {
-    //println!("{} Getting the listens...", "[CLI Tools]".green());
-    //let listens = fetch_listens(username).unwrap();
-    //println!("{} Calculating stats...", "[CLI Tools]".green());
-
     match target {
         GroupByTarget::Recording => {
-            //stats_recording(listens);
+            stats_recording(username);
         }
         GroupByTarget::Artist => {
             stats_artist(username);
@@ -23,28 +21,7 @@ pub fn stats_command(username: &str, target: GroupByTarget) {
     }
 }
 
-//pub fn stats_recording(listens: UserListenCollection) {
-//    let mut sorter = EntityStats::new(target);
-//    sorter.extend(listens.get_mapped_listens());
-//
-//    for key in sorter.into_sorted() {
-//        println!(
-//            "[{}] - {}",
-//            key.len(),
-//            key.first()
-//                .unwrap()
-//                .get_mapping_data()
-//                .as_ref()
-//                .unwrap()
-//                .get_recording_name()
-//        )
-//    }
-//}
-
-pub fn stats_artist(username: &str) {
-    let mut sorter = ArtistStatsSorter::new();
-    let mut mb_api = MusicBrainzAPI::new();
-
+pub fn stats_recording(username: &str) {
     // Get the listens
     let mut lb_api = ListenBrainzAPI::new();
     let user_listens = lb_api
@@ -52,20 +29,62 @@ pub fn stats_artist(username: &str) {
         .expect("Couldn't fetch the new listens");
 
     // Data sorting
-    sorter.extend(user_listens.get_mapped_listens(), &mut mb_api);
+    let mut sorter = RecordingStatsSorter::new();
+    sorter.extend(user_listens.get_mapped_listens());
 
-    mb_api.save_cache();
+    let mut pager = CLIPager::new(5);
+    for (_key, listens) in sorter.into_sorted() {
+        let conti = pager.execute(|| {
+            println!(
+                "[{}] {} - {}",
+                listens.len(),
+                listens
+                    .first()
+                    .unwrap()
+                    .get_mapping_data()
+                    .as_ref()
+                    .unwrap()
+                    .get_recording_name(),
+                listens
+                    .first()
+                    .unwrap()
+                    .mapping_data
+                    .as_ref()
+                    .unwrap()
+                    .artist_credit
+                    .as_ref()
+                    .unwrap_or(&"".to_string())
+            )
+        });
 
+        if !conti {
+            return;
+        };
+    }
+}
+
+pub fn stats_artist(username: &str) {
+    // Get the listens
+    let mut lb_api = ListenBrainzAPI::new();
+    let user_listens = lb_api
+        .fetch_listens_of_user_cached(username)
+        .expect("Couldn't fetch the new listens");
+
+    // Data sorting
+    let mut sorter = ArtistStatsSorter::new();
+    sorter.extend(user_listens.get_mapped_listens());
+
+    let mut mb_api = MusicBrainzAPI::new();
     let mut pager = CLIPager::new(5);
     for (key, data) in sorter.into_sorted() {
         let artist = mb_api.get_artist(key.clone());
 
-        if !pager.execute(|| {
+        let conti = pager.execute(|| {
             println!("[{}] - {}", data.len(), artist.name);
-        }) {
+        });
+
+        if !conti {
             return;
         };
     }
-
-    mb_api.save_cache();
 }

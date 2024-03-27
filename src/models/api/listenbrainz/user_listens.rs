@@ -17,7 +17,7 @@ impl ListenBrainzAPI {
         user: &str,
         before_date: DateTime<Utc>,
     ) -> color_eyre::Result<UserListensResponse> {
-        println_lis(&format!(
+        println_lis(format!(
             "Getting listens from before: {} ({})",
             before_date,
             before_date.timestamp()
@@ -28,8 +28,7 @@ impl ListenBrainzAPI {
                 .user_listens(user, None, Some(before_date.timestamp()), Some(999))?;
 
         self.listen_cache
-            .get_or_new_mut(user)
-            .insert_api_return(result.payload.clone());
+            .insert_listen_payload(user, result.payload.clone());
 
         Ok(result)
     }
@@ -38,13 +37,15 @@ impl ListenBrainzAPI {
     ///
     /// If the cache is empty, then it will fill it completly
     pub fn update_lastest_listens(&mut self, username: &str) -> color_eyre::Result<()> {
-        let cache_of_user = self.listen_cache.get_or_new_mut(username);
+        let cache_of_user = self.listen_cache.get(username);
         let operation_start = Utc::now();
 
         // We get the date of the latest listen
-        let latest_cached_listen_date = cache_of_user
-            .get_latest_cached_listen()
-            .map(|cached_listen| cached_listen.listen_data.listened_at);
+        let latest_cached_listen_date = cache_of_user.and_then(|cache| {
+            cache
+                .get_latest_cached_listen()
+                .map(|cached_listen| cached_listen.listen_data.listened_at)
+        });
 
         // Prepare the loop variables
         let mut last_count = 1;
@@ -132,7 +133,10 @@ impl ListenBrainzAPI {
     }
 
     pub fn get_cached_listens_of_user(&mut self, username: &str) -> UserListenCollection {
-        self.listen_cache.get_or_new_mut(username).get_listens()
+        self.listen_cache
+            .get(username)
+            .map(|cache| cache.get_listens())
+            .unwrap_or_default()
     }
 }
 

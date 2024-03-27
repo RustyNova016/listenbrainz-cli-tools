@@ -1,73 +1,55 @@
-use moka::sync::Cache;
-
-use std::fs::File;
-
-use crate::{models::data::recording::Artist, utils::println_cli};
-
 use super::{CacheWrapper, DiskCache};
+use crate::{models::data::recording::Artist, utils::println_cli};
+use moka::sync::Cache;
+use once_cell::sync::Lazy;
+use std::ops::Deref;
+use std::path::Path;
 
-#[derive(Debug)]
+use color_eyre::owo_colors::OwoColorize;
+
+pub(crate) static ARTIST_CACHE: Lazy<Cache<String, Artist>> = Lazy::new(create_artist_cache);
+
+fn create_artist_cache() -> Cache<String, Artist> {
+    let Ok(cache) = ArtistCache::try_load_new_cache() else {
+        println_cli("Failed to load artists cache. A new one will get created".red());
+
+        return ArtistCache::get_base_cache();
+    };
+
+    cache.run_pending_tasks();
+    println_cli(format!("Loaded {} artists from cache", cache.entry_count()));
+
+    cache
+}
+
+#[derive(Debug, Clone)]
 pub struct ArtistCache {
     cache: Cache<String, Artist>,
 }
 
-impl CacheWrapper<String, Artist> for ArtistCache {
-    fn get_cache(&self) -> &Cache<String, Artist> {
-        &self.cache
-    }
+impl Deref for ArtistCache {
+    type Target = Cache<String, Artist>;
 
-    fn get_cache_mut(&mut self) -> &mut Cache<String, Artist> {
-        &mut self.cache
+    fn deref(&self) -> &Self::Target {
+        &self.cache
     }
 }
 
-impl<'de> DiskCache<'de, String, Artist> for ArtistCache {
-    fn save_cache(&self) -> color_eyre::Result<()> {
-        let file = File::create(Self::get_file_path())?;
+impl CacheWrapper<String, Artist> for ArtistCache {}
 
-        serde_json::to_writer(file, &self.to_json_vec())?;
-
-        Ok(())
+impl DiskCache<String, Artist> for ArtistCache {
+    fn get_filename() -> &'static Path {
+        Path::new("artists.json")
     }
 
-    fn load_cache(&mut self) -> color_eyre::Result<()> {
-        let file = File::open(Self::get_file_path())?;
-        let cache_vec: Vec<(String, Artist)> = serde_json::from_reader(file)?;
-
-        for (key, value) in cache_vec {
-            self.cache.insert(key, value);
-        }
-
-        println_cli(&format!(
-            "Loaded {} artists from cache",
-            self.cache.entry_count()
-        ));
-
-        Ok(())
-    }
-
-    fn get_filename() -> &'static str {
-        todo!()
-    }
-
-    fn get_file_path() -> std::path::PathBuf {
-        "C:\\test\\artists.json".into()
-    }
-
+    /// Mutiple caches can be safely started as they are only references to the same [`Cache`](`moka::sync::cache::Cache`) object
     fn new() -> Self {
         Self {
-            cache: Cache::builder().max_capacity(100000).build(),
+            cache: ARTIST_CACHE.clone(),
         }
     }
 
-    fn load_from_disk_or_new() -> Self {
-        let mut cache = Self::new();
-        let res = cache.load_cache();
-        if res.is_err() {
-            println_cli("Couldn't load the artist cache file. Creating a new one");
-            Self::new()
-        } else {
-            cache
-        }
+    fn get_static_cache() -> &'static Lazy<Cache<String, Artist>> {
+        &ARTIST_CACHE
     }
 }

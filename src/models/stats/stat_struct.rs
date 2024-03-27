@@ -1,6 +1,5 @@
 use std::rc::Rc;
 
-use crate::models::api::musicbrainz::MusicBrainzAPI;
 use crate::models::{cli::stats::GroupByTarget, data::listens::UserListen};
 
 pub struct EntityStats {
@@ -10,10 +9,10 @@ pub struct EntityStats {
 }
 
 impl EntityStats {
-    pub fn push(&mut self, value: Rc<UserListen>, mb_client: &mut MusicBrainzAPI) {
+    pub fn push(&mut self, value: Rc<UserListen>) {
         match self.entity_type {
             GroupByTarget::Recording => self.push_recording(value),
-            GroupByTarget::Artist => self.push_artist(value, mb_client),
+            GroupByTarget::Artist => self.push_artist(value),
         }
     }
 
@@ -23,8 +22,8 @@ impl EntityStats {
         }
     }
 
-    fn push_artist(&mut self, value: Rc<UserListen>, mb_client: &mut MusicBrainzAPI) {
-        let Some(recording) = value.get_recording_data(mb_client) else {
+    fn push_artist(&mut self, value: Rc<UserListen>) {
+        let Some(recording) = value.get_recording_data() else {
             return;
         };
 
