@@ -1,5 +1,4 @@
 use color_eyre::owo_colors::OwoColorize;
-use colored::Colorize;
 use derive_builder::Builder;
 use listenbrainz::raw::{
     response::{UserListensListen, UserListensResponse},
@@ -8,6 +7,7 @@ use listenbrainz::raw::{
 
 pub mod cli_paging;
 pub mod extensions;
+pub mod traits;
 
 #[derive(Clone, Debug, PartialEq, Eq, Builder)]
 #[allow(missing_docs)]
@@ -90,5 +90,5 @@ pub fn println_cli(string: &str) {
 }
 
 pub fn println_lis(string: &str) {
-    println!("{} {}", "[Listenbrainz]".bright_purple(), string);
+    println!("{} {}", "[Listenbrainz]".blue(), string);
 }

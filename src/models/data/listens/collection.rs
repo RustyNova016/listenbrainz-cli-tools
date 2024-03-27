@@ -1,8 +1,9 @@
 use std::rc::Rc;
 
+use chrono::{DateTime, Utc};
 use listenbrainz::raw::response::UserListensListen;
 
-use crate::models::musicbrainz::MBIDType;
+use crate::{models::musicbrainz::MBIDType, utils::traits::VecWrapper};
 
 use super::UserListen;
 
@@ -17,12 +18,38 @@ impl UserListenCollection {
         Self { data: Vec::new() }
     }
 
-    pub fn get_mapped_listens(&self) -> Vec<Rc<UserListen>> {
+    pub fn get_mapped_listens(&self) -> UserListenCollection {
         self.data
             .iter()
             .filter(|element| element.is_mapped())
             .cloned()
             .collect()
+    }
+
+    pub fn get_unmapped_listens(&self) -> UserListenCollection {
+        self.data
+            .iter()
+            .filter(|element| !element.is_mapped())
+            .cloned()
+            .collect()
+    }
+
+    /// Remove all the listens in between two dates.
+    pub fn remove_period(&mut self, start: DateTime<Utc>, end: DateTime<Utc>, inclusive: bool) {
+        self.data.retain(|listen| {
+            if inclusive {
+                listen.listened_at < start || end < listen.listened_at
+            } else {
+                listen.listened_at <= start || end <= listen.listened_at
+            }
+        })
+    }
+
+    pub fn get_latest_listen(&self) -> Option<Rc<UserListen>> {
+        self.data
+            .iter()
+            .max_by_key(|listen| listen.listened_at)
+            .cloned()
     }
 
     pub fn get_listens_for_mbid<'a>(
@@ -36,7 +63,7 @@ impl UserListenCollection {
         }
     }
 
-    fn get_listen_with_recording<'a, 'b>(&'a self, recording_mbid: &'a str) -> Vec<Rc<UserListen>> {
+    fn get_listen_with_recording<'a>(&'a self, recording_mbid: &'a str) -> Vec<Rc<UserListen>> {
         self.get_mapped_listens()
             .into_iter()
             .filter(|listen| {
@@ -50,6 +77,16 @@ impl UserListenCollection {
 
     pub fn push(&mut self, item: UserListen) {
         self.data.push(Rc::new(item))
+    }
+
+    pub fn get(&self, index: usize) -> Option<Rc<UserListen>> {
+        self.data.get(index).cloned()
+    }
+}
+
+impl VecWrapper<Rc<UserListen>> for UserListenCollection {
+    fn get_vec(&self) -> &Vec<Rc<UserListen>> {
+        &self.data
     }
 }
 

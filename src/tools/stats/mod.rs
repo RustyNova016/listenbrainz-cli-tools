@@ -47,14 +47,9 @@ pub fn stats_artist(username: &str) {
 
     // Get the listens
     let mut lb_api = ListenBrainzAPI::new();
-    lb_api
-        .fetch_lastest_listens(username)
+    let user_listens = lb_api
+        .fetch_listens_of_user_cached(username)
         .expect("Couldn't fetch the new listens");
-
-    lb_api
-        .save_cache()
-        .expect("Couldn't save ListenBrainz cache");
-    let user_listens = lb_api.get_cached_listens_of_user(username);
 
     // Data sorting
     sorter.extend(user_listens.get_mapped_listens(), &mut mb_api);
