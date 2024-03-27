@@ -5,13 +5,16 @@ use color_eyre::eyre::Context;
 use listenbrainz::raw::{response::UserListensListen, Client};
 
 use crate::{
-    models::messy_recording::MessyRecording,
-    utils::{cli_paging::CLIPager, ListenAPIPaginatorBuilder},
+    models::{api::listenbrainz::ListenBrainzAPI, messy_recording::MessyRecording},
+    utils::{cli_paging::CLIPager, println_cli, traits::VecWrapper, ListenAPIPaginatorBuilder},
 };
 
 pub fn unlinked_command(username: &str) {
-    println!("Fetching unlinkeds for user {}", username);
-    let unlinked = get_all_unlinked_of_user(username);
+    println_cli(&format!("Fetching unlinkeds for user {}", username));
+    let mut lb_api = ListenBrainzAPI::new();
+    let unlinked = lb_api
+        .fetch_unlinked_of_user(username)
+        .expect("Couldn't fetch the new listens");
 
     let mut messy_recordings: Vec<MessyRecording> = vec![];
     let unlinked_count = unlinked.len();
@@ -20,12 +23,12 @@ pub fn unlinked_command(username: &str) {
     for listen in unlinked {
         let messy_recording = messy_recordings
             .iter_mut()
-            .find(|record| record.id == listen.recording_msid);
+            .find(|record| record.id == listen.messybrainz_data.msid);
 
         if let Some(messy_recording) = messy_recording {
             messy_recording.add_listen(listen)
         } else {
-            let mut messy_recording = MessyRecording::new(listen.recording_msid.clone());
+            let mut messy_recording = MessyRecording::new(listen.messybrainz_data.msid.clone());
             messy_recording.add_listen(listen);
             messy_recordings.push(messy_recording)
         }
@@ -53,10 +56,10 @@ pub fn unlinked_command(username: &str) {
                 "    -> https://listenbrainz.org/user/{}/?min_ts={}&max_ts={}",
                 username,
                 latest_listen
-                    .map(|listen| listen.listened_at - 1)
+                    .map(|listen| listen.listened_at.timestamp() - 1)
                     .unwrap_or(0),
                 latest_listen
-                    .map(|listen| listen.listened_at + 1)
+                    .map(|listen| listen.listened_at.timestamp() + 1)
                     .unwrap_or(0)
             );
         }) {
