@@ -2,7 +2,7 @@ use chrono::{DateTime, TimeZone, Utc};
 use listenbrainz::raw::response::{UserListensListen, UserListensMBIDMapping};
 use serde::{Deserialize, Serialize};
 
-use crate::models::api::musicbrainz::MusicBrainzAPI;
+use crate::models::api::musicbrainz::{MusicBrainzAPI, MUSICBRAINZ_API};
 use crate::models::data::recording::Recording;
 
 pub mod collection;
@@ -45,11 +45,11 @@ impl UserListen {
             .is_some_and(|mapping| mapping.recording_mbid == mbid)
     }
 
-    /// Return the recording's data from Musicbrainz if it is mapped
+    /// Return the recording's data from Musicbrainz from its mapping
     pub fn get_recording_data(&self, mb_client: &mut MusicBrainzAPI) -> Option<Recording> {
         self.mapping_data
             .as_ref()
-            .map(|mapping| mb_client.get_recording_data(&mapping.recording_mbid))
+            .map(|mapping| MUSICBRAINZ_API.get_recording_data(&mapping.recording_mbid))
     }
 }
 
@@ -91,13 +91,13 @@ impl From<UserListensListen> for MessyBrainzData {
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub struct MappingData {
     /// The MBID of the recordings
-    recording_mbid: String,
+    pub recording_mbid: String,
 
     /// Name of the recording
-    recording_name: String,
+    pub recording_name: String,
 
     /// Artists MBID
-    artist_mbid: Vec<String>,
+    pub artist_mbid: Vec<String>,
 }
 
 impl MappingData {

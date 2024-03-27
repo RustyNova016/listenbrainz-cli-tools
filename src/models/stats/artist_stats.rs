@@ -1,6 +1,7 @@
 use std::{cmp::Reverse, collections::HashMap, rc::Rc};
 
-use crate::models::api::musicbrainz::MusicBrainzAPI;
+use crate::models::{api::musicbrainz::MusicBrainzAPI, data::listens::collection::UserListenCollection};
+use itertools::Itertools;
 use musicbrainz_rs::{entity::artist::Artist, Fetch};
 
 use crate::models::data::listens::UserListen;
@@ -9,7 +10,6 @@ use super::{stat_struct::StatStruct, StatSorter};
 
 pub struct ArtistStats {
     mbid: String,
-
     listens: Vec<Rc<UserListen>>,
 }
 
@@ -42,14 +42,9 @@ impl StatStruct for ArtistStats {
     }
 }
 
+#[derive(Debug, Default, Eq, PartialEq, Clone)]
 pub struct ArtistStatsSorter {
-    listens: HashMap<String, Vec<Rc<UserListen>>>,
-}
-
-impl Default for ArtistStatsSorter {
-    fn default() -> Self {
-        Self::new()
-    }
+    listens: HashMap<String, UserListenCollection>,
 }
 
 impl ArtistStatsSorter {
@@ -61,7 +56,7 @@ impl ArtistStatsSorter {
 }
 
 impl StatSorter for ArtistStatsSorter {
-    fn get_map_mut(&mut self) -> &mut HashMap<String, Vec<Rc<UserListen>>> {
+    fn get_map_mut(&mut self) -> &mut HashMap<String, UserListenCollection> {
         &mut self.listens
     }
 
@@ -74,11 +69,8 @@ impl StatSorter for ArtistStatsSorter {
             self.get_mut(&artist_credited.artist.id).push(value.clone());
         }
     }
-
-    fn into_sorted(self) -> Vec<(String, Vec<Rc<UserListen>>)> {
-        let mut out: Vec<(String, Vec<Rc<UserListen>>)> = Vec::new();
-        out.extend(self.listens);
-        out.sort_unstable_by_key(|item| Reverse(item.1.len()));
-        out
+    
+    fn into_vec(self) -> Vec<(String, UserListenCollection)> {
+        self.listens.into_iter().collect_vec()
     }
 }

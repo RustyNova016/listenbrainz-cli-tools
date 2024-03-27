@@ -1,8 +1,10 @@
-use std::rc::Rc;
+use std::{collections::HashMap, rc::Rc};
 
-use crate::models::data::listens::UserListen;
+use itertools::Itertools;
 
-use super::stat_struct::StatStruct;
+use crate::models::data::listens::{collection::UserListenCollection, UserListen};
+
+use super::{stat_struct::StatStruct, StatSorter};
 
 pub struct RecordingStats {
     mbid: String,
@@ -28,6 +30,23 @@ impl StatStruct for RecordingStats {
     }
 }
 
+#[derive(Debug, Default, Eq, PartialEq, Clone)]
 pub struct RecordingStatsSorter {
-    mbid: String,
+    listens: HashMap<String, UserListenCollection>,
+}
+
+impl StatSorter for RecordingStatsSorter {
+    fn get_map_mut(&mut self) -> &mut HashMap<String, UserListenCollection> {
+        &mut self.listens
+    }
+
+    fn push(&mut self, value: Rc<UserListen>, mb_client: &mut crate::models::api::musicbrainz::MusicBrainzAPI) {
+        if let Some(mapping_info) = value.mapping_data {
+            self.get_mut(&mapping_info.recording_mbid).push(value)
+        }
+    }
+    
+    fn into_vec(self) -> Vec<(String, UserListenCollection)> {
+        self.listens.into_iter().collect_vec()
+    }
 }

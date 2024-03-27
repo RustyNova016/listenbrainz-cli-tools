@@ -75,8 +75,8 @@ impl UserListenCollection {
             .collect()
     }
 
-    pub fn push(&mut self, item: UserListen) {
-        self.data.push(Rc::new(item))
+    pub fn push<T>(&mut self, item: T) where T: Into<Rc<UserListen>> {
+        self.data.push(item.into())
     }
 
     pub fn get(&self, index: usize) -> Option<Rc<UserListen>> {

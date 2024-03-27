@@ -1,5 +1,5 @@
 use once_cell::sync::Lazy;
-use std::sync::Mutex;
+use std::sync::{Arc, Mutex};
 
 use crate::models::cache::artist_cache::ArtistCache;
 use crate::models::cache::recording_cache::RecordingCache;
@@ -11,8 +11,7 @@ pub mod artist;
 pub mod artist_credit;
 pub mod recording;
 
-pub(crate) static mut MUSICBRAINZ_API: Lazy<Mutex<MusicBrainzAPI>> =
-    Lazy::new(|| Mutex::new(MusicBrainzAPI::new()));
+pub(crate) static MUSICBRAINZ_API: Lazy<Arc<Mutex<MusicBrainzAPI>>> = Lazy::new(init_mb_api_wrapper);
 
 #[derive(Debug)]
 pub struct MusicBrainzAPI {
@@ -52,4 +51,8 @@ impl MusicBrainzAPI {
             .save_cache()
             .expect("IO Error: Failed to save artists cache file");
     }
+}
+
+fn init_mb_api_wrapper() -> Arc<Mutex<MusicBrainzAPI>> {
+    Arc::new(Mutex::new(MusicBrainzAPI::new()))
 }
