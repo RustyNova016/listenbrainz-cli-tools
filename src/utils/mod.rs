@@ -1,5 +1,4 @@
 use color_eyre::owo_colors::OwoColorize;
-use colored::Colorize;
 use derive_builder::Builder;
 use listenbrainz::raw::{
     response::{UserListensListen, UserListensResponse},

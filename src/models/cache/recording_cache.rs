@@ -1,4 +1,3 @@
-use crate::models::cache::CacheWrapper;
 use crate::models::data::recording::Recording;
 use crate::utils::println_cli;
 use moka::sync::Cache;
