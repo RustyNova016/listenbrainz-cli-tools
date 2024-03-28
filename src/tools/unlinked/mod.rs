@@ -38,7 +38,7 @@ pub fn unlinked_command(username: &str) {
     let mut pager = CLIPager::new(5);
 
     for record in messy_recordings.iter() {
-        if !pager.execute(|| {
+        let pager_exit = pager.execute(|| {
             println!(
                 "({}) {} - {}",
                 record.associated_listens.len(),
@@ -58,7 +58,9 @@ pub fn unlinked_command(username: &str) {
                     .map(|listen| listen.listened_at + 1)
                     .unwrap_or(0)
             );
-        }) {
+        });
+
+        if !pager_exit {
             return;
         }
     }
