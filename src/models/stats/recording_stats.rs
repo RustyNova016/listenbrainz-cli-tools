@@ -40,12 +40,16 @@ impl StatSorter for RecordingStatsSorter {
         &mut self.listens
     }
 
-    fn push(&mut self, value: Rc<UserListen>, mb_client: &mut crate::models::api::musicbrainz::MusicBrainzAPI) {
+    fn push(
+        &mut self,
+        value: Rc<UserListen>,
+        mb_client: &mut crate::models::api::musicbrainz::MusicBrainzAPI,
+    ) {
         if let Some(mapping_info) = value.mapping_data {
             self.get_mut(&mapping_info.recording_mbid).push(value)
         }
     }
-    
+
     fn into_vec(self) -> Vec<(String, UserListenCollection)> {
         self.listens.into_iter().collect_vec()
     }

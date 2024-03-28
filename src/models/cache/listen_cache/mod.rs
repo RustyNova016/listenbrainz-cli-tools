@@ -1,17 +1,21 @@
-use std::{collections::HashMap, fs::File, rc::Rc};
-
+use std::{
+    collections::HashMap,
+    fs::File,
+    sync::{Arc, Mutex},
+};
 use chrono::{DateTime, Utc};
-
 use listenbrainz::raw::response::{UserListensListen, UserListensPayload};
-
+use once_cell::sync::Lazy;
 use serde::{Deserialize, Serialize};
-
 use crate::{
     models::data::listens::{collection::UserListenCollection, UserListen},
     utils::{extensions::UserListensPayloadExt, println_cli},
 };
-
 use super::DiskCache;
+
+pub(crate) static LISTEN_CACHE: Lazy<Arc<Mutex<ListenCache>>> =
+    Lazy::new(|| Arc::new(Mutex::new(ListenCache::load_from_disk_or_new())));
+
 
 #[derive(Debug, Clone, Default)]
 pub struct ListenCache {
@@ -158,12 +162,12 @@ impl UserListens {
 /// An holder for a Listen with caching info
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct UserListenCache {
-    pub listen_data: Rc<UserListen>,
+    pub listen_data: Arc<UserListen>,
     pub updated_at: DateTime<Utc>,
 }
 
 impl UserListenCache {
-    pub fn new(listen_data: Rc<UserListen>) -> Self {
+    pub fn new(listen_data: Arc<UserListen>) -> Self {
         Self {
             listen_data,
             updated_at: chrono::offset::Utc::now(),
@@ -173,7 +177,7 @@ impl UserListenCache {
 
 impl From<UserListensListen> for UserListenCache {
     fn from(value: UserListensListen) -> Self {
-        Self::new(Rc::new(
+        Self::new(Arc::new(
             UserListen::try_from(value).expect("Couldn't parse timestamp of listen"),
         ))
     }

@@ -49,7 +49,7 @@ impl UserListen {
     pub fn get_recording_data(&self, mb_client: &mut MusicBrainzAPI) -> Option<Recording> {
         self.mapping_data
             .as_ref()
-            .map(|mapping| MUSICBRAINZ_API.get_recording_data(&mapping.recording_mbid))
+            .map(|mapping| MusicBrainzAPI.get_recording_data(&mapping.recording_mbid))
     }
 }
 

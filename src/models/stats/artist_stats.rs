@@ -1,6 +1,8 @@
 use std::{cmp::Reverse, collections::HashMap, rc::Rc};
 
-use crate::models::{api::musicbrainz::MusicBrainzAPI, data::listens::collection::UserListenCollection};
+use crate::models::{
+    api::musicbrainz::MusicBrainzAPI, data::listens::collection::UserListenCollection,
+};
 use itertools::Itertools;
 use musicbrainz_rs::{entity::artist::Artist, Fetch};
 
@@ -69,7 +71,7 @@ impl StatSorter for ArtistStatsSorter {
             self.get_mut(&artist_credited.artist.id).push(value.clone());
         }
     }
-    
+
     fn into_vec(self) -> Vec<(String, UserListenCollection)> {
         self.listens.into_iter().collect_vec()
     }

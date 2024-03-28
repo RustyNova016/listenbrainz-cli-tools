@@ -11,7 +11,8 @@ pub mod artist;
 pub mod artist_credit;
 pub mod recording;
 
-pub(crate) static MUSICBRAINZ_API: Lazy<Arc<Mutex<MusicBrainzAPI>>> = Lazy::new(init_mb_api_wrapper);
+pub(crate) static MUSICBRAINZ_API: Lazy<Arc<Mutex<MusicBrainzAPI>>> =
+    Lazy::new(init_mb_api_wrapper);
 
 #[derive(Debug)]
 pub struct MusicBrainzAPI {
