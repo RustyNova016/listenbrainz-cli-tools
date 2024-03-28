@@ -36,3 +36,7 @@ Total: 8 unlinked recordings
 > 
 > This also means that the same recording can be shown twice in the list. 
 > For example: "Panic - Dion Timer" won't have the same MSID as "Panic by Dion Timmer", even if they are the same recording.
+
+## True stats
+
+Due to a bug in listenbrainz, album and artist stats aren't counted properly. This tool allow to see the true stats.
