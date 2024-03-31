@@ -42,7 +42,7 @@ pub fn unlinked_command(username: &str) {
 
     println!("Total: {} unlinked recordings", unlinked_count);
     for record in messy_recordings.iter() {
-        let pager_result = pager.execute(|| {
+        let pager_continue = pager.execute(|| {
             println!(
                 "({}) {} - {}",
                 record.associated_listens.len(),
@@ -64,7 +64,7 @@ pub fn unlinked_command(username: &str) {
             );
         });
 
-        if !pager_result {
+        if !pager_continue {
             return;
         }
     }

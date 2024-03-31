@@ -34,7 +34,7 @@ pub fn stats_recording(username: &str) {
 
     let mut pager = CLIPager::new(5);
     for (_key, listens) in sorter.into_sorted() {
-        let conti = pager.execute(|| {
+        let pager_continue = pager.execute(|| {
             println!(
                 "[{}] {} - {}",
                 listens.len(),
@@ -57,7 +57,7 @@ pub fn stats_recording(username: &str) {
             )
         });
 
-        if !conti {
+        if !pager_continue {
             return;
         };
     }
@@ -79,11 +79,11 @@ pub fn stats_artist(username: &str) {
     for (key, data) in sorter.into_sorted() {
         let artist = mb_api.get_artist(key.clone());
 
-        let conti = pager.execute(|| {
+        let pager_continue = pager.execute(|| {
             println!("[{}] - {}", data.len(), artist.name);
         });
 
-        if !conti {
+        if !pager_continue {
             return;
         };
     }
