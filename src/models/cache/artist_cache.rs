@@ -42,7 +42,7 @@ impl DiskCache<String, Artist> for ArtistCache {
         Path::new("artists.json")
     }
 
-    /// Mutiple caches can be safely started as they are only references to the same [`Cache`](`moka::sync::cache::Cache`) object
+    /// Mutiple caches can be safely started as they are only references to the same [`Cache`] object
     fn new() -> Self {
         Self {
             cache: ARTIST_CACHE.clone(),
