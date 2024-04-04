@@ -27,8 +27,7 @@ where
         }
     }
 
-    pub fn get(&self, key: &K) -> Option<Arc<V>> where 
-    {
+    pub fn get(&self, key: &K) -> Option<Arc<V>> where {
         self.data.get(key).map(|inner| inner.clone())
     }
 
@@ -53,7 +52,7 @@ where
             .collect_vec()
     }
 
-    fn save_cache(&self) -> color_eyre::Result<()> {
+    pub fn save_cache(&self) -> color_eyre::Result<()> {
         let file = File::create(self.get_file_path())?;
 
         let json_vec = self.to_vec();

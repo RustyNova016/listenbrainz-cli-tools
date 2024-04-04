@@ -2,15 +2,21 @@ use std::{ops::Deref, sync::Arc};
 
 use super::static_cache::{StaticCache, STATIC_CACHE};
 
-#[derive(Debug, Clone)]
+#[derive(Clone)]
 pub struct GlobalCache {
-    inner: Arc<StaticCache>
+    inner: Arc<StaticCache>,
+}
+
+impl Default for GlobalCache {
+    fn default() -> Self {
+        Self::new()
+    }
 }
 
 impl GlobalCache {
     pub fn new() -> Self {
         Self {
-            inner: STATIC_CACHE.clone()
+            inner: STATIC_CACHE.clone(),
         }
     }
 }

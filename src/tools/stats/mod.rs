@@ -1,5 +1,5 @@
 use crate::models::api::listenbrainz::ListenBrainzAPI;
-use crate::models::api::musicbrainz::MusicBrainzAPI;
+use crate::models::data::recording::Artist;
 use crate::models::stats::recording_stats::RecordingStatsSorter;
 use crate::utils::traits::VecWrapper;
 use crate::{
@@ -30,7 +30,9 @@ pub fn stats_recording(username: &str) {
 
     // Data sorting
     let mut sorter = RecordingStatsSorter::new();
-    sorter.extend(user_listens.get_mapped_listens());
+    sorter
+        .extend(user_listens.get_mapped_listens())
+        .expect("Couldn't sort the listens");
 
     let mut pager = CLIPager::new(5);
     for (_key, listens) in sorter.into_sorted() {
@@ -72,12 +74,13 @@ pub fn stats_artist(username: &str) {
 
     // Data sorting
     let mut sorter = ArtistStatsSorter::new();
-    sorter.extend(user_listens.get_mapped_listens());
+    sorter
+        .extend(user_listens.get_mapped_listens())
+        .expect("Couldn't sort the listens");
 
-    let mut mb_api = MusicBrainzAPI::new();
     let mut pager = CLIPager::new(5);
     for (key, data) in sorter.into_sorted() {
-        let artist = mb_api.get_artist(key.clone());
+        let artist = Artist::get_or_fetch(&key).unwrap();
 
         let pager_continue = pager.execute(|| {
             println!("[{}] - {}", data.len(), artist.name);

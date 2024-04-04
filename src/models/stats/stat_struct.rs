@@ -9,32 +9,6 @@ pub struct EntityStats {
 }
 
 impl EntityStats {
-    pub fn push(&mut self, value: Rc<UserListen>) {
-        match self.entity_type {
-            GroupByTarget::Recording => self.push_recording(value),
-            GroupByTarget::Artist => self.push_artist(value),
-        }
-    }
-
-    fn push_recording(&mut self, value: Rc<UserListen>) {
-        if value.is_mapped_to_recording(&self.mbid) {
-            self.listens.push(value)
-        }
-    }
-
-    fn push_artist(&mut self, value: Rc<UserListen>) {
-        let Some(recording) = value.get_recording_data() else {
-            return;
-        };
-
-        if recording
-            .artist_credit
-            .is_some_and(|credit| credit.iter().any(|artist| artist.artist.id == self.mbid))
-        {
-            self.listens.push(value)
-        }
-    }
-
     pub fn get_mbid(&self) -> &str {
         &self.mbid
     }

@@ -1,4 +1,4 @@
-use musicbrainz_rs::{Fetch, FetchQuery};
+use crate::models::data::musicbrainz::artist_credit::collection::ArtistCredits;
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone, Eq, PartialEq, Deserialize, Serialize)]
@@ -6,13 +6,7 @@ use serde::{Deserialize, Serialize};
 pub struct Recording {
     pub id: String,
     pub title: String,
-    pub artist_credit: Option<Vec<ArtistCredit>>,
-}
-
-impl Recording {
-    pub fn fetch() -> FetchQuery<musicbrainz_rs::entity::recording::Recording> {
-        musicbrainz_rs::entity::recording::Recording::fetch()
-    }
+    pub artist_credit: Option<ArtistCredits>,
 }
 
 impl From<musicbrainz_rs::entity::recording::Recording> for Recording {
@@ -20,27 +14,7 @@ impl From<musicbrainz_rs::entity::recording::Recording> for Recording {
         Self {
             id: recording.id,
             title: recording.title,
-            artist_credit: recording
-                .artist_credit
-                .map(|coll| coll.into_iter().map(|c| c.into()).collect()),
-        }
-    }
-}
-
-#[derive(Debug, Clone, Eq, PartialEq, Deserialize, Serialize)]
-#[serde(rename_all = "kebab-case")]
-pub struct ArtistCredit {
-    pub name: String,
-    pub joinphrase: Option<String>,
-    pub artist: Artist,
-}
-
-impl From<musicbrainz_rs::entity::artist_credit::ArtistCredit> for ArtistCredit {
-    fn from(artist_credit: musicbrainz_rs::entity::artist_credit::ArtistCredit) -> Self {
-        Self {
-            name: artist_credit.name,
-            joinphrase: artist_credit.joinphrase,
-            artist: artist_credit.artist.into(),
+            artist_credit: recording.artist_credit.map(|coll| coll.into()),
         }
     }
 }

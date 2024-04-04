@@ -14,6 +14,7 @@ use self::{
 };
 
 pub mod artist_cache;
+pub mod cached_trait;
 pub mod disk_cache;
 pub mod global_cache;
 pub mod listen_cache;
