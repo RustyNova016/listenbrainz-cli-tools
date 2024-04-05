@@ -5,10 +5,6 @@ use crate::models::cache::recording_cache::RecordingCache;
 use crate::models::cache::DiskCache;
 use crate::utils::println_cli;
 
-pub mod artist;
-pub mod artist_credit;
-pub mod recording;
-
 #[derive(Debug)]
 pub struct MusicBrainzAPI {
     recording_cache: Lazy<RecordingCache>,

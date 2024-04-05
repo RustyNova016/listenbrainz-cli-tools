@@ -5,7 +5,7 @@ use crate::models::data::recording::{Artist, Recording};
 
 use super::{disk_cache::DiskCache, listen_cache::UserListensCache};
 
-pub(crate) static STATIC_CACHE: Lazy<Arc<StaticCache>> = Lazy::new(||Arc::new(StaticCache::new()));
+pub(crate) static STATIC_CACHE: Lazy<Arc<StaticCache>> = Lazy::new(|| Arc::new(StaticCache::new()));
 
 #[derive(Debug)]
 pub struct StaticCache {
@@ -17,7 +17,7 @@ pub struct StaticCache {
     listens: Lazy<DiskCache<String, UserListensCache>>,
 
     // Data
-    insertion_count: AtomicU64
+    insertion_count: AtomicU64,
 }
 
 impl StaticCache {
@@ -28,7 +28,7 @@ impl StaticCache {
 
             listens: Lazy::new(|| DiskCache::load_or_new("listens.json".to_string())),
 
-            insertion_count: AtomicU64::new(0)
+            insertion_count: AtomicU64::new(0),
         }
     }
 
@@ -54,6 +54,22 @@ impl StaticCache {
 
     pub fn insert_artist(&self, key: Arc<String>, value: Arc<Artist>) -> Option<Arc<Artist>> {
         self.artists.insert(key, value)
+    }
+
+    pub fn save_loaded(&self) -> color_eyre::Result<()> {
+        if Lazy::get(&self.artists).is_some() {
+            self.artists.save_cache()?
+        }
+
+        if Lazy::get(&self.recordings).is_some() {
+            self.recordings.save_cache()?
+        }
+
+        if Lazy::get(&self.listens).is_some() {
+            self.listens.save_cache()?
+        }
+
+        Ok(())
     }
 }
 

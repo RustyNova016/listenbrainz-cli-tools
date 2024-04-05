@@ -3,6 +3,7 @@ use std::{collections::HashMap, rc::Rc, sync::Arc};
 use crate::models::data::listens::collection::UserListenCollection;
 use itertools::Itertools;
 use musicbrainz_rs::{entity::artist::Artist, Fetch};
+use color_eyre::Result;
 
 use crate::models::data::listens::UserListen;
 
@@ -60,14 +61,16 @@ impl StatSorter for ArtistStatsSorter {
         &mut self.listens
     }
 
-    fn push(&mut self, value: Arc<UserListen>) {
+    fn push(&mut self, value: Arc<UserListen>) -> Result<()> {
         let Some(recording_data) = value.get_recording_data() else {
-            return;
+            return Ok(());
         };
 
-        for artist_credited in recording_data.artist_credit.unwrap_or(Vec::new()) {
-            self.get_mut(&artist_credited.artist.id).push(value.clone());
+        for artist_id in recording_data.get_or_fetch_artist_credits()?.get_artist_ids() {
+            self.get_mut(&artist_id).push(value.clone());
         }
+
+        Ok(())
     }
 
     fn into_vec(self) -> Vec<(String, UserListenCollection)> {

@@ -1,8 +1,10 @@
+use std::sync::Arc;
+
 use chrono::{DateTime, TimeZone, Utc};
 use listenbrainz::raw::response::{UserListensListen, UserListensMBIDMapping};
 use serde::{Deserialize, Serialize};
 
-use crate::models::api::musicbrainz::MusicBrainzAPI;
+use crate::models::cache::global_cache::GlobalCache;
 use crate::models::data::recording::Recording;
 use crate::utils::extensions::UserListensMBIDMappingExt;
 
@@ -47,10 +49,10 @@ impl UserListen {
     }
 
     /// Return the recording's data from Musicbrainz from its mapping
-    pub fn get_recording_data(&self) -> Option<Recording> {
+    pub fn get_recording_data(&self) -> Option<Arc<Recording>> {
         self.mapping_data
             .as_ref()
-            .map(|mapping| MusicBrainzAPI::new().get_recording_data(&mapping.recording_mbid))
+            .and_then(|mapping| GlobalCache::new().get_recording(&mapping.recording_mbid))
     }
 }
 

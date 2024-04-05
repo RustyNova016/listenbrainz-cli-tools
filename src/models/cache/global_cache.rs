@@ -4,13 +4,13 @@ use super::static_cache::{StaticCache, STATIC_CACHE};
 
 #[derive(Debug, Clone)]
 pub struct GlobalCache {
-    inner: Arc<StaticCache>
+    inner: Arc<StaticCache>,
 }
 
 impl GlobalCache {
     pub fn new() -> Self {
         Self {
-            inner: STATIC_CACHE.clone()
+            inner: STATIC_CACHE.clone(),
         }
     }
 }

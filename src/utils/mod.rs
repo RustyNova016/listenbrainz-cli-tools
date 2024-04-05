@@ -93,3 +93,7 @@ pub fn println_cli<T: Display>(string: T) {
 pub fn println_lis<T: Display>(string: T) {
     println!("{} {}", "[Listenbrainz]".blue(), string);
 }
+
+pub fn println_mus<T: Display>(string: T) {
+    println!("{} {}", "[MusicBrainz]".bright_magenta(), string);
+}

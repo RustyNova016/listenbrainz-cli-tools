@@ -3,6 +3,10 @@ use std::{collections::HashMap, sync::Arc};
 use itertools::Itertools;
 
 use crate::models::data::listens::{collection::UserListenCollection, UserListen};
+use color_eyre::{
+    eyre::Ok,
+    Result,
+};
 
 use super::StatSorter;
 
@@ -24,10 +28,12 @@ impl StatSorter for RecordingStatsSorter {
         &mut self.listens
     }
 
-    fn push(&mut self, value: Arc<UserListen>) {
+    fn push(&mut self, value: Arc<UserListen>) -> Result<()> {
         if let Some(mapping_info) = &value.mapping_data {
             self.get_mut(&mapping_info.recording_mbid).push(value)
         }
+
+        Ok(())
     }
 
     fn into_vec(self) -> Vec<(String, UserListenCollection)> {

@@ -2,6 +2,9 @@ use crate::utils::traits::VecWrapper;
 use std::{cmp::Reverse, collections::HashMap, sync::Arc};
 
 use super::data::listens::{collection::UserListenCollection, UserListen};
+use color_eyre::
+    Result
+;
 
 pub mod artist_stats;
 pub mod recording_stats;
@@ -12,7 +15,7 @@ pub trait StatSorter {
 
     fn into_vec(self) -> Vec<(String, UserListenCollection)>;
 
-    fn push(&mut self, value: Arc<UserListen>);
+    fn push(&mut self, value: Arc<UserListen>) -> Result<()>;
 
     fn get_mut(&mut self, key: &String) -> &mut UserListenCollection {
         if self.get_map_mut().get(key).is_none() {
@@ -27,10 +30,12 @@ pub trait StatSorter {
             .expect("Could not retrieve EntityStats from stat list");
     }
 
-    fn extend<T: IntoIterator<Item = Arc<UserListen>>>(&mut self, iter: T) {
+    fn extend<T: IntoIterator<Item = Arc<UserListen>>>(&mut self, iter: T) -> Result<()> {
         for element in iter {
-            self.push(element)
+            self.push(element)?;
         }
+
+        Ok(())
     }
 
     fn into_sorted(self) -> Vec<(String, UserListenCollection)>

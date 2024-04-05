@@ -1,5 +1,9 @@
 use std::ops::Deref;
 
+pub mod artist;
+pub mod artist_credit;
+pub mod recording;
+
 /// Type of the entity having this MBID
 #[derive(Debug, Clone, Copy)]
 pub enum MBIDType {
@@ -22,4 +26,8 @@ impl Deref for MBID {
             Self::Artist(data) => data,
         }
     }
+}
+
+pub trait HasMbid {
+    fn get_mbid(&self) -> &str;
 }
