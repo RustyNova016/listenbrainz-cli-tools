@@ -9,6 +9,7 @@ use crate::{
     },
     utils::cli_paging::CLIPager,
 };
+use crate::models::data::recording::Artist;
 
 pub fn stats_command(username: &str, target: GroupByTarget) {
     match target {
@@ -77,7 +78,7 @@ pub fn stats_artist(username: &str) {
     let mut mb_api = MusicBrainzAPI::new();
     let mut pager = CLIPager::new(5);
     for (key, data) in sorter.into_sorted() {
-        let artist = mb_api.get_artist(key.clone());
+        let artist = Artist::get(key.clone()).unwrap();
 
         let pager_continue = pager.execute(|| {
             println!("[{}] - {}", data.len(), artist.name);

@@ -19,6 +19,7 @@ pub mod global_cache;
 pub mod listen_cache;
 pub mod recording_cache;
 pub mod static_cache;
+pub mod cached_trait;
 
 pub static CACHE_LOCATION: Lazy<PathBuf> = Lazy::new(|| {
     let mut path = BaseDirs::new()
