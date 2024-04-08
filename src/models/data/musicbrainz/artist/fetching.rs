@@ -1,7 +1,6 @@
 use color_eyre::eyre::{Context, Ok};
 use musicbrainz_rs::{entity::artist::Artist as ArtistMS, Fetch};
 
-
 use crate::{
     models::{
         cache::{cached_trait::CacheFromMusicbrainzAutoId, global_cache::GlobalCache},

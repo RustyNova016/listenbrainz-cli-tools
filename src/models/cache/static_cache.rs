@@ -1,21 +1,25 @@
+use std::sync::Arc;
+
+use cached::IOCached;
 use cached::{DiskCache, DiskCacheError};
 use once_cell::sync::Lazy;
-use std::sync::{Arc};
 
-use crate::models::data::recording::{Artist, Recording};
+use crate::models::data::{
+    listenbrainz::user_listens::UserListens,
+    recording::{Artist, Recording},
+};
 
-use super::{listen_cache::UserListensCache, CACHE_LOCATION};
-use cached::IOCached;
+use super::CACHE_LOCATION;
 
 pub(crate) static STATIC_CACHE: Lazy<Arc<StaticCache>> = Lazy::new(|| Arc::new(StaticCache::new()));
 
 pub struct StaticCache {
     // MusicBrainz Caches
-    recordings: Lazy<DiskCache<String, Recording>>,
-    artists: Lazy<DiskCache<String, Artist>>,
+    pub(super) recordings: Lazy<DiskCache<String, Recording>>,
+    pub(super) artists: Lazy<DiskCache<String, Artist>>,
 
     // Listenbrainz Caches
-    listens: Lazy<DiskCache<String, UserListensCache>>,
+    pub(super) listens: Lazy<DiskCache<String, UserListens>>,
 }
 
 impl StaticCache {
@@ -39,16 +43,12 @@ impl StaticCache {
                     .set_disk_directory(CACHE_LOCATION.clone())
                     .build()
                     .unwrap()
-            })
+            }),
         }
     }
 
     pub fn get_artist(&self, key: &str) -> Result<Option<Artist>, DiskCacheError> {
         self.artists.cache_get(&key.to_string())
-    }
-
-    pub fn get_listen(&self, key: &str) -> Result<Option<UserListensCache>, DiskCacheError> {
-        self.listens.cache_get(&key.to_string())
     }
 
     pub fn get_recording(&self, key: &str) -> Result<Option<Recording>, DiskCacheError> {

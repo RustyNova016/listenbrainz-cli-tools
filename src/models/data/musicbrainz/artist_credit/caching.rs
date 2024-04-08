@@ -13,6 +13,7 @@ impl ArtistCredit {
         values: I,
     ) -> color_eyre::Result<()> {
         values
-            .into_iter().try_for_each(Self::insert_ms_artist_into_cache)
+            .into_iter()
+            .try_for_each(Self::insert_ms_artist_into_cache)
     }
 }

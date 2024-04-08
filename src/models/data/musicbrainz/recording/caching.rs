@@ -1,5 +1,3 @@
-
-
 use crate::models::data::musicbrainz::HasMbid;
 use crate::models::{
     cache::{cached_trait::CacheFromMusicbrainz, global_cache::GlobalCache},
@@ -8,6 +6,10 @@ use crate::models::{
 use musicbrainz_rs::entity::recording::Recording as RecordingMS;
 
 impl Recording {
+    pub fn get_from_cache(mbid: &str) -> Result<Option<Recording>, cached::DiskCacheError> {
+        GlobalCache::new().get_recording(mbid)
+    }
+
     pub fn insert_into_cache(
         mbid: String,
         value: Recording,

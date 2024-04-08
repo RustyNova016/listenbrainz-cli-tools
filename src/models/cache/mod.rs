@@ -9,15 +9,12 @@ use once_cell::sync::Lazy;
 use serde::de::DeserializeOwned;
 use serde::Serialize;
 
-use self::{
-    artist_cache::ArtistCache, listen_cache::cache::ListenCache, recording_cache::RecordingCache,
-};
-
 pub mod artist_cache;
+pub mod cache_with_id;
 pub mod cached_trait;
 pub mod disk_cache;
 pub mod global_cache;
-pub mod listen_cache;
+pub mod listen_caching;
 pub mod recording_cache;
 pub mod static_cache;
 
@@ -108,15 +105,4 @@ where
 
         Ok(())
     }
-}
-
-pub fn global_cache_save() -> color_eyre::Result<()> {
-    // Musicbrainz
-    ArtistCache::save_if_loaded()?;
-    RecordingCache::save_if_loaded()?;
-
-    // Listenbrainz
-    ListenCache::save_if_loaded()?;
-
-    Ok(())
 }

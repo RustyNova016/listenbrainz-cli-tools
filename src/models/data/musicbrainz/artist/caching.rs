@@ -1,5 +1,3 @@
-
-
 use musicbrainz_rs::entity::artist::Artist as ArtistMS;
 
 use crate::models::data::musicbrainz::HasMbid;

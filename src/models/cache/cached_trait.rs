@@ -29,7 +29,8 @@ where
         values: I,
     ) -> Result<()> {
         values
-            .into_iter().try_for_each(|(mbid, value)| Self::insert_ms_with_id_into_cache(mbid, value))
+            .into_iter()
+            .try_for_each(|(mbid, value)| Self::insert_ms_with_id_into_cache(mbid, value))
     }
 }
 
@@ -46,7 +47,8 @@ where
     /// Insert a collection of items with their own MBIDs into the cache.
     fn insert_ms_iter_into_cache<I: IntoIterator<Item = MbV>>(values: I) -> Result<()> {
         values
-            .into_iter().try_for_each(|value| Self::insert_ms_into_cache(value))
+            .into_iter()
+            .try_for_each(|value| Self::insert_ms_into_cache(value))
     }
 
     /// Insert the current item with its own MBID into the cache, as well as an alias MBID.

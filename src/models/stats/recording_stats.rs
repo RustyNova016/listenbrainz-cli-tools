@@ -2,14 +2,15 @@ use std::{collections::HashMap, sync::Arc};
 
 use itertools::Itertools;
 
-use crate::models::data::listens::{collection::UserListenCollection, UserListen};
 use color_eyre::{eyre::Ok, Result};
+
+use crate::models::data::listenbrainz::listen::{collection::ListenCollection, Listen};
 
 use super::StatSorter;
 
 #[derive(Debug, Default, Eq, PartialEq, Clone)]
 pub struct RecordingStatsSorter {
-    listens: HashMap<String, UserListenCollection>,
+    listens: HashMap<String, ListenCollection>,
 }
 
 impl RecordingStatsSorter {
@@ -21,11 +22,11 @@ impl RecordingStatsSorter {
 }
 
 impl StatSorter for RecordingStatsSorter {
-    fn get_map_mut(&mut self) -> &mut HashMap<String, UserListenCollection> {
+    fn get_map_mut(&mut self) -> &mut HashMap<String, ListenCollection> {
         &mut self.listens
     }
 
-    fn push(&mut self, value: Arc<UserListen>) -> Result<()> {
+    fn push(&mut self, value: Arc<Listen>) -> Result<()> {
         if let Some(mapping_info) = &value.mapping_data {
             self.get_mut(&mapping_info.recording_mbid).push(value)
         }
@@ -33,7 +34,7 @@ impl StatSorter for RecordingStatsSorter {
         Ok(())
     }
 
-    fn into_vec(self) -> Vec<(String, UserListenCollection)> {
+    fn into_vec(self) -> Vec<(String, ListenCollection)> {
         self.listens.into_iter().collect_vec()
     }
 }
