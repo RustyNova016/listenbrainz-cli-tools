@@ -3,9 +3,9 @@ use std::sync::Arc;
 use crate::models::{
     cache::{cached_trait::CacheFromMusicbrainz, global_cache::GlobalCache},
     data::recording::Recording,
-    musicbrainz::HasMbid,
 };
 use musicbrainz_rs::entity::recording::Recording as RecordingMS;
+use crate::models::data::musicbrainz::HasMbid;
 
 impl Recording {
     fn get_cached(key: &String) -> Option<Arc<Recording>> {

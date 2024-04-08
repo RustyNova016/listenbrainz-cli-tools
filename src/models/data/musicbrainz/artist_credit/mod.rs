@@ -1,7 +1,5 @@
 use serde::{Deserialize, Serialize};
 
-use crate::models::data::recording::Artist;
-
 pub mod caching;
 pub mod collection;
 
@@ -10,7 +8,7 @@ pub mod collection;
 pub struct ArtistCredit {
     pub name: String,
     pub joinphrase: Option<String>,
-    pub artist: Artist,
+    pub artist: String,
 }
 
 impl From<musicbrainz_rs::entity::artist_credit::ArtistCredit> for ArtistCredit {
@@ -18,7 +16,7 @@ impl From<musicbrainz_rs::entity::artist_credit::ArtistCredit> for ArtistCredit 
         Self {
             name: artist_credit.name,
             joinphrase: artist_credit.joinphrase,
-            artist: artist_credit.artist.into(),
+            artist: artist_credit.artist.id,
         }
     }
 }

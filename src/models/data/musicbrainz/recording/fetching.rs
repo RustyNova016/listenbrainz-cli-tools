@@ -20,12 +20,14 @@ impl Recording {
 
     fn fetch(mbid: &str) -> color_eyre::Result<Arc<Self>> {
         println_mus(format!("Getting data for recording MBID: {}", &mbid));
+        
         let msreturn = RecordingMS::fetch()
             .id(&mbid)
             .with_artists()
             .execute()
             .context("Failed to fetch recording from MusicBrainz")?;
-        Self::insert_ms_into_cache(msreturn);
+        
+        Self::insert_ms_with_alias_into_cache(mbid.to_string(), msreturn);
 
         // The element have been inserted above, so it should be safe to unwrap
         Ok(GlobalCache::new().get_recording(&mbid).unwrap())

@@ -8,8 +8,8 @@ use crate::models::{
         global_cache::GlobalCache,
     },
     data::recording::{Artist, Recording},
-    musicbrainz::HasMbid,
 };
+use crate::models::data::musicbrainz::HasMbid;
 
 impl Artist {
     fn get_cached(key: &String) -> Option<Arc<Artist>> {

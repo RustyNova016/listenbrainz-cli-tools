@@ -19,7 +19,7 @@ impl Deref for ArtistCredits {
 
 impl ArtistCredits {
     pub fn get_artist_ids(&self) -> Vec<String> {
-        self.iter().map(|credit| credit.artist.id.clone()).collect_vec()
+        self.iter().map(|credit| credit.artist.clone()).collect_vec()
     }
 }
 

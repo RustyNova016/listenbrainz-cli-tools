@@ -7,6 +7,7 @@ use serde::{Deserialize, Serialize};
 use crate::models::cache::global_cache::GlobalCache;
 use crate::models::data::recording::Recording;
 use crate::utils::extensions::UserListensMBIDMappingExt;
+use color_eyre::Result;
 
 pub mod collection;
 
@@ -49,10 +50,11 @@ impl UserListen {
     }
 
     /// Return the recording's data from Musicbrainz from its mapping
-    pub fn get_recording_data(&self) -> Option<Arc<Recording>> {
-        self.mapping_data
-            .as_ref()
-            .and_then(|mapping| GlobalCache::new().get_recording(&mapping.recording_mbid))
+    pub fn get_recording_data(&self) -> Result<Option<Arc<Recording>>> {
+        match &self.mapping_data { 
+            Some(mapping) => Ok(Some(Recording::get_or_fetch(&mapping.get_recording_id())?)),
+            None => Ok(None)
+        }
     }
 }
 

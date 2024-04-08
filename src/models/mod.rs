@@ -5,7 +5,6 @@ pub mod cache;
 pub mod cli;
 pub mod data;
 pub mod messy_recording;
-pub mod musicbrainz;
 pub mod stats;
 
 pub struct UnlinkedListenCollection(Vec<UserListensListen>);

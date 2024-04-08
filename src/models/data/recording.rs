@@ -1,7 +1,7 @@
 
 use serde::{Deserialize, Serialize};
+use crate::models::data::musicbrainz::artist_credit::collection::ArtistCredits;
 
-use crate::models::musicbrainz::artist_credit::collection::ArtistCredits;
 
 #[derive(Debug, Clone, Eq, PartialEq, Deserialize, Serialize)]
 #[serde(rename_all = "kebab-case")]

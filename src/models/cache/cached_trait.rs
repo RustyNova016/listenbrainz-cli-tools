@@ -1,8 +1,8 @@
 use color_eyre::Result;
 
 use std::sync::Arc;
+use crate::models::data::musicbrainz::HasMbid;
 
-use crate::models::musicbrainz::HasMbid;
 
 pub trait CachedOLD<K, V> {
     fn get_cached_or_fetch(key: &K) -> Result<Arc<V>> {
@@ -35,23 +35,32 @@ where
 
 pub trait CacheFromMusicbrainzAutoId<MbV>: CacheFromMusicbrainz<MbV>
 where
-    MbV: Into<Self> + HasMbid,
+    MbV: Into<Self> + HasMbid + Clone,
     Self: Sized,
 {
+    /// Insert the current item with its own MBID into the cache.
     fn insert_ms_into_cache(value: MbV) {
         Self::insert_ms_with_id_into_cache(value.get_mbid().to_string(), value)
     }
 
+    /// Insert a collection of items with their own MBIDs into the cache.
     fn insert_ms_iter_into_cache<I: IntoIterator<Item = MbV>>(values: I) {
         values
             .into_iter()
             .for_each(|value| Self::insert_ms_into_cache(value))
     }
+    
+    /// Insert the current item with its own MBID into the cache, as well as an alias MBID.
+    /// This is useful incase an item has be been merged, and the alias MBID is only a reference to the original.
+    fn insert_ms_with_alias_into_cache(alias_mbid: String, value: MbV) {
+        Self::insert_ms_into_cache(value.clone());
+        Self::insert_ms_with_id_into_cache(alias_mbid, value)
+    }
 }
 
 impl<V, MbV> CacheFromMusicbrainzAutoId<MbV> for V
 where
-    MbV: Into<V> + HasMbid,
+    MbV: Into<V> + HasMbid + Clone,
     V: Sized + CacheFromMusicbrainz<MbV>,
 {
 }

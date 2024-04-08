@@ -62,11 +62,12 @@ impl StatSorter for ArtistStatsSorter {
     }
 
     fn push(&mut self, value: Arc<UserListen>) -> Result<()> {
-        let Some(recording_data) = value.get_recording_data() else {
+        let Some(recording_data) = value.get_recording_data()? else {
             return Ok(());
         };
 
-        for artist_id in recording_data.get_or_fetch_artist_credits()?.get_artist_ids() {
+        let artist_credits = recording_data.get_or_fetch_artist_credits()?;
+        for artist_id in artist_credits.get_artist_ids() {
             self.get_mut(&artist_id).push(value.clone());
         }
 
