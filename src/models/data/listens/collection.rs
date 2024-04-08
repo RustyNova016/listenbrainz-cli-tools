@@ -1,9 +1,9 @@
 use std::sync::Arc;
 
-use chrono::{DateTime, Utc};
-use listenbrainz::raw::response::UserListensListen;
 use crate::models::data::musicbrainz::MBIDType;
 use crate::utils::traits::VecWrapper;
+use chrono::{DateTime, Utc};
+use listenbrainz::raw::response::UserListensListen;
 
 use super::UserListen;
 

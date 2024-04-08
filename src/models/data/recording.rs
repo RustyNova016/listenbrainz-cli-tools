@@ -1,7 +1,5 @@
-
-use serde::{Deserialize, Serialize};
 use crate::models::data::musicbrainz::artist_credit::collection::ArtistCredits;
-
+use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone, Eq, PartialEq, Deserialize, Serialize)]
 #[serde(rename_all = "kebab-case")]
@@ -16,9 +14,7 @@ impl From<musicbrainz_rs::entity::recording::Recording> for Recording {
         Self {
             id: recording.id,
             title: recording.title,
-            artist_credit: recording
-                .artist_credit
-                .map(|coll| coll.into()),
+            artist_credit: recording.artist_credit.map(|coll| coll.into()),
         }
     }
 }

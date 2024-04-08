@@ -1,6 +1,6 @@
 use color_eyre::eyre::{Context, Ok};
 use musicbrainz_rs::{entity::artist::Artist as ArtistMS, Fetch};
-use std::sync::Arc;
+
 
 use crate::{
     models::{
@@ -11,23 +11,24 @@ use crate::{
 };
 
 impl Artist {
-    pub fn get_or_fetch(mbid: &str) -> color_eyre::Result<Arc<Self>> {
-        match GlobalCache::new().get_artist(mbid) {
+    pub fn get_or_fetch(mbid: &str) -> color_eyre::Result<Self> {
+        match GlobalCache::new().get_artist(mbid)? {
             Some(val) => Ok(val),
             None => Self::fetch(mbid),
         }
     }
 
-    fn fetch(mbid: &str) -> color_eyre::Result<Arc<Self>> {
+    fn fetch(mbid: &str) -> color_eyre::Result<Self> {
         println_mus(format!("Getting data for artist MBID: {}", &mbid));
         let msreturn = ArtistMS::fetch()
-            .id(&mbid)
+            .id(mbid)
             .with_recordings()
             .execute()
             .context("Failed to fetch artist from MusicBrainz")?;
-        Self::insert_ms_into_cache(msreturn);
 
-        // The element have been inserted above, so it should be safe to unwrap
-        Ok(GlobalCache::new().get_artist(&mbid).unwrap())
+        Self::insert_ms_into_cache(msreturn)?;
+
+        // The element have been inserted above, so it should be safe to unwrap the option
+        Ok(GlobalCache::new().get_artist(mbid)?.unwrap())
     }
 }

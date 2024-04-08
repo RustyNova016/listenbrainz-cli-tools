@@ -2,9 +2,7 @@ use crate::utils::traits::VecWrapper;
 use std::{cmp::Reverse, collections::HashMap, sync::Arc};
 
 use super::data::listens::{collection::UserListenCollection, UserListen};
-use color_eyre::
-    Result
-;
+use color_eyre::Result;
 
 pub mod artist_stats;
 pub mod recording_stats;

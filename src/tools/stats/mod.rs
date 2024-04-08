@@ -30,7 +30,9 @@ pub fn stats_recording(username: &str) {
 
     // Data sorting
     let mut sorter = RecordingStatsSorter::new();
-    sorter.extend(user_listens.get_mapped_listens()).expect("Couldn't sort the listens");
+    sorter
+        .extend(user_listens.get_mapped_listens())
+        .expect("Couldn't sort the listens");
 
     let mut pager = CLIPager::new(5);
     for (_key, listens) in sorter.into_sorted() {
@@ -72,7 +74,9 @@ pub fn stats_artist(username: &str) {
 
     // Data sorting
     let mut sorter = ArtistStatsSorter::new();
-    sorter.extend(user_listens.get_mapped_listens()).expect("Couldn't sort the listens");
+    sorter
+        .extend(user_listens.get_mapped_listens())
+        .expect("Couldn't sort the listens");
 
     let mut pager = CLIPager::new(5);
     for (key, data) in sorter.into_sorted() {

@@ -1,13 +1,14 @@
+use cached::{DiskCache, DiskCacheError};
 use once_cell::sync::Lazy;
-use std::sync::{atomic::AtomicU64, Arc};
+use std::sync::{Arc};
 
 use crate::models::data::recording::{Artist, Recording};
 
-use super::{disk_cache::DiskCache, listen_cache::UserListensCache};
+use super::{listen_cache::UserListensCache, CACHE_LOCATION};
+use cached::IOCached;
 
 pub(crate) static STATIC_CACHE: Lazy<Arc<StaticCache>> = Lazy::new(|| Arc::new(StaticCache::new()));
 
-#[derive(Debug)]
 pub struct StaticCache {
     // MusicBrainz Caches
     recordings: Lazy<DiskCache<String, Recording>>,
@@ -15,61 +16,59 @@ pub struct StaticCache {
 
     // Listenbrainz Caches
     listens: Lazy<DiskCache<String, UserListensCache>>,
-
-    // Data
-    insertion_count: AtomicU64,
 }
 
 impl StaticCache {
     pub fn new() -> Self {
         Self {
-            recordings: Lazy::new(|| DiskCache::load_or_new("recordings.json".to_string())),
-            artists: Lazy::new(|| DiskCache::load_or_new("artists.json".to_string())),
+            recordings: Lazy::new(|| {
+                DiskCache::new("recordings")
+                    .set_disk_directory(CACHE_LOCATION.clone())
+                    .build()
+                    .unwrap()
+            }),
+            artists: Lazy::new(|| {
+                DiskCache::new("artists")
+                    .set_disk_directory(CACHE_LOCATION.clone())
+                    .build()
+                    .unwrap()
+            }),
 
-            listens: Lazy::new(|| DiskCache::load_or_new("listens.json".to_string())),
-
-            insertion_count: AtomicU64::new(0),
+            listens: Lazy::new(|| {
+                DiskCache::new("listens")
+                    .set_disk_directory(CACHE_LOCATION.clone())
+                    .build()
+                    .unwrap()
+            })
         }
     }
 
-    pub fn get_artist(&self, key: &str) -> Option<Arc<Artist>> {
-        self.artists.get(&key.to_string())
+    pub fn get_artist(&self, key: &str) -> Result<Option<Artist>, DiskCacheError> {
+        self.artists.cache_get(&key.to_string())
     }
 
-    pub fn get_listen(&self, key: &str) -> Option<Arc<UserListensCache>> {
-        self.listens.get(&key.to_string())
+    pub fn get_listen(&self, key: &str) -> Result<Option<UserListensCache>, DiskCacheError> {
+        self.listens.cache_get(&key.to_string())
     }
 
-    pub fn get_recording(&self, key: &str) -> Option<Arc<Recording>> {
-        self.recordings.get(&key.to_string())
+    pub fn get_recording(&self, key: &str) -> Result<Option<Recording>, DiskCacheError> {
+        self.recordings.cache_get(&key.to_string())
     }
 
     pub fn insert_recording(
         &self,
-        key: Arc<String>,
-        value: Arc<Recording>,
-    ) -> Option<Arc<Recording>> {
-        self.recordings.insert(key, value)
+        key: String,
+        value: Recording,
+    ) -> Result<Option<Recording>, DiskCacheError> {
+        self.recordings.cache_set(key, value)
     }
 
-    pub fn insert_artist(&self, key: Arc<String>, value: Arc<Artist>) -> Option<Arc<Artist>> {
-        self.artists.insert(key, value)
-    }
-
-    pub fn save_loaded(&self) -> color_eyre::Result<()> {
-        if Lazy::get(&self.artists).is_some() {
-            self.artists.save_cache()?
-        }
-
-        if Lazy::get(&self.recordings).is_some() {
-            self.recordings.save_cache()?
-        }
-
-        if Lazy::get(&self.listens).is_some() {
-            self.listens.save_cache()?
-        }
-
-        Ok(())
+    pub fn insert_artist(
+        &self,
+        key: String,
+        value: Artist,
+    ) -> Result<Option<Artist>, DiskCacheError> {
+        self.artists.cache_set(key, value)
     }
 }
 

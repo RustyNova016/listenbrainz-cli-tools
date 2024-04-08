@@ -1,9 +1,9 @@
 use std::{collections::HashMap, rc::Rc, sync::Arc};
 
 use crate::models::data::listens::collection::UserListenCollection;
+use color_eyre::Result;
 use itertools::Itertools;
 use musicbrainz_rs::{entity::artist::Artist, Fetch};
-use color_eyre::Result;
 
 use crate::models::data::listens::UserListen;
 

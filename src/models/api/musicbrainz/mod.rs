@@ -3,13 +3,11 @@ use once_cell::sync::Lazy;
 use crate::models::cache::artist_cache::ArtistCache;
 use crate::models::cache::recording_cache::RecordingCache;
 use crate::models::cache::DiskCache;
-use crate::utils::println_cli;
 
 #[derive(Debug)]
 pub struct MusicBrainzAPI {
     recording_cache: Lazy<RecordingCache>,
     artist_cache: Lazy<ArtistCache>,
-    fetch_count: u32,
 }
 
 impl Default for MusicBrainzAPI {
@@ -21,16 +19,8 @@ impl Default for MusicBrainzAPI {
 impl MusicBrainzAPI {
     pub fn new() -> Self {
         Self {
-            fetch_count: 0,
             recording_cache: Lazy::new(RecordingCache::new),
             artist_cache: Lazy::new(ArtistCache::new),
-        }
-    }
-
-    fn autosave(&mut self) {
-        if self.fetch_count % 100 == 0 {
-            println_cli("Autosaving the cache file...");
-            self.save_cache()
         }
     }
 

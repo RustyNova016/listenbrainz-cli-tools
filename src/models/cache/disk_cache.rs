@@ -1,9 +1,4 @@
-use std::{
-    fs::File,
-    hash::Hash,
-    path::PathBuf,
-    sync::Arc,
-};
+use std::{fs::File, hash::Hash, path::PathBuf, sync::Arc};
 
 use chashmap::CHashMap;
 use color_eyre::owo_colors::OwoColorize;

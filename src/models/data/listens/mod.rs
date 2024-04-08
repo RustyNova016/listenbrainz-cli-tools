@@ -1,10 +1,10 @@
-use std::sync::Arc;
+
 
 use chrono::{DateTime, TimeZone, Utc};
 use listenbrainz::raw::response::{UserListensListen, UserListensMBIDMapping};
 use serde::{Deserialize, Serialize};
 
-use crate::models::cache::global_cache::GlobalCache;
+
 use crate::models::data::recording::Recording;
 use crate::utils::extensions::UserListensMBIDMappingExt;
 use color_eyre::Result;
@@ -50,10 +50,10 @@ impl UserListen {
     }
 
     /// Return the recording's data from Musicbrainz from its mapping
-    pub fn get_recording_data(&self) -> Result<Option<Arc<Recording>>> {
-        match &self.mapping_data { 
-            Some(mapping) => Ok(Some(Recording::get_or_fetch(&mapping.get_recording_id())?)),
-            None => Ok(None)
+    pub fn get_recording_data(&self) -> Result<Option<Recording>> {
+        match &self.mapping_data {
+            Some(mapping) => Ok(Some(Recording::get_or_fetch(mapping.get_recording_id())?)),
+            None => Ok(None),
         }
     }
 }

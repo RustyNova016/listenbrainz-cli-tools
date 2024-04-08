@@ -9,7 +9,6 @@ pub struct EntityStats {
 }
 
 impl EntityStats {
-
     pub fn get_mbid(&self) -> &str {
         &self.mbid
     }

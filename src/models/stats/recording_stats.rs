@@ -3,10 +3,7 @@ use std::{collections::HashMap, sync::Arc};
 use itertools::Itertools;
 
 use crate::models::data::listens::{collection::UserListenCollection, UserListen};
-use color_eyre::{
-    eyre::Ok,
-    Result,
-};
+use color_eyre::{eyre::Ok, Result};
 
 use super::StatSorter;
 
