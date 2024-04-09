@@ -1,9 +1,7 @@
 use color_eyre::owo_colors::OwoColorize;
 use derive_builder::Builder;
-use listenbrainz::raw::{
-    response::{UserListensListen, UserListensResponse},
-    Client,
-};
+use listenbrainz::raw::response::{UserListensListen, UserListensResponse};
+use listenbrainz::raw::Client;
 use std::fmt::Display;
 
 pub mod cli_paging;

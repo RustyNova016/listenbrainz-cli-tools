@@ -1,13 +1,11 @@
 use std::sync::Arc;
 
-use cached::IOCached;
-use cached::{DiskCache, DiskCacheError};
+use cached::{DiskCache, DiskCacheError, IOCached};
 use once_cell::sync::Lazy;
 
-use crate::models::data::{
-    listenbrainz::user_listens::UserListens,
-    recording::{Artist, Recording},
-};
+use crate::models::data::listenbrainz::user_listens::UserListens;
+use crate::models::data::musicbrainz::artist::Artist;
+use crate::models::data::musicbrainz::recording::Recording;
 
 use super::CACHE_LOCATION;
 

@@ -6,7 +6,8 @@ use serde::{Deserialize, Serialize};
 
 use crate::utils::extensions::UserListensPayloadExt;
 
-use super::listen::{collection::ListenCollection, Listen};
+use super::listen::collection::ListenCollection;
+use super::listen::Listen;
 
 pub mod fetching;
 
@@ -81,7 +82,7 @@ impl UserListens {
     pub fn get_unmapped_listens(&self) -> ListenCollection {
         self.listens.get_unmapped_listens()
     }
-    
+
     /// Returns all the mapped listens
     pub fn get_mapped_listens(&self) -> ListenCollection {
         self.listens.get_mapped_listens()

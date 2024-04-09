@@ -1,13 +1,11 @@
 use color_eyre::eyre::{Context, Ok};
-use musicbrainz_rs::{entity::recording::Recording as RecordingMS, Fetch};
+use musicbrainz_rs::entity::recording::Recording as RecordingMS;
+use musicbrainz_rs::Fetch;
 
-use crate::{
-    models::{
-        cache::{cached_trait::CacheFromMusicbrainzAutoId, global_cache::GlobalCache},
-        data::recording::Recording,
-    },
-    utils::println_mus,
-};
+use crate::models::cache::cached_trait::CacheFromMusicbrainzAutoId;
+use crate::models::cache::global_cache::GlobalCache;
+use crate::models::data::musicbrainz::recording::Recording;
+use crate::utils::println_mus;
 
 impl Recording {
     pub fn get_or_fetch(mbid: &str) -> color_eyre::Result<Self> {

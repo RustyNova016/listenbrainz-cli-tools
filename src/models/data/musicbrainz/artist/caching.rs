@@ -1,13 +1,10 @@
 use musicbrainz_rs::entity::artist::Artist as ArtistMS;
 
+use crate::models::cache::cached_trait::{CacheFromMusicbrainz, CacheFromMusicbrainzAutoId};
+use crate::models::cache::global_cache::GlobalCache;
+use crate::models::data::musicbrainz::artist::Artist;
+use crate::models::data::musicbrainz::recording::Recording;
 use crate::models::data::musicbrainz::HasMbid;
-use crate::models::{
-    cache::{
-        cached_trait::{CacheFromMusicbrainz, CacheFromMusicbrainzAutoId},
-        global_cache::GlobalCache,
-    },
-    data::recording::{Artist, Recording},
-};
 
 impl Artist {
     pub fn insert_into_cache(

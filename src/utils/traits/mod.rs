@@ -1,5 +1,3 @@
-
-
 pub trait VecWrapper<T> {
     fn get_vec(&self) -> &Vec<T>;
 

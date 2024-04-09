@@ -2,13 +2,13 @@
 use std::cmp::Reverse;
 
 use color_eyre::eyre::Context;
-use listenbrainz::raw::{response::UserListensListen, Client};
+use listenbrainz::raw::response::UserListensListen;
+use listenbrainz::raw::Client;
 
 use crate::models::cache::global_cache::GlobalCache;
-use crate::models::messy_recording::MessyRecording;
-use crate::utils::{
-    cli_paging::CLIPager, println_cli, ListenAPIPaginatorBuilder,
-};
+use crate::models::data::listenbrainz::messy_recording::MessyRecording;
+use crate::utils::cli_paging::CLIPager;
+use crate::utils::{println_cli, ListenAPIPaginatorBuilder};
 
 pub fn unlinked_command(username: &str) {
     println_cli(format!("Fetching unlinkeds for user {}", username));

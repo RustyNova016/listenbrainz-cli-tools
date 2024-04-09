@@ -1,7 +1,8 @@
 use chrono::{TimeZone, Utc};
 use listenbrainz::raw::response::UserListensListen;
 
-use crate::models::data::{listenbrainz::messybrainz::MessyBrainzData, listens::MappingData};
+use crate::models::data::listenbrainz::mapping_data::MappingData;
+use crate::models::data::listenbrainz::messybrainz::MessyBrainzData;
 
 use super::Listen;
 

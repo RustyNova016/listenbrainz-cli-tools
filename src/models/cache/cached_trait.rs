@@ -1,4 +1,5 @@
-use color_eyre::{eyre::Ok, Result};
+use color_eyre::eyre::Ok;
+use color_eyre::Result;
 
 use crate::models::data::musicbrainz::HasMbid;
 use std::sync::Arc;

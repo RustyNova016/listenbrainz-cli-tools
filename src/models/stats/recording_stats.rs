@@ -1,10 +1,13 @@
-use std::{collections::HashMap, sync::Arc};
+use std::collections::HashMap;
+use std::sync::Arc;
 
 use itertools::Itertools;
 
-use color_eyre::{eyre::Ok, Result};
+use color_eyre::eyre::Ok;
+use color_eyre::Result;
 
-use crate::models::data::listenbrainz::listen::{collection::ListenCollection, Listen};
+use crate::models::data::listenbrainz::listen::collection::ListenCollection;
+use crate::models::data::listenbrainz::listen::Listen;
 
 use super::StatSorter;
 

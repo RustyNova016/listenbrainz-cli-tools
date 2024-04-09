@@ -1,10 +1,10 @@
 use chrono::{DateTime, TimeDelta, Utc};
-use listenbrainz::raw::{response::UserListensResponse, Client};
+use listenbrainz::raw::response::UserListensResponse;
+use listenbrainz::raw::Client;
 
-use crate::{
-    models::cache::global_cache::GlobalCache,
-    utils::{extensions::UserListensPayloadExt, println_lis},
-};
+use crate::models::cache::global_cache::GlobalCache;
+use crate::utils::extensions::UserListensPayloadExt;
+use crate::utils::println_lis;
 
 use super::UserListens;
 

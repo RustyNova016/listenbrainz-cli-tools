@@ -1,6 +1,5 @@
+use crate::models::data::listenbrainz::listen::Listen;
 use std::sync::Arc;
-
-use super::data::listenbrainz::listen::Listen;
 
 /// Represent a messybrain recording id
 pub struct MessyRecording {

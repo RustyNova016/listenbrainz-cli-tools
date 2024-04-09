@@ -1,12 +1,15 @@
 use crate::models::cache::global_cache::GlobalCache;
-use crate::models::data::recording::Artist;
+use crate::models::data::musicbrainz::artist::Artist;
 use crate::models::stats::artist_stats::ArtistStatsSorter;
 use crate::models::stats::StatSorter;
 use crate::utils::cli_paging::CLIPager;
 
 pub fn stats_artist(username: &str) {
     // Get the listens
-    let user_listens = GlobalCache::new().get_user_listens_with_refresh(username).expect("Couldn't fetch the new listens").expect("Couldn't fetch the new listens");
+    let user_listens = GlobalCache::new()
+        .get_user_listens_with_refresh(username)
+        .expect("Couldn't fetch the new listens")
+        .expect("Couldn't fetch the new listens");
 
     // Data sorting
     let mut sorter = ArtistStatsSorter::new();

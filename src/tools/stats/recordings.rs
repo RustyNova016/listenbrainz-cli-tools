@@ -5,7 +5,10 @@ use crate::utils::cli_paging::CLIPager;
 
 pub fn stats_recording(username: &str) {
     // Get the listens
-    let user_listens = GlobalCache::new().get_user_listens_with_refresh(username).expect("Couldn't fetch the new listens").expect("Couldn't fetch the new listens");
+    let user_listens = GlobalCache::new()
+        .get_user_listens_with_refresh(username)
+        .expect("Couldn't fetch the new listens")
+        .expect("Couldn't fetch the new listens");
 
     // Data sorting
     let mut sorter = RecordingStatsSorter::new();

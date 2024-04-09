@@ -3,7 +3,6 @@ use color_eyre::eyre::Ok;
 
 use models::cli::Cli;
 
-
 use crate::utils::println_cli;
 
 pub mod models;

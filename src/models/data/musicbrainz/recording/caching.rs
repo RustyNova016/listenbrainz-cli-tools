@@ -1,8 +1,7 @@
+use crate::models::cache::cached_trait::CacheFromMusicbrainz;
+use crate::models::cache::global_cache::GlobalCache;
+use crate::models::data::musicbrainz::recording::Recording;
 use crate::models::data::musicbrainz::HasMbid;
-use crate::models::{
-    cache::{cached_trait::CacheFromMusicbrainz, global_cache::GlobalCache},
-    data::recording::Recording,
-};
 use musicbrainz_rs::entity::recording::Recording as RecordingMS;
 
 impl Recording {

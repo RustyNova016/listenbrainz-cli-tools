@@ -1,7 +1,8 @@
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 
-use crate::models::data::{listens::MappingData, recording::Recording};
+use crate::models::data::listenbrainz::mapping_data::MappingData;
+use crate::models::data::musicbrainz::recording::Recording;
 
 use super::messybrainz::MessyBrainzData;
 

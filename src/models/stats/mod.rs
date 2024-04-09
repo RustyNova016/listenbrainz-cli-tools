@@ -1,8 +1,11 @@
-use std::{cmp::Reverse, collections::HashMap, sync::Arc};
+use std::cmp::Reverse;
+use std::collections::HashMap;
+use std::sync::Arc;
 
 use color_eyre::Result;
 
-use super::data::listenbrainz::listen::{collection::ListenCollection, Listen};
+use super::data::listenbrainz::listen::collection::ListenCollection;
+use super::data::listenbrainz::listen::Listen;
 
 pub mod artist_stats;
 pub mod recording_stats;

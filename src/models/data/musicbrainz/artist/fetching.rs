@@ -1,13 +1,11 @@
 use color_eyre::eyre::{Context, Ok};
-use musicbrainz_rs::{entity::artist::Artist as ArtistMS, Fetch};
+use musicbrainz_rs::entity::artist::Artist as ArtistMS;
+use musicbrainz_rs::Fetch;
 
-use crate::{
-    models::{
-        cache::{cached_trait::CacheFromMusicbrainzAutoId, global_cache::GlobalCache},
-        data::recording::Artist,
-    },
-    utils::println_mus,
-};
+use crate::models::cache::cached_trait::CacheFromMusicbrainzAutoId;
+use crate::models::cache::global_cache::GlobalCache;
+use crate::models::data::musicbrainz::artist::Artist;
+use crate::utils::println_mus;
 
 impl Artist {
     pub fn get_or_fetch(mbid: &str) -> color_eyre::Result<Self> {

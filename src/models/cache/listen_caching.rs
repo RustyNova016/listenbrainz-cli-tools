@@ -1,5 +1,4 @@
-use cached::DiskCacheError;
-use cached::IOCached;
+use cached::{DiskCacheError, IOCached};
 use listenbrainz::raw::response::UserListensPayload;
 
 use crate::models::data::listenbrainz::user_listens::UserListens;

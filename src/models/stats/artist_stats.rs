@@ -1,7 +1,9 @@
-use std::{collections::HashMap, sync::Arc};
 use itertools::Itertools;
+use std::collections::HashMap;
+use std::sync::Arc;
 
-use crate::models::data::listenbrainz::listen::{collection::ListenCollection, Listen};
+use crate::models::data::listenbrainz::listen::collection::ListenCollection;
+use crate::models::data::listenbrainz::listen::Listen;
 
 use super::StatSorter;
 
