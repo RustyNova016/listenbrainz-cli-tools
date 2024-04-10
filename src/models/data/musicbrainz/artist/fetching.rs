@@ -8,19 +8,20 @@ use crate::models::data::musicbrainz::artist::Artist;
 use crate::utils::println_mus;
 
 impl Artist {
-    pub fn get_or_fetch(mbid: &str) -> color_eyre::Result<Self> {
+    pub async fn get_or_fetch(mbid: &str) -> color_eyre::Result<Self> {
         match GlobalCache::new().get_artist(mbid)? {
             Some(val) => Ok(val),
-            None => Self::fetch(mbid),
+            None => Self::fetch(mbid).await,
         }
     }
 
-    fn fetch(mbid: &str) -> color_eyre::Result<Self> {
+    async fn fetch(mbid: &str) -> color_eyre::Result<Self> {
         println_mus(format!("Getting data for artist MBID: {}", &mbid));
         let msreturn = ArtistMS::fetch()
             .id(mbid)
             .with_recordings()
             .execute()
+            .await
             .context("Failed to fetch artist from MusicBrainz")?;
 
         Self::insert_ms_into_cache(msreturn)?;

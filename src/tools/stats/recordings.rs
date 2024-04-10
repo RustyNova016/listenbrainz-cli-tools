@@ -6,7 +6,7 @@ use crate::models::stats::StatSorter;
 use crate::utils::cli_paging::CLIPager;
 use crate::utils::Logger;
 
-pub fn stats_recording(username: &str) {
+pub async fn stats_recording(username: &str) {
     // Get the listens
     let mapped_listens = GlobalCache::new()
         .get_user_listens_with_refresh(username)
@@ -21,6 +21,7 @@ pub fn stats_recording(username: &str) {
     let mut sorter = RecordingStatsSorter::new();
     sorter
         .extend(progress_bar.wrap_iter(mapped_listens.into_iter()))
+        .await
         .expect("Couldn't sort the listens");
 
     let mut pager = CLIPager::new(5);

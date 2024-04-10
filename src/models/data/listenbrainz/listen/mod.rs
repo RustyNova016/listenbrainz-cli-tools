@@ -52,9 +52,9 @@ impl Listen {
     }
 
     /// Return the recording's data from Musicbrainz from its mapping
-    pub fn get_recording_data(&self) -> color_eyre::Result<Option<Recording>> {
+    pub async fn get_recording_data(&self) -> color_eyre::Result<Option<Recording>> {
         match &self.mapping_data {
-            Some(mapping) => Ok(Some(Recording::get_or_fetch(mapping.get_recording_id())?)),
+            Some(mapping) => Ok(Some(Recording::get_or_fetch(mapping.get_recording_id()).await?)),
             None => Ok(None),
         }
     }

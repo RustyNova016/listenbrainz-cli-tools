@@ -7,7 +7,7 @@ use crate::models::stats::StatSorter;
 use crate::utils::cli_paging::CLIPager;
 use crate::utils::Logger;
 
-pub fn stats_artist(username: &str) {
+pub async fn stats_artist(username: &str) {
     // Get the listens
     let user_listens = GlobalCache::new()
         .get_user_listens_with_refresh(username)
@@ -23,11 +23,12 @@ pub fn stats_artist(username: &str) {
     let mut sorter = ArtistStatsSorter::new();
     sorter
         .extend(progress_bar.wrap_iter(mapped_listens.into_iter()))
+        .await
         .expect("Couldn't sort the listens");
 
     let mut pager = CLIPager::new(5);
     for (key, data) in sorter.into_sorted() {
-        let artist = Artist::get_or_fetch(&key).unwrap();
+        let artist = Artist::get_or_fetch(&key).await.unwrap();
 
         let pager_continue = pager.execute(|| {
             println!("[{}] - {}", data.len(), artist.name);

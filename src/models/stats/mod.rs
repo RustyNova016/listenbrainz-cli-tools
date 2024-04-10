@@ -16,7 +16,8 @@ pub trait StatSorter {
 
     fn into_vec(self) -> Vec<(String, ListenCollection)>;
 
-    fn push(&mut self, value: Arc<Listen>) -> Result<()>;
+    #[allow(async_fn_in_trait)] // This temporary until the sorters get redone
+    async fn push(&mut self, value: Arc<Listen>) -> Result<()>;
 
     fn get_mut(&mut self, key: &String) -> &mut ListenCollection {
         if self.get_map_mut().get(key).is_none() {
@@ -31,9 +32,10 @@ pub trait StatSorter {
             .expect("Could not retrieve EntityStats from stat list");
     }
 
-    fn extend<T: IntoIterator<Item = Arc<Listen>>>(&mut self, iter: T) -> Result<()> {
+    #[allow(async_fn_in_trait)] // This temporary until the sorters get redone
+    async fn extend<T: IntoIterator<Item = Arc<Listen>>>(&mut self, iter: T) -> Result<()> {
         for element in iter {
-            self.push(element)?;
+            self.push(element).await?;
         }
 
         Ok(())

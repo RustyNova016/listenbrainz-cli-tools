@@ -9,13 +9,14 @@ pub mod models;
 pub mod tools;
 pub mod utils;
 
-fn main() -> color_eyre::Result<()> {
+#[tokio::main]
+async fn main() -> color_eyre::Result<()> {
     color_eyre::install()?;
     let cli = Cli::parse();
 
     println!("Hello!");
 
-    cli.command.run();
+    cli.command.run().await;
 
     println_cli("Have a nice day!");
     Ok(())
