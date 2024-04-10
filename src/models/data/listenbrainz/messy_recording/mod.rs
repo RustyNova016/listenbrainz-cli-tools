@@ -1,11 +1,10 @@
+use crate::models::data::listenbrainz::listen::Listen;
 use std::sync::Arc;
-
-use super::data::listens::UserListen;
 
 /// Represent a messybrain recording id
 pub struct MessyRecording {
     pub id: String,
-    pub associated_listens: Vec<Arc<UserListen>>,
+    pub associated_listens: Vec<Arc<Listen>>,
 }
 
 impl MessyRecording {
@@ -16,7 +15,7 @@ impl MessyRecording {
         }
     }
 
-    pub fn add_listen(&mut self, listen: Arc<UserListen>) {
+    pub fn add_listen(&mut self, listen: Arc<Listen>) {
         if listen.messybrainz_data.msid == self.id {
             self.associated_listens.push(listen)
         }
@@ -36,7 +35,7 @@ impl MessyRecording {
             .map(|listen| listen.messybrainz_data.artist_name.clone())
     }
 
-    pub fn get_latest_listen(&self) -> Option<&Arc<UserListen>> {
+    pub fn get_latest_listen(&self) -> Option<&Arc<Listen>> {
         self.associated_listens
             .iter()
             .max_by_key(|listen| listen.listened_at)

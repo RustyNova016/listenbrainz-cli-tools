@@ -1,50 +1,15 @@
-use std::{collections::HashMap, rc::Rc, sync::Arc};
-
-use crate::models::data::listens::collection::UserListenCollection;
 use itertools::Itertools;
-use musicbrainz_rs::{entity::artist::Artist, Fetch};
+use std::collections::HashMap;
+use std::sync::Arc;
 
-use crate::models::data::listens::UserListen;
+use crate::models::data::listenbrainz::listen::collection::ListenCollection;
+use crate::models::data::listenbrainz::listen::Listen;
 
-use super::{stat_struct::StatStruct, StatSorter};
-
-pub struct ArtistStats {
-    mbid: String,
-    listens: Vec<Rc<UserListen>>,
-}
-
-impl ArtistStats {
-    pub fn get_name(&self) -> String {
-        Artist::fetch().id(&self.mbid).execute().unwrap().name //TODO: Remove ugly unwrap
-    }
-}
-
-impl StatStruct for ArtistStats {
-    fn get_mbid(&self) -> &str {
-        &self.mbid
-    }
-
-    fn new(mbid: String) -> Self {
-        Self {
-            listens: Vec::new(),
-            mbid,
-        }
-    }
-
-    fn push(&mut self, item: Rc<UserListen>) {
-        if item
-            .get_mapping_data()
-            .as_ref()
-            .is_some_and(|mapdata| mapdata.get_artists_mbids().contains(&self.mbid))
-        {
-            self.listens.push(item)
-        }
-    }
-}
+use super::StatSorter;
 
 #[derive(Debug, Default, Eq, PartialEq, Clone)]
 pub struct ArtistStatsSorter {
-    listens: HashMap<String, UserListenCollection>,
+    listens: HashMap<String, ListenCollection>,
 }
 
 impl ArtistStatsSorter {
@@ -56,21 +21,24 @@ impl ArtistStatsSorter {
 }
 
 impl StatSorter for ArtistStatsSorter {
-    fn get_map_mut(&mut self) -> &mut HashMap<String, UserListenCollection> {
+    fn get_map_mut(&mut self) -> &mut HashMap<String, ListenCollection> {
         &mut self.listens
     }
 
-    fn push(&mut self, value: Arc<UserListen>) {
-        let Some(recording_data) = value.get_recording_data() else {
-            return;
+    fn push(&mut self, value: Arc<Listen>) -> color_eyre::Result<()> {
+        let Some(recording_data) = value.get_recording_data()? else {
+            return Ok(());
         };
 
-        for artist_credited in recording_data.artist_credit.unwrap_or(Vec::new()) {
-            self.get_mut(&artist_credited.artist.id).push(value.clone());
+        let artist_credits = recording_data.get_or_fetch_artist_credits()?;
+        for artist_id in artist_credits.get_artist_ids() {
+            self.get_mut(&artist_id).push(value.clone());
         }
+
+        Ok(())
     }
 
-    fn into_vec(self) -> Vec<(String, UserListenCollection)> {
+    fn into_vec(self) -> Vec<(String, ListenCollection)> {
         self.listens.into_iter().collect_vec()
     }
 }

@@ -2,19 +2,21 @@
 use std::cmp::Reverse;
 
 use color_eyre::eyre::Context;
-use listenbrainz::raw::{response::UserListensListen, Client};
+use listenbrainz::raw::response::UserListensListen;
+use listenbrainz::raw::Client;
 
-use crate::{
-    models::{api::listenbrainz::ListenBrainzAPI, messy_recording::MessyRecording},
-    utils::{cli_paging::CLIPager, println_cli, traits::VecWrapper, ListenAPIPaginatorBuilder},
-};
+use crate::models::cache::global_cache::GlobalCache;
+use crate::models::data::listenbrainz::messy_recording::MessyRecording;
+use crate::utils::cli_paging::CLIPager;
+use crate::utils::{println_cli, ListenAPIPaginatorBuilder};
 
 pub fn unlinked_command(username: &str) {
     println_cli(format!("Fetching unlinkeds for user {}", username));
-    let mut lb_api = ListenBrainzAPI::new();
-    let unlinked = lb_api
-        .fetch_unlinked_of_user(username)
-        .expect("Couldn't fetch the new listens");
+    let unlinked = GlobalCache::new()
+        .get_user_listens_with_refresh(username)
+        .expect("Couldn't fetch the new listens")
+        .expect("Couldn't fetch the new listens")
+        .get_unmapped_listens();
 
     let mut messy_recordings: Vec<MessyRecording> = vec![];
     let unlinked_count = unlinked.len();

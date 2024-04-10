@@ -1,9 +1,7 @@
 use color_eyre::owo_colors::OwoColorize;
 use derive_builder::Builder;
-use listenbrainz::raw::{
-    response::{UserListensListen, UserListensResponse},
-    Client,
-};
+use listenbrainz::raw::response::{UserListensListen, UserListensResponse};
+use listenbrainz::raw::Client;
 use std::fmt::Display;
 
 pub mod cli_paging;
@@ -92,4 +90,8 @@ pub fn println_cli<T: Display>(string: T) {
 
 pub fn println_lis<T: Display>(string: T) {
     println!("{} {}", "[Listenbrainz]".blue(), string);
+}
+
+pub fn println_mus<T: Display>(string: T) {
+    println!("{} {}", "[MusicBrainz]".bright_magenta(), string);
 }

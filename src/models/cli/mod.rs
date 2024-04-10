@@ -1,4 +1,5 @@
-use crate::tools::{stats::stats_command, unlinked::unlinked_command};
+use crate::tools::stats::stats_command;
+use crate::tools::unlinked::unlinked_command;
 use clap::{Parser, Subcommand};
 
 use self::stats::GroupByTarget;
