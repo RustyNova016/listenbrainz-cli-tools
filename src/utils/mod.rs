@@ -1,8 +1,11 @@
 use color_eyre::owo_colors::OwoColorize;
 use derive_builder::Builder;
+use indicatif::ProgressBar;
 use listenbrainz::raw::response::{UserListensListen, UserListensResponse};
 use listenbrainz::raw::Client;
+use once_cell::sync::Lazy;
 use std::fmt::Display;
+use std::sync::{Arc, Mutex};
 
 pub mod cli_paging;
 pub mod extensions;
@@ -84,14 +87,89 @@ impl Iterator for ListenAPIReader {
     }
 }
 
+pub(crate) static STATIC_LOGGER: Lazy<Arc<Mutex<Logger>>> =
+    Lazy::new(|| Arc::new(Mutex::new(Logger::new())));
+
+pub trait OverridePrint {
+    fn override_print<I: AsRef<str>>(&self, msg: I);
+}
+
+pub struct Logger {
+    print_override: Option<ProgressBar>,
+}
+
+impl Logger {
+    pub fn new() -> Self {
+        Self {
+            print_override: None,
+        }
+    }
+
+    pub fn set_override(&mut self, pg: ProgressBar) {
+        self.print_override = Some(pg);
+    }
+
+    pub fn clear_overide(&mut self) {
+        self.print_override = None
+    }
+
+    fn print<T: Display + std::convert::AsRef<str>>(&self, string: T) {
+        if let Some(overide) = &self.print_override {
+            overide.println(string)
+        } else {
+            println!("{}", string)
+        }
+    }
+
+    pub fn println_cli<T: Display>(&self, string: T) {
+        self.print(format!("{} {}", "[CLI Tools]".green(), string));
+    }
+
+    pub fn println_lis<T: Display>(&self, string: T) {
+        self.print(format!("{} {}", "[Listenbrainz Tools]".blue(), string));
+    }
+
+    pub fn println_mus<T: Display>(&self, string: T) {
+        self.print(format!(
+            "{} {}",
+            "[CLI MusicBrainz]".bright_magenta(),
+            string
+        ));
+    }
+
+    pub fn set_global_overide(pg: ProgressBar) {
+        let static_clone = STATIC_LOGGER.clone();
+        let mut logger = static_clone.lock().unwrap();
+        logger.set_override(pg);
+    }
+
+    pub fn clear_global_overide() {
+        let static_clone = STATIC_LOGGER.clone();
+        let mut logger = static_clone.lock().unwrap();
+        logger.clear_overide();
+    }
+}
+
+impl Default for Logger {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 pub fn println_cli<T: Display>(string: T) {
-    println!("{} {}", "[CLI Tools]".green(), string);
+    let static_clone = STATIC_LOGGER.clone();
+    let logger = static_clone.lock().unwrap();
+    logger.println_cli(string);
 }
 
 pub fn println_lis<T: Display>(string: T) {
-    println!("{} {}", "[Listenbrainz]".blue(), string);
+    let static_clone = STATIC_LOGGER.clone();
+    let logger = static_clone.lock().unwrap();
+    logger.println_lis(string)
 }
 
 pub fn println_mus<T: Display>(string: T) {
-    println!("{} {}", "[MusicBrainz]".bright_magenta(), string);
+    let static_clone = STATIC_LOGGER.clone();
+    let logger = static_clone.lock().unwrap();
+    logger.println_mus(string)
 }

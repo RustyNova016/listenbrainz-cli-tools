@@ -1,10 +1,11 @@
 use chrono::{DateTime, TimeDelta, Utc};
+use indicatif::ProgressBar;
 use listenbrainz::raw::response::UserListensResponse;
 use listenbrainz::raw::Client;
 
 use crate::models::cache::global_cache::GlobalCache;
 use crate::utils::extensions::UserListensPayloadExt;
-use crate::utils::println_lis;
+use crate::utils::{println_lis, Logger};
 
 use super::UserListens;
 
@@ -66,6 +67,10 @@ impl UserListens {
         let mut unlinkeds = GlobalCache::new()
             .get_user_listens_or_empty(username)?
             .get_unmapped_listens();
+        let start_count = unlinkeds.len();
+
+        let progress_bar = ProgressBar::new(unlinkeds.len().try_into().unwrap());
+        Logger::set_global_overide(progress_bar.clone());
 
         while unlinkeds.len() > 0 {
             let refresh_target = unlinkeds
@@ -86,8 +91,12 @@ impl UserListens {
                     .get_date_of_latest_listen_of_payload()
                     .unwrap_or(Utc::now()),
                 true,
-            )
+            );
+
+            progress_bar.set_position((start_count - unlinkeds.len()).try_into().unwrap());
         }
+
+        Logger::clear_global_overide();
 
         Ok(())
     }
