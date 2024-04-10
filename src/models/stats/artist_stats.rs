@@ -25,12 +25,12 @@ impl StatSorter for ArtistStatsSorter {
         &mut self.listens
     }
 
-    fn push(&mut self, value: Arc<Listen>) -> color_eyre::Result<()> {
-        let Some(recording_data) = value.get_recording_data()? else {
+    async fn push(&mut self, value: Arc<Listen>) -> color_eyre::Result<()> {
+        let Some(recording_data) = value.get_recording_data().await? else {
             return Ok(());
         };
 
-        let artist_credits = recording_data.get_or_fetch_artist_credits()?;
+        let artist_credits = recording_data.get_or_fetch_artist_credits().await?;
         for artist_id in artist_credits.get_artist_ids() {
             self.get_mut(&artist_id).push(value.clone());
         }

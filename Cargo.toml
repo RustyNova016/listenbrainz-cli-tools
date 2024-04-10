@@ -9,7 +9,7 @@ publish = true
 
 [dependencies]
 listenbrainz = { version = "0.7.1", package = "listenbrainz_rs_nova"} # Upstream version of the listenbrainz crate
-musicbrainz_rs = { version = "0.5.0", features = ["blocking"], default-features = false }
+musicbrainz_rs = { version = "0.5.0" }
 derive_builder = "0.20.0"
 inquire = "0.7.4"
 itertools = "0.12.0"
@@ -29,6 +29,8 @@ extend = "1.2.0"
 directories = "5.0.1"
 chashmap = "2.2.2"
 indicatif = { version = "0.17.8", features = ["rayon", "improved_unicode"] }
+tokio = {version = "1.37.0", features = ["full"]}
+rayon = "1.10.0"
 
 # The profile that 'cargo dist' will build with
 [profile.dist]

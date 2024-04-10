@@ -38,11 +38,11 @@ pub enum Commands {
 }
 
 impl Commands {
-    pub fn run(&self) {
+    pub async fn run(&self) {
         match self {
             Commands::Unlinked { username } => unlinked_command(&username.to_lowercase()),
             Commands::Stats { username, target } => {
-                stats_command(&username.to_lowercase(), *target)
+                stats_command(&username.to_lowercase(), *target).await
             }
         }
     }

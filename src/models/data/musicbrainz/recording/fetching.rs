@@ -8,21 +8,22 @@ use crate::models::data::musicbrainz::recording::Recording;
 use crate::utils::println_mus;
 
 impl Recording {
-    pub fn get_or_fetch(mbid: &str) -> color_eyre::Result<Self> {
+    pub async fn get_or_fetch(mbid: &str) -> color_eyre::Result<Self> {
         //println!("Recording from cache: {:?}", GlobalCache::new().get_recording(mbid));
         match GlobalCache::new().get_recording(mbid)? {
             Some(val) => Ok(val),
-            None => Self::fetch(mbid),
+            None => Self::fetch(mbid).await,
         }
     }
 
-    pub(super) fn fetch(mbid: &str) -> color_eyre::Result<Self> {
+    pub(super) async fn fetch(mbid: &str) -> color_eyre::Result<Self> {
         println_mus(format!("Getting data for recording MBID: {}", &mbid));
 
         let msreturn = RecordingMS::fetch()
             .id(mbid)
             .with_artists()
             .execute()
+            .await
             .context("Failed to fetch recording from MusicBrainz")?;
 
         Self::insert_ms_with_alias_into_cache(mbid.to_string(), msreturn)?;
