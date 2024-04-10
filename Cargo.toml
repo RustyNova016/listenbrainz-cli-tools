@@ -29,7 +29,6 @@ extend = "1.2.0"
 directories = "5.0.1"
 chashmap = "2.2.2"
 indicatif = { version = "0.17.8", features = ["rayon", "improved_unicode"] }
-indicatif-log-bridge = "0.2.2"
 
 # The profile that 'cargo dist' will build with
 [profile.dist]
