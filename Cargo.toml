@@ -17,7 +17,7 @@ prettytable-rs = { version = "0.10.0" }
 color-eyre = "0.6.3"
 rust_decimal = "1.35.0"
 clap = { version = "4.5.4", features = ["unicode", "wrap_help", "derive"]}
-clap_complete = "4.5.1"
+clap_complete = "4.5.2"
 chrono = "0.4.37"
 cached = "0.49.3"
 moka = { version = "0.12.5", features = ["sync"] }
