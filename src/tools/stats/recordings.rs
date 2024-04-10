@@ -1,19 +1,26 @@
+use indicatif::ProgressBar;
+
 use crate::models::cache::global_cache::GlobalCache;
 use crate::models::stats::recording_stats::RecordingStatsSorter;
 use crate::models::stats::StatSorter;
 use crate::utils::cli_paging::CLIPager;
+use crate::utils::Logger;
 
 pub fn stats_recording(username: &str) {
     // Get the listens
-    let user_listens = GlobalCache::new()
+    let mapped_listens = GlobalCache::new()
         .get_user_listens_with_refresh(username)
         .expect("Couldn't fetch the new listens")
-        .expect("Couldn't fetch the new listens");
+        .expect("Couldn't fetch the new listens")
+        .get_mapped_listens();
+
+    let progress_bar = ProgressBar::new(mapped_listens.len().try_into().unwrap());
+    Logger::set_global_overide(progress_bar.clone());
 
     // Data sorting
     let mut sorter = RecordingStatsSorter::new();
     sorter
-        .extend(user_listens.get_mapped_listens())
+        .extend(progress_bar.wrap_iter(mapped_listens.into_iter()))
         .expect("Couldn't sort the listens");
 
     let mut pager = CLIPager::new(5);
