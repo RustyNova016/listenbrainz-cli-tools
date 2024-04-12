@@ -1,8 +1,10 @@
 use chrono::{DateTime, TimeDelta, Utc};
+
 use indicatif::ProgressBar;
 use listenbrainz::raw::response::UserListensResponse;
 use listenbrainz::raw::Client;
 
+use crate::models::api::FetchAPI;
 use crate::models::cache::global_cache::GlobalCache;
 use crate::utils::extensions::UserListensPayloadExt;
 use crate::utils::{println_lis, Logger};
@@ -34,6 +36,7 @@ impl UserListens {
     /// If the cache is empty, then it will fill it completly
     pub fn fetch_latest(username: &str) -> color_eyre::Result<()> {
         let operation_start = Utc::now();
+
         let latest_cached_listen_date = GlobalCache::new()
             .get_user_listens(&username.to_lowercase())?
             .and_then(|user_listens| user_listens.listens.get_latest_listen())
@@ -99,5 +102,11 @@ impl UserListens {
         Logger::clear_global_overide();
 
         Ok(())
+    }
+}
+
+impl FetchAPI<String, UserListens> for UserListens {
+    async fn fetch_and_insert(key: &String) -> color_eyre::Result<UserListens> {
+        GlobalCache::new().get_user_listens_with_refresh(key)
     }
 }

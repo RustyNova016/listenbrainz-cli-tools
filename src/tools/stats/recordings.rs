@@ -11,7 +11,6 @@ pub async fn stats_recording(username: &str) {
     let mapped_listens = GlobalCache::new()
         .get_user_listens_with_refresh(username)
         .expect("Couldn't fetch the new listens")
-        .expect("Couldn't fetch the new listens")
         .get_mapped_listens();
 
     let progress_bar = ProgressBar::new(mapped_listens.len().try_into().unwrap());

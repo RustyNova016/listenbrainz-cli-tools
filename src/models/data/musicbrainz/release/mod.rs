@@ -4,6 +4,7 @@ use self::media::Media;
 
 pub mod caching;
 pub mod converters;
+pub mod fetching;
 pub mod getters;
 pub mod media;
 pub mod track;

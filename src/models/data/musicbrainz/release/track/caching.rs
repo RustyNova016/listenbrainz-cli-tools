@@ -13,7 +13,7 @@ impl HasMbid for TrackMS {
 }
 
 impl CacheFromMusicbrainz<TrackMS> for Track {
-    fn insert_ms_with_id_into_cache(mbid: String, value: TrackMS) -> color_eyre::eyre::Result<()> {
+    fn insert_ms_with_id_into_cache(_mbid: String, value: TrackMS) -> color_eyre::eyre::Result<()> {
         Recording::insert_ms_into_cache(value.recording)
     }
 }
