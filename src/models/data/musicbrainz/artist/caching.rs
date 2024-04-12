@@ -2,6 +2,7 @@ use musicbrainz_rs::entity::artist::Artist as ArtistMS;
 
 use crate::models::cache::cached_trait::{CacheFromMusicbrainz, CacheFromMusicbrainzAutoId};
 use crate::models::cache::global_cache::GlobalCache;
+use crate::models::cache::traits::merge::UpdateCachedEntity;
 use crate::models::data::musicbrainz::artist::Artist;
 use crate::models::data::musicbrainz::recording::Recording;
 use crate::models::data::musicbrainz::HasMbid;
@@ -30,5 +31,11 @@ impl CacheFromMusicbrainz<ArtistMS> for Artist {
 impl HasMbid for ArtistMS {
     fn get_mbid(&self) -> &str {
         &self.id
+    }
+}
+
+impl UpdateCachedEntity for Artist {
+    fn update_entity(self, new: Self) -> Self {
+        new
     }
 }

@@ -9,6 +9,7 @@ use crate::utils::extensions::UserListensPayloadExt;
 use super::listen::collection::ListenCollection;
 use super::listen::Listen;
 
+pub mod caching;
 pub mod fetching;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]

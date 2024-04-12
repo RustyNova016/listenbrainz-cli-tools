@@ -3,9 +3,12 @@ use once_cell::sync::Lazy;
 use std::path::PathBuf;
 
 pub mod cached_trait;
+pub mod disk_cache;
 pub mod global_cache;
 pub mod listen_caching;
+pub mod musicbrainz;
 pub mod static_cache;
+pub mod traits;
 
 pub static CACHE_LOCATION: Lazy<PathBuf> = Lazy::new(|| {
     let mut path = BaseDirs::new()
