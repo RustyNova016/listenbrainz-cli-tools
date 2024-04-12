@@ -2,6 +2,7 @@ pub mod getters;
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 
+use crate::models::api::GetFromCacheOrFetch;
 use crate::models::data::listenbrainz::mapping_data::MappingData;
 use crate::models::data::musicbrainz::recording::Recording;
 
@@ -56,7 +57,7 @@ impl Listen {
     pub async fn get_recording_data(&self) -> color_eyre::Result<Option<Recording>> {
         match &self.mapping_data {
             Some(mapping) => Ok(Some(
-                Recording::get_or_fetch(mapping.get_recording_id()).await?,
+                Recording::get_cached_or_fetch(mapping.get_recording_id()).await?,
             )),
             None => Ok(None),
         }

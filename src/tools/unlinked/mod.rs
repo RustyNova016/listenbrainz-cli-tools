@@ -16,7 +16,6 @@ pub fn unmapped_command(username: &str, sort: Option<SortBy>) {
     let unlinked = GlobalCache::new()
         .get_user_listens_with_refresh(username)
         .expect("Couldn't fetch the new listens")
-        .expect("Couldn't fetch the new listens")
         .get_unmapped_listens();
 
     let mut messy_recordings: Vec<MessyRecording> = vec![];

@@ -1,21 +1,19 @@
-use color_eyre::eyre::{Context, Ok};
-use musicbrainz_rs::entity::artist::Artist as ArtistMS;
-use musicbrainz_rs::Fetch;
-
-use crate::models::api::FetchAPI;
+use super::Release;
 use crate::models::cache::cached_trait::CacheFromMusicbrainzAutoId;
-use crate::models::cache::global_cache::GlobalCache;
-use crate::models::data::musicbrainz::artist::Artist;
-use crate::utils::println_mus;
 
-impl FetchAPI<String, Artist> for Artist {
+use crate::models::cache::traits::has_cache::HasCache;
+use crate::{models::api::FetchAPI, utils::println_mus};
+use color_eyre::eyre::Context;
+use musicbrainz_rs::{entity::release::Release as ReleaseMS, Fetch};
+
+impl FetchAPI<String, Release> for Release {
     fn fetch_and_insert(
         key: &String,
-    ) -> impl std::future::Future<Output = color_eyre::Result<Artist>> {
+    ) -> impl std::future::Future<Output = color_eyre::Result<Release>> {
         let key = key.clone();
         async move {
             println_mus(format!("Getting data for artist MBID: {}", &key));
-            let msreturn = ArtistMS::fetch()
+            let msreturn = ReleaseMS::fetch()
                 .id(&key)
                 .with_recordings()
                 .execute()
@@ -25,7 +23,7 @@ impl FetchAPI<String, Artist> for Artist {
             Self::insert_ms_into_cache(msreturn)?;
 
             // The element have been inserted above, so it should be safe to unwrap the option
-            Ok(GlobalCache::new().get_artist_cache().get(&key)?.unwrap())
+            Ok(Self::get_from_cache(&key)?.unwrap())
         }
     }
 }
