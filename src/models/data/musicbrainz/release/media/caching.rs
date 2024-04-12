@@ -1,11 +1,8 @@
 use musicbrainz_rs::entity::release::Media as MediaMS;
 
 use crate::models::{
-    cache::{
-        cached_trait::{CacheFromMusicbrainz, CacheFromMusicbrainzAutoId},
-        traits::InsertExternalEntityIntoCache,
-    },
-    data::musicbrainz::{release::track::Track, HasId},
+    cache::{cached_trait::CacheFromMusicbrainzAutoId, traits::InsertExternalEntityIntoCache},
+    data::musicbrainz::release::track::Track,
 };
 
 use super::Media;

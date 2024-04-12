@@ -1,5 +1,6 @@
 use indicatif::ProgressBar;
 
+use crate::models::api::GetFromCacheOrFetch;
 use crate::models::cache::global_cache::GlobalCache;
 use crate::models::data::musicbrainz::artist::Artist;
 use crate::models::stats::artist_stats::ArtistStatsSorter;
@@ -11,7 +12,6 @@ pub async fn stats_artist(username: &str) {
     // Get the listens
     let user_listens = GlobalCache::new()
         .get_user_listens_with_refresh(username)
-        .expect("Couldn't fetch the new listens")
         .expect("Couldn't fetch the new listens");
 
     let mapped_listens = user_listens.get_mapped_listens();
@@ -28,7 +28,7 @@ pub async fn stats_artist(username: &str) {
 
     let mut pager = CLIPager::new(5);
     for (key, data) in sorter.into_sorted() {
-        let artist = Artist::get_or_fetch(&key).await.unwrap();
+        let artist = Artist::get_cached_or_fetch(&key).await.unwrap();
 
         let pager_continue = pager.execute(|| {
             println!("[{}] - {}", data.len(), artist.name);
