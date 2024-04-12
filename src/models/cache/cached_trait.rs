@@ -24,8 +24,10 @@ where
     MbV: Into<Self>,
     Self: Sized,
 {
+    /// Insert an element with a specific MBID into the cache
     fn insert_ms_with_id_into_cache(mbid: String, value: MbV) -> Result<()>;
 
+    /// Insert an iterator element with a specific MBID into the cache
     fn insert_ms_with_id_iter_into_cache<I: IntoIterator<Item = (String, MbV)>>(
         values: I,
     ) -> Result<()> {

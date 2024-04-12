@@ -10,6 +10,7 @@ use super::data::listenbrainz::listen::Listen;
 pub mod artist_stats;
 pub mod recording_stats;
 pub mod stat_item;
+pub mod generic_statistic_holder;
 
 pub trait StatSorter {
     fn get_map_mut(&mut self) -> &mut HashMap<String, ListenCollection>;
@@ -49,4 +50,18 @@ pub trait StatSorter {
         out.sort_unstable_by_key(|item| Reverse(item.1.len()));
         out
     }
+}
+
+pub trait StatisticHolder<K> {
+    fn insert_listen(&self, listen: Arc<Listen>) -> impl std::future::Future<Output = Result<()>>;
+
+    fn count(&self) -> usize;
+
+    fn create(id: K) -> Self;
+}
+
+pub trait StatisticSorter<K, H: StatisticHolder<K>> {
+    fn insert_listen(&self, listen: Arc<Listen>) -> impl std::future::Future<Output = Result<()>>;
+
+    fn get(&self, key: &K) -> Arc<H>;
 }

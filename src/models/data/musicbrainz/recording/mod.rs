@@ -34,7 +34,6 @@ impl Recording {
 }
 
 #[derive(Debug, Clone, Eq, PartialEq, Deserialize, Serialize)]
-#[serde(rename_all = "kebab-case")]
 pub struct Recording {
     pub id: String,
     pub title: String,

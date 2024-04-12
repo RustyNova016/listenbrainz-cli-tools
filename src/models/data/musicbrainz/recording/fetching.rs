@@ -22,6 +22,7 @@ impl Recording {
         let msreturn = RecordingMS::fetch()
             .id(mbid)
             .with_artists()
+            .with_releases()
             .execute()
             .await
             .context("Failed to fetch recording from MusicBrainz")?;
