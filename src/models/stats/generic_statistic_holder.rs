@@ -5,19 +5,17 @@ use crate::models::data::listenbrainz::listen::{collection::ListenCollection, Li
 use super::StatisticHolder;
 
 pub struct GenericStatisticHolder<K> {
-    id: K,
-    listens: Mutex<ListenCollection>
+    _id: K,
+    listens: Mutex<ListenCollection>,
 }
 
-impl<K> StatisticHolder<String> for GenericStatisticHolder<K> {
-    fn insert_listen(&self, listen: Arc<Listen>) -> impl std::future::Future<Output = color_eyre::eyre::Result<()>> {
-        async {
-            let mut listens = self.listens.lock().unwrap();
+impl<K> StatisticHolder<K> for GenericStatisticHolder<K> {
+    async fn insert_listen(&self, listen: Arc<Listen>) -> color_eyre::eyre::Result<()> {
+        let mut listens = self.listens.lock().unwrap();
 
-            listens.push(listen);
-            drop(listens);
-            Ok(())
-        }
+        listens.push(listen);
+        drop(listens);
+        Ok(())
     }
 
     fn count(&self) -> usize {
@@ -26,8 +24,8 @@ impl<K> StatisticHolder<String> for GenericStatisticHolder<K> {
 
     fn create(id: K) -> Self {
         Self {
-            id,
-            listens: Mutex::new(ListenCollection::new())
+            _id: id,
+            listens: Mutex::new(ListenCollection::new()),
         }
     }
 }
