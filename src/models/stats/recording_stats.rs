@@ -11,7 +11,7 @@ use crate::models::data::listenbrainz::listen::collection::ListenCollection;
 use crate::models::data::listenbrainz::listen::Listen;
 
 use super::generic_statistic_holder::GenericStatisticHolder;
-use super::{StatSorter, StatisticSorter};
+use super::{StatSorter, StatisticHolder, StatisticSorter};
 
 #[derive(Debug, Default, Eq, PartialEq, Clone)]
 pub struct RecordingStatsSorter {
@@ -45,12 +45,19 @@ impl StatSorter for RecordingStatsSorter {
 }
 
 pub struct RecordingStatisticSorter {
-    data: CHashMap<String, Arc<GenericStatisticHolder<String>>>
+    data: CHashMap<String, Arc<GenericStatisticHolder<String>>>,
 }
 
 impl StatisticSorter<String, GenericStatisticHolder<String>> for RecordingStatisticSorter {
-    fn insert_listen(&self, listen: Arc<Listen>) -> impl std::future::Future<Output = Result<()>> {
-        todo!()
+    async fn insert_listen(&self, listen: Arc<Listen>) -> Result<()> {
+        let Some(recording_mbid) = listen.get_recording_mbid() else {
+            return Ok(());
+        };
+
+        let holder = self.get(recording_mbid);
+
+        holder.insert_listen(listen).await?;
+        Ok(())
     }
 
     fn get(&self, key: &String) -> Arc<GenericStatisticHolder<String>> {
@@ -60,7 +67,17 @@ impl StatisticSorter<String, GenericStatisticHolder<String>> for RecordingStatis
             return collection.clone();
         }
 
-        self.data.insert(key.to_string(), Arc::new(ArtistStatisticHolder::create(key.to_string())));
-        self.data.get(key).map(|collection| collection.clone()).expect("Couldn't retrieve inserted collection")
+        self.data.insert(
+            key.to_string(),
+            Arc::new(GenericStatisticHolder::create(key.to_string())),
+        );
+        self.data
+            .get(key)
+            .map(|collection| collection.clone())
+            .expect("Couldn't retrieve inserted collection")
+    }
+
+    fn into_vec(self) -> Vec<(String, Arc<GenericStatisticHolder<String>>)> {
+        self.data.into_iter().collect_vec()
     }
 }

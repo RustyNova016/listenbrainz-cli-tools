@@ -8,9 +8,8 @@ use super::data::listenbrainz::listen::collection::ListenCollection;
 use super::data::listenbrainz::listen::Listen;
 
 pub mod artist_stats;
-pub mod recording_stats;
-pub mod stat_item;
 pub mod generic_statistic_holder;
+pub mod recording_stats;
 
 pub trait StatSorter {
     fn get_map_mut(&mut self) -> &mut HashMap<String, ListenCollection>;
@@ -61,7 +60,38 @@ pub trait StatisticHolder<K> {
 }
 
 pub trait StatisticSorter<K, H: StatisticHolder<K>> {
-    fn insert_listen(&self, listen: Arc<Listen>) -> impl std::future::Future<Output = Result<()>>;
+    fn insert_listen(
+        &self,
+        listen: Arc<Listen>,
+    ) -> impl std::future::Future<Output = Result<()>> + Send;
 
     fn get(&self, key: &K) -> Arc<H>;
+
+    fn extend<'a, T: IntoIterator<Item = Arc<Listen>>>(
+        &'a mut self,
+        iter: T,
+    ) -> impl std::future::Future<Output = color_eyre::Result<()>>
+    where
+        K: 'a,
+        H: 'a,
+    {
+        async {
+            for listen in iter.into_iter() {
+                self.insert_listen(listen).await?;
+            }
+
+            Ok(())
+        }
+    }
+
+    fn into_vec(self) -> Vec<(String, Arc<H>)>;
+
+    fn into_sorted(self) -> Vec<(String, Arc<H>)>
+    where
+        Self: Sized,
+    {
+        let mut out = self.into_vec();
+        out.sort_unstable_by_key(|item| Reverse(item.1.count()));
+        out
+    }
 }
