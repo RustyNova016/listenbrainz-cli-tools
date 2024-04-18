@@ -14,13 +14,13 @@ cargo build --release
 ```
 
 # Tools
-## Unlinked listens 
-To search for your unlinked listens, use:
+## Unmapped listens 
+To search for your unmapped listens, use:
 ```shell
-listenbrainz-cli-tools unlinked -u <username>
+listenbrainz-cli-tools unmapped -u <username>
 ```
 
-This will list all your unlinked listens, grouped by similarity. 
+This will list all your unmapped listens, grouped by similarity. 
 It also gives a link to quickly look up the listen in listenbrainz, and go link it
 
 ```
