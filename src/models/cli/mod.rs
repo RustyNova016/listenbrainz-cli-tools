@@ -1,8 +1,9 @@
+pub mod unmapped;
 use crate::tools::stats::stats_command;
-use crate::tools::unlinked::unlinked_command;
+use crate::tools::unlinked::unmapped_command;
 use clap::{Parser, Subcommand};
 
-use self::stats::GroupByTarget;
+use self::{stats::GroupByTarget, unmapped::SortBy};
 
 pub mod stats;
 
@@ -17,10 +18,14 @@ pub struct Cli {
 #[derive(Subcommand, Debug, Clone)]
 pub enum Commands {
     /// Tools with the unlinked listens
-    Unlinked {
+    Unmapped {
         /// Name of the user to fetch unlinked listen from
         #[arg(short, long)]
         username: String,
+
+        /// Sort the listens by type
+        #[arg(short, long)]
+        sort: Option<SortBy>,
     },
 
     /// Live and accurate statistics
@@ -40,7 +45,9 @@ pub enum Commands {
 impl Commands {
     pub async fn run(&self) {
         match self {
-            Commands::Unlinked { username } => unlinked_command(&username.to_lowercase()),
+            Commands::Unmapped { username, sort } => {
+                unmapped_command(&username.to_lowercase(), *sort)
+            }
             Commands::Stats { username, target } => {
                 stats_command(&username.to_lowercase(), *target).await
             }

@@ -6,12 +6,13 @@ use listenbrainz::raw::response::UserListensListen;
 use listenbrainz::raw::Client;
 
 use crate::models::cache::global_cache::GlobalCache;
+use crate::models::cli::unmapped::SortBy;
 use crate::models::data::listenbrainz::messy_recording::MessyRecording;
 use crate::utils::cli_paging::CLIPager;
 use crate::utils::{println_cli, ListenAPIPaginatorBuilder};
 
-pub fn unlinked_command(username: &str) {
-    println_cli(format!("Fetching unlinkeds for user {}", username));
+pub fn unmapped_command(username: &str, sort: Option<SortBy>) {
+    println_cli(format!("Fetching unmapped for user {}", username));
     let unlinked = GlobalCache::new()
         .get_user_listens_with_refresh(username)
         .expect("Couldn't fetch the new listens")
@@ -36,13 +37,20 @@ pub fn unlinked_command(username: &str) {
         }
     }
 
-    messy_recordings.sort_by_key(|recording| Reverse(recording.associated_listens.len()));
+    match sort {
+        Some(SortBy::Name) => {
+            messy_recordings.sort_by_key(|recording| recording.get_recording_name());
+        }
+        _ => {
+            messy_recordings.sort_by_key(|recording| Reverse(recording.associated_listens.len()));
+        }
+    }
 
-    println!("Done! Here are {}'s top unlinked listens:", username);
+    println!("Done! Here are {}'s top unmapped listens:", username);
 
     let mut pager = CLIPager::new(5);
 
-    println!("Total: {} unlinked recordings", unlinked_count);
+    println!("Total: {} unmapped recordings", unlinked_count);
     for record in messy_recordings.iter() {
         let pager_continue = pager.execute(|| {
             println!(
