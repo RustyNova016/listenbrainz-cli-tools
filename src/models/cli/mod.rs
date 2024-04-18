@@ -1,4 +1,4 @@
-use crate::tools::stats::stats_command;
+use crate::tools::{stats::stats_command, wrong_link::wrong_link};
 use crate::tools::unlinked::unlinked_command;
 use clap::{Parser, Subcommand};
 
@@ -35,6 +35,12 @@ pub enum Commands {
         #[arg(short, long)]
         username: String,
     },
+
+    WrongLink {
+        /// Name of the user to fetch stats listen from
+        #[arg(short, long)]
+        username: String,
+    }
 }
 
 impl Commands {
@@ -44,6 +50,7 @@ impl Commands {
             Commands::Stats { username, target } => {
                 stats_command(&username.to_lowercase(), *target).await
             }
+            Commands::WrongLink { username } => wrong_link(username.to_owned()).await
         }
     }
 }
