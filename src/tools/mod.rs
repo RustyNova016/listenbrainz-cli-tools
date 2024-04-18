@@ -1,3 +1,4 @@
-//! This is the module containing all the different tools of this app
+pub mod interactive_mapper;
+
 pub mod stats;
 pub mod unlinked;

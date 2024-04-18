@@ -1,5 +1,5 @@
 pub mod unmapped;
-use crate::tools::stats::stats_command;
+use crate::tools::{interactive_mapper::interactive_mapper, stats::stats_command};
 use crate::tools::unlinked::unmapped_command;
 use clap::{Parser, Subcommand};
 
@@ -40,6 +40,13 @@ pub enum Commands {
         #[arg(short, long)]
         username: String,
     },
+
+    /// Map unmapped recordings easily
+    Mapping {
+        /// Name of the user to fetch unlinked listen from
+        #[arg(short, long)]
+        username: String,
+    },
 }
 
 impl Commands {
@@ -51,6 +58,7 @@ impl Commands {
             Commands::Stats { username, target } => {
                 stats_command(&username.to_lowercase(), *target).await
             }
+            Commands::Mapping { username } => {interactive_mapper(username).await}
         }
     }
 }
