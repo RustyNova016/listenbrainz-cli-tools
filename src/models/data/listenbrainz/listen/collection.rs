@@ -4,6 +4,8 @@ use std::sync::Arc;
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 
+use crate::models::cli::unmapped::SortBy;
+
 use super::Listen;
 
 /// Wrapper for a vector of listens
@@ -61,6 +63,26 @@ impl ListenCollection {
     /// Add a listen to the collection.
     pub fn push(&mut self, listen: Arc<Listen>) {
         self.data.push(listen);
+    }
+
+    pub fn sort_by_criteria(&mut self, sort: Option<SortBy>) {
+        println!("JFeo");
+        match sort {
+            Some(SortBy::Name) => {
+                let mut sorted = self.to_vec();
+                sorted.sort_by_key(|recording| {
+                    recording
+                        .get_mapping_data()
+                        .as_ref()
+                        .map(|data| data.recording_name.clone())
+                        .unwrap_or(recording.get_messybrain_data().track_name.clone())
+                });
+                *self = Self { data: sorted }
+            }
+
+            None => {}
+            Some(SortBy::Count) => {}
+        }
     }
 }
 

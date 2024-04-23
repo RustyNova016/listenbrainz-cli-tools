@@ -1,6 +1,9 @@
+pub mod listenbrainz;
+use ::listenbrainz::raw::response::{
+    UserListensListen, UserListensMBIDMapping, UserListensPayload,
+};
 use chrono::{DateTime, TimeZone, Utc};
 use extend::ext;
-use listenbrainz::raw::response::{UserListensListen, UserListensMBIDMapping, UserListensPayload};
 
 #[ext]
 pub impl UserListensPayload {

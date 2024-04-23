@@ -9,7 +9,6 @@ use std::sync::{Arc, Mutex};
 
 pub mod cli_paging;
 pub mod extensions;
-pub mod tokio;
 pub mod traits;
 
 #[derive(Clone, Debug, PartialEq, Eq, Builder)]
