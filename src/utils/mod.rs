@@ -9,6 +9,7 @@ use std::sync::{Arc, Mutex};
 
 pub mod cli_paging;
 pub mod extensions;
+pub mod tokio;
 pub mod traits;
 
 #[derive(Clone, Debug, PartialEq, Eq, Builder)]
@@ -126,15 +127,11 @@ impl Logger {
     }
 
     pub fn println_lis<T: Display>(&self, string: T) {
-        self.print(format!("{} {}", "[Listenbrainz Tools]".blue(), string));
+        self.print(format!("{} {}", "[Listenbrainz]".blue(), string));
     }
 
     pub fn println_mus<T: Display>(&self, string: T) {
-        self.print(format!(
-            "{} {}",
-            "[CLI MusicBrainz]".bright_magenta(),
-            string
-        ));
+        self.print(format!("{} {}", "[MusicBrainz]".bright_magenta(), string));
     }
 
     pub fn set_global_overide(pg: ProgressBar) {

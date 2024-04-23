@@ -1,44 +1,88 @@
+use chashmap::CHashMap;
 use itertools::Itertools;
-use std::collections::HashMap;
-use std::sync::Arc;
+use std::sync::{Arc, Mutex};
 
 use crate::models::data::listenbrainz::listen::collection::ListenCollection;
 use crate::models::data::listenbrainz::listen::Listen;
 
-use super::StatSorter;
+use super::{StatisticHolder, StatisticSorter};
 
-#[derive(Debug, Default, Eq, PartialEq, Clone)]
-pub struct ArtistStatsSorter {
-    listens: HashMap<String, ListenCollection>,
+#[derive(Debug, Default)]
+pub struct ArtistStatisticHolder {
+    listens: Mutex<ListenCollection>,
 }
 
-impl ArtistStatsSorter {
-    pub fn new() -> Self {
-        Self {
-            listens: HashMap::new(),
-        }
-    }
-}
+impl StatisticHolder<String> for ArtistStatisticHolder {
+    async fn insert_listen(&self, listen: Arc<Listen>) -> color_eyre::eyre::Result<()> {
+        let mut listens = self.listens.lock().unwrap();
 
-impl StatSorter for ArtistStatsSorter {
-    fn get_map_mut(&mut self) -> &mut HashMap<String, ListenCollection> {
-        &mut self.listens
-    }
-
-    async fn push(&mut self, value: Arc<Listen>) -> color_eyre::Result<()> {
-        let Some(recording_data) = value.get_recording_data().await? else {
-            return Ok(());
-        };
-
-        let artist_credits = recording_data.get_or_fetch_artist_credits().await?;
-        for artist_id in artist_credits.get_artist_ids() {
-            self.get_mut(&artist_id).push(value.clone());
-        }
-
+        listens.push(listen);
+        drop(listens);
         Ok(())
     }
 
-    fn into_vec(self) -> Vec<(String, ListenCollection)> {
-        self.listens.into_iter().collect_vec()
+    fn count(&self) -> usize {
+        self.listens.lock().unwrap().len()
+    }
+
+    fn create(_id: String) -> Self {
+        Self {
+            listens: Mutex::new(ListenCollection::new()),
+        }
+    }
+}
+
+#[derive(Debug, Default)]
+pub struct ArtistStatisticSorter {
+    data: CHashMap<String, Arc<ArtistStatisticHolder>>,
+}
+
+impl ArtistStatisticSorter {
+    pub fn new() -> Self {
+        Self {
+            data: CHashMap::new(),
+        }
+    }
+}
+
+impl StatisticSorter<String, ArtistStatisticHolder> for ArtistStatisticSorter {
+    fn insert_listen(
+        &self,
+        listen: Arc<Listen>,
+    ) -> impl std::future::Future<Output = color_eyre::eyre::Result<()>> {
+        let listen = listen.clone();
+        async move {
+            let Some(recording_data) = listen.get_recording_data().await? else {
+                return Ok(());
+            };
+
+            let artist_credits = recording_data.get_or_fetch_artist_credits().await?;
+            for artist_id in artist_credits.get_artist_ids() {
+                self.get(&artist_id).insert_listen(listen.clone()).await?;
+            }
+
+            Ok(())
+        }
+    }
+
+    fn get(&self, key: &String) -> Arc<ArtistStatisticHolder> {
+        let collection = self.data.get(key);
+
+        if let Some(collection) = collection {
+            return collection.clone();
+        }
+
+        self.data.insert(
+            key.to_string(),
+            Arc::new(ArtistStatisticHolder::create(key.to_string())),
+        );
+        self.data
+            .get(key)
+            .map(|collection| collection.clone())
+            .expect("Couldn't retrieve inserted collection")
+    }
+
+    fn into_vec(self) -> Vec<(String, Arc<ArtistStatisticHolder>)> {
+        self.data.into_iter().collect_vec()
     }
 }

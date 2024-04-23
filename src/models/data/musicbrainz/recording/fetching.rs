@@ -2,33 +2,32 @@ use color_eyre::eyre::{Context, Ok};
 use musicbrainz_rs::entity::recording::Recording as RecordingMS;
 use musicbrainz_rs::Fetch;
 
+use crate::models::api::FetchAPI;
 use crate::models::cache::cached_trait::CacheFromMusicbrainzAutoId;
 use crate::models::cache::global_cache::GlobalCache;
 use crate::models::data::musicbrainz::recording::Recording;
 use crate::utils::println_mus;
 
-impl Recording {
-    pub async fn get_or_fetch(mbid: &str) -> color_eyre::Result<Self> {
-        //println!("Recording from cache: {:?}", GlobalCache::new().get_recording(mbid));
-        match GlobalCache::new().get_recording(mbid)? {
-            Some(val) => Ok(val),
-            None => Self::fetch(mbid).await,
+impl FetchAPI<String, Recording> for Recording {
+    fn fetch_and_insert(
+        key: &String,
+    ) -> impl std::future::Future<Output = color_eyre::Result<Recording>> {
+        let key = key.clone();
+        async move {
+            println_mus(format!("Getting data for recording MBID: {}", &key));
+
+            let msreturn = RecordingMS::fetch()
+                .id(&key)
+                .with_artists()
+                .with_releases()
+                .execute()
+                .await
+                .context("Failed to fetch recording from MusicBrainz")?;
+
+            Self::insert_ms_with_alias_into_cache(key.to_string(), msreturn)?;
+
+            // The element have been inserted above, so it should be safe to unwrap the option
+            Ok(GlobalCache::new().get_recording(&key)?.unwrap())
         }
-    }
-
-    pub(super) async fn fetch(mbid: &str) -> color_eyre::Result<Self> {
-        println_mus(format!("Getting data for recording MBID: {}", &mbid));
-
-        let msreturn = RecordingMS::fetch()
-            .id(mbid)
-            .with_artists()
-            .execute()
-            .await
-            .context("Failed to fetch recording from MusicBrainz")?;
-
-        Self::insert_ms_with_alias_into_cache(mbid.to_string(), msreturn)?;
-
-        // The element have been inserted above, so it should be safe to unwrap the option
-        Ok(GlobalCache::new().get_recording(mbid)?.unwrap())
     }
 }

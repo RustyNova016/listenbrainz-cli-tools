@@ -1,56 +1,40 @@
 use std::sync::Arc;
 
-use cached::{DiskCache, DiskCacheError, IOCached};
+use cached::DiskCacheError;
 use once_cell::sync::Lazy;
 
 use crate::models::data::listenbrainz::user_listens::UserListens;
 use crate::models::data::musicbrainz::artist::Artist;
 use crate::models::data::musicbrainz::recording::Recording;
+use crate::models::data::musicbrainz::release::Release;
 
-use super::CACHE_LOCATION;
+use super::disk_cache::DiskCacheWrapper;
 
 pub(crate) static STATIC_CACHE: Lazy<Arc<StaticCache>> = Lazy::new(|| Arc::new(StaticCache::new()));
 
 pub struct StaticCache {
     // MusicBrainz Caches
-    pub(super) recordings: Lazy<DiskCache<String, Recording>>,
-    pub(super) artists: Lazy<DiskCache<String, Artist>>,
+    pub(super) artists: Lazy<Arc<DiskCacheWrapper<String, Artist>>>,
+    pub(super) recordings: Lazy<Arc<DiskCacheWrapper<String, Recording>>>,
+    pub(super) releases: Lazy<Arc<DiskCacheWrapper<String, Release>>>,
 
     // Listenbrainz Caches
-    pub(super) listens: Lazy<DiskCache<String, UserListens>>,
+    pub(super) listens: Lazy<Arc<DiskCacheWrapper<String, UserListens>>>,
 }
 
 impl StaticCache {
     pub fn new() -> Self {
         Self {
-            recordings: Lazy::new(|| {
-                DiskCache::new("recordings")
-                    .set_disk_directory(CACHE_LOCATION.clone())
-                    .build()
-                    .unwrap()
-            }),
-            artists: Lazy::new(|| {
-                DiskCache::new("artists")
-                    .set_disk_directory(CACHE_LOCATION.clone())
-                    .build()
-                    .unwrap()
-            }),
+            recordings: Lazy::new(|| Arc::new(DiskCacheWrapper::new("recordings"))),
+            artists: Lazy::new(|| Arc::new(DiskCacheWrapper::new("artists"))),
+            releases: Lazy::new(|| Arc::new(DiskCacheWrapper::new("releases"))),
 
-            listens: Lazy::new(|| {
-                DiskCache::new("listens")
-                    .set_disk_directory(CACHE_LOCATION.clone())
-                    .build()
-                    .unwrap()
-            }),
+            listens: Lazy::new(|| Arc::new(DiskCacheWrapper::new("listens"))),
         }
     }
 
-    pub fn get_artist(&self, key: &str) -> Result<Option<Artist>, DiskCacheError> {
-        self.artists.cache_get(&key.to_string())
-    }
-
     pub fn get_recording(&self, key: &str) -> Result<Option<Recording>, DiskCacheError> {
-        self.recordings.cache_get(&key.to_string())
+        self.recordings.get(&key.to_string())
     }
 
     pub fn insert_recording(
@@ -58,15 +42,23 @@ impl StaticCache {
         key: String,
         value: Recording,
     ) -> Result<Option<Recording>, DiskCacheError> {
-        self.recordings.cache_set(key, value)
+        self.recordings.set_or_update(key, value)
     }
 
-    pub fn insert_artist(
-        &self,
-        key: String,
-        value: Artist,
-    ) -> Result<Option<Artist>, DiskCacheError> {
-        self.artists.cache_set(key, value)
+    pub fn get_artist_cache(&self) -> Arc<DiskCacheWrapper<String, Artist>> {
+        self.artists.clone()
+    }
+
+    pub fn get_recording_cache(&self) -> Arc<DiskCacheWrapper<String, Recording>> {
+        self.recordings.clone()
+    }
+
+    pub fn get_release_cache(&self) -> Arc<DiskCacheWrapper<String, Release>> {
+        self.releases.clone()
+    }
+
+    pub fn get_listen_cache(&self) -> Arc<DiskCacheWrapper<String, UserListens>> {
+        self.listens.clone()
     }
 }
 
