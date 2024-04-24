@@ -1,4 +1,8 @@
+pub mod getters;
+use std::collections::HashMap;
+
 use chrono::{DateTime, Utc};
+use color_eyre::eyre::Context;
 use serde::{Deserialize, Serialize};
 
 use crate::models::api::GetFromCacheOrFetch;
@@ -60,5 +64,26 @@ impl Listen {
             )),
             None => Ok(None),
         }
+    }
+
+    /// Send a mapping request to Listenbrainz
+    pub async fn submit_mapping(&self, mbid: &str, token: &str) -> color_eyre::Result<()> {
+        let client = reqwest::Client::new();
+
+        let mut body_json = HashMap::new();
+        body_json.insert("recording_msid", self.get_messybrain_data().msid.clone());
+        body_json.insert("recording_mbid", mbid.to_owned());
+
+        client
+            .post("https://api.listenbrainz.org/1/metadata/submit_manual_mapping/")
+            .header("Authorization", format!("Token {}", token.to_owned()))
+            .json(&body_json)
+            .send()
+            .await
+            .context("Couldn't send the mapping to Listenbrainz")?
+            .error_for_status()
+            .context("Listenbrainz returned an error")?;
+
+        Ok(())
     }
 }
