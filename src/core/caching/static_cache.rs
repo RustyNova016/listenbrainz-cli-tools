@@ -14,12 +14,12 @@ pub(crate) static STATIC_CACHE: Lazy<Arc<StaticCache>> = Lazy::new(|| Arc::new(S
 
 pub struct StaticCache {
     // MusicBrainz Caches
-    pub(super) artists: Lazy<Arc<DiskCacheWrapper<String, Artist>>>,
-    pub(super) recordings: Lazy<Arc<DiskCacheWrapper<String, Recording>>>,
-    pub(super) releases: Lazy<Arc<DiskCacheWrapper<String, Release>>>,
+    pub(crate) artists: Lazy<Arc<DiskCacheWrapper<String, Artist>>>,
+    pub(crate) recordings: Lazy<Arc<DiskCacheWrapper<String, Recording>>>,
+    pub(crate) releases: Lazy<Arc<DiskCacheWrapper<String, Release>>>,
 
     // Listenbrainz Caches
-    pub(super) listens: Lazy<Arc<DiskCacheWrapper<String, UserListens>>>,
+    pub(crate) listens: Lazy<Arc<DiskCacheWrapper<String, UserListens>>>,
 }
 
 impl StaticCache {

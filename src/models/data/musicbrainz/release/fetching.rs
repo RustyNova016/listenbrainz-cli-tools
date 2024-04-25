@@ -1,10 +1,11 @@
 use super::Release;
-use crate::models::cache::cached_trait::CacheFromMusicbrainzAutoId;
-
-use crate::models::cache::traits::has_cache::HasCache;
-use crate::{models::api::FetchAPI, utils::println_mus};
+use crate::core::entity_traits::cached_trait::CacheFromMusicbrainzAutoId;
+use crate::core::entity_traits::fetch_api::FetchAPI;
+use crate::core::entity_traits::has_cache::HasCache;
+use crate::utils::println_mus;
 use color_eyre::eyre::Context;
-use musicbrainz_rs::{entity::release::Release as ReleaseMS, Fetch};
+use musicbrainz_rs::entity::release::Release as ReleaseMS;
+use musicbrainz_rs::Fetch;
 
 impl FetchAPI<String, Release> for Release {
     fn fetch_and_insert(

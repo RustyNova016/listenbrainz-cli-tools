@@ -1,4 +1,4 @@
-use crate::models::cache::cached_trait::CacheFromMusicbrainzAutoId;
+use crate::core::entity_traits::cached_trait::CacheFromMusicbrainzAutoId;
 use crate::models::data::musicbrainz::artist::Artist;
 use musicbrainz_rs::entity::artist_credit::ArtistCredit as ArtistCreditMS;
 

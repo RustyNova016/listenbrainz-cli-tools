@@ -1,17 +1,14 @@
-use std::sync::Arc;
-
-use crate::models::{
-    cache::{
-        cached_trait::CacheFromMusicbrainz,
-        disk_cache::DiskCacheWrapper,
-        global_cache::GlobalCache,
-        traits::{has_cache::HasCache, merge::UpdateCachedEntity, InsertExternalEntityIntoCache},
-    },
-    data::musicbrainz::HasMbid,
-};
-
-use super::{media::Media, Release};
+use super::media::Media;
+use super::Release;
+use crate::core::caching::disk_cache::DiskCacheWrapper;
+use crate::core::caching::global_cache::GlobalCache;
+use crate::core::entity_traits::cached_trait::CacheFromMusicbrainz;
+use crate::core::entity_traits::has_cache::HasCache;
+use crate::core::entity_traits::insert_external_entity_into_cache::InsertExternalEntityIntoCache;
+use crate::core::entity_traits::merge::UpdateCachedEntity;
+use crate::models::data::musicbrainz::HasMbid;
 use musicbrainz_rs::entity::release::Release as ReleaseMS;
+use std::sync::Arc;
 
 impl CacheFromMusicbrainz<ReleaseMS> for Release {
     fn insert_ms_with_id_into_cache(mbid: String, value: ReleaseMS) -> color_eyre::Result<()> {

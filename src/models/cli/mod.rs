@@ -1,9 +1,10 @@
 pub mod unmapped;
+use self::stats::GroupByTarget;
+use self::unmapped::SortBy;
+use crate::tools::interactive_mapper::interactive_mapper;
+use crate::tools::stats::stats_command;
 use crate::tools::unlinked::unmapped_command;
-use crate::tools::{interactive_mapper::interactive_mapper, stats::stats_command};
 use clap::{Parser, Subcommand};
-
-use self::{stats::GroupByTarget, unmapped::SortBy};
 
 pub mod stats;
 

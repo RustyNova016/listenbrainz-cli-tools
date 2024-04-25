@@ -1,11 +1,12 @@
+use crate::core::caching::global_cache::GlobalCache;
+use crate::core::entity_traits::get_from_cache_or_fetch::GetFromCacheOrFetch;
+use crate::core::statistics::statistic_sorter::StatisticSorter;
 use indicatif::ProgressBar;
 
-use crate::models::api::GetFromCacheOrFetch;
-use crate::models::cache::global_cache::GlobalCache;
 use crate::models::data::musicbrainz::artist::Artist;
 use crate::models::stats::artist_stats::ArtistStatisticSorter;
-use crate::models::stats::StatisticHolder;
-use crate::models::stats::StatisticSorter;
+
+use crate::core::statistics::statistic_holder::StatisticHolder;
 use crate::utils::cli_paging::CLIPager;
 use crate::utils::Logger;
 

@@ -1,8 +1,9 @@
+use crate::core::caching::global_cache::GlobalCache;
+use crate::core::statistics::stat_sorter::StatSorter;
 use indicatif::ProgressBar;
 
-use crate::models::cache::global_cache::GlobalCache;
 use crate::models::stats::recording_stats::RecordingStatsSorter;
-use crate::models::stats::StatSorter;
+
 use crate::utils::cli_paging::CLIPager;
 use crate::utils::Logger;
 

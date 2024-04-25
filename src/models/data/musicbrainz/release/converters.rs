@@ -1,7 +1,7 @@
+use super::media::Media;
+use super::Release;
 use itertools::Itertools;
 use musicbrainz_rs::entity::release::Release as ReleaseMS;
-
-use super::{media::Media, Release};
 
 impl From<ReleaseMS> for Release {
     fn from(value: ReleaseMS) -> Self {

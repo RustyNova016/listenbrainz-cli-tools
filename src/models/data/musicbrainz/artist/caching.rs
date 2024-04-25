@@ -1,12 +1,12 @@
 use std::sync::Arc;
 
+use crate::core::caching::disk_cache::DiskCacheWrapper;
+use crate::core::caching::global_cache::GlobalCache;
 use musicbrainz_rs::entity::artist::Artist as ArtistMS;
 
-use crate::models::cache::cached_trait::{CacheFromMusicbrainz, CacheFromMusicbrainzAutoId};
-use crate::models::cache::disk_cache::DiskCacheWrapper;
-use crate::models::cache::global_cache::GlobalCache;
-use crate::models::cache::traits::has_cache::HasCache;
-use crate::models::cache::traits::merge::UpdateCachedEntity;
+use crate::core::entity_traits::cached_trait::{CacheFromMusicbrainz, CacheFromMusicbrainzAutoId};
+use crate::core::entity_traits::has_cache::HasCache;
+use crate::core::entity_traits::merge::UpdateCachedEntity;
 use crate::models::data::musicbrainz::artist::Artist;
 use crate::models::data::musicbrainz::recording::Recording;
 use crate::models::data::musicbrainz::HasMbid;

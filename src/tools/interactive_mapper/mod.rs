@@ -1,23 +1,15 @@
+use crate::core::caching::global_cache::GlobalCache;
+use crate::models::cli::unmapped::SortBy;
+use crate::models::data::listenbrainz::listen::collection::ListenCollection;
+use crate::models::data::listenbrainz::listen::Listen;
+use crate::utils::println_cli;
 use core::fmt;
-use std::{
-    collections::HashMap,
-    fmt::{Display, Formatter},
-    sync::Arc,
-};
-
 use inquire::Select;
 use itertools::Itertools;
-
 use serde::{Deserialize, Serialize};
-
-use crate::{
-    models::{
-        cache::global_cache::GlobalCache,
-        cli::unmapped::SortBy,
-        data::listenbrainz::listen::{collection::ListenCollection, Listen},
-    },
-    utils::println_cli,
-};
+use std::collections::HashMap;
+use std::fmt::{Display, Formatter};
+use std::sync::Arc;
 
 pub async fn interactive_mapper(username: &str, token: String, sort: Option<SortBy>) {
     println_cli(format!("Fetching unmapped for user {}", username));

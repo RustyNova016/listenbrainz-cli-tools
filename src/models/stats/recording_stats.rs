@@ -10,8 +10,10 @@ use color_eyre::Result;
 use crate::models::data::listenbrainz::listen::collection::ListenCollection;
 use crate::models::data::listenbrainz::listen::Listen;
 
-use super::generic_statistic_holder::GenericStatisticHolder;
-use super::{StatSorter, StatisticHolder, StatisticSorter};
+use crate::core::statistics::generic_statistic_holder::GenericStatisticHolder;
+use crate::core::statistics::stat_sorter::StatSorter;
+use crate::core::statistics::statistic_holder::StatisticHolder;
+use crate::core::statistics::statistic_sorter::StatisticSorter;
 
 #[derive(Debug, Default, Eq, PartialEq, Clone)]
 pub struct RecordingStatsSorter {

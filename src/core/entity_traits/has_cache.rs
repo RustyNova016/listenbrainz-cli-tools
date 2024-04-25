@@ -1,11 +1,13 @@
-use std::{fmt::Display, hash::Hash, sync::Arc};
-
+use crate::core::caching::disk_cache::DiskCacheWrapper;
+use crate::core::entity_traits::fetch_api::FetchAPI;
 use cached::DiskCacheError;
-use serde::{de::DeserializeOwned, Serialize};
+use serde::de::DeserializeOwned;
+use serde::Serialize;
+use std::fmt::Display;
+use std::hash::Hash;
+use std::sync::Arc;
 
-use crate::models::{api::FetchAPI, cache::disk_cache::DiskCacheWrapper};
-
-use super::merge::UpdateCachedEntity;
+use crate::core::entity_traits::merge::UpdateCachedEntity;
 pub trait HasCache<K, V>
 where
     K: Eq + Hash + Clone + Display,
