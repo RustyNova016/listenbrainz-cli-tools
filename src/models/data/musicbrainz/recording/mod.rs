@@ -1,4 +1,4 @@
-use crate::models::api::FetchAPI;
+use crate::core::entity_traits::fetch_api::FetchAPI;
 
 use color_eyre::eyre::{eyre, Context, OptionExt};
 use color_eyre::Result;

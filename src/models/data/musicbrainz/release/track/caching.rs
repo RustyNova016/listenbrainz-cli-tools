@@ -1,10 +1,8 @@
-use crate::models::{
-    cache::cached_trait::{CacheFromMusicbrainz, CacheFromMusicbrainzAutoId},
-    data::musicbrainz::{recording::Recording, HasMbid},
-};
-use musicbrainz_rs::entity::release::Track as TrackMS;
-
 use super::Track;
+use crate::core::entity_traits::cached_trait::{CacheFromMusicbrainz, CacheFromMusicbrainzAutoId};
+use crate::models::data::musicbrainz::recording::Recording;
+use crate::models::data::musicbrainz::HasMbid;
+use musicbrainz_rs::entity::release::Track as TrackMS;
 
 impl HasMbid for TrackMS {
     fn get_mbid(&self) -> &str {

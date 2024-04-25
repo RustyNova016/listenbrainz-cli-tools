@@ -1,16 +1,11 @@
-use serde::{de::DeserializeOwned, Serialize};
+use crate::core::entity_traits::fetch_api::FetchAPI;
+use crate::core::entity_traits::has_cache::HasCache;
+use crate::core::entity_traits::merge::UpdateCachedEntity;
+use serde::de::DeserializeOwned;
+use serde::Serialize;
+use std::fmt::Display;
+use std::future::Future;
 use std::hash::Hash;
-use std::{fmt::Display, future::Future};
-
-use super::cache::traits::has_cache::HasCache;
-use super::cache::traits::merge::UpdateCachedEntity;
-
-pub trait FetchAPI<K, V> {
-    /// Fetch an item an put it into the cache
-    ///
-    /// This operation isn't deduplicated! Refer to the Diskcache for safe call
-    fn fetch_and_insert(key: &K) -> impl Future<Output = color_eyre::Result<V>>;
-}
 
 pub trait GetFromCacheOrFetch<K, V>: HasCache<K, V> + FetchAPI<K, V>
 where

@@ -1,11 +1,11 @@
 use chrono::{DateTime, TimeDelta, Utc};
 
+use crate::core::caching::global_cache::GlobalCache;
 use indicatif::ProgressBar;
 use listenbrainz::raw::response::UserListensResponse;
 use listenbrainz::raw::Client;
 
-use crate::models::api::FetchAPI;
-use crate::models::cache::global_cache::GlobalCache;
+use crate::core::entity_traits::fetch_api::FetchAPI;
 use crate::utils::extensions::UserListensPayloadExt;
 use crate::utils::{println_lis, Logger};
 

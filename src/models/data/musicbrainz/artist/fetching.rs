@@ -1,10 +1,11 @@
+use crate::core::caching::global_cache::GlobalCache;
 use color_eyre::eyre::{Context, Ok};
 use musicbrainz_rs::entity::artist::Artist as ArtistMS;
 use musicbrainz_rs::Fetch;
 
-use crate::models::api::FetchAPI;
-use crate::models::cache::cached_trait::CacheFromMusicbrainzAutoId;
-use crate::models::cache::global_cache::GlobalCache;
+use crate::core::entity_traits::cached_trait::CacheFromMusicbrainzAutoId;
+use crate::core::entity_traits::fetch_api::FetchAPI;
+
 use crate::models::data::musicbrainz::artist::Artist;
 use crate::utils::println_mus;
 

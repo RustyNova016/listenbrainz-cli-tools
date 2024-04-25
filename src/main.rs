@@ -10,6 +10,7 @@ pub mod models;
 /// This is the module containing all the different tools of this app
 pub mod tools;
 
+pub mod core;
 pub mod utils;
 
 #[tokio::main]

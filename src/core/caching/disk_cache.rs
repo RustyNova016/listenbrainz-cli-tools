@@ -1,16 +1,15 @@
-use std::{fmt::Display, sync::Arc};
-
+use crate::core::caching::CACHE_LOCATION;
+use crate::core::entity_traits::fetch_api::FetchAPI;
+use crate::core::entity_traits::merge::UpdateCachedEntity;
 use cached::{DiskCache, DiskCacheError, IOCached};
 use chashmap::CHashMap;
 use color_eyre::eyre::Context;
-
-use serde::{de::DeserializeOwned, Serialize};
-use tokio::sync::{Semaphore, SemaphorePermit};
-
-use crate::models::api::FetchAPI;
-
-use super::{traits::merge::UpdateCachedEntity, CACHE_LOCATION};
+use serde::de::DeserializeOwned;
+use serde::Serialize;
+use std::fmt::Display;
 use std::hash::Hash;
+use std::sync::Arc;
+use tokio::sync::{Semaphore, SemaphorePermit};
 
 pub struct DiskCacheWrapper<K, V> {
     cache: DiskCache<K, V>,
