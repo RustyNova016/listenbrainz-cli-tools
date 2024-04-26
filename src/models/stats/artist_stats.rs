@@ -32,7 +32,7 @@ impl StatisticHolder<String> for ArtistStatisticHolder {
     }
 }
 
-#[derive(Debug, Default)]
+#[derive(Debug, Default, Clone)]
 pub struct ArtistStatisticSorter {
     data: CHashMap<String, Arc<ArtistStatisticHolder>>,
 }

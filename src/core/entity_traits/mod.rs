@@ -1,6 +1,10 @@
+pub mod cached;
 pub mod cached_trait;
 pub mod fetch_api;
+pub mod fetchable;
 pub mod get_from_cache_or_fetch;
 pub mod has_cache;
+pub mod has_id;
 pub mod insert_external_entity_into_cache;
+pub mod insertable;
 pub mod merge;

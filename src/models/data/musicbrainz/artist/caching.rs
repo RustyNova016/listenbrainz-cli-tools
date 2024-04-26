@@ -1,27 +1,13 @@
-use std::sync::Arc;
-
-use crate::core::caching::disk_cache::DiskCacheWrapper;
-use crate::core::caching::global_cache::GlobalCache;
-use musicbrainz_rs::entity::artist::Artist as ArtistMS;
-
-use crate::core::entity_traits::cached_trait::{CacheFromMusicbrainz, CacheFromMusicbrainzAutoId};
-use crate::core::entity_traits::has_cache::HasCache;
+use crate::core::caching::entity_cache::EntityCache;
+use crate::core::entity_traits::cached::Cached;
+use crate::core::entity_traits::has_id::HasID;
+use crate::core::entity_traits::insertable::{InsertableAs, InsertableWithExtras, IsAutoInsertableAs};
 use crate::core::entity_traits::merge::UpdateCachedEntity;
+use crate::models::data::entity_database::ENTITY_DATABASE;
 use crate::models::data::musicbrainz::artist::Artist;
-use crate::models::data::musicbrainz::recording::Recording;
 use crate::models::data::musicbrainz::HasMbid;
-
-impl CacheFromMusicbrainz<ArtistMS> for Artist {
-    fn insert_ms_with_id_into_cache(mbid: String, value: ArtistMS) -> color_eyre::Result<()> {
-        Self::set_or_update(mbid, value.clone().into())?;
-
-        if let Some(recordings) = value.recordings {
-            Recording::insert_ms_iter_into_cache(recordings)?;
-        }
-
-        Ok(())
-    }
-}
+use musicbrainz_rs::entity::artist::Artist as ArtistMS;
+use std::sync::Arc;
 
 impl HasMbid for ArtistMS {
     fn get_mbid(&self) -> &str {
@@ -35,8 +21,45 @@ impl UpdateCachedEntity for Artist {
     }
 }
 
-impl HasCache<String, Artist> for Artist {
-    fn get_cache() -> Arc<DiskCacheWrapper<String, Artist>> {
-        GlobalCache::new().get_artist_cache()
+impl Cached<String> for Artist {
+    fn get_cache() -> Arc<EntityCache<String, Self>>
+    where
+        Self: Sized,
+    {
+        ENTITY_DATABASE.artists()
+    }
+}
+
+impl InsertableAs<String, Artist> for ArtistMS {
+    async fn insert_into_cache_as(&self, key: String) -> color_eyre::Result<()> {
+        Artist::get_cache().set(&key, self.clone().into()).await?;
+
+        Ok(())
+    }
+}
+
+impl InsertableWithExtras<String, Artist> for ArtistMS {
+    async fn insert_with_relations(&self, key: String) -> color_eyre::Result<()> {
+        Artist::get_cache().set(&key, self.clone().into()).await?;
+
+        if let Some(recordings) = self.recordings.clone() {
+            for item in recordings.iter() {
+                item.insert_into_cache().await?;
+            }
+        }
+
+        Ok(())
+    }
+}
+
+impl HasID<String> for Artist {
+    fn get_id(&self) -> String {
+        self.id.to_string()
+    }
+}
+
+impl HasID<String> for ArtistMS {
+    fn get_id(&self) -> String {
+        self.id.to_string()
     }
 }

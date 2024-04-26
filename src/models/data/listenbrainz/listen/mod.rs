@@ -1,14 +1,11 @@
 pub mod getters;
 use std::collections::HashMap;
-
-use crate::core::entity_traits::get_from_cache_or_fetch::GetFromCacheOrFetch;
+use crate::core::entity_traits::fetchable::FetchableAndCachable;
 use chrono::{DateTime, Utc};
 use color_eyre::eyre::Context;
 use serde::{Deserialize, Serialize};
-
 use crate::models::data::listenbrainz::mapping_data::MappingData;
 use crate::models::data::musicbrainz::recording::Recording;
-
 use super::messybrainz::MessyBrainzData;
 
 pub mod collection;

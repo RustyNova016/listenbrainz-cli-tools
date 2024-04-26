@@ -12,7 +12,7 @@ pub trait StatisticSorter<K, H: StatisticHolder<K>> {
     fn get(&self, key: &K) -> Arc<H>;
 
     fn extend<'a, T: IntoIterator<Item = Arc<Listen>>>(
-        &'a mut self,
+        &'a self,
         iter: T,
     ) -> impl std::future::Future<Output = color_eyre::Result<()>>
     where

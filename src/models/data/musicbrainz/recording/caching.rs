@@ -1,65 +1,11 @@
 use std::sync::Arc;
-
-use crate::core::entity_traits::cached_trait::CacheFromMusicbrainz;
-use crate::core::entity_traits::has_cache::HasCache;
+use crate::core::entity_traits::cached::Cached;
+use crate::core::entity_traits::has_id::HasID;
+use crate::core::entity_traits::insertable::{InsertableAs, IsAutoInsertableAs};
 use crate::core::entity_traits::merge::UpdateCachedEntity;
-
-use crate::core::caching::disk_cache::DiskCacheWrapper;
-use crate::core::caching::global_cache::GlobalCache;
-use crate::core::entity_traits::get_from_cache_or_fetch::GetFromCacheOrFetch;
-use crate::models::data::musicbrainz::artist_credit::ArtistCredit;
+use crate::models::data::entity_database::ENTITY_DATABASE;
 use crate::models::data::musicbrainz::recording::Recording;
-use crate::models::data::musicbrainz::HasMbid;
-use cached::DiskCacheError;
-use itertools::Itertools;
 use musicbrainz_rs::entity::recording::Recording as RecordingMS;
-use tokio::task::JoinHandle;
-
-impl CacheFromMusicbrainz<RecordingMS> for Recording {
-    fn insert_ms_with_id_into_cache(mbid: String, value: RecordingMS) -> color_eyre::Result<()> {
-        Self::set_or_update(mbid, value.clone().into())?;
-
-        if let Some(data) = value.artist_credit.clone() {
-            ArtistCredit::insert_ms_artist_iter_into_cache(data)?;
-        }
-
-        Ok(())
-    }
-}
-
-impl HasMbid for RecordingMS {
-    fn get_mbid(&self) -> &str {
-        &self.id
-    }
-}
-
-pub trait HasRecordingIDs {
-    fn get_recording_mbids(&self) -> Vec<String>;
-
-    fn get_recordings(&self) -> Result<Vec<(String, Option<Recording>)>, DiskCacheError> {
-        let cache = GlobalCache::new();
-        self.get_recording_mbids()
-            .into_iter()
-            .map(|id| {
-                let recording = cache.get_recording(&id);
-                recording.map(|record| (id, record))
-            })
-            .collect()
-    }
-
-    fn get_recordings_or_fetch(&self) -> Vec<JoinHandle<color_eyre::Result<(String, Recording)>>> {
-        self.get_recording_mbids()
-            .into_iter()
-            .map(|id| {
-                let id = id.clone();
-                tokio::spawn(async move {
-                    let recording = Recording::get_cached_or_fetch(&id).await;
-                    recording.map(|record| (id, record))
-                })
-            })
-            .collect_vec()
-    }
-}
 
 impl UpdateCachedEntity for Recording {
     fn update_entity(self, new: Self) -> Self {
@@ -71,8 +17,39 @@ impl UpdateCachedEntity for Recording {
     }
 }
 
-impl HasCache<String, Recording> for Recording {
-    fn get_cache() -> Arc<DiskCacheWrapper<String, Recording>> {
-        GlobalCache::new().get_recording_cache()
+impl Cached<String> for Recording {
+    fn get_cache() -> Arc<crate::core::caching::entity_cache::EntityCache<String, Self>>
+    where
+        Self: Sized,
+    {
+        ENTITY_DATABASE.recordings()
+    }
+}
+
+impl InsertableAs<String, Recording> for RecordingMS {
+    async fn insert_into_cache_as(&self, key: String) -> color_eyre::Result<()> {
+        <Recording as Cached<String>>::get_cache()
+            .set(&key, self.clone().into())
+            .await?;
+
+        if let Some(data) = self.artist_credit.clone() {
+            for item in data.iter() {
+                item.insert_into_cache().await?;
+            }
+        }
+
+        Ok(())
+    }
+}
+
+impl HasID<String> for Recording {
+    fn get_id(&self) -> String {
+        self.id.to_string()
+    }
+}
+
+impl HasID<String> for RecordingMS {
+    fn get_id(&self) -> String {
+        self.id.to_string()
     }
 }
