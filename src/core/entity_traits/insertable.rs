@@ -1,5 +1,5 @@
-use std::{fmt::Display, future::Future};
 use super::has_id::HasID;
+use std::{fmt::Display, future::Future};
 
 pub trait InsertableAs<K, V> {
     // Insert everything into the global cache

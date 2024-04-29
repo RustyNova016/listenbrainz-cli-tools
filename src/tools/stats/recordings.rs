@@ -1,16 +1,14 @@
-use crate::core::caching::global_cache::GlobalCache;
 use crate::core::statistics::stat_sorter::StatSorter;
-use indicatif::ProgressBar;
-
+use crate::models::data::listenbrainz::user_listens::UserListens;
 use crate::models::stats::recording_stats::RecordingStatsSorter;
-
 use crate::utils::cli_paging::CLIPager;
 use crate::utils::Logger;
+use indicatif::ProgressBar;
 
 pub async fn stats_recording(username: &str) {
     // Get the listens
-    let mapped_listens = GlobalCache::new()
-        .get_user_listens_with_refresh(username)
+    let mapped_listens = UserListens::get_user_with_refresh(username)
+        .await
         .expect("Couldn't fetch the new listens")
         .get_mapped_listens();
 

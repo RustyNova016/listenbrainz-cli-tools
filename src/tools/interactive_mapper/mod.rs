@@ -1,7 +1,7 @@
-use crate::core::caching::global_cache::GlobalCache;
 use crate::models::cli::unmapped::SortBy;
 use crate::models::data::listenbrainz::listen::collection::ListenCollection;
 use crate::models::data::listenbrainz::listen::Listen;
+use crate::models::data::listenbrainz::user_listens::UserListens;
 use crate::utils::println_cli;
 use core::fmt;
 use inquire::Select;
@@ -13,8 +13,8 @@ use std::sync::Arc;
 
 pub async fn interactive_mapper(username: &str, token: String, sort: Option<SortBy>) {
     println_cli(format!("Fetching unmapped for user {}", username));
-    let mut unmappeds: ListenCollection = GlobalCache::new()
-        .get_user_listens_with_refresh(username)
+    let mut unmappeds: ListenCollection = UserListens::get_user_with_refresh(username)
+        .await
         .expect("Couldn't fetch the new listens")
         .get_unmapped_listens()
         .into_iter()

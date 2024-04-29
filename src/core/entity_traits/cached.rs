@@ -1,6 +1,6 @@
-use std::sync::Arc;
-use serde::{de::DeserializeOwned, Serialize};
 use crate::core::caching::entity_cache::EntityCache;
+use serde::{de::DeserializeOwned, Serialize};
+use std::sync::Arc;
 
 /// For all the entities that have a cache
 pub trait Cached<K>: Serialize + DeserializeOwned {

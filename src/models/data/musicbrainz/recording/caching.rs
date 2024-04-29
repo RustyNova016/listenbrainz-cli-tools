@@ -1,4 +1,3 @@
-use std::sync::Arc;
 use crate::core::entity_traits::cached::Cached;
 use crate::core::entity_traits::has_id::HasID;
 use crate::core::entity_traits::insertable::{InsertableAs, IsAutoInsertableAs};
@@ -6,6 +5,7 @@ use crate::core::entity_traits::merge::UpdateCachedEntity;
 use crate::models::data::entity_database::ENTITY_DATABASE;
 use crate::models::data::musicbrainz::recording::Recording;
 use musicbrainz_rs::entity::recording::Recording as RecordingMS;
+use std::sync::Arc;
 
 impl UpdateCachedEntity for Recording {
     fn update_entity(self, new: Self) -> Self {

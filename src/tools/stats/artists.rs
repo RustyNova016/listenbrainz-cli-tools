@@ -1,21 +1,18 @@
-use std::sync::Arc;
-
-use crate::core::caching::global_cache::GlobalCache;
 use crate::core::entity_traits::fetchable::FetchableAndCachable;
+use crate::core::statistics::statistic_holder::StatisticHolder;
 use crate::core::statistics::statistic_sorter::StatisticSorter;
-use indicatif::ProgressBar;
-
+use crate::models::data::listenbrainz::user_listens::UserListens;
 use crate::models::data::musicbrainz::artist::Artist;
 use crate::models::stats::artist_stats::ArtistStatisticSorter;
-
-use crate::core::statistics::statistic_holder::StatisticHolder;
 use crate::utils::cli_paging::CLIPager;
 use crate::utils::Logger;
+use indicatif::ProgressBar;
+use std::sync::Arc;
 
 pub async fn stats_artist(username: &str) {
     // Get the listens
-    let user_listens = GlobalCache::new()
-        .get_user_listens_with_refresh(username)
+    let user_listens = UserListens::get_user_with_refresh(username)
+        .await
         .expect("Couldn't fetch the new listens");
 
     let mapped_listens = user_listens.get_mapped_listens();
@@ -37,10 +34,10 @@ pub async fn stats_artist(username: &str) {
     //     task.await.expect("Couldn't sort the listens").expect("Couldn't sort the listens");
     // }
 
-     sorter
-         .extend(progress_bar.wrap_iter(mapped_listens.into_iter()))
-         .await
-         .expect("Couldn't sort the listens");
+    sorter
+        .extend(progress_bar.wrap_iter(mapped_listens.into_iter()))
+        .await
+        .expect("Couldn't sort the listens");
 
     let mut pager = CLIPager::new(5);
     let extracted_sorter: ArtistStatisticSorter = sorter.as_ref().clone();

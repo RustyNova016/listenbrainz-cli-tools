@@ -1,19 +1,30 @@
+use crate::core::entity_traits::cached::Cached;
+use crate::core::entity_traits::insertable::InsertableAs;
+use crate::utils::extensions::UserListensPayloadExt;
+use crate::utils::{println_cli, println_lis, Logger};
 use chrono::{DateTime, TimeDelta, Utc};
-
-use crate::core::caching::global_cache::GlobalCache;
 use indicatif::ProgressBar;
 use listenbrainz::raw::response::UserListensResponse;
 use listenbrainz::raw::Client;
 
-use crate::core::entity_traits::fetch_api::FetchAPI;
-use crate::utils::extensions::UserListensPayloadExt;
-use crate::utils::{println_lis, Logger};
-
 use super::UserListens;
 
 impl UserListens {
+    pub async fn get_user_with_refresh(username: &str) -> color_eyre::Result<UserListens> {
+        println_cli("Getting new user listens...");
+        UserListens::fetch_latest(username).await?;
+
+        println_cli("Updating unmapped listens...");
+        UserListens::update_unlinked_of_user(username).await?;
+
+        Ok(Self::get_from_cache(username)
+            .await
+            .expect("Couldn't get listen that were inserted")
+            .expect("Couldn't get listen that were inserted"))
+    }
+
     /// Fetch the most listens it can, that have been listened before the provided date. Additionally save them to the cache
-    pub fn fetch_before(
+    pub async fn fetch_before(
         user: &str,
         before_date: DateTime<Utc>,
     ) -> color_eyre::Result<UserListensResponse> {
@@ -26,7 +37,7 @@ impl UserListens {
         let result =
             Client::new().user_listens(user, None, Some(before_date.timestamp()), Some(999))?;
 
-        GlobalCache::new().insert_lb_listen_payload(result.payload.clone())?;
+        result.insert_into_cache_as(user.to_lowercase()).await?;
 
         Ok(result)
     }
@@ -34,11 +45,11 @@ impl UserListens {
     /// Fetch the latest listens that aren't yet in the cache. If it fetched more than needed, entries will get updated
     ///
     /// If the cache is empty, then it will fill it completly
-    pub fn fetch_latest(username: &str) -> color_eyre::Result<()> {
+    pub async fn fetch_latest(username: &str) -> color_eyre::Result<()> {
         let operation_start = Utc::now();
 
-        let latest_cached_listen_date = GlobalCache::new()
-            .get_user_listens(&username.to_lowercase())?
+        let latest_cached_listen_date = UserListens::get_from_cache(username)
+            .await?
             .and_then(|user_listens| user_listens.listens.get_latest_listen())
             .map(|listen| *listen.get_listened_at());
 
@@ -51,7 +62,7 @@ impl UserListens {
             && !latest_cached_listen_date.is_some_and(|cache_date| cache_date > before_date)
         {
             // We fetch a page of listens
-            let result = Self::fetch_before(username, before_date)?;
+            let result = Self::fetch_before(username, before_date).await?;
 
             // We put the new before date as the last listen's
             before_date = result
@@ -65,10 +76,10 @@ impl UserListens {
     }
 
     /// Refetch all the unlinked listens of a user and recache them
-    pub fn update_unlinked_of_user(username: &str) -> color_eyre::Result<()> {
+    pub async fn update_unlinked_of_user(username: &str) -> color_eyre::Result<()> {
         // We first get all the unlinked cached
-        let mut unlinkeds = GlobalCache::new()
-            .get_user_listens_or_empty(username)?
+        let mut unlinkeds = UserListens::get_from_cache_or_new(username)
+            .await?
             .get_unmapped_listens();
         let start_count = unlinkeds.len();
 
@@ -83,7 +94,8 @@ impl UserListens {
             let result = Self::fetch_before(
                 username,
                 refresh_target.listened_at + TimeDelta::new(1, 0).unwrap(),
-            )?
+            )
+            .await?
             .payload;
 
             unlinkeds.remove_timerange(
@@ -105,8 +117,18 @@ impl UserListens {
     }
 }
 
-impl FetchAPI<String, UserListens> for UserListens {
-    async fn fetch_and_insert(key: &String) -> color_eyre::Result<UserListens> {
-        GlobalCache::new().get_user_listens_with_refresh(key)
+impl InsertableAs<String, UserListens> for UserListensResponse {
+    async fn insert_into_cache_as(&self, key: String) -> color_eyre::Result<()> {
+        let mut user_listens = UserListens::get_cache()
+            .get(&key)
+            .await?
+            .unwrap_or(UserListens::new(&key));
+
+        user_listens.refresh_timerange(self.payload.clone());
+
+        UserListens::get_cache()
+            .set(&key.to_lowercase(), user_listens)
+            .await?;
+        Ok(())
     }
 }

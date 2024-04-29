@@ -1,7 +1,9 @@
 use crate::core::caching::entity_cache::EntityCache;
 use crate::core::entity_traits::cached::Cached;
 use crate::core::entity_traits::has_id::HasID;
-use crate::core::entity_traits::insertable::{InsertableAs, InsertableWithExtras, IsAutoInsertableAs};
+use crate::core::entity_traits::insertable::{
+    InsertableAs, InsertableWithExtras, IsAutoInsertableAs,
+};
 use crate::core::entity_traits::merge::UpdateCachedEntity;
 use crate::models::data::entity_database::ENTITY_DATABASE;
 use crate::models::data::musicbrainz::artist::Artist;
