@@ -1,9 +1,10 @@
 use crate::core::entity_traits::cached::Cached;
 use crate::core::entity_traits::has_id::HasID;
-use crate::core::entity_traits::insertable::{InsertableAs, IsAutoInsertableAs};
+use crate::core::entity_traits::insertable::{InsertableAs, InsertableWithExtras, IsAutoInsertableAs};
 use crate::core::entity_traits::merge::UpdateCachedEntity;
 use crate::models::data::entity_database::ENTITY_DATABASE;
 use crate::models::data::musicbrainz::recording::Recording;
+use chrono::format::Item;
 use musicbrainz_rs::entity::recording::Recording as RecordingMS;
 use std::sync::Arc;
 
@@ -13,6 +14,7 @@ impl UpdateCachedEntity for Recording {
             artist_credit: new.artist_credit.or(self.artist_credit),
             id: new.id,
             title: new.title,
+            releases: new.releases.or(self.releases)
         }
     }
 }
@@ -32,9 +34,25 @@ impl InsertableAs<String, Recording> for RecordingMS {
             .set(&key, self.clone().into())
             .await?;
 
+        self.insert_with_relations(key).await?;
+
+        Ok(())
+    }
+}
+
+impl InsertableWithExtras<String, Recording> for RecordingMS {
+    async fn insert_with_relations(&self, key: String) -> color_eyre::Result<()> {
+        Recording::get_cache().set(&key, self.clone().into()).await?;
+
         if let Some(data) = self.artist_credit.clone() {
             for item in data.iter() {
                 item.insert_into_cache().await?;
+            }
+        }
+
+        if let Some(releases) = self.releases.clone() {
+            for release in releases.iter() {
+                release.insert_into_cache().await?;
             }
         }
 

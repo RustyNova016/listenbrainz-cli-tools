@@ -1,7 +1,7 @@
 pub mod unmapped;
 use self::stats::GroupByTarget;
 use self::unmapped::SortBy;
-use crate::tools::interactive_mapper::interactive_mapper;
+use crate::tools::{interactive_mapper::interactive_mapper, radio::create_radio_mix};
 use crate::tools::stats::stats_command;
 use crate::tools::unlinked::unmapped_command;
 use clap::{Parser, Subcommand};
@@ -56,6 +56,17 @@ pub enum Commands {
         #[arg(short, long)]
         sort: Option<SortBy>,
     },
+
+    /// Generate playlists
+    Radio {
+        /// Name of the user to fetch unlinked listen from
+        #[arg(short, long)]
+        username: String,
+    
+        /// User token
+        #[arg(short, long)]
+        token: String,
+    }
 }
 
 impl Commands {
@@ -71,7 +82,13 @@ impl Commands {
                 username,
                 token,
                 sort,
-            } => interactive_mapper(username, token.clone(), *sort).await,
+            } => {
+                interactive_mapper(username, token.clone(), *sort).await
+            },
+
+            Commands::Radio { username, token } => {
+                create_radio_mix(username, token.clone()).await
+            }
         }
     }
 }
