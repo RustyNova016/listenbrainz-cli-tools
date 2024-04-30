@@ -29,7 +29,7 @@ where
         Ok(cacache::write(&self.name, key.to_string(), serialized).await?)
     }
 
-    /// Get an item and return an option if it isn't found. This is more akin to a [`std::collections::Hashmap`]
+    /// Get an item and return an option if it isn't found. This is more akin to a [`HashMap`](std::collections::HashMap)
     pub async fn get(&self, key: &K) -> color_eyre::Result<Option<V>> {
         let read = cacache::read(&self.name, key.to_string()).await;
 
