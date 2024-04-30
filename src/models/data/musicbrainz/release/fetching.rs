@@ -1,30 +1,24 @@
 use super::Release;
-use crate::core::entity_traits::cached_trait::CacheFromMusicbrainzAutoId;
-use crate::core::entity_traits::fetch_api::FetchAPI;
-use crate::core::entity_traits::has_cache::HasCache;
+use crate::core::entity_traits::fetchable::Fetchable;
 use crate::utils::println_mus;
 use color_eyre::eyre::Context;
 use musicbrainz_rs::entity::release::Release as ReleaseMS;
 use musicbrainz_rs::Fetch;
 
-impl FetchAPI<String, Release> for Release {
-    fn fetch_and_insert(
+impl Fetchable<String> for Release {
+    async fn fetch(
         key: &String,
-    ) -> impl std::future::Future<Output = color_eyre::Result<Release>> {
-        let key = key.clone();
-        async move {
-            println_mus(format!("Getting data for artist MBID: {}", &key));
-            let msreturn = ReleaseMS::fetch()
-                .id(&key)
-                .with_recordings()
-                .execute()
-                .await
-                .context("Failed to fetch artist from MusicBrainz")?;
+    ) -> color_eyre::Result<impl crate::core::entity_traits::insertable::InsertableAs<String, Self>>
+    where
+        Self: Sized,
+    {
+        println_mus(format!("Getting data for artist MBID: {}", &key));
 
-            Self::insert_ms_into_cache(msreturn)?;
-
-            // The element have been inserted above, so it should be safe to unwrap the option
-            Ok(Self::get_from_cache(&key)?.unwrap())
-        }
+        ReleaseMS::fetch()
+            .id(key)
+            .with_recordings()
+            .execute()
+            .await
+            .context("Failed to fetch artist from MusicBrainz")
     }
 }

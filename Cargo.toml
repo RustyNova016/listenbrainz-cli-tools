@@ -32,6 +32,8 @@ indicatif = { version = "0.17.8", features = ["rayon", "improved_unicode"] }
 tokio = {version = "1.37.0", features = ["full"]}
 rayon = "1.10.0"
 reqwest = {version = "0.12.4", features = ["json"]}
+cacache = { version = "13.0.0", default-features = false, features = ["tokio-runtime", "mmap"] }
+rmp-serde = "1.2.0"
 
 # The profile that 'cargo dist' will build with
 [profile.dist]

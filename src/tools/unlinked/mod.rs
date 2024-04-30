@@ -1,20 +1,19 @@
 //! Contain the code for the "unlisted" command
-use std::cmp::Reverse;
-
-use crate::core::caching::global_cache::GlobalCache;
 use color_eyre::eyre::Context;
 use listenbrainz::raw::response::UserListensListen;
 use listenbrainz::raw::Client;
+use std::cmp::Reverse;
 
 use crate::models::cli::unmapped::SortBy;
 use crate::models::data::listenbrainz::messy_recording::MessyRecording;
+use crate::models::data::listenbrainz::user_listens::UserListens;
 use crate::utils::cli_paging::CLIPager;
 use crate::utils::{println_cli, ListenAPIPaginatorBuilder};
 
-pub fn unmapped_command(username: &str, sort: Option<SortBy>) {
+pub async fn unmapped_command(username: &str, sort: Option<SortBy>) {
     println_cli(format!("Fetching unmapped for user {}", username));
-    let unlinked = GlobalCache::new()
-        .get_user_listens_with_refresh(username)
+    let unlinked = UserListens::get_user_with_refresh(username)
+        .await
         .expect("Couldn't fetch the new listens")
         .get_unmapped_listens();
 

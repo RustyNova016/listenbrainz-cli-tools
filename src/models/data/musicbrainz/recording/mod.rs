@@ -1,4 +1,4 @@
-use crate::core::entity_traits::fetch_api::FetchAPI;
+use crate::models::data::entity_database::ENTITY_DATABASE;
 
 use color_eyre::eyre::{eyre, Context, OptionExt};
 use color_eyre::Result;
@@ -25,9 +25,10 @@ impl Recording {
         Ok(match &self.get_artist_credits() {
             Some(credits) => credits.clone(),
             None => {
-                Self::fetch_and_insert(&self.get_mbid().to_string())
+                ENTITY_DATABASE.recordings().fetch_and_save(self.get_mbid().to_string())
                 .await
                 .context("Couldn't fetch data from the API")?
+                .ok_or_eyre(eyre!("Couldn't find any recording with the MBID"))?
                 .get_artist_credits()
                 .ok_or_eyre(eyre!(format!("Artist credit is null after fetching from the API. Something wrong happened, as it should return a empty vec. \n Is there an include missing somewhere in the API call? Or is the credit not saved? Faulty requested recording ID is: {}", &self.id)))?
             }

@@ -1,11 +1,8 @@
+pub mod entity_cache;
+pub mod serde_cacache;
 use directories::BaseDirs;
 use once_cell::sync::Lazy;
-use std::path::PathBuf;
-
-pub mod disk_cache;
-pub mod global_cache;
-pub mod listen_caching;
-pub mod static_cache;
+use std::{fs, path::PathBuf};
 
 pub static CACHE_LOCATION: Lazy<PathBuf> = Lazy::new(|| {
     let mut path = BaseDirs::new()
@@ -13,5 +10,6 @@ pub static CACHE_LOCATION: Lazy<PathBuf> = Lazy::new(|| {
         .cache_dir()
         .to_path_buf();
     path.push("listenbrainz_cli_tools");
+    fs::create_dir_all(&path).expect("Couldn't create cache directory");
     path
 });

@@ -1,30 +1,11 @@
-use super::media::Media;
 use super::Release;
-use crate::core::caching::disk_cache::DiskCacheWrapper;
-use crate::core::caching::global_cache::GlobalCache;
-use crate::core::entity_traits::cached_trait::CacheFromMusicbrainz;
-use crate::core::entity_traits::has_cache::HasCache;
-use crate::core::entity_traits::insert_external_entity_into_cache::InsertExternalEntityIntoCache;
+use crate::core::entity_traits::cached::Cached;
+use crate::core::entity_traits::has_id::HasID;
+use crate::core::entity_traits::insertable::InsertableAs;
 use crate::core::entity_traits::merge::UpdateCachedEntity;
-use crate::models::data::musicbrainz::HasMbid;
+use crate::models::data::entity_database::ENTITY_DATABASE;
 use musicbrainz_rs::entity::release::Release as ReleaseMS;
 use std::sync::Arc;
-
-impl CacheFromMusicbrainz<ReleaseMS> for Release {
-    fn insert_ms_with_id_into_cache(mbid: String, value: ReleaseMS) -> color_eyre::Result<()> {
-        Self::set_or_update(mbid, value.clone().into())?;
-
-        Media::insert_opt_ext_iter_into_cache(value.media.clone())?;
-
-        Ok(())
-    }
-}
-
-impl HasMbid for ReleaseMS {
-    fn get_mbid(&self) -> &str {
-        &self.id
-    }
-}
 
 impl UpdateCachedEntity for Release {
     fn update_entity(self, new: Self) -> Self {
@@ -42,8 +23,37 @@ impl UpdateCachedEntity for Release {
     }
 }
 
-impl HasCache<String, Release> for Release {
-    fn get_cache() -> Arc<DiskCacheWrapper<String, Release>> {
-        GlobalCache::new().get_release_cache()
+impl HasID<String> for Release {
+    fn get_id(&self) -> String {
+        self.id.to_string()
+    }
+}
+
+impl HasID<String> for ReleaseMS {
+    fn get_id(&self) -> String {
+        self.id.to_string()
+    }
+}
+
+impl Cached<String> for Release {
+    fn get_cache() -> Arc<crate::core::caching::entity_cache::EntityCache<String, Self>>
+    where
+        Self: Sized,
+    {
+        ENTITY_DATABASE.releases()
+    }
+}
+
+impl InsertableAs<String, Release> for ReleaseMS {
+    async fn insert_into_cache_as(&self, key: String) -> color_eyre::Result<()> {
+        Release::get_cache().set(&key, self.clone().into()).await?;
+
+        if let Some(tracks) = &self.media {
+            for track in tracks {
+                track.insert_into_cache_as("".to_string()).await?;
+            }
+        }
+
+        Ok(())
     }
 }
