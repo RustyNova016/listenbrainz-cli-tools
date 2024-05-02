@@ -117,7 +117,7 @@ impl UserListens {
     }
 }
 
-impl InsertableAs<String, UserListens> for UserListensResponse {
+impl InsertableAs<UserListens> for UserListensResponse {
     async fn insert_into_cache_as(&self, key: String) -> color_eyre::Result<()> {
         let mut user_listens = UserListens::get_cache()
             .get(&key)

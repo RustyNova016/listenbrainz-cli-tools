@@ -16,20 +16,20 @@ impl UpdateCachedEntity for UserListens {
     }
 }
 
-impl Cached<String> for UserListens {
-    fn get_cache() -> Arc<EntityCache<String, UserListens>> {
+impl Cached for UserListens {
+    fn get_cache() -> Arc<EntityCache<UserListens>> {
         ENTITY_DATABASE.user_listens()
     }
 }
 
-impl InsertableAs<String, UserListens> for UserListens {
+impl InsertableAs<UserListens> for UserListens {
     async fn insert_into_cache_as(&self, key: String) -> color_eyre::Result<()> {
         UserListens::get_cache().set(&key, self.clone()).await?;
         Ok(())
     }
 }
 
-impl HasID<String> for UserListens {
+impl HasID for UserListens {
     fn get_id(&self) -> String {
         self.username.to_string()
     }

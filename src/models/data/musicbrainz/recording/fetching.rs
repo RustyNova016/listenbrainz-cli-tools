@@ -6,8 +6,8 @@ use color_eyre::eyre::{Context, Ok};
 use musicbrainz_rs::entity::recording::Recording as RecordingMS;
 use musicbrainz_rs::Fetch;
 
-impl Fetchable<String> for Recording {
-    async fn fetch(key: &String) -> color_eyre::Result<impl InsertableAs<String, Self>>
+impl Fetchable for Recording {
+    async fn fetch(key: &String) -> color_eyre::Result<impl InsertableAs<Self>>
     where
         Self: Sized,
     {

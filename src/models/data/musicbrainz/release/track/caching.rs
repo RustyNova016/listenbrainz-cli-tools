@@ -2,7 +2,7 @@ use crate::core::entity_traits::insertable::{InsertableAs, IsAutoInsertableAs};
 use crate::models::data::musicbrainz::recording::Recording;
 use musicbrainz_rs::entity::release::Track as TrackMS;
 
-impl InsertableAs<String, Recording> for TrackMS {
+impl InsertableAs<Recording> for TrackMS {
     fn insert_into_cache_as(
         &self,
         _key: String,

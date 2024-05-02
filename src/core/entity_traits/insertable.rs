@@ -1,30 +1,29 @@
 use super::has_id::HasID;
 use std::{fmt::Display, future::Future};
 
-pub trait InsertableAs<K, V> {
+pub trait InsertableAs<V> {
     // Insert everything into the global cache
-    fn insert_into_cache_as(&self, key: K) -> impl Future<Output = color_eyre::Result<()>> + Send;
+    fn insert_into_cache_as(&self, key: String) -> impl Future<Output = color_eyre::Result<()>> + Send;
 }
 
-pub trait IsAutoInsertableAs<K: Display, V>: HasID<K> + InsertableAs<K, V> {
+pub trait IsAutoInsertableAs<V>: HasID + InsertableAs<V> {
     fn insert_into_cache<'a>(&'a self) -> impl Future<Output = color_eyre::Result<()>> + Send
-    where
-        K: 'a,
     {
         self.insert_into_cache_as(self.get_id())
     }
 
     /// Insert the value int
-    fn insert_into_cache_along_key(&self, key: K) -> impl Future<Output = color_eyre::Result<()>> {
+    fn insert_into_cache_along_key(&self, key: String) -> impl Future<Output = color_eyre::Result<()>> {
         async {
             self.insert_into_cache_as(self.get_id()).await?;
-            self.insert_into_cache_as(key).await
+            self.insert_into_cache_as(key).await?;
+            Ok(())
         }
     }
 }
 
-impl<K: Display, V, T: HasID<K> + InsertableAs<K, V>> IsAutoInsertableAs<K, V> for T {}
+impl<V, T: HasID + InsertableAs<V>> IsAutoInsertableAs<V> for T {}
 
-pub trait InsertableWithExtras<K: Display + Clone, V>: InsertableAs<K, V> + HasID<K> {
-    fn insert_with_relations(&self, key: K) -> impl Future<Output = color_eyre::Result<()>> + Send;
+pub trait InsertableWithExtras<V>: InsertableAs<V> + HasID {
+    fn insert_with_relations(&self, key: String) -> impl Future<Output = color_eyre::Result<()>> + Send;
 }

@@ -5,7 +5,7 @@ use crate::{
     models::data::musicbrainz::artist::Artist,
 };
 
-impl InsertableAs<String, Artist> for ArtistCreditMS {
+impl InsertableAs<Artist> for ArtistCreditMS {
     fn insert_into_cache_as(
         &self,
         key: String,
@@ -14,7 +14,7 @@ impl InsertableAs<String, Artist> for ArtistCreditMS {
     }
 }
 
-impl HasID<String> for ArtistCreditMS {
+impl HasID for ArtistCreditMS {
     fn get_id(&self) -> String {
         self.artist.id.to_string()
     }

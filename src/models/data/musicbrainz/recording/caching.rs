@@ -17,8 +17,8 @@ impl UpdateCachedEntity for Recording {
     }
 }
 
-impl Cached<String> for Recording {
-    fn get_cache() -> Arc<crate::core::caching::entity_cache::EntityCache<String, Self>>
+impl Cached for Recording {
+    fn get_cache() -> Arc<crate::core::caching::entity_cache::EntityCache<Self>>
     where
         Self: Sized,
     {
@@ -26,9 +26,9 @@ impl Cached<String> for Recording {
     }
 }
 
-impl InsertableAs<String, Recording> for RecordingMS {
+impl InsertableAs<Recording> for RecordingMS {
     async fn insert_into_cache_as(&self, key: String) -> color_eyre::Result<()> {
-        <Recording as Cached<String>>::get_cache()
+        Recording::get_cache()
             .set(&key, self.clone().into())
             .await?;
 
@@ -42,13 +42,13 @@ impl InsertableAs<String, Recording> for RecordingMS {
     }
 }
 
-impl HasID<String> for Recording {
+impl HasID for Recording {
     fn get_id(&self) -> String {
         self.id.to_string()
     }
 }
 
-impl HasID<String> for RecordingMS {
+impl HasID for RecordingMS {
     fn get_id(&self) -> String {
         self.id.to_string()
     }

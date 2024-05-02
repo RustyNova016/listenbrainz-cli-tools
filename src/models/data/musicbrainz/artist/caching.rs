@@ -23,8 +23,8 @@ impl UpdateCachedEntity for Artist {
     }
 }
 
-impl Cached<String> for Artist {
-    fn get_cache() -> Arc<EntityCache<String, Self>>
+impl Cached for Artist {
+    fn get_cache() -> Arc<EntityCache<Self>>
     where
         Self: Sized,
     {
@@ -32,15 +32,21 @@ impl Cached<String> for Artist {
     }
 }
 
-impl InsertableAs<String, Artist> for ArtistMS {
+impl InsertableAs<Artist> for ArtistMS {
     async fn insert_into_cache_as(&self, key: String) -> color_eyre::Result<()> {
         Artist::get_cache().set(&key, self.clone().into()).await?;
+
+        if let Some(recordings) = self.recordings.clone() {
+            for item in recordings.iter() {
+                item.insert_into_cache().await?;
+            }
+        }
 
         Ok(())
     }
 }
 
-impl InsertableWithExtras<String, Artist> for ArtistMS {
+impl InsertableWithExtras<Artist> for ArtistMS {
     async fn insert_with_relations(&self, key: String) -> color_eyre::Result<()> {
         Artist::get_cache().set(&key, self.clone().into()).await?;
 
@@ -54,13 +60,13 @@ impl InsertableWithExtras<String, Artist> for ArtistMS {
     }
 }
 
-impl HasID<String> for Artist {
+impl HasID for Artist {
     fn get_id(&self) -> String {
         self.id.to_string()
     }
 }
 
-impl HasID<String> for ArtistMS {
+impl HasID for ArtistMS {
     fn get_id(&self) -> String {
         self.id.to_string()
     }

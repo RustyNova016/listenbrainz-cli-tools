@@ -5,10 +5,10 @@ use color_eyre::eyre::Context;
 use musicbrainz_rs::entity::release::Release as ReleaseMS;
 use musicbrainz_rs::Fetch;
 
-impl Fetchable<String> for Release {
+impl Fetchable for Release {
     async fn fetch(
         key: &String,
-    ) -> color_eyre::Result<impl crate::core::entity_traits::insertable::InsertableAs<String, Self>>
+    ) -> color_eyre::Result<impl crate::core::entity_traits::insertable::InsertableAs<Self>>
     where
         Self: Sized,
     {

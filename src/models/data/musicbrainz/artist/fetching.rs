@@ -6,10 +6,10 @@ use color_eyre::eyre::Context;
 use musicbrainz_rs::entity::artist::Artist as ArtistMS;
 use musicbrainz_rs::Fetch;
 
-impl Fetchable<String> for Artist {
+impl Fetchable for Artist {
     fn fetch(
         key: &String,
-    ) -> impl std::future::Future<Output = color_eyre::Result<impl InsertableAs<String, Self>>> + Send
+    ) -> impl std::future::Future<Output = color_eyre::Result<impl InsertableAs<Self>>> + Send
     where
         Self: Sized,
     {
