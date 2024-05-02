@@ -1,12 +1,11 @@
-pub mod unmapped;
-use self::stats::GroupByTarget;
-use self::unmapped::SortBy;
+use clap::{Parser, Subcommand};
+
+use crate::models::cli::common::{GroupByTarget, SortListensBy, SortSorterBy};
 use crate::tools::interactive_mapper::interactive_mapper;
 use crate::tools::stats::stats_command;
 use crate::tools::unlinked::unmapped_command;
-use clap::{Parser, Subcommand};
 
-pub mod stats;
+pub mod common;
 
 /// Tools for Listenbrainz
 #[derive(Parser, Debug, Clone)]
@@ -26,7 +25,7 @@ pub enum Commands {
 
         /// Sort the listens by type
         #[arg(short, long)]
-        sort: Option<SortBy>,
+        sort: Option<SortSorterBy>,
     },
 
     /// Live and accurate statistics
@@ -54,7 +53,7 @@ pub enum Commands {
 
         /// Sort the listens by type
         #[arg(short, long)]
-        sort: Option<SortBy>,
+        sort: Option<SortListensBy>,
     },
 }
 
@@ -75,27 +74,3 @@ impl Commands {
         }
     }
 }
-
-//#[derive(Subcommand, Debug, Clone)]
-//pub enum StatsCommand {
-//    /// Get recording stats (Default)
-//    Recordings {
-//
-//    },
-//
-//    /// Get artist stats.
-//    Artist {
-//        /// Name of the user to fetch stats listen from
-//        #[arg(short, long)]
-//        username: String,
-//    },
-//}
-//
-//impl StatsCommand {
-//    pub fn run(&self) {
-//        match self {
-//            StatsCommand::Recordings { username } => recording_stats(username),
-//            StatsCommand::Artist { username } => artist_stats(username),
-//        }
-//    }
-//}

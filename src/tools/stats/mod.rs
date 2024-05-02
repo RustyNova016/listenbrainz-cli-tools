@@ -1,4 +1,4 @@
-use crate::models::cli::stats::GroupByTarget;
+use crate::models::cli::common::GroupByTarget;
 
 mod artists;
 mod recordings;

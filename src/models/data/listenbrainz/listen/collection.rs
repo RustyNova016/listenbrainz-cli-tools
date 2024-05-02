@@ -1,11 +1,8 @@
 use std::ops::Deref;
 use std::sync::Arc;
-
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
-
-use crate::models::cli::unmapped::SortBy;
-
+use crate::models::cli::common::SortListensBy;
 use super::Listen;
 
 /// Wrapper for a vector of listens
@@ -65,10 +62,9 @@ impl ListenCollection {
         self.data.push(listen);
     }
 
-    pub fn sort_by_criteria(&mut self, sort: Option<SortBy>) {
-        println!("JFeo");
+    pub fn sort_by_criteria(&mut self, sort: SortListensBy) {
         match sort {
-            Some(SortBy::Name) => {
+            SortListensBy::Name => {
                 let mut sorted = self.to_vec();
                 sorted.sort_by_key(|recording| {
                     recording
@@ -79,9 +75,16 @@ impl ListenCollection {
                 });
                 *self = Self { data: sorted }
             }
-
-            None => {}
-            Some(SortBy::Count) => {}
+            
+            SortListensBy::OldestListen => {
+                let mut sorted = self.to_vec();
+                sorted.sort_by_key(|recording| {
+                    recording.listened_at
+                });
+                *self = Self { data: sorted }
+            }
+            
+            SortListensBy::None => {}
         }
     }
 }

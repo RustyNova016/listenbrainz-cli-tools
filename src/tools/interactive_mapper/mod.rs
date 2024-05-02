@@ -1,4 +1,3 @@
-use crate::models::cli::unmapped::SortBy;
 use crate::models::data::listenbrainz::listen::collection::ListenCollection;
 use crate::models::data::listenbrainz::listen::Listen;
 use crate::models::data::listenbrainz::user_listens::UserListens;
@@ -10,8 +9,9 @@ use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use std::fmt::{Display, Formatter};
 use std::sync::Arc;
+use crate::models::cli::common::SortListensBy;
 
-pub async fn interactive_mapper(username: &str, token: String, sort: Option<SortBy>) {
+pub async fn interactive_mapper(username: &str, token: String, sort: Option<SortListensBy>) {
     println_cli(format!("Fetching unmapped for user {}", username));
     let mut unmappeds: ListenCollection = UserListens::get_user_with_refresh(username)
         .await
@@ -21,7 +21,7 @@ pub async fn interactive_mapper(username: &str, token: String, sort: Option<Sort
         .unique_by(|listen| listen.get_messybrain_data().msid.clone())
         .collect();
 
-    unmappeds.sort_by_criteria(sort);
+    unmappeds.sort_by_criteria(sort.unwrap_or_default());
 
     let mut i = 0;
     loop {
