@@ -8,6 +8,7 @@ use crate::{
 };
 use itertools::Itertools;
 use musicbrainz_rs::{entity::recording::Recording as RecordingMS, Browse};
+use crate::utils::println_mus;
 
 impl Artist {
     pub async fn get_all_recordings(&mut self) -> color_eyre::Result<Vec<Recording>> {
@@ -29,10 +30,9 @@ impl Artist {
     }
 
     async fn fetch_all_recordings(&mut self) -> color_eyre::Result<()> {
+        println_mus(format!("Browsing: {}", self.id));
         let recordings = RecordingMS::browse()
             .by_artist(&self.id)
-            .with_artists()
-            .with_releases()
             .execute_all(100)
             .await?;
 

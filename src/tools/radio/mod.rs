@@ -1,4 +1,8 @@
-use std::sync::Arc;
+use clap::builder::TypedValueParser;
+use color_eyre::eyre::Ok;
+use itertools::Itertools;
+use listenbrainz::raw::Client;
+use rand::{prelude::SliceRandom, thread_rng};
 
 use crate::{
     core::entity_traits::fetchable::FetchableAndCachable, models::data::{
@@ -7,20 +11,11 @@ use crate::{
             user_listens::UserListens,
         },
         musicbrainz::{
-            artist::{self, Artist},
-            recording::{self, Recording},
+            artist::Artist,
+            recording::Recording,
         },
     }, utils::playlist::PlaylistStub
 };
-use clap::builder::TypedValueParser;
-use color_eyre::eyre::Ok;
-use itertools::Itertools;
-use listenbrainz::raw::{
-    jspf::{Playlist, PlaylistInfo},
-    Client,
-};
-
-use rand::{prelude::SliceRandom, thread_rng};
 
 pub async fn create_radio_mix(username: &str, token: String) {
     let listens = UserListens::get_user_with_refresh(username)
@@ -98,7 +93,7 @@ impl RadioCircle {
                 results.push(recording);
             }
 
-            if results.len() > 10 {
+            if results.len() > 50 {
                 return Ok(results);
             }
         }
