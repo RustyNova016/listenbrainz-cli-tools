@@ -1,3 +1,4 @@
+pub mod external;
 use serde::{Deserialize, Serialize};
 
 use self::media::Media;

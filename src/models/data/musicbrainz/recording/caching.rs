@@ -1,6 +1,6 @@
 use crate::core::entity_traits::cached::Cached;
 use crate::core::entity_traits::has_id::HasID;
-use crate::core::entity_traits::insertable::{InsertableAs, IsAutoInsertableAs};
+use crate::core::entity_traits::insertable::Insertable;
 use crate::core::entity_traits::merge::UpdateCachedEntity;
 use crate::models::data::entity_database::ENTITY_DATABASE;
 use crate::models::data::musicbrainz::recording::Recording;
@@ -17,8 +17,8 @@ impl UpdateCachedEntity for Recording {
     }
 }
 
-impl Cached<String> for Recording {
-    fn get_cache() -> Arc<crate::core::caching::entity_cache::EntityCache<String, Self>>
+impl Cached for Recording {
+    fn get_cache() -> Arc<crate::core::caching::entity_cache::EntityCache<Self>>
     where
         Self: Sized,
     {
@@ -26,29 +26,17 @@ impl Cached<String> for Recording {
     }
 }
 
-impl InsertableAs<String, Recording> for RecordingMS {
+impl Insertable for RecordingMS {
     async fn insert_into_cache_as(&self, key: String) -> color_eyre::Result<()> {
-        <Recording as Cached<String>>::get_cache()
+        Recording::get_cache()
             .set(&key, self.clone().into())
             .await?;
-
-        if let Some(data) = self.artist_credit.clone() {
-            for item in data.iter() {
-                item.insert_into_cache().await?;
-            }
-        }
 
         Ok(())
     }
 }
 
-impl HasID<String> for Recording {
-    fn get_id(&self) -> String {
-        self.id.to_string()
-    }
-}
-
-impl HasID<String> for RecordingMS {
+impl HasID for Recording {
     fn get_id(&self) -> String {
         self.id.to_string()
     }
