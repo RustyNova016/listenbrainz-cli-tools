@@ -1,7 +1,7 @@
-use crate::core::entity_traits::insertable::InsertableAs;
-use musicbrainz_rs::entity::{recording::Recording, release::Media as MediaMS};
+use crate::core::entity_traits::{has_id::HasID, insertable::Insertable};
+use musicbrainz_rs::entity::release::Media as MediaMS;
 
-impl InsertableAs<String, Recording> for MediaMS {
+impl Insertable for MediaMS {
     async fn insert_into_cache_as(&self, _key: String) -> color_eyre::Result<()> {
         if let Some(tracks) = &self.tracks {
             for track in tracks {
@@ -10,5 +10,11 @@ impl InsertableAs<String, Recording> for MediaMS {
         }
 
         Ok(())
+    }
+}
+
+impl HasID for MediaMS {
+    fn get_id(&self) -> String {
+        "".to_string()
     }
 }

@@ -1,7 +1,7 @@
 use super::Release;
 use crate::core::entity_traits::cached::Cached;
 use crate::core::entity_traits::has_id::HasID;
-use crate::core::entity_traits::insertable::InsertableAs;
+use crate::core::entity_traits::insertable::Insertable;
 use crate::core::entity_traits::merge::UpdateCachedEntity;
 use crate::models::data::entity_database::ENTITY_DATABASE;
 use musicbrainz_rs::entity::release::Release as ReleaseMS;
@@ -23,20 +23,14 @@ impl UpdateCachedEntity for Release {
     }
 }
 
-impl HasID<String> for Release {
+impl HasID for Release {
     fn get_id(&self) -> String {
         self.id.to_string()
     }
 }
 
-impl HasID<String> for ReleaseMS {
-    fn get_id(&self) -> String {
-        self.id.to_string()
-    }
-}
-
-impl Cached<String> for Release {
-    fn get_cache() -> Arc<crate::core::caching::entity_cache::EntityCache<String, Self>>
+impl Cached for Release {
+    fn get_cache() -> Arc<crate::core::caching::entity_cache::EntityCache<Self>>
     where
         Self: Sized,
     {
@@ -44,7 +38,7 @@ impl Cached<String> for Release {
     }
 }
 
-impl InsertableAs<String, Release> for ReleaseMS {
+impl Insertable for ReleaseMS {
     async fn insert_into_cache_as(&self, key: String) -> color_eyre::Result<()> {
         Release::get_cache().set(&key, self.clone().into()).await?;
 

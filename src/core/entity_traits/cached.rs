@@ -3,9 +3,9 @@ use serde::{de::DeserializeOwned, Serialize};
 use std::sync::Arc;
 
 /// For all the entities that have a cache
-pub trait Cached<K>: Serialize + DeserializeOwned {
+pub trait Cached: Serialize + DeserializeOwned {
     /// Get the cache correponding to the entity
-    fn get_cache() -> Arc<EntityCache<K, Self>>
+    fn get_cache() -> Arc<EntityCache<Self>>
     where
         Self: Sized;
 }
