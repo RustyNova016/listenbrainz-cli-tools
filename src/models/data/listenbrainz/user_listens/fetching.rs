@@ -1,5 +1,5 @@
 use crate::core::entity_traits::cached::Cached;
-use crate::core::entity_traits::insertable::InsertableAs;
+use crate::core::entity_traits::insertable::Insertable;
 use crate::utils::extensions::UserListensPayloadExt;
 use crate::utils::{println_cli, println_lis, Logger};
 use chrono::{DateTime, TimeDelta, Utc};
@@ -117,7 +117,7 @@ impl UserListens {
     }
 }
 
-impl InsertableAs<UserListens> for UserListensResponse {
+impl Insertable for UserListensResponse {
     async fn insert_into_cache_as(&self, key: String) -> color_eyre::Result<()> {
         let mut user_listens = UserListens::get_cache()
             .get(&key)

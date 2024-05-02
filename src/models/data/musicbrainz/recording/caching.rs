@@ -1,6 +1,6 @@
 use crate::core::entity_traits::cached::Cached;
 use crate::core::entity_traits::has_id::HasID;
-use crate::core::entity_traits::insertable::{InsertableAs, IsAutoInsertableAs};
+use crate::core::entity_traits::insertable::Insertable;
 use crate::core::entity_traits::merge::UpdateCachedEntity;
 use crate::models::data::entity_database::ENTITY_DATABASE;
 use crate::models::data::musicbrainz::recording::Recording;
@@ -26,29 +26,17 @@ impl Cached for Recording {
     }
 }
 
-impl InsertableAs<Recording> for RecordingMS {
+impl Insertable for RecordingMS {
     async fn insert_into_cache_as(&self, key: String) -> color_eyre::Result<()> {
         Recording::get_cache()
             .set(&key, self.clone().into())
             .await?;
-
-        if let Some(data) = self.artist_credit.clone() {
-            for item in data.iter() {
-                item.insert_into_cache().await?;
-            }
-        }
 
         Ok(())
     }
 }
 
 impl HasID for Recording {
-    fn get_id(&self) -> String {
-        self.id.to_string()
-    }
-}
-
-impl HasID for RecordingMS {
     fn get_id(&self) -> String {
         self.id.to_string()
     }

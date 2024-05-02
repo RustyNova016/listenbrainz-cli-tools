@@ -1,3 +1,4 @@
+pub mod external;
 use crate::models::data::entity_database::ENTITY_DATABASE;
 
 use color_eyre::eyre::{eyre, Context, OptionExt};

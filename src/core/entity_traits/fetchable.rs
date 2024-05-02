@@ -1,12 +1,11 @@
-use super::{cached::Cached, insertable::InsertableAs};
-use std::fmt::Display;
+use super::{cached::Cached, insertable::Insertable};
 
 /// Trait for all the entities that can be fetched
 pub trait Fetchable {
     /// Fetch the entity
     fn fetch(
-        key: &String,
-    ) -> impl std::future::Future<Output = color_eyre::Result<impl InsertableAs<Self>>> + Send
+        key: &str,
+    ) -> impl std::future::Future<Output = color_eyre::Result<impl Insertable>> + Send
     where
         Self: Sized;
 }
@@ -14,12 +13,13 @@ pub trait Fetchable {
 // --------
 pub trait FetchableAndCachable: Fetchable + Cached {
     /// Get the data from the cache, or call the API. Any request is deduplicated
-    fn get_cached_or_fetch(key: &String) -> impl std::future::Future<Output = color_eyre::Result<Self>> {
-        let key = key.clone();
+    fn get_cached_or_fetch(
+        key: &str,
+    ) -> impl std::future::Future<Output = color_eyre::Result<Self>> {
         async move {
-            match Self::get_cache().get(&key).await? {
+            match Self::get_cache().get(key).await? {
                 Some(val) => Ok(val),
-                None => Self::get_cache().get_or_fetch(&key).await,
+                None => Self::get_cache().get_or_fetch(key).await,
             }
         }
     }
@@ -41,8 +41,4 @@ pub trait FetchableAndCachable: Fetchable + Cached {
     //}
 }
 
-impl<V> FetchableAndCachable for V
-where
-    V: Fetchable + Cached,
-{
-}
+impl<V> FetchableAndCachable for V where V: Fetchable + Cached {}

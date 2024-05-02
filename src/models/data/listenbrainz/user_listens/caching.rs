@@ -3,7 +3,7 @@ use color_eyre::eyre::Ok;
 use crate::core::caching::entity_cache::EntityCache;
 use crate::core::entity_traits::cached::Cached;
 use crate::core::entity_traits::has_id::HasID;
-use crate::core::entity_traits::insertable::InsertableAs;
+use crate::core::entity_traits::insertable::Insertable;
 use crate::core::entity_traits::merge::UpdateCachedEntity;
 use crate::models::data::entity_database::ENTITY_DATABASE;
 use std::sync::Arc;
@@ -22,7 +22,7 @@ impl Cached for UserListens {
     }
 }
 
-impl InsertableAs<UserListens> for UserListens {
+impl Insertable for UserListens {
     async fn insert_into_cache_as(&self, key: String) -> color_eyre::Result<()> {
         UserListens::get_cache().set(&key, self.clone()).await?;
         Ok(())
