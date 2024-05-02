@@ -1,4 +1,5 @@
 pub mod listenbrainz;
+pub mod musicbrainz;
 use ::listenbrainz::raw::response::{
     UserListensListen, UserListensMBIDMapping, UserListensPayload,
 };

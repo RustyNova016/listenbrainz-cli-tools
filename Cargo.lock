@@ -117,9 +117,9 @@ checksum = "96d30a06541fbafbc7f82ed10c06164cfbd2c401138f6addd8404629c4b16711"
 
 [[package]]
 name = "attohttpc"
-version = "0.27.0"
+version = "0.28.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "184f5e6cce583a9db6b6f8d772a42cfce5b78e7c3ef26118cec3ce4c8c14969b"
+checksum = "9a13149d0cf3f7f9b9261fad4ec63b2efbf9a80665f52def86282d26255e6331"
 dependencies = [
  "flate2",
  "http 1.1.0",
@@ -1382,6 +1382,17 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "01cda141df6706de531b6c46c3a33ecca755538219bd484262fa09410c13539c"
 
 [[package]]
+name = "listenbrainz"
+version = "0.7.0"
+source = "git+https://github.com/RustyNova016/listenbrainz-rs.git?branch=8.0-experimental#29347fe767fb0548bb68eaea7e18ecb5c9ff7ca0"
+dependencies = [
+ "attohttpc",
+ "serde",
+ "serde_json",
+ "thiserror",
+]
+
+[[package]]
 name = "listenbrainz-cli-tools"
 version = "0.1.0"
 dependencies = [
@@ -1399,11 +1410,12 @@ dependencies = [
  "inquire",
  "itertools",
  "lazy_static",
- "listenbrainz_rs_nova",
+ "listenbrainz",
  "moka",
  "musicbrainz_rs",
  "once_cell",
  "prettytable-rs",
+ "rand 0.8.5",
  "rayon",
  "reqwest 0.12.4",
  "rmp-serde",
@@ -1411,18 +1423,6 @@ dependencies = [
  "serde",
  "serde_json",
  "tokio",
-]
-
-[[package]]
-name = "listenbrainz_rs_nova"
-version = "0.7.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "1ad7db81cfb80d1e1f27509e9ca4cd4d0e80eb0abde996944f3a7e88e30c2143"
-dependencies = [
- "attohttpc",
- "serde",
- "serde_json",
- "thiserror",
 ]
 
 [[package]]

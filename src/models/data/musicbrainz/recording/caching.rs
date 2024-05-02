@@ -14,7 +14,7 @@ impl UpdateCachedEntity for Recording {
             artist_credit: new.artist_credit.or(self.artist_credit),
             id: new.id,
             title: new.title,
-            releases: new.releases.or(self.releases)
+            releases: new.releases.or(self.releases),
         }
     }
 }
