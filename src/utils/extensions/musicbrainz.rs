@@ -1,5 +1,3 @@
-use std::future::Future;
-
 use extend::ext;
 use musicbrainz_rs::{
     entity::{Browsable, BrowseResult},
@@ -9,11 +7,12 @@ use serde::de::DeserializeOwned;
 
 #[ext]
 pub impl<'a, T: Send> BrowseQuery<T> {
-    fn execute_all(&mut self, limit: u8) -> impl Future<Output = color_eyre::Result<BrowseResult<T>>> + Send
+    #[allow(async_fn_in_trait)] // This is fine for this application, and if the lint is applied, it will complain about the huge async block...
+    async fn execute_all(&mut self, limit: u8) -> color_eyre::Result<BrowseResult<T>>
     where
         T: Fetch<'a> + DeserializeOwned + Browsable + Clone,
     {
-        async move {
+
         self.limit(limit);
         let base_request = self.clone();
         
@@ -38,5 +37,5 @@ pub impl<'a, T: Send> BrowseQuery<T> {
             offset: 0,
             entities: elements,
         })
-    } }
+    } 
 }

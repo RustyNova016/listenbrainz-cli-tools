@@ -15,7 +15,7 @@ pub struct EntityCache<V> {
 
 impl<V> EntityCache<V>
 where
-    V: Serialize + DeserializeOwned,
+    V: Serialize + DeserializeOwned + Clone + PartialEq + Eq,
 {
     pub fn new(name: &str) -> Self {
         let mut location = CACHE_LOCATION.clone();
@@ -52,7 +52,7 @@ where
 
 impl<V> EntityCache<V>
 where
-    V: Serialize + DeserializeOwned + Fetchable,
+    V: Serialize + DeserializeOwned + Fetchable  + Clone + PartialEq + Eq,
 {
     /// Fetch an item, bypassing the cache. This also save the request.
     /// Only one request is allowed at a time, so a Semaphore permit is required.

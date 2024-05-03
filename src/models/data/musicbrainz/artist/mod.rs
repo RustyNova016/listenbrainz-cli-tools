@@ -28,7 +28,7 @@ pub struct Artist {
     pub releases: Option<Vec<String>>,
     pub works: Option<Vec<String>>,
     pub release_groups: Option<Vec<String>>,
-    pub recordings: Option<Vec<String>>,
+    recordings: Option<Vec<String>>,
     pub aliases: Option<Vec<Alias>>,
     pub tags: Option<Vec<Tag>>,
     pub genres: Option<Vec<Genre>>,
