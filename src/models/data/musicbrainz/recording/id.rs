@@ -5,7 +5,6 @@ use serde::{Deserialize, Serialize};
 use crate::core::entity_traits::cached::Cached;
 
 use super::Recording;
-use extend::ext;
 
 #[derive(Debug, Clone, Eq, PartialEq, Deserialize, Serialize)]
 pub struct RecordingMBID(String);

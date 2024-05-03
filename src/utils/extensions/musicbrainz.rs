@@ -1,3 +1,5 @@
+use std::future::Future;
+
 use extend::ext;
 use musicbrainz_rs::{
     entity::{Browsable, BrowseResult},
@@ -6,11 +8,12 @@ use musicbrainz_rs::{
 use serde::de::DeserializeOwned;
 
 #[ext]
-pub impl<'a, T> BrowseQuery<T> {
-    async fn execute_all(&mut self, limit: u8) -> color_eyre::Result<BrowseResult<T>>
+pub impl<'a, T: Send> BrowseQuery<T> {
+    fn execute_all(&mut self, limit: u8) -> impl Future<Output = color_eyre::Result<BrowseResult<T>>> + Send
     where
         T: Fetch<'a> + DeserializeOwned + Browsable + Clone,
     {
+        async move {
         self.limit(limit);
         let base_request = self.clone();
         
@@ -35,5 +38,5 @@ pub impl<'a, T> BrowseQuery<T> {
             offset: 0,
             entities: elements,
         })
-    }
+    } }
 }

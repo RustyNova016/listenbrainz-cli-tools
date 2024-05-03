@@ -1,4 +1,5 @@
 use super::Artist;
+use crate::core::entity_traits::insertable::IsAutoInsertable;
 use crate::{
     core::entity_traits::{
         cached::Cached, has_id::HasID, insertable::Insertable, insertable_children::InsertChildren,
@@ -49,6 +50,8 @@ impl Artist {
                 .map(|recoding| recoding.id)
                 .collect_vec(),
         );
+
+        self.insert_into_cache().await?;
         Ok(())
     }
 }

@@ -61,3 +61,12 @@ impl HasID for ArtistMS {
         self.id.to_string()
     }
 }
+
+impl Insertable for Artist {
+    async fn insert_into_cache_as(
+        &self,
+        key: String,
+    ) -> color_eyre::Result<()> {
+        Self::get_cache().set(&key, self.clone()).await
+    }
+}

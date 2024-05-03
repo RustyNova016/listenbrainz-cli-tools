@@ -35,3 +35,4 @@ pub trait InsertableWithExtras<V>: Insertable + HasID {
         key: String,
     ) -> impl Future<Output = color_eyre::Result<()>> + Send;
 }
+

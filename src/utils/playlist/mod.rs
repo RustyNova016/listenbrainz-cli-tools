@@ -1,12 +1,8 @@
-use chrono::{DateTime, Utc};
-use itertools::Itertools;
-use listenbrainz::raw::{
-    jspf::{Playlist, PlaylistInfo},
-    request::{
+
+use listenbrainz::raw::request::{
         PlaylistCreate, PlaylistCreatePlaylist, PlaylistCreatePlaylistExtension,
         PlaylistCreatePlaylistExtensionInner, PlaylistCreatePlaylistTrack,
-    },
-};
+    };
 
 #[derive(Clone)]
 pub struct PlaylistStub {
