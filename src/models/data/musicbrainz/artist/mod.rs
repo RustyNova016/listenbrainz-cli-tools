@@ -1,13 +1,11 @@
 pub mod external;
 pub mod getters;
 use itertools::Itertools;
-use musicbrainz_rs::entity::{
-    alias::Alias,
-    artist::{ArtistType, Gender},
-    genre::Genre,
-    lifespan::LifeSpan,
-    tag::Tag,
-};
+use musicbrainz_rs::entity::alias::Alias;
+use musicbrainz_rs::entity::artist::{ArtistType, Gender};
+use musicbrainz_rs::entity::genre::Genre;
+use musicbrainz_rs::entity::lifespan::LifeSpan;
+use musicbrainz_rs::entity::tag::Tag;
 use serde::{Deserialize, Serialize};
 
 pub mod caching;

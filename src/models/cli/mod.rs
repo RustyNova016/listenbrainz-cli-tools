@@ -1,11 +1,11 @@
 pub mod unmapped;
 use self::stats::GroupByTarget;
 use self::unmapped::SortBy;
+use crate::tools::interactive_mapper::interactive_mapper;
+use crate::tools::radio::create_radio_mix;
 use crate::tools::stats::stats_command;
 use crate::tools::unlinked::unmapped_command;
-use crate::tools::{interactive_mapper::interactive_mapper, radio::create_radio_mix};
-use clap::{Parser, Subcommand};
-use clap::ArgAction;
+use clap::{ArgAction, Parser, Subcommand};
 pub mod stats;
 
 /// Tools for Listenbrainz
@@ -69,7 +69,7 @@ pub enum Commands {
 
         /// Use this flag to only get unlistened recordings
         #[clap(long, action=ArgAction::SetTrue)]
-        unlistened: bool
+        unlistened: bool,
     },
 }
 
@@ -88,7 +88,11 @@ impl Commands {
                 sort,
             } => interactive_mapper(username, token.clone(), *sort).await,
 
-            Commands::Radio { username, token, unlistened } => create_radio_mix(username, token.clone(), *unlistened).await,
+            Commands::Radio {
+                username,
+                token,
+                unlistened,
+            } => create_radio_mix(username, token.clone(), *unlistened).await,
         }
     }
 }

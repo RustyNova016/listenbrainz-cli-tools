@@ -1,4 +1,5 @@
 use super::has_id::HasID;
+use crate::core::entity_traits::cached::Cached;
 use std::future::Future;
 
 pub trait Insertable {
@@ -9,6 +10,18 @@ pub trait Insertable {
     ) -> impl Future<Output = color_eyre::Result<()>> + Send;
 }
 
+impl<T> Insertable for T
+where
+    T: Cached + Clone + Send + Sync,
+{
+    async fn insert_into_cache_as(&self, key: String) -> color_eyre::Result<()> {
+        Self::get_cache().set(&key, self.clone()).await
+    }
+}
+
+// ---
+
+/// A trait for types that can be inserted into the cache directly from the ID
 pub trait IsAutoInsertable: HasID + Insertable {
     fn insert_into_cache(&self) -> impl Future<Output = color_eyre::Result<()>> + Send {
         self.insert_into_cache_as(self.get_id())
@@ -35,4 +48,3 @@ pub trait InsertableWithExtras<V>: Insertable + HasID {
         key: String,
     ) -> impl Future<Output = color_eyre::Result<()>> + Send;
 }
-

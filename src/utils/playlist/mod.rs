@@ -1,8 +1,7 @@
-
 use listenbrainz::raw::request::{
-        PlaylistCreate, PlaylistCreatePlaylist, PlaylistCreatePlaylistExtension,
-        PlaylistCreatePlaylistExtensionInner, PlaylistCreatePlaylistTrack,
-    };
+    PlaylistCreate, PlaylistCreatePlaylist, PlaylistCreatePlaylistExtension,
+    PlaylistCreatePlaylistExtensionInner, PlaylistCreatePlaylistTrack,
+};
 
 #[derive(Clone)]
 pub struct PlaylistStub {

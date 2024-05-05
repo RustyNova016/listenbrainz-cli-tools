@@ -1,11 +1,9 @@
 use musicbrainz_rs::entity::release::Release;
 
 use crate::core::entity_traits::cached::Cached;
-use crate::core::entity_traits::{
-    has_id::HasID,
-    insertable::{Insertable, IsAutoInsertable},
-    insertable_children::InsertableWithChildren,
-};
+use crate::core::entity_traits::has_id::HasID;
+use crate::core::entity_traits::insertable::{Insertable, IsAutoInsertable};
+use crate::core::entity_traits::insertable_children::InsertableWithChildren;
 
 impl HasID for Release {
     fn get_id(&self) -> String {

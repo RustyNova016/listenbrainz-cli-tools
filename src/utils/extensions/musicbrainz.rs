@@ -1,8 +1,6 @@
 use extend::ext;
-use musicbrainz_rs::{
-    entity::{Browsable, BrowseResult},
-    BrowseQuery, Fetch,
-};
+use musicbrainz_rs::entity::{Browsable, BrowseResult};
+use musicbrainz_rs::{BrowseQuery, Fetch};
 use serde::de::DeserializeOwned;
 
 #[ext]
@@ -12,10 +10,9 @@ pub impl<'a, T: Send> BrowseQuery<T> {
     where
         T: Fetch<'a> + DeserializeOwned + Browsable + Clone,
     {
-
         self.limit(limit);
         let base_request = self.clone();
-        
+
         let mut total_elements = None;
         let mut current_offset = 0_u16;
         let mut elements = Vec::new();
@@ -25,7 +22,7 @@ pub impl<'a, T: Send> BrowseQuery<T> {
         {
             let mut new_request = base_request.clone();
             new_request.offset(current_offset);
-            
+
             let response = new_request.execute().await?;
             total_elements = Some(response.count);
             current_offset += limit as u16;
@@ -37,5 +34,5 @@ pub impl<'a, T: Send> BrowseQuery<T> {
             offset: 0,
             entities: elements,
         })
-    } 
+    }
 }

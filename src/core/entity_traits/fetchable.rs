@@ -1,4 +1,5 @@
-use super::{cached::Cached, insertable::Insertable};
+use super::cached::Cached;
+use super::insertable::Insertable;
 
 /// Trait for all the entities that can be fetched
 pub trait Fetchable {

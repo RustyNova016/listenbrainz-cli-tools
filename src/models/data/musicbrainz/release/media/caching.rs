@@ -1,4 +1,5 @@
-use crate::core::entity_traits::{has_id::HasID, insertable::Insertable};
+use crate::core::entity_traits::has_id::HasID;
+use crate::core::entity_traits::insertable::Insertable;
 use musicbrainz_rs::entity::release::Media as MediaMS;
 
 impl Insertable for MediaMS {
