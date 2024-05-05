@@ -19,7 +19,7 @@ pub struct EntityCache<V> {
 
 impl<V> EntityCache<V>
 where
-    V: Serialize + DeserializeOwned + Clone + PartialEq + Eq,
+    V: Serialize + DeserializeOwned
 {
     pub fn new(name: &str) -> Self {
         let mut location = CACHE_LOCATION.clone();

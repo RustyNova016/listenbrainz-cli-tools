@@ -62,7 +62,7 @@ impl RadioCircle {
         let recording = Recording::get_cached_or_fetch(mapping_data.get_recording_id()).await?;
 
         for artist_id in recording.get_or_fetch_artist_credits().await?.iter() {
-            let artist = Artist::get_cache().get_or_fetch("1f8ef6a0-6d01-4ea2-92d4-693bc565fb61").await?; //&artist_id.artist
+            let artist = Artist::get_cache().get_or_fetch(&artist_id.artist).await?;
 
             let result = self.get_recording_of_artist(artist, listens, playlist).await?;
             

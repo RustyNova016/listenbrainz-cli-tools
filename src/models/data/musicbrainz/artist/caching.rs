@@ -27,15 +27,20 @@ impl Updatable for Artist {
         Self {
             id: newer.id,
             name: newer.name,
+            annotation: newer.annotation.or(self.annotation),
+            tags: newer.tags.or(self.tags),
+            aliases: newer.aliases.or(self.aliases),
+            artist_type: newer.artist_type.or(self.artist_type),
+            country: newer.country.or(self.country),
+            gender: newer.gender.or(self.gender),
+            genres: newer.genres.or(self.genres),
+            life_span: newer.life_span.or(self.life_span),
+            disambiguation: newer.disambiguation,
+            recordings: newer.recordings.or(self.recordings),
+            release_groups: newer.release_groups.or(self.release_groups),
+            releases: newer.releases.or(self.releases),
+            sort_name: newer.sort_name,
+            works: newer.works.or(self.works),
         }
-    }
-}
-
-impl Insertable for Artist {
-    async fn insert_into_cache_as(
-        &self,
-        key: String,
-    ) -> color_eyre::Result<()> {
-        Self::get_cache().set(&key, self.clone()).await
     }
 }
