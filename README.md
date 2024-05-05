@@ -37,15 +37,33 @@ Total: 8 unlinked recordings
 > This also means that the same recording can be shown twice in the list. 
 > For example: "Panic - Dion Timer" won't have the same MSID as "Panic by Dion Timmer", even if they are the same recording.
 
-## True stats
+## Interactive mass mapper
 
-Due to a bug in listenbrainz, album and artist stats aren't counted properly. This tool allow to see the true stats.
+This tools allow for easy and faster mapping of recordings. It goes through each unmapped recordings, 
+and give a few suggested recordings for the mapping. This is the exact same as mapping recording in the web UI.
+
+```shell
+listenbrainz-cli-tools mapping -u <username> -t <user token>
+```
+
+## Live statistics
+
+While ListenBrainz have its own statistic page, it only refreshes daily, and is limited to only some entities.
+With those commands, you'll be able to see your statistics in no time!
+
+```shell
+listenbrainz-cli-tools stats -u <username> -t <target>
+```
+
+Target is the entity type to group the stats by. Currently, those entities stats are implemented:
+- Recordings (`recording`)
+- Artists (`artist`)
 
 ## Radio
 
-Currently, only one algorythm is implemented.
+Currently, only one algorithm is implemented.
 
-### Circles
+### Artist Circles
 
 This algorythm keep your playlist close to the artists you are listening to. The way it generate is as follow:
 
@@ -53,7 +71,7 @@ This algorythm keep your playlist close to the artists you are listening to. The
 - Get its artist
 - Add a random recording made by this artist
 
-There is the option to only get unlistened recordings, making a alternative to ListenBrainz's own discovery playlists.
+There is the option to only get unlistened recordings, making an alternative to ListenBrainz's own discovery playlists.
 
 Usage:
 ```shell

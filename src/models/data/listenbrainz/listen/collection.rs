@@ -1,9 +1,9 @@
-use std::ops::Deref;
-use std::sync::Arc;
+use super::Listen;
+use crate::models::cli::common::SortListensBy;
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
-use crate::models::cli::common::SortListensBy;
-use super::Listen;
+use std::ops::Deref;
+use std::sync::Arc;
 
 /// Wrapper for a vector of listens
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
@@ -75,15 +75,13 @@ impl ListenCollection {
                 });
                 *self = Self { data: sorted }
             }
-            
+
             SortListensBy::OldestListen => {
                 let mut sorted = self.to_vec();
-                sorted.sort_by_key(|recording| {
-                    recording.listened_at
-                });
+                sorted.sort_by_key(|recording| recording.listened_at);
                 *self = Self { data: sorted }
             }
-            
+
             SortListensBy::None => {}
         }
     }

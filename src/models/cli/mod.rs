@@ -1,14 +1,13 @@
+use clap::ArgAction;
+use clap::{Parser, Subcommand};
+
 use crate::models::cli::common::{GroupByTarget, SortListensBy, SortSorterBy};
-use self::stats::GroupByTarget;
-use self::unmapped::SortBy;
 use crate::tools::interactive_mapper::interactive_mapper;
 use crate::tools::radio::create_radio_mix;
 use crate::tools::stats::stats_command;
 use crate::tools::unlinked::unmapped_command;
-use clap::{Parser, Subcommand};
 
-pub mod stats;
-pub mod unmapped;
+pub mod common;
 
 /// Tools for Listenbrainz
 #[derive(Parser, Debug, Clone)]

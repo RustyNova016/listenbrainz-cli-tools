@@ -1,6 +1,7 @@
 use clap::ValueEnum;
+use derive_more::IsVariant;
 
-#[derive(ValueEnum, Clone, Debug, Copy, Default)]
+#[derive(ValueEnum, Clone, Debug, Copy, Default, IsVariant)]
 pub enum SortListensBy {
     #[default]
     None,
@@ -8,7 +9,7 @@ pub enum SortListensBy {
     OldestListen,
 }
 
-#[derive(ValueEnum, Clone, Debug, Copy, Default)]
+#[derive(ValueEnum, Clone, Debug, Copy, Default, IsVariant)]
 pub enum SortSorterBy {
     #[default]
     Count,
@@ -16,7 +17,7 @@ pub enum SortSorterBy {
     Oldest,
 }
 
-#[derive(ValueEnum, Clone, Debug, Copy)]
+#[derive(ValueEnum, Clone, Debug, Copy, IsVariant)]
 pub enum GroupByTarget {
     Recording,
     Artist,

@@ -40,7 +40,7 @@ impl MessyRecording {
             .iter()
             .max_by_key(|listen| listen.listened_at)
     }
-    
+
     pub fn get_oldest_listen(&self) -> Option<&Arc<Listen>> {
         self.associated_listens
             .iter()
