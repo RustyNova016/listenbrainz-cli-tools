@@ -1,18 +1,18 @@
+use std::sync::Arc;
+
 use color_eyre::eyre::Ok;
 
 use crate::core::caching::entity_cache::EntityCache;
 use crate::core::entity_traits::cached::Cached;
 use crate::core::entity_traits::has_id::HasID;
 use crate::core::entity_traits::insertable::Insertable;
-use crate::core::entity_traits::merge::UpdateCachedEntity;
 use crate::models::data::entity_database::ENTITY_DATABASE;
-use std::sync::Arc;
 
 use super::UserListens;
 
-impl UpdateCachedEntity for UserListens {
-    fn update_entity(self, new: Self) -> Self {
-        new
+impl HasID for UserListens {
+    fn get_id(&self) -> String {
+        self.username.to_string()
     }
 }
 
@@ -26,12 +26,6 @@ impl Insertable for UserListens {
     async fn insert_into_cache_as(&self, key: String) -> color_eyre::Result<()> {
         UserListens::get_cache().set(&key, self.clone()).await?;
         Ok(())
-    }
-}
-
-impl HasID for UserListens {
-    fn get_id(&self) -> String {
-        self.username.to_string()
     }
 }
 
