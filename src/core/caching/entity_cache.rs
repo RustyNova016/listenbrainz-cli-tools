@@ -2,12 +2,14 @@ use std::sync::Arc;
 
 use chashmap::CHashMap;
 use color_eyre::eyre::Context;
-use serde::{de::DeserializeOwned, Serialize};
+use serde::de::DeserializeOwned;
+use serde::Serialize;
 use tokio::sync::{Semaphore, SemaphorePermit};
 
+use crate::core::caching::CACHE_LOCATION;
+use crate::core::entity_traits::fetchable::Fetchable;
 use crate::core::entity_traits::insertable::Insertable;
 use crate::core::entity_traits::updatable::Updatable;
-use crate::core::{caching::CACHE_LOCATION, entity_traits::fetchable::Fetchable};
 
 use super::serde_cacache::SerdeCacache;
 
@@ -56,7 +58,7 @@ where
 
 impl<V> EntityCache<V>
 where
-    V: Serialize + DeserializeOwned + Fetchable,
+    V: Serialize + DeserializeOwned + Fetchable + Clone + PartialEq + Eq,
 {
     /// Fetch an item, bypassing the cache. This also save the request.
     /// Only one request is allowed at a time, so a Semaphore permit is required.

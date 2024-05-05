@@ -2,10 +2,10 @@ use std::sync::Arc;
 
 use once_cell::sync::Lazy;
 
-use super::{
-    listenbrainz::user_listens::UserListens,
-    musicbrainz::{artist::Artist, recording::Recording, release::Release},
-};
+use super::listenbrainz::user_listens::UserListens;
+use super::musicbrainz::artist::Artist;
+use super::musicbrainz::recording::Recording;
+use super::musicbrainz::release::Release;
 use crate::core::caching::entity_cache::EntityCache;
 
 pub(crate) static ENTITY_DATABASE: Lazy<Arc<EntityDatabase>> =

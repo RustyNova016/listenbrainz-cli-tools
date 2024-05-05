@@ -12,7 +12,7 @@ use super::listen::Listen;
 pub mod caching;
 pub mod fetching;
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
 pub struct UserListens {
     username: String,
     listens: ListenCollection,

@@ -1,6 +1,7 @@
 use musicbrainz_rs::entity::artist_credit::ArtistCredit as ArtistCreditMS;
 
-use crate::core::entity_traits::{has_id::HasID, insertable::Insertable};
+use crate::core::entity_traits::has_id::HasID;
+use crate::core::entity_traits::insertable::Insertable;
 
 impl Insertable for ArtistCreditMS {
     fn insert_into_cache_as(
