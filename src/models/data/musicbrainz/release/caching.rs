@@ -1,27 +1,11 @@
-use super::Release;
-use crate::core::entity_traits::cached::Cached;
-use crate::core::entity_traits::has_id::HasID;
-use crate::core::entity_traits::insertable::Insertable;
-use crate::core::entity_traits::merge::UpdateCachedEntity;
-use crate::models::data::entity_database::ENTITY_DATABASE;
-use musicbrainz_rs::entity::release::Release as ReleaseMS;
 use std::sync::Arc;
 
-impl UpdateCachedEntity for Release {
-    fn update_entity(self, new: Self) -> Self {
-        Self {
-            annotation: new.annotation.or(self.annotation),
-            barcode: new.barcode.or(self.barcode),
-            country: new.country.or(self.country),
-            disambiguation: new.disambiguation.or(self.disambiguation),
-            id: new.id,
-            media: new.media.or(self.media),
-            packaging_id: new.packaging_id.or(self.packaging_id),
-            status_id: new.status_id.or(self.status_id),
-            title: new.title,
-        }
-    }
-}
+use crate::core::entity_traits::cached::Cached;
+use crate::core::entity_traits::has_id::HasID;
+use crate::core::entity_traits::updatable::Updatable;
+use crate::models::data::entity_database::ENTITY_DATABASE;
+
+use super::Release;
 
 impl HasID for Release {
     fn get_id(&self) -> String {
@@ -38,16 +22,18 @@ impl Cached for Release {
     }
 }
 
-impl Insertable for ReleaseMS {
-    async fn insert_into_cache_as(&self, key: String) -> color_eyre::Result<()> {
-        Release::get_cache().set(&key, self.clone().into()).await?;
-
-        if let Some(tracks) = &self.media {
-            for track in tracks {
-                track.insert_into_cache_as("".to_string()).await?;
-            }
+impl Updatable for Release {
+    fn update(self, newer: Self) -> Self {
+        Self {
+            annotation: newer.annotation.or(self.annotation),
+            barcode: newer.barcode.or(self.barcode),
+            country: newer.country.or(self.country),
+            disambiguation: newer.disambiguation.or(self.disambiguation),
+            media: newer.media.or(self.media),
+            packaging_id: newer.packaging_id.or(self.packaging_id),
+            status_id: newer.status_id.or(self.status_id),
+            title: newer.title,
+            id: newer.id,
         }
-
-        Ok(())
     }
 }

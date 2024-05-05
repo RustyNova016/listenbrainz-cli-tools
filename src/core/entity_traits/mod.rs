@@ -4,4 +4,4 @@ pub mod fetchable;
 pub mod has_id;
 pub mod insertable;
 pub mod insertable_children;
-pub mod merge;
+pub mod updatable;

@@ -1,11 +1,15 @@
-use super::serde_cacache::SerdeCacache;
-use crate::core::entity_traits::insertable::Insertable;
-use crate::core::{caching::CACHE_LOCATION, entity_traits::fetchable::Fetchable};
+use std::sync::Arc;
+
 use chashmap::CHashMap;
 use color_eyre::eyre::Context;
 use serde::{de::DeserializeOwned, Serialize};
-use std::sync::Arc;
 use tokio::sync::{Semaphore, SemaphorePermit};
+
+use crate::core::entity_traits::insertable::Insertable;
+use crate::core::entity_traits::updatable::Updatable;
+use crate::core::{caching::CACHE_LOCATION, entity_traits::fetchable::Fetchable};
+
+use super::serde_cacache::SerdeCacache;
 
 #[derive(Debug)]
 pub struct EntityCache<V> {
@@ -95,5 +99,22 @@ where
             .get(key)
             .await?
             .expect("Entity couldn't be found after insertion"))
+    }
+}
+
+impl<V> EntityCache<V>
+where
+    V: Serialize + DeserializeOwned + Updatable,
+{
+    pub async fn update(&self, key: &String, value: V) -> color_eyre::Result<()> {
+        let older = self.get(key).await?;
+
+        if let Some(older) = older {
+            self.set(key, older.update(value)).await?;
+        } else {
+            self.set(key, value).await?;
+        }
+
+        Ok(())
     }
 }
