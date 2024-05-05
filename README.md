@@ -40,3 +40,27 @@ Total: 8 unlinked recordings
 ## True stats
 
 Due to a bug in listenbrainz, album and artist stats aren't counted properly. This tool allow to see the true stats.
+
+## Radio
+
+Currently, only one algorythm is implemented.
+
+### Circles
+
+This algorythm keep your playlist close to the artists you are listening to. The way it generate is as follow:
+
+- Get a random listen
+- Get its artist
+- Add a random recording made by this artist
+
+There is the option to only get unlistened recordings, making a alternative to ListenBrainz's own discovery playlists.
+
+Usage:
+```shell
+listenbrainz-cli-tools ratio -u <username> -t <token>
+```
+
+Only unlistened:
+```shell
+listenbrainz-cli-tools ratio -u <username> -t <token> --unlistened
+```

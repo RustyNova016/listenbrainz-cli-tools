@@ -2,10 +2,10 @@ use std::sync::Arc;
 
 use once_cell::sync::Lazy;
 
-use super::{
-    listenbrainz::user_listens::UserListens,
-    musicbrainz::{artist::Artist, recording::Recording, release::Release},
-};
+use super::listenbrainz::user_listens::UserListens;
+use super::musicbrainz::artist::Artist;
+use super::musicbrainz::recording::Recording;
+use super::musicbrainz::release::Release;
 use crate::core::caching::entity_cache::EntityCache;
 
 pub(crate) static ENTITY_DATABASE: Lazy<Arc<EntityDatabase>> =
@@ -13,11 +13,11 @@ pub(crate) static ENTITY_DATABASE: Lazy<Arc<EntityDatabase>> =
 
 #[derive(Debug)]
 pub struct EntityDatabase {
-    artists: Arc<EntityCache<String, Artist>>,
-    releases: Arc<EntityCache<String, Release>>,
-    recordings: Arc<EntityCache<String, Recording>>,
+    artists: Arc<EntityCache<Artist>>,
+    releases: Arc<EntityCache<Release>>,
+    recordings: Arc<EntityCache<Recording>>,
 
-    user_listens: Arc<EntityCache<String, UserListens>>,
+    user_listens: Arc<EntityCache<UserListens>>,
 }
 
 impl Default for EntityDatabase {
@@ -33,19 +33,19 @@ impl Default for EntityDatabase {
 }
 
 impl EntityDatabase {
-    pub fn artists(&self) -> Arc<EntityCache<String, Artist>> {
+    pub fn artists(&self) -> Arc<EntityCache<Artist>> {
         self.artists.clone()
     }
 
-    pub fn releases(&self) -> Arc<EntityCache<String, Release>> {
+    pub fn releases(&self) -> Arc<EntityCache<Release>> {
         self.releases.clone()
     }
 
-    pub fn recordings(&self) -> Arc<EntityCache<String, Recording>> {
+    pub fn recordings(&self) -> Arc<EntityCache<Recording>> {
         self.recordings.clone()
     }
 
-    pub fn user_listens(&self) -> Arc<EntityCache<String, UserListens>> {
+    pub fn user_listens(&self) -> Arc<EntityCache<UserListens>> {
         self.user_listens.clone()
     }
 }

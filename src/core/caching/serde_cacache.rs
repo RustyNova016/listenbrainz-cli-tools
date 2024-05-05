@@ -1,7 +1,10 @@
-use std::{fmt::Display, marker::PhantomData, path::PathBuf};
+use std::fmt::Display;
+use std::marker::PhantomData;
+use std::path::PathBuf;
 
 use cacache::Integrity;
-use serde::{de::DeserializeOwned, Serialize};
+use serde::de::DeserializeOwned;
+use serde::Serialize;
 
 #[derive(Debug, Clone)]
 pub struct SerdeCacache<K, V> {
@@ -45,7 +48,7 @@ where
 
     /// Get an item from the cache.
     pub async fn get_as_result(&self, key: &K) -> color_eyre::Result<V> {
-        let read = cacache::read(&self.name, key.to_string()).await?;
+        let read: Vec<u8> = cacache::read(&self.name, key.to_string()).await?;
         Ok(rmp_serde::from_slice(&read)?)
     }
 }

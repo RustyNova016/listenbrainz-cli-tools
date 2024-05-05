@@ -87,6 +87,15 @@ impl ListenCollection {
             SortListensBy::None => {}
         }
     }
+
+    pub fn has_recording(&self, id: &str) -> bool {
+        self.iter().any(|listen| {
+            listen
+                .get_mapping_data()
+                .as_ref()
+                .is_some_and(|mapping| mapping.recording_mbid == id)
+        })
+    }
 }
 
 impl Deref for ListenCollection {
