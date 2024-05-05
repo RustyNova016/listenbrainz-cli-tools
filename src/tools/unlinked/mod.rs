@@ -1,16 +1,17 @@
 //! Contain the code for the "unlisted" command
+use std::cmp::Reverse;
+
 use color_eyre::eyre::Context;
 use listenbrainz::raw::response::UserListensListen;
 use listenbrainz::raw::Client;
-use std::cmp::Reverse;
 
-use crate::models::cli::unmapped::SortBy;
+use crate::models::cli::common::SortSorterBy;
 use crate::models::data::listenbrainz::messy_recording::MessyRecording;
 use crate::models::data::listenbrainz::user_listens::UserListens;
 use crate::utils::cli_paging::CLIPager;
 use crate::utils::{println_cli, ListenAPIPaginatorBuilder};
 
-pub async fn unmapped_command(username: &str, sort: Option<SortBy>) {
+pub async fn unmapped_command(username: &str, sort: Option<SortSorterBy>) {
     println_cli(format!("Fetching unmapped for user {}", username));
     let unlinked = UserListens::get_user_with_refresh(username)
         .await
@@ -35,11 +36,20 @@ pub async fn unmapped_command(username: &str, sort: Option<SortBy>) {
         }
     }
 
-    match sort {
-        Some(SortBy::Name) => {
+    match sort.unwrap_or_default() {
+        SortSorterBy::Name => {
             messy_recordings.sort_by_key(|recording| recording.get_recording_name());
         }
-        _ => {
+
+        SortSorterBy::Oldest => {
+            messy_recordings.sort_by_key(|recording| {
+                recording
+                    .get_oldest_listen()
+                    .map(|listen| listen.listened_at)
+            });
+        }
+
+        SortSorterBy::Count => {
             messy_recordings.sort_by_key(|recording| Reverse(recording.associated_listens.len()));
         }
     }
