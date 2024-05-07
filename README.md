@@ -14,13 +14,13 @@ cargo build --release
 ```
 
 # Tools
-## Unlinked listens 
-To search for your unlinked listens, use:
+## Unmapped listens 
+To search for your unmapped listens, use:
 ```shell
-listenbrainz-cli-tools unlinked -u <username>
+listenbrainz-cli-tools unmapped -u <username>
 ```
 
-This will list all your unlinked listens, grouped by similarity. 
+This will list all your unmapped listens, grouped by similarity. 
 It also gives a link to quickly look up the listen in listenbrainz, and go link it
 
 ```
@@ -36,3 +36,49 @@ Total: 8 unlinked recordings
 > 
 > This also means that the same recording can be shown twice in the list. 
 > For example: "Panic - Dion Timer" won't have the same MSID as "Panic by Dion Timmer", even if they are the same recording.
+
+## Interactive mass mapper
+
+This tools allow for easy and faster mapping of recordings. It goes through each unmapped recordings, 
+and give a few suggested recordings for the mapping. This is the exact same as mapping recording in the web UI.
+
+```shell
+listenbrainz-cli-tools mapping -u <username> -t <user token>
+```
+
+## Live statistics
+
+While ListenBrainz have its own statistic page, it only refreshes daily, and is limited to only some entities.
+With those commands, you'll be able to see your statistics in no time!
+
+```shell
+listenbrainz-cli-tools stats -u <username> -t <target>
+```
+
+Target is the entity type to group the stats by. Currently, those entities stats are implemented:
+- Recordings (`recording`)
+- Artists (`artist`)
+
+## Radio
+
+Currently, only one algorithm is implemented.
+
+### Artist Circles
+
+This algorythm keep your playlist close to the artists you are listening to. The way it generate is as follow:
+
+- Get a random listen
+- Get its artist
+- Add a random recording made by this artist
+
+There is the option to only get unlistened recordings, making an alternative to ListenBrainz's own discovery playlists.
+
+Usage:
+```shell
+listenbrainz-cli-tools ratio -u <username> -t <token>
+```
+
+Only unlistened:
+```shell
+listenbrainz-cli-tools ratio -u <username> -t <token> --unlistened
+```
