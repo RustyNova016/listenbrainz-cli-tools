@@ -1,2 +1,6 @@
-//pub(crate) static GLOBAL_FETCH_LIMITER: Lazy<Arc<FetchLimiter>> =
-//    Lazy::new(|| Arc::new(FetchLimiter::default()));
+use once_cell::sync::Lazy;
+use std::sync::Arc;
+use tokio::sync::Semaphore;
+
+pub(crate) static MB_FETCH_LIMITER: Lazy<Arc<Semaphore>> =
+    Lazy::new(|| Arc::new(Semaphore::new(1)));

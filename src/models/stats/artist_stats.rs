@@ -53,6 +53,8 @@ impl StatisticSorter<String, ArtistStatisticHolder> for ArtistStatisticSorter {
     ) -> impl std::future::Future<Output = color_eyre::eyre::Result<()>> {
         let listen = listen.clone();
         async move {
+            
+            
             let Some(recording_data) = listen.get_recording_data().await? else {
                 return Ok(());
             };
