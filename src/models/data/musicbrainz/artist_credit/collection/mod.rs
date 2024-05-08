@@ -3,6 +3,7 @@ use std::sync::Arc;
 
 use itertools::Itertools;
 use serde::{Deserialize, Serialize};
+use crate::models::data::musicbrainz::artist::mbid::ArtistMBID;
 
 use super::ArtistCredit;
 
@@ -18,7 +19,7 @@ impl Deref for ArtistCredits {
 }
 
 impl ArtistCredits {
-    pub fn get_artist_ids(&self) -> Vec<String> {
+    pub fn get_artist_ids(&self) -> Vec<ArtistMBID> {
         self.iter()
             .map(|credit| credit.artist.clone())
             .collect_vec()

@@ -10,6 +10,7 @@ use std::collections::HashMap;
 
 pub mod collection;
 pub mod convertion;
+mod mapped_listen;
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub struct Listen {
@@ -57,7 +58,7 @@ impl Listen {
     pub async fn get_recording_data(&self) -> color_eyre::Result<Option<Recording>> {
         match &self.mapping_data {
             Some(mapping) => Ok(Some(
-                Recording::get_cached_or_fetch(mapping.get_recording_id()).await?,
+                Recording::get_cached_or_fetch(mapping.recording_mbid()).await?,
             )),
             None => Ok(None),
         }

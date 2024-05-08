@@ -1,11 +1,10 @@
-use crate::core::statistics::stat_sorter::StatSorter;
+use indicatif::ProgressBar;
 use crate::models::data::listenbrainz::user_listens::UserListens;
 use crate::models::stats::recording_stats::RecordingStatsSorter;
 use crate::utils::cli_paging::CLIPager;
 use crate::utils::Logger;
-use indicatif::ProgressBar;
 
-pub async fn stats_recording(username: &str) {
+pub async fn stats_releases(username: &str) {
     // Get the listens
     let mapped_listens = UserListens::get_user_with_refresh(username)
         .await
@@ -34,7 +33,7 @@ pub async fn stats_recording(username: &str) {
                     .get_mapping_data()
                     .as_ref()
                     .unwrap()
-                    .recording_name(),
+                    .get_recording_name(),
                 listens
                     .first()
                     .unwrap()
@@ -43,8 +42,8 @@ pub async fn stats_recording(username: &str) {
                     .unwrap()
                     .artist_credit
                     .as_ref()
-                    .unwrap_or(&String::new())
-            );
+                    .unwrap_or(&"".to_string())
+            )
         });
 
         if !pager_continue {

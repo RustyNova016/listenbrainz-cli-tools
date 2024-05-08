@@ -1,4 +1,6 @@
 pub mod external;
+
+use derive_getters::Getters;
 use serde::{Deserialize, Serialize};
 
 use self::media::Media;
@@ -9,8 +11,9 @@ pub mod fetching;
 pub mod getters;
 pub mod media;
 pub mod track;
+pub mod mbid;
 
-#[derive(Debug, Clone, Eq, PartialEq, Deserialize, Serialize)]
+#[derive(Debug, Clone, Eq, PartialEq, Deserialize, Serialize, Getters)]
 pub struct Release {
     id: String,
     title: String,

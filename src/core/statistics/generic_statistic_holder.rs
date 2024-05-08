@@ -2,9 +2,12 @@ use crate::core::statistics::statistic_holder::StatisticHolder;
 use crate::models::data::listenbrainz::listen::collection::ListenCollection;
 use crate::models::data::listenbrainz::listen::Listen;
 use std::sync::{Arc, Mutex};
+use derive_new::new;
 
+#[derive(Debug, new)]
 pub struct GenericStatisticHolder<K> {
     _id: K,
+    #[new(default)]
     listens: Mutex<ListenCollection>,
 }
 

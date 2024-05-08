@@ -1,4 +1,5 @@
 use serde::{Deserialize, Serialize};
+use crate::models::data::musicbrainz::artist::mbid::ArtistMBID;
 
 pub mod caching;
 pub mod collection;
@@ -8,5 +9,5 @@ pub mod converters;
 pub struct ArtistCredit {
     pub name: String,
     pub joinphrase: Option<String>,
-    pub artist: String,
+    pub artist: ArtistMBID,
 }

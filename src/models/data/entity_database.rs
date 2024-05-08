@@ -1,4 +1,5 @@
 use std::sync::Arc;
+use derive_getters::Getters;
 
 use once_cell::sync::Lazy;
 
@@ -11,7 +12,7 @@ use crate::core::caching::entity_cache::EntityCache;
 pub(crate) static ENTITY_DATABASE: Lazy<Arc<EntityDatabase>> =
     Lazy::new(|| Arc::new(EntityDatabase::default()));
 
-#[derive(Debug)]
+#[derive(Debug, Getters)]
 pub struct EntityDatabase {
     artists: Arc<EntityCache<Artist>>,
     releases: Arc<EntityCache<Release>>,
@@ -29,23 +30,5 @@ impl Default for EntityDatabase {
 
             user_listens: Arc::new(EntityCache::new("user_listens")),
         }
-    }
-}
-
-impl EntityDatabase {
-    pub fn artists(&self) -> Arc<EntityCache<Artist>> {
-        self.artists.clone()
-    }
-
-    pub fn releases(&self) -> Arc<EntityCache<Release>> {
-        self.releases.clone()
-    }
-
-    pub fn recordings(&self) -> Arc<EntityCache<Recording>> {
-        self.recordings.clone()
-    }
-
-    pub fn user_listens(&self) -> Arc<EntityCache<UserListens>> {
-        self.user_listens.clone()
     }
 }

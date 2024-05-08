@@ -1,6 +1,6 @@
 use crate::core::entity_traits::fetchable::FetchableAndCachable;
 use crate::core::statistics::statistic_holder::StatisticHolder;
-use crate::core::statistics::statistic_sorter::StatisticSorter;
+use crate::core::statistics::statistic_sorter_trait::StatisticSorter;
 use crate::models::data::listenbrainz::user_listens::UserListens;
 use crate::models::data::musicbrainz::artist::Artist;
 use crate::models::stats::artist_stats::ArtistStatisticSorter;

@@ -1,3 +1,5 @@
+mod stats;
+
 use super::Listen;
 use crate::models::cli::common::SortListensBy;
 use chrono::{DateTime, Utc};

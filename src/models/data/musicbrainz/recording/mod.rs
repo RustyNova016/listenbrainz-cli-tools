@@ -26,19 +26,7 @@ impl Recording {
         self.artist_credit.clone()
     }
 
-    pub async fn get_or_fetch_artist_credits(&self) -> Result<ArtistCredits> {
-        Ok(match &self.get_artist_credits() {
-            Some(credits) => credits.clone(),
-            None => {
-                ENTITY_DATABASE.recordings().fetch_and_save(self.get_mbid().to_string())
-                .await
-                .context("Couldn't fetch data from the API")?
-                .ok_or_eyre(eyre!("Couldn't find any recording with the MBID"))?
-                .get_artist_credits()
-                .ok_or_eyre(eyre!(format!("Artist credit is null after fetching from the API. Something wrong happened, as it should return a empty vec. \n Is there an include missing somewhere in the API call? Or is the credit not saved? Faulty requested recording ID is: {}", &self.id)))?
-            }
-        })
-    }
+
 }
 
 #[derive(Debug, Clone, Eq, PartialEq, Deserialize, Serialize)]
