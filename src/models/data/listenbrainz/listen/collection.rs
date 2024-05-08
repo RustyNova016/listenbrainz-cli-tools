@@ -54,7 +54,7 @@ impl ListenCollection {
             } else {
                 listen.get_listened_at() <= start || end <= listen.get_listened_at()
             }
-        })
+        });
     }
 
     /// Add a listen to the collection.

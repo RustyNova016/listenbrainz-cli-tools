@@ -28,11 +28,11 @@ pub async fn unmapped_command(username: &str, sort: Option<SortSorterBy>) {
             .find(|record| record.id == listen.messybrainz_data.msid);
 
         if let Some(messy_recording) = messy_recording {
-            messy_recording.add_listen(listen)
+            messy_recording.add_listen(listen);
         } else {
             let mut messy_recording = MessyRecording::new(listen.messybrainz_data.msid.clone());
             messy_recording.add_listen(listen);
-            messy_recordings.push(messy_recording)
+            messy_recordings.push(messy_recording);
         }
     }
 

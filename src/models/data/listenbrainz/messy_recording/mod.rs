@@ -17,7 +17,7 @@ impl MessyRecording {
 
     pub fn add_listen(&mut self, listen: Arc<Listen>) {
         if listen.messybrainz_data.msid == self.id {
-            self.associated_listens.push(listen)
+            self.associated_listens.push(listen);
         }
     }
 

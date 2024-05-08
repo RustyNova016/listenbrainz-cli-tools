@@ -45,7 +45,7 @@ impl ListenAPIPaginator {
             .listens
             .iter()
             .min_by_key(|listen| listen.listened_at)
-            .map(|latest_listen| latest_listen.listened_at)
+            .map(|latest_listen| latest_listen.listened_at);
     }
 
     /// Retreive the next page of listens
@@ -112,14 +112,14 @@ impl Logger {
     }
 
     pub fn clear_overide(&mut self) {
-        self.print_override = None
+        self.print_override = None;
     }
 
     fn print<T: Display + std::convert::AsRef<str>>(&self, string: T) {
         if let Some(overide) = &self.print_override {
-            overide.println(string)
+            overide.println(string);
         } else {
-            println!("{}", string)
+            println!("{}", string);
         }
     }
 
@@ -163,11 +163,11 @@ pub fn println_cli<T: Display>(string: T) {
 pub fn println_lis<T: Display>(string: T) {
     let static_clone = STATIC_LOGGER.clone();
     let logger = static_clone.lock().unwrap();
-    logger.println_lis(string)
+    logger.println_lis(string);
 }
 
 pub fn println_mus<T: Display>(string: T) {
     let static_clone = STATIC_LOGGER.clone();
     let logger = static_clone.lock().unwrap();
-    logger.println_mus(string)
+    logger.println_mus(string);
 }

@@ -44,7 +44,7 @@ pub async fn stats_recording(username: &str) {
                     .artist_credit
                     .as_ref()
                     .unwrap_or(&"".to_string())
-            )
+            );
         });
 
         if !pager_continue {

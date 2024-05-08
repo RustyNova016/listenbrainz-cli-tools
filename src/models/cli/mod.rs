@@ -78,10 +78,10 @@ impl Commands {
     pub async fn run(&self) {
         match self {
             Commands::Unmapped { username, sort } => {
-                unmapped_command(&username.to_lowercase(), *sort).await
+                unmapped_command(&username.to_lowercase(), *sort).await;
             }
             Commands::Stats { username, target } => {
-                stats_command(&username.to_lowercase(), *target).await
+                stats_command(&username.to_lowercase(), *target).await;
             }
             Commands::Mapping {
                 username,
