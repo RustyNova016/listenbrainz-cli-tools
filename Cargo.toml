@@ -58,9 +58,11 @@ enum_glob_use = { level = "deny", priority = 1  }
 semicolon_if_nothing_returned = { level = "deny", priority = 1  }
 use_self = { level = "deny", priority = 1  }
 or_fun_call = { level = "warn", priority = 1  }
+match_same_arms = { level = "deny", priority = 1  }
 
 # Won't apply
 must_use_candidate = { level = "allow", priority = 1  }
+map_unwrap_or = { level = "allow", priority = 1  }
 
 # Config for 'cargo dist'
 [workspace.metadata.dist]

@@ -23,8 +23,7 @@ impl Deref for MBID {
 
     fn deref(&self) -> &Self::Target {
         match self {
-            Self::Recording(data) => data,
-            Self::Artist(data) => data,
+            Self::Artist(data) | Self::Recording(data) => data,
         }
     }
 }
