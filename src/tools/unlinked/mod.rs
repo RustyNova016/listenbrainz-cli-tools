@@ -59,7 +59,7 @@ pub async fn unmapped_command(username: &str, sort: Option<SortSorterBy>) {
     let mut pager = CLIPager::new(5);
 
     println!("Total: {unlinked_count} unmapped recordings");
-    for record in messy_recordings.iter() {
+    for record in &messy_recordings {
         let pager_continue = pager.execute(|| {
             println!(
                 "({}) {} - {}",
