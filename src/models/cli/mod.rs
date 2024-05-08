@@ -77,19 +77,19 @@ pub enum Commands {
 impl Commands {
     pub async fn run(&self) {
         match self {
-            Commands::Unmapped { username, sort } => {
-                unmapped_command(&username.to_lowercase(), *sort).await
+            Self::Unmapped { username, sort } => {
+                unmapped_command(&username.to_lowercase(), *sort).await;
             }
-            Commands::Stats { username, target } => {
-                stats_command(&username.to_lowercase(), *target).await
+            Self::Stats { username, target } => {
+                stats_command(&username.to_lowercase(), *target).await;
             }
-            Commands::Mapping {
+            Self::Mapping {
                 username,
                 token,
                 sort,
             } => interactive_mapper(username, token.clone(), *sort).await,
 
-            Commands::Radio {
+            Self::Radio {
                 username,
                 token,
                 unlistened,

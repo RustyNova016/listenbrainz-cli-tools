@@ -11,7 +11,7 @@ pub trait InsertableWithChildren: Insertable + Sync {
     }
 }
 
-/// Wrapper to treat [InsertableWithChildren] as an [Insertable]
+/// Wrapper to treat [`InsertableWithChildren`] as an [Insertable]
 pub struct InsertChildren<T: InsertableWithChildren + Sync> {
     data: T,
 }

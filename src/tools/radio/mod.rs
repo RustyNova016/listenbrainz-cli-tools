@@ -92,7 +92,7 @@ impl RadioCircle {
 
         let mut listen_shuffle = listens.deref().clone();
         listen_shuffle.shuffle(&mut thread_rng());
-        for listen in listen_shuffle.iter() {
+        for listen in &listen_shuffle {
             let result = self
                 .get_recording_from_listen(listen.as_ref(), listens, &results)
                 .await?;

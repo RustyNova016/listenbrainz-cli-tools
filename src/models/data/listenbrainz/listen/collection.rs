@@ -16,7 +16,7 @@ impl ListenCollection {
         Self { data: Vec::new() }
     }
 
-    pub fn get_mapped_listens(&self) -> ListenCollection {
+    pub fn get_mapped_listens(&self) -> Self {
         self.data
             .iter()
             .filter(|element| element.is_mapped())
@@ -33,7 +33,7 @@ impl ListenCollection {
     }
 
     /// Returns all the unmapped listens
-    pub fn get_unmapped_listens(&self) -> ListenCollection {
+    pub fn get_unmapped_listens(&self) -> Self {
         self.data
             .iter()
             .filter(|listen| !listen.is_mapped())
@@ -54,7 +54,7 @@ impl ListenCollection {
             } else {
                 listen.get_listened_at() <= start || end <= listen.get_listened_at()
             }
-        })
+        });
     }
 
     /// Add a listen to the collection.
@@ -71,7 +71,7 @@ impl ListenCollection {
                         .get_mapping_data()
                         .as_ref()
                         .map(|data| data.recording_name.clone())
-                        .unwrap_or(recording.get_messybrain_data().track_name.clone())
+                        .unwrap_or_else(|| recording.get_messybrain_data().track_name.clone())
                 });
                 *self = Self { data: sorted }
             }

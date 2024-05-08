@@ -26,7 +26,7 @@ impl Artist {
 
         let mut recordings = Vec::new();
         for id in recording_ids {
-            recordings.push(Recording::get_cache().get_or_fetch(&id).await?)
+            recordings.push(Recording::get_cache().get_or_fetch(&id).await?);
         }
         Ok(recordings)
     }

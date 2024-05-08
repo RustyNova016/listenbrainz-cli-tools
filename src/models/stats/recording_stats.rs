@@ -35,7 +35,7 @@ impl StatSorter for RecordingStatsSorter {
 
     async fn push(&mut self, value: Arc<Listen>) -> Result<()> {
         if let Some(mapping_info) = &value.mapping_data {
-            self.get_mut(&mapping_info.recording_mbid).push(value)
+            self.get_mut(&mapping_info.recording_mbid).push(value);
         }
 
         Ok(())

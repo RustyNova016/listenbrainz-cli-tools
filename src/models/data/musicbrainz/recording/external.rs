@@ -26,13 +26,13 @@ impl InsertableWithChildren for Recording {
         self.insert_into_cache_as(key).await?;
 
         if let Some(data) = self.artist_credit.clone() {
-            for item in data.iter() {
+            for item in &data {
                 item.insert_into_cache().await?;
             }
         }
 
         if let Some(data) = self.releases.clone() {
-            for item in data.iter() {
+            for item in &data {
                 item.insert_into_cache().await?;
             }
         }

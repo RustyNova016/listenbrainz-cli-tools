@@ -1,7 +1,7 @@
 use crate::models::data::listenbrainz::listen::Listen;
 use std::sync::Arc;
 
-/// Represent a messybrain recording id
+/// Represent a messybrainz recording id
 pub struct MessyRecording {
     pub id: String,
     pub associated_listens: Vec<Arc<Listen>>,
@@ -9,7 +9,7 @@ pub struct MessyRecording {
 
 impl MessyRecording {
     pub fn new(id: String) -> Self {
-        MessyRecording {
+        Self {
             id,
             associated_listens: Vec::new(),
         }
@@ -17,7 +17,7 @@ impl MessyRecording {
 
     pub fn add_listen(&mut self, listen: Arc<Listen>) {
         if listen.messybrainz_data.msid == self.id {
-            self.associated_listens.push(listen)
+            self.associated_listens.push(listen);
         }
     }
 
