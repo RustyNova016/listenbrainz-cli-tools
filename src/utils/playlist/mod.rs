@@ -29,7 +29,7 @@ impl PlaylistStub {
                     .tracks
                     .iter()
                     .map(|id| PlaylistCreatePlaylistTrack {
-                        identifier: format!("https://musicbrainz.org/recording/{}", id),
+                        identifier: format!("https://musicbrainz.org/recording/{id}"),
                     })
                     .collect(),
                 extension: PlaylistCreatePlaylistExtension {

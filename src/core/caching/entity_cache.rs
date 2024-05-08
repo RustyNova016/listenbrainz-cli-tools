@@ -65,7 +65,7 @@ where
     /// If none is provided, it will get assigned automatically.
     ///
     /// ⚠️ Waiting for a permit doesn't cancel the request. It only delays it.
-    /// If the intention is to only fetch once, see [Self::get_or_fetch]
+    /// If the intention is to only fetch once, see [`Self::get_or_fetch`]
     pub async fn fetch_and_save(&self, key: String) -> color_eyre::Result<Option<V>> {
         let semaphore = self.get_semaphore(&key);
         let permit = semaphore.acquire().await.context("Couldn't get permit")?;

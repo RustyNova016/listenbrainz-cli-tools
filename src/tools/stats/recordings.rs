@@ -43,7 +43,7 @@ pub async fn stats_recording(username: &str) {
                     .unwrap()
                     .artist_credit
                     .as_ref()
-                    .unwrap_or(&"".to_string())
+                    .unwrap_or(&String::new())
             );
         });
 

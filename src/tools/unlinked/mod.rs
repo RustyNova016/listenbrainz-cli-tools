@@ -12,7 +12,7 @@ use crate::utils::cli_paging::CLIPager;
 use crate::utils::{println_cli, ListenAPIPaginatorBuilder};
 
 pub async fn unmapped_command(username: &str, sort: Option<SortSorterBy>) {
-    println_cli(format!("Fetching unmapped for user {}", username));
+    println_cli(format!("Fetching unmapped for user {username}"));
     let unlinked = UserListens::get_user_with_refresh(username)
         .await
         .expect("Couldn't fetch the new listens")
@@ -54,11 +54,11 @@ pub async fn unmapped_command(username: &str, sort: Option<SortSorterBy>) {
         }
     }
 
-    println!("Done! Here are {}'s top unmapped listens:", username);
+    println!("Done! Here are {username}'s top unmapped listens:");
 
     let mut pager = CLIPager::new(5);
 
-    println!("Total: {} unmapped recordings", unlinked_count);
+    println!("Total: {unlinked_count} unmapped recordings");
     for record in messy_recordings.iter() {
         let pager_continue = pager.execute(|| {
             println!(
@@ -102,7 +102,7 @@ pub fn get_all_unlinked_of_user(username: &str) -> Vec<UserListensListen> {
     let mut unlinked = vec![];
     let mut i = 1;
     loop {
-        println!("Page: {}", i);
+        println!("Page: {i}");
         i += 1;
         let page = reader.next(&client).unwrap();
 

@@ -119,7 +119,7 @@ impl Logger {
         if let Some(overide) = &self.print_override {
             overide.println(string);
         } else {
-            println!("{}", string);
+            println!("{string}");
         }
     }
 
