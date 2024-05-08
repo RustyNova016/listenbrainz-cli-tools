@@ -18,7 +18,7 @@ impl Cached for Artist {
     where
         Self: Sized,
     {
-        ENTITY_DATABASE.artists()
+        ENTITY_DATABASE.artists().clone()
     }
 }
 

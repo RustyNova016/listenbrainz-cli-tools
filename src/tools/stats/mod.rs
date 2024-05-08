@@ -2,6 +2,7 @@ use crate::models::cli::common::GroupByTarget;
 
 mod artists;
 mod recordings;
+mod releases;
 
 pub async fn stats_command(username: &str, target: GroupByTarget) {
     match target {
@@ -10,6 +11,9 @@ pub async fn stats_command(username: &str, target: GroupByTarget) {
         }
         GroupByTarget::Artist => {
             artists::stats_artist(username).await;
+        }
+        GroupByTarget::Release => {
+            releases::stats_releases(username).await;
         }
     }
 }

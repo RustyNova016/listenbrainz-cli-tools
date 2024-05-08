@@ -1,11 +1,12 @@
 use crate::core::entity_traits::cached::Cached;
 use crate::core::entity_traits::insertable::Insertable;
 use crate::utils::extensions::UserListensPayloadExt;
-use crate::utils::{println_cli, println_lis, Logger};
+use crate::utils::{println_cli, println_lis};
 use chrono::{DateTime, TimeDelta, Utc};
 use indicatif::ProgressBar;
 use listenbrainz::raw::response::UserListensResponse;
 use listenbrainz::raw::Client;
+use crate::utils::logger::Logger;
 
 use super::UserListens;
 
@@ -84,7 +85,7 @@ impl UserListens {
         let start_count = unlinkeds.len();
 
         let progress_bar = ProgressBar::new(unlinkeds.len().try_into().unwrap());
-        Logger::set_global_overide(progress_bar.clone());
+        Logger::add_global_pg(progress_bar.clone());
 
         while unlinkeds.len() > 0 {
             let refresh_target = unlinkeds
@@ -111,7 +112,7 @@ impl UserListens {
             progress_bar.set_position((start_count - unlinkeds.len()).try_into().unwrap());
         }
 
-        Logger::clear_global_overide();
+        Logger::remove_global_pg(progress_bar);
 
         Ok(())
     }

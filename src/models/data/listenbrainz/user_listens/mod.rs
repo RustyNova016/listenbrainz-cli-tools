@@ -1,6 +1,7 @@
 use std::sync::Arc;
 
 use chrono::{DateTime, Utc};
+use derive_getters::Getters;
 use listenbrainz::raw::response::{UserListensListen, UserListensPayload};
 use serde::{Deserialize, Serialize};
 
@@ -12,9 +13,10 @@ use super::listen::Listen;
 pub mod caching;
 pub mod fetching;
 
-#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq, Getters)]
 pub struct UserListens {
     username: String,
+    #[getter(rename = "get_listens")]
     listens: ListenCollection,
 }
 

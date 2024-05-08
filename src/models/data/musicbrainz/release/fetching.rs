@@ -9,14 +9,16 @@ use musicbrainz_rs::Fetch;
 impl Fetchable for Release {
     #[allow(refining_impl_trait)]
     async fn fetch(key: &str) -> color_eyre::Result<InsertChildren<ReleaseMS>> {
-        println_mus(format!("Getting data for artist MBID: {}", &key));
+        println_mus(format!("Getting data for release MBID: {}", &key));
 
         Ok(ReleaseMS::fetch()
             .id(key)
             .with_recordings()
+            .with_artists()
+            .with_artist_credits()
             .execute()
             .await
-            .context("Failed to fetch artist from MusicBrainz")?
+            .context("Failed to fetch release from MusicBrainz")?
             .into())
     }
 }

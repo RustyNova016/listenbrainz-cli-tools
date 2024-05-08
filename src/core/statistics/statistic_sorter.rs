@@ -1,41 +1,55 @@
-use crate::core::statistics::statistic_holder::StatisticHolder;
+use std::ops::Deref;
+use std::sync::{Arc, Mutex};
+
+use chashmap::{CHashMap, ReadGuard};
+use derive_new::new;
+use itertools::Itertools;
+use crate::models::cli::common::SortSorterBy;
+
+use crate::models::data::listenbrainz::listen::collection::ListenCollection;
 use crate::models::data::listenbrainz::listen::Listen;
-use std::cmp::Reverse;
-use std::sync::Arc;
 
-pub trait StatisticSorter<K, H: StatisticHolder<K>> {
-    fn insert_listen(
-        &self,
-        listen: Arc<Listen>,
-    ) -> impl std::future::Future<Output = color_eyre::Result<()>> + Send;
+#[derive(Debug, new)]
+pub struct StatisticSorter {
+    #[new(default)]
+    listens: CHashMap<String, Mutex<ListenCollection>>,
+}
 
-    fn get(&self, key: &K) -> Arc<H>;
+impl StatisticSorter {
+    fn get_or_create(&self, key: &str) -> ReadGuard<String, Mutex<ListenCollection>> {
+        let inside = self.listens.get(key);
 
-    fn extend<'a, T: IntoIterator<Item = Arc<Listen>>>(
-        &'a self,
-        iter: T,
-    ) -> impl std::future::Future<Output = color_eyre::Result<()>>
-    where
-        K: 'a,
-        H: 'a,
-    {
-        async {
-            for listen in iter.into_iter() {
-                self.insert_listen(listen).await?;
-            }
-
-            Ok(())
+        if let Some(data) = inside {
+            return data;
         }
+
+        let new = Mutex::new(ListenCollection::new());
+        self.listens.insert(key.to_string(), new);
+        return self
+            .listens
+            .get(key)
+            .expect("Failed to get element just inserted");
     }
 
-    fn into_vec(self) -> Vec<(String, Arc<H>)>;
+    pub fn insert(&self, key: &str, listen: Arc<Listen>) {
+        let element = self.get_or_create(key);
+        let mut inner_coll = element.deref().lock().expect("Failed to get lock");
 
-    fn into_sorted(self) -> Vec<(String, Arc<H>)>
-    where
-        Self: Sized,
-    {
-        let mut out = self.into_vec();
-        out.sort_unstable_by_key(|item| Reverse(item.1.count()));
+        inner_coll.push(listen);
+    }
+
+    pub fn into_sorted_vec(self, sort_by: SortSorterBy) -> Vec<(String, ListenCollection)> {
+        let mut out = self.listens.into_iter().map(|item| (item.0, item.1.into_inner().unwrap())).collect_vec();
+
+        match sort_by {
+            SortSorterBy::Count => {
+                out.sort_by_key(|item| item.1.len());
+                out.reverse();
+            }
+            SortSorterBy::Name => {} //TODO
+            SortSorterBy::Oldest => {} //TODO
+        }
+
         out
     }
 }

@@ -1,5 +1,9 @@
 pub mod external;
+
+use derive_getters::Getters;
 use serde::{Deserialize, Serialize};
+use crate::models::data::musicbrainz::artist_credit::ArtistCredit;
+use crate::models::data::musicbrainz::artist_credit::collection::ArtistCredits;
 
 use self::media::Media;
 
@@ -9,8 +13,10 @@ pub mod fetching;
 pub mod getters;
 pub mod media;
 pub mod track;
+pub mod mbid;
+mod get_or_fetch;
 
-#[derive(Debug, Clone, Eq, PartialEq, Deserialize, Serialize)]
+#[derive(Debug, Clone, Eq, PartialEq, Deserialize, Serialize, Getters)]
 pub struct Release {
     id: String,
     title: String,
@@ -25,7 +31,7 @@ pub struct Release {
     //packaging: Option<ReleasePackaging>,
     //relations: Option<Vec<Relation>>,
     //release_group: Option<ReleaseGroup>,
-    //artist_credit: Option<Vec<ArtistCredit>>,
+    artist_credit: Option<ArtistCredits>,
     media: Option<Vec<Media>>,
     //label_info: Option<Vec<LabelInfo>>,
     //tags: Option<Vec<Tag>>,

@@ -10,7 +10,7 @@ impl Cached for Recording {
     where
         Self: Sized,
     {
-        ENTITY_DATABASE.recordings()
+        ENTITY_DATABASE.recordings().clone()
     }
 }
 
