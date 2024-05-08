@@ -10,12 +10,12 @@ use listenbrainz::raw::Client;
 use super::UserListens;
 
 impl UserListens {
-    pub async fn get_user_with_refresh(username: &str) -> color_eyre::Result<UserListens> {
+    pub async fn get_user_with_refresh(username: &str) -> color_eyre::Result<Self> {
         println_cli("Getting new user listens...");
-        UserListens::fetch_latest(username).await?;
+        Self::fetch_latest(username).await?;
 
         println_cli("Updating unmapped listens...");
-        UserListens::update_unlinked_of_user(username).await?;
+        Self::update_unlinked_of_user(username).await?;
 
         Ok(Self::get_from_cache(username)
             .await
@@ -23,7 +23,7 @@ impl UserListens {
             .expect("Couldn't get listen that were inserted"))
     }
 
-    /// Fetch the most listens it can, that have been listened before the provided date. Additionally save them to the cache
+    /// Fetch the most listens it can, that have been listened before the provided date. Additionally, save them to the cache
     pub async fn fetch_before(
         user: &str,
         before_date: DateTime<Utc>,
@@ -44,11 +44,11 @@ impl UserListens {
 
     /// Fetch the latest listens that aren't yet in the cache. If it fetched more than needed, entries will get updated
     ///
-    /// If the cache is empty, then it will fill it completly
+    /// If the cache is empty, then it will fill it completely
     pub async fn fetch_latest(username: &str) -> color_eyre::Result<()> {
         let operation_start = Utc::now();
 
-        let latest_cached_listen_date = UserListens::get_from_cache(username)
+        let latest_cached_listen_date = Self::get_from_cache(username)
             .await?
             .and_then(|user_listens| user_listens.listens.get_latest_listen())
             .map(|listen| *listen.get_listened_at());
@@ -78,7 +78,7 @@ impl UserListens {
     /// Refetch all the unlinked listens of a user and recache them
     pub async fn update_unlinked_of_user(username: &str) -> color_eyre::Result<()> {
         // We first get all the unlinked cached
-        let mut unlinkeds = UserListens::get_from_cache_or_new(username)
+        let mut unlinkeds = Self::get_from_cache_or_new(username)
             .await?
             .get_unmapped_listens();
         let start_count = unlinkeds.len();

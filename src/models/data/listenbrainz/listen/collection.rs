@@ -16,7 +16,7 @@ impl ListenCollection {
         Self { data: Vec::new() }
     }
 
-    pub fn get_mapped_listens(&self) -> ListenCollection {
+    pub fn get_mapped_listens(&self) -> Self {
         self.data
             .iter()
             .filter(|element| element.is_mapped())
@@ -33,7 +33,7 @@ impl ListenCollection {
     }
 
     /// Returns all the unmapped listens
-    pub fn get_unmapped_listens(&self) -> ListenCollection {
+    pub fn get_unmapped_listens(&self) -> Self {
         self.data
             .iter()
             .filter(|listen| !listen.is_mapped())
