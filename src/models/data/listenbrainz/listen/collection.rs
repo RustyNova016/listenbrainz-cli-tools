@@ -71,7 +71,7 @@ impl ListenCollection {
                         .get_mapping_data()
                         .as_ref()
                         .map(|data| data.recording_name.clone())
-                        .unwrap_or(recording.get_messybrain_data().track_name.clone())
+                        .unwrap_or_else(|| recording.get_messybrain_data().track_name.clone())
                 });
                 *self = Self { data: sorted }
             }

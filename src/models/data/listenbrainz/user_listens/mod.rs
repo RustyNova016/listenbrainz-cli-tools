@@ -48,10 +48,10 @@ impl UserListens {
         self.remove_timerange(
             &data
                 .get_date_of_oldest_listen_of_payload()
-                .unwrap_or(Utc::now()),
+                .unwrap_or_else(Utc::now),
             &data
                 .get_date_of_latest_listen_of_payload()
-                .unwrap_or(Utc::now()),
+                .unwrap_or_else(Utc::now),
             true,
         );
 

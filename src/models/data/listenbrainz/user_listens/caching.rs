@@ -29,6 +29,6 @@ impl UserListens {
     pub async fn get_from_cache_or_new(username: &str) -> color_eyre::Result<Self> {
         Ok(Self::get_from_cache(username)
             .await?
-            .unwrap_or(Self::new(username)))
+            .unwrap_or_else(|| Self::new(username)))
     }
 }

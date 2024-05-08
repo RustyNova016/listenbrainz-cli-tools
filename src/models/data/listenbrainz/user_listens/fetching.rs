@@ -101,10 +101,10 @@ impl UserListens {
             unlinkeds.remove_timerange(
                 &result
                     .get_date_of_oldest_listen_of_payload()
-                    .unwrap_or(Utc::now()),
+                    .unwrap_or_else(Utc::now),
                 &result
                     .get_date_of_latest_listen_of_payload()
-                    .unwrap_or(Utc::now()),
+                    .unwrap_or_else(Utc::now),
                 true,
             );
 
@@ -122,7 +122,7 @@ impl Insertable for UserListensResponse {
         let mut user_listens = UserListens::get_cache()
             .get(&key)
             .await?
-            .unwrap_or(UserListens::new(&key));
+            .unwrap_or_else(|| UserListens::new(&key));
 
         user_listens.refresh_timerange(self.payload.clone());
 
