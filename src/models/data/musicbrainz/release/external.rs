@@ -37,6 +37,10 @@ impl InsertableWithChildren for Release {
             }
         }
 
+        if let Some(data) = self.release_group.clone() {
+            data.insert_into_cache().await?;
+        }
+
         Ok(())
     }
 }

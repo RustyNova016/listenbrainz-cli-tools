@@ -35,6 +35,7 @@ impl Updatable for Release {
             title: newer.title,
             id: newer.id,
             artist_credit: newer.artist_credit.or(self.artist_credit),
+            release_group: newer.release_group.or(self.release_group),
         }
     }
 }

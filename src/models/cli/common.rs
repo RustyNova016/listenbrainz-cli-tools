@@ -20,7 +20,6 @@ pub enum SortSorterBy {
 
     /// The oldest element
     Oldest,
-
     // /// The oldest listen
 }
 
@@ -29,4 +28,5 @@ pub enum GroupByTarget {
     Recording,
     Artist,
     Release,
+    ReleaseGroup,
 }

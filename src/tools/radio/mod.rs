@@ -7,6 +7,8 @@ use std::ops::Deref;
 
 use crate::core::entity_traits::cached::Cached;
 use crate::core::entity_traits::fetchable::FetchableAndCachable;
+use crate::core::entity_traits::relations::has_artist_credits::HasArtistCredits;
+
 use crate::models::data::listenbrainz::listen::collection::ListenCollection;
 use crate::models::data::listenbrainz::listen::Listen;
 use crate::models::data::listenbrainz::user_listens::UserListens;
@@ -73,7 +75,7 @@ impl RadioCircle {
         let recording = Recording::get_cached_or_fetch(mapping_data.recording_mbid()).await?;
 
         for artist_id in recording.get_or_fetch_artist_credits().await?.iter() {
-            let artist = Artist::get_cache().get_or_fetch(&artist_id.artist()).await?;
+            let artist = Artist::get_cache().get_or_fetch(artist_id.artist()).await?;
 
             let result = self
                 .get_recording_of_artist(artist, listens, playlist)

@@ -3,11 +3,11 @@ use crate::core::entity_traits::relations::has_artist_credits::HasArtistCredits;
 
 use crate::models::cli::common::SortSorterBy;
 use crate::models::data::listenbrainz::user_listens::UserListens;
-use crate::models::data::musicbrainz::release::Release;
+use crate::models::data::musicbrainz::release_group::ReleaseGroup;
 use crate::utils::cli_paging::CLIPager;
 use crate::utils::println_cli;
 
-pub async fn stats_releases(username: &str) {
+pub async fn stats_release_groups(username: &str) {
     // Get the listens
     let user_listens = UserListens::get_user_with_refresh(username)
         .await
@@ -20,16 +20,16 @@ pub async fn stats_releases(username: &str) {
 
     let stats = user_listens
         .get_listens()
-        .get_release_statistics()
+        .get_release_group_statistics()
         .await
         .expect("Couldn't sort the listens");
 
     let mut pager = CLIPager::new(5);
 
     for (key, data) in stats.into_sorted_vec(SortSorterBy::Count) {
-        let release = Release::get_cached_or_fetch(&key).await.unwrap();
+        let release_group = ReleaseGroup::get_cached_or_fetch(&key).await.unwrap();
 
-        let artist_credit_string = release
+        let artist_credit_string = release_group
             .get_or_fetch_artist_credits()
             .await
             .unwrap()
@@ -38,7 +38,7 @@ pub async fn stats_releases(username: &str) {
             println!(
                 "[{}] - {} by {}",
                 data.len(),
-                release.title(),
+                release_group.title(),
                 artist_credit_string
             );
         });

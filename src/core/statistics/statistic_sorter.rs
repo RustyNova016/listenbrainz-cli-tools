@@ -1,10 +1,10 @@
 use std::ops::Deref;
 use std::sync::{Arc, Mutex};
 
+use crate::models::cli::common::SortSorterBy;
 use chashmap::{CHashMap, ReadGuard};
 use derive_new::new;
 use itertools::Itertools;
-use crate::models::cli::common::SortSorterBy;
 
 use crate::models::data::listenbrainz::listen::collection::ListenCollection;
 use crate::models::data::listenbrainz::listen::Listen;
@@ -39,15 +39,18 @@ impl StatisticSorter {
     }
 
     pub fn into_sorted_vec(self, sort_by: SortSorterBy) -> Vec<(String, ListenCollection)> {
-        let mut out = self.listens.into_iter().map(|item| (item.0, item.1.into_inner().unwrap())).collect_vec();
+        let mut out = self
+            .listens
+            .into_iter()
+            .map(|item| (item.0, item.1.into_inner().unwrap()))
+            .collect_vec();
 
         match sort_by {
             SortSorterBy::Count => {
                 out.sort_by_key(|item| item.1.len());
                 out.reverse();
             }
-            SortSorterBy::Name => {} //TODO
-            SortSorterBy::Oldest => {} //TODO
+            SortSorterBy::Name | SortSorterBy::Oldest => {} //TODO
         }
 
         out

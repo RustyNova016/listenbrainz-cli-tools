@@ -20,6 +20,9 @@ impl From<ReleaseMS> for Release {
             artist_credit: value
                 .artist_credit
                 .map(|artist_credits| artist_credits.into()),
+            release_group: value
+                .release_group
+                .map(|release_group| release_group.id.into()),
         }
     }
 }

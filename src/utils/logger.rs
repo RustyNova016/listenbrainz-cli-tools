@@ -1,11 +1,11 @@
+use crate::utils::STATIC_LOGGER;
+use color_eyre::owo_colors::OwoColorize;
 use indicatif::{MultiProgress, ProgressBar};
 use std::fmt::Display;
-use color_eyre::owo_colors::OwoColorize;
-use crate::utils::STATIC_LOGGER;
 
 pub struct Logger {
     print_override: Option<MultiProgress>,
-    bar_count: u32
+    bar_count: u32,
 }
 
 impl Logger {
@@ -19,7 +19,9 @@ impl Logger {
     pub fn add_bar(&mut self, pg: ProgressBar) {
         self.bar_count += 1;
         match &self.print_override {
-            Some(mpg) => { mpg.add(pg); },
+            Some(mpg) => {
+                mpg.add(pg);
+            }
             None => {
                 let mpg = MultiProgress::new();
                 mpg.add(pg);
@@ -31,10 +33,11 @@ impl Logger {
     pub fn remove_bar(&mut self, pg: ProgressBar) {
         self.bar_count -= 1;
         match &self.print_override {
-            Some(mpg) => { mpg.remove(&pg); mpg.clear().expect("TODO: panic message");},
-            None => {
-
+            Some(mpg) => {
+                mpg.remove(&pg);
+                mpg.clear().expect("TODO: panic message");
             }
+            None => {}
         }
 
         if self.bar_count == 0 {

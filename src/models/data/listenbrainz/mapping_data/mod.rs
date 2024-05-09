@@ -1,10 +1,11 @@
+use crate::core::entity_traits::cached::Cached;
+use crate::core::entity_traits::relations::has_artist_credits::HasArtistCredits;
+use crate::models::data::musicbrainz::artist::mbid::ArtistMBID;
+use crate::models::data::musicbrainz::recording::Recording;
 use derive_getters::Getters;
 use itertools::Itertools;
 use listenbrainz::raw::response::UserListensMBIDMapping;
 use serde::{Deserialize, Serialize};
-use crate::core::entity_traits::cached::Cached;
-use crate::models::data::musicbrainz::artist::mbid::ArtistMBID;
-use crate::models::data::musicbrainz::recording::Recording;
 
 use crate::utils::extensions::UserListensMBIDMappingExt;
 
@@ -26,14 +27,21 @@ pub struct MappingData {
 impl MappingData {
     /// Get the mapped [`Recording`]
     pub async fn get_or_fetch_recording(&self) -> color_eyre::Result<Recording> {
-        Recording::get_cache().get_or_fetch(&self.recording_mbid).await
+        Recording::get_cache()
+            .get_or_fetch(&self.recording_mbid)
+            .await
     }
-    
+
     /// Get the ids of the associated [`Recording`]'s [`Artist`]\(s)
     pub async fn get_or_fetch_artist_mbids(&self) -> color_eyre::Result<Vec<ArtistMBID>> {
-        Ok(match &self.artist_mbid { 
-            None => {self.get_or_fetch_recording().await?.get_or_fetch_artist_credits().await?.get_artist_ids()},
-            Some(artists) => artists.clone()
+        Ok(match &self.artist_mbid {
+            None => self
+                .get_or_fetch_recording()
+                .await?
+                .get_or_fetch_artist_credits()
+                .await?
+                .get_artist_ids(),
+            Some(artists) => artists.clone(),
         })
     }
 }
@@ -46,7 +54,10 @@ impl From<UserListensMBIDMapping> for MappingData {
                 .recording_name
                 .clone()
                 .unwrap_or(format!("Unknown Track ({})", value.recording_mbid)),
-            artist_mbid: value.artist_mbids.clone().map(|artists| artists.into_iter().map(Into::into).collect_vec()),
+            artist_mbid: value
+                .artist_mbids
+                .clone()
+                .map(|artists| artists.into_iter().map(Into::into).collect_vec()),
             artist_credit: value.get_artist_credit_as_string(),
         }
     }

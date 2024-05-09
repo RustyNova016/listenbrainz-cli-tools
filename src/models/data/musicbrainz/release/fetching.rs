@@ -16,6 +16,11 @@ impl Fetchable for Release {
             .with_recordings()
             .with_artists()
             .with_artist_credits()
+            .with_release_groups()
+            .with_artist_credits()
+            .with_aliases()
+            .with_annotations()
+            .with_artist_relations()
             .execute()
             .await
             .context("Failed to fetch release from MusicBrainz")?

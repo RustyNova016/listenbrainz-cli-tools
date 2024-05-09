@@ -1,8 +1,8 @@
 use crate::core::statistics::statistic_holder::StatisticHolder;
 use crate::models::data::listenbrainz::listen::collection::ListenCollection;
 use crate::models::data::listenbrainz::listen::Listen;
-use std::sync::{Arc, Mutex};
 use derive_new::new;
+use std::sync::{Arc, Mutex};
 
 #[derive(Debug, new)]
 pub struct GenericStatisticHolder<K> {

@@ -1,12 +1,12 @@
 use crate::core::entity_traits::cached::Cached;
 use crate::core::entity_traits::insertable::Insertable;
 use crate::utils::extensions::UserListensPayloadExt;
+use crate::utils::logger::Logger;
 use crate::utils::{println_cli, println_lis};
 use chrono::{DateTime, TimeDelta, Utc};
 use indicatif::ProgressBar;
 use listenbrainz::raw::response::UserListensResponse;
 use listenbrainz::raw::Client;
-use crate::utils::logger::Logger;
 
 use super::UserListens;
 

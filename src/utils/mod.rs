@@ -1,18 +1,17 @@
 pub mod playlist;
-use color_eyre::owo_colors::OwoColorize;
 use derive_builder::Builder;
 use listenbrainz::raw::response::{UserListensListen, UserListensResponse};
 use listenbrainz::raw::Client;
+use logger::Logger;
 use once_cell::sync::Lazy;
 use std::fmt::Display;
 use std::sync::{Arc, Mutex};
-use logger::Logger;
 
 pub mod cli_paging;
 pub mod extensions;
+pub mod logger;
 pub mod tokio;
 pub mod traits;
-pub mod logger;
 
 #[derive(Clone, Debug, PartialEq, Eq, Builder)]
 #[allow(missing_docs)]
