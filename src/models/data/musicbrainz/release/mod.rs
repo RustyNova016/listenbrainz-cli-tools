@@ -1,16 +1,25 @@
-pub mod external;
+use crate::core::entity_traits::relations::has_artist_credits::HasArtistCredits;
+use crate::core::entity_traits::relations::has_release_group::HasReleaseGroup;
+use derive_getters::Getters;
 use serde::{Deserialize, Serialize};
 
+use crate::models::data::musicbrainz::artist_credit::collection::ArtistCredits;
+use crate::models::data::musicbrainz::release_group::mbid::ReleaseGroupMBID;
+
 use self::media::Media;
+
+pub mod external;
 
 pub mod caching;
 pub mod converters;
 pub mod fetching;
+pub mod get_or_fetch;
 pub mod getters;
+pub mod mbid;
 pub mod media;
 pub mod track;
 
-#[derive(Debug, Clone, Eq, PartialEq, Deserialize, Serialize)]
+#[derive(Debug, Clone, Eq, PartialEq, Deserialize, Serialize, Getters)]
 pub struct Release {
     id: String,
     title: String,
@@ -24,12 +33,24 @@ pub struct Release {
     packaging_id: Option<String>,
     //packaging: Option<ReleasePackaging>,
     //relations: Option<Vec<Relation>>,
-    //release_group: Option<ReleaseGroup>,
-    //artist_credit: Option<Vec<ArtistCredit>>,
+    release_group: Option<ReleaseGroupMBID>,
+    artist_credit: Option<ArtistCredits>,
     media: Option<Vec<Media>>,
     //label_info: Option<Vec<LabelInfo>>,
     //tags: Option<Vec<Tag>>,
     //aliases: Option<Vec<Alias>>,
     //genres: Option<Vec<Genre>>,
     annotation: Option<String>,
+}
+
+impl HasArtistCredits for Release {
+    fn get_artist_credits(&self) -> &Option<ArtistCredits> {
+        &self.artist_credit
+    }
+}
+
+impl HasReleaseGroup for Release {
+    fn get_release_group(&self) -> &Option<ReleaseGroupMBID> {
+        &self.release_group
+    }
 }

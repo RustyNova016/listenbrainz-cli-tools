@@ -10,6 +10,7 @@ use serde::{Deserialize, Serialize};
 
 pub mod caching;
 pub mod fetching;
+pub mod mbid;
 
 #[derive(Debug, Clone, Eq, PartialEq, Deserialize, Serialize)]
 #[serde(rename_all = "kebab-case")]

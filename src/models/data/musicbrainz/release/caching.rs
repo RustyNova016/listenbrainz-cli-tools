@@ -18,7 +18,7 @@ impl Cached for Release {
     where
         Self: Sized,
     {
-        ENTITY_DATABASE.releases()
+        ENTITY_DATABASE.releases().clone()
     }
 }
 
@@ -34,6 +34,8 @@ impl Updatable for Release {
             status_id: newer.status_id.or(self.status_id),
             title: newer.title,
             id: newer.id,
+            artist_credit: newer.artist_credit.or(self.artist_credit),
+            release_group: newer.release_group.or(self.release_group),
         }
     }
 }

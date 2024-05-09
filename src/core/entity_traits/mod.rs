@@ -4,4 +4,6 @@ pub mod fetchable;
 pub mod has_id;
 pub mod insertable;
 pub mod insertable_children;
+pub mod mbid;
+pub mod relations;
 pub mod updatable;

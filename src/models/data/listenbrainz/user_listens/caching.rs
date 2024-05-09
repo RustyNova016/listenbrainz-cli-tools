@@ -17,7 +17,7 @@ impl HasID for UserListens {
 
 impl Cached for UserListens {
     fn get_cache() -> Arc<EntityCache<Self>> {
-        ENTITY_DATABASE.user_listens()
+        ENTITY_DATABASE.user_listens().clone()
     }
 }
 

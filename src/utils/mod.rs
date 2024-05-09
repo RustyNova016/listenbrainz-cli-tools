@@ -1,21 +1,21 @@
 pub mod playlist;
-use color_eyre::owo_colors::OwoColorize;
 use derive_builder::Builder;
-use indicatif::ProgressBar;
 use listenbrainz::raw::response::{UserListensListen, UserListensResponse};
 use listenbrainz::raw::Client;
+use logger::Logger;
 use once_cell::sync::Lazy;
 use std::fmt::Display;
 use std::sync::{Arc, Mutex};
 
 pub mod cli_paging;
 pub mod extensions;
+pub mod logger;
 pub mod tokio;
 pub mod traits;
 
 #[derive(Clone, Debug, PartialEq, Eq, Builder)]
 #[allow(missing_docs)]
-/// Reader for the the User Listens endpoint
+/// Reader for the User Listens endpoint
 pub struct ListenAPIPaginator {
     #[builder(setter(into, strip_option))]
     /// The name of the target user
@@ -94,64 +94,6 @@ pub(crate) static STATIC_LOGGER: Lazy<Arc<Mutex<Logger>>> =
 
 pub trait OverridePrint {
     fn override_print<I: AsRef<str>>(&self, msg: I);
-}
-
-pub struct Logger {
-    print_override: Option<ProgressBar>,
-}
-
-impl Logger {
-    pub fn new() -> Self {
-        Self {
-            print_override: None,
-        }
-    }
-
-    pub fn set_override(&mut self, pg: ProgressBar) {
-        self.print_override = Some(pg);
-    }
-
-    pub fn clear_overide(&mut self) {
-        self.print_override = None;
-    }
-
-    fn print<T: Display + std::convert::AsRef<str>>(&self, string: T) {
-        if let Some(overide) = &self.print_override {
-            overide.println(string);
-        } else {
-            println!("{string}");
-        }
-    }
-
-    pub fn println_cli<T: Display>(&self, string: T) {
-        self.print(format!("{} {}", "[CLI Tools]".green(), string));
-    }
-
-    pub fn println_lis<T: Display>(&self, string: T) {
-        self.print(format!("{} {}", "[Listenbrainz]".blue(), string));
-    }
-
-    pub fn println_mus<T: Display>(&self, string: T) {
-        self.print(format!("{} {}", "[MusicBrainz]".bright_magenta(), string));
-    }
-
-    pub fn set_global_overide(pg: ProgressBar) {
-        let static_clone = STATIC_LOGGER.clone();
-        let mut logger = static_clone.lock().unwrap();
-        logger.set_override(pg);
-    }
-
-    pub fn clear_global_overide() {
-        let static_clone = STATIC_LOGGER.clone();
-        let mut logger = static_clone.lock().unwrap();
-        logger.clear_overide();
-    }
-}
-
-impl Default for Logger {
-    fn default() -> Self {
-        Self::new()
-    }
 }
 
 pub fn println_cli<T: Display>(string: T) {
