@@ -33,6 +33,8 @@ impl MappingData {
     }
 
     /// Get the ids of the associated [`Recording`]'s [`Artist`]\(s)
+    /// 
+    /// [`Artist`]: crate::models::data::musicbrainz::artist::Artist
     pub async fn get_or_fetch_artist_mbids(&self) -> color_eyre::Result<Vec<ArtistMBID>> {
         Ok(match &self.artist_mbid {
             None => self

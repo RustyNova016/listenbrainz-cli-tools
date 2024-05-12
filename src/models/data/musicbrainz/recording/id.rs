@@ -1,24 +1,18 @@
-use std::ops::Deref;
-
+use derive_more::{Deref, DerefMut, From, Into};
 use serde::{Deserialize, Serialize};
 
 use crate::core::entity_traits::cached::Cached;
+use crate::core::entity_traits::mbid::MBID;
 
 use super::Recording;
 
-#[derive(Debug, Clone, Eq, PartialEq, Deserialize, Serialize)]
+#[derive(
+    Debug, Clone, PartialEq, Eq, Deref, DerefMut, Into, From, Serialize, Deserialize, Hash,
+)]
 pub struct RecordingMBID(String);
 
-impl Deref for RecordingMBID {
-    type Target = String;
-
-    fn deref(&self) -> &String {
-        &self.0
-    }
-}
-
-impl RecordingMBID {
-    pub async fn get_recording(&self) -> color_eyre::Result<Recording> {
+impl MBID<Recording> for RecordingMBID {
+    async fn get_or_fetch_entity(&self) -> color_eyre::Result<Recording> {
         Recording::get_cache().get_or_fetch(&self.0).await
     }
 }
