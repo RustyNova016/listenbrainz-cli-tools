@@ -41,6 +41,10 @@ pub enum Commands {
         /// Name of the user to fetch stats listen from
         #[arg(short, long)]
         username: String,
+
+        /// Sort by:
+        #[arg(short, long, default_value_t = SortSorterBy::Count)]
+        sort: SortSorterBy,
     },
 
     /// Map unmapped recordings easily
@@ -68,8 +72,12 @@ impl Commands {
             Self::Unmapped { username, sort } => {
                 unmapped_command(&username.to_lowercase(), *sort).await;
             }
-            Self::Stats { username, target } => {
-                stats_command(&username.to_lowercase(), *target).await;
+            Self::Stats {
+                username,
+                target,
+                sort,
+            } => {
+                stats_command(&username.to_lowercase(), *target, *sort).await;
             }
             Self::Mapping {
                 username,

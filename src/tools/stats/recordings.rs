@@ -1,29 +1,11 @@
-use crate::core::statistics::stat_sorter::StatSorter;
-use crate::models::data::listenbrainz::user_listens::UserListens;
-use crate::models::stats::recording_stats::RecordingStatsSorter;
+use crate::core::statistics::statistic_sorter::StatisticSorter;
+use crate::models::cli::common::SortSorterBy;
 use crate::utils::cli_paging::CLIPager;
-use crate::utils::logger::Logger;
-use indicatif::ProgressBar;
 
-pub async fn stats_recording(username: &str) {
-    // Get the listens
-    let mapped_listens = UserListens::get_user_with_refresh(username)
-        .await
-        .expect("Couldn't fetch the new listens")
-        .get_mapped_listens();
-
-    let progress_bar = ProgressBar::new(mapped_listens.len().try_into().unwrap());
-    Logger::add_global_pg(progress_bar.clone());
-
-    // Data sorting
-    let mut sorter = RecordingStatsSorter::new();
-    sorter
-        .extend(progress_bar.wrap_iter(mapped_listens.into_iter()))
-        .await
-        .expect("Couldn't sort the listens");
-
+pub async fn stats_recording(stats: StatisticSorter, sort_by: SortSorterBy) {
     let mut pager = CLIPager::new(5);
-    for (_key, listens) in sorter.into_sorted() {
+
+    for (_key, listens) in stats.into_sorted_vec(sort_by) {
         let pager_continue = pager.execute(|| {
             println!(
                 "[{}] {} - {}",
