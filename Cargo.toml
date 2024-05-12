@@ -9,7 +9,7 @@ rust-version = "1.75"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-listenbrainz = { branch = "8.0-experimental", git = "https://github.com/RustyNova016/listenbrainz-rs.git"} # Upstream version of the listenbrainz crate
+listenbrainz = { branch = "8.0-experimental+popularity", git = "https://github.com/RustyNova016/listenbrainz-rs.git"} # Upstream version of the listenbrainz crate
 musicbrainz_rs = { version = "0.5.0" }
 derive_builder = "0.20.0"
 inquire = "0.7.5"
@@ -40,6 +40,7 @@ thiserror = "1.0.60"
 derive_more = { version = "0.99.17" }
 derive-new = "0.6.0"
 derive-getters = "0.3.0"
+rust_decimal_macros = "1.34.2"
 
 # The profile that 'cargo dist' will build with
 [profile.dist]
@@ -66,10 +67,13 @@ manual_string_new = { level = "warn", priority = 1  }
 doc_markdown = { level = "warn", priority = 1  }
 uninlined_format_args  = { level = "warn", priority = 1  }
 explicit_iter_loop = { level = "warn", priority = 1  }
+#unwrap_used = { level = "warn", priority = 1  } # Fix needed in separate PR
 
 # Won't apply
 must_use_candidate = { level = "allow", priority = 1  }
 map_unwrap_or = { level = "allow", priority = 1  }
+
+
 
 # Config for 'cargo dist'
 [workspace.metadata.dist]
