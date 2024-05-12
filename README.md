@@ -61,11 +61,9 @@ Target is the entity type to group the stats by. Currently, those entities stats
 
 ## Radio
 
-Currently, only one algorithm is implemented.
-
 ### Artist Circles
 
-This algorythm keep your playlist close to the artists you are listening to. The way it generate is as follow:
+This algorithm keep your playlist close to the artists you are listening to. The way it generate is as follow:
 
 - Get a random listen
 - Get its artist
@@ -75,10 +73,23 @@ There is the option to only get unlistened recordings, making an alternative to 
 
 Usage:
 ```shell
-listenbrainz-cli-tools ratio -u <username> -t <token>
+listenbrainz-cli-tools radio circles -u <username> -t <token>
 ```
 
 Only unlistened:
 ```shell
-listenbrainz-cli-tools ratio -u <username> -t <token> --unlistened
+listenbrainz-cli-tools radio circles -u <username> -t <token> --unlistened
 ```
+
+### Underrated tracks
+
+This radio will create a playlist containing all the tracks that you listen to, but seemingly no one else does. 
+
+Usage:
+```shell
+listenbrainz-cli-tools radio underrated -u <username> -t <token>
+```
+
+> The mix is made by calculating a score for each listen. This score is composed of two values:<br>
+> - The rank in RustyNova's top 1000 recording of all time (First place get 100 points, second get 999.9, etc...)<br>
+> - The percentage of the recording's listens being from RustyNova (Made with this formula: (user listens / worldwide listens) *100)<br>

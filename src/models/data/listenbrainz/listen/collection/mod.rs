@@ -1,8 +1,11 @@
 pub mod stats;
+mod underrated;
 
 use super::Listen;
 use crate::models::cli::common::SortListensBy;
+use crate::models::data::musicbrainz::recording::id::RecordingMBID;
 use chrono::{DateTime, Utc};
+use itertools::Itertools;
 use serde::{Deserialize, Serialize};
 use std::ops::Deref;
 use std::sync::Arc;
@@ -95,6 +98,23 @@ impl ListenCollection {
                 .as_ref()
                 .is_some_and(|mapping| mapping.recording_mbid == id)
         })
+    }
+
+    /// Return the list of unique recordings ids that have been listened to.
+    pub fn get_listened_recordings(&self) -> Vec<RecordingMBID> {
+        self.get_mapped_listens()
+            .into_iter()
+            .map(|listen| {
+                listen
+                    .get_mapping_data()
+                    .as_ref()
+                    .unwrap()
+                    .recording_mbid
+                    .clone()
+            })
+            .unique()
+            .map_into()
+            .collect_vec()
     }
 }
 

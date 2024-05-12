@@ -1,13 +1,13 @@
-use clap::ArgAction;
 use clap::{Parser, Subcommand};
 
 use crate::models::cli::common::{GroupByTarget, SortListensBy, SortSorterBy};
+use crate::models::cli::radio::CliRadios;
 use crate::tools::interactive_mapper::interactive_mapper;
-use crate::tools::radio::create_radio_mix;
 use crate::tools::stats::stats_command;
 use crate::tools::unlinked::unmapped_command;
 
 pub mod common;
+mod radio;
 
 /// Tools for Listenbrainz
 #[derive(Parser, Debug, Clone)]
@@ -59,19 +59,7 @@ pub enum Commands {
     },
 
     /// Generate playlists
-    Radio {
-        /// Name of the user to fetch unlinked listen from
-        #[arg(short, long)]
-        username: String,
-
-        /// User token
-        #[arg(short, long)]
-        token: String,
-
-        /// Use this flag to only get unlistened recordings
-        #[clap(long, action=ArgAction::SetTrue)]
-        unlistened: bool,
-    },
+    Radio(CliRadios),
 }
 
 impl Commands {
@@ -89,11 +77,7 @@ impl Commands {
                 sort,
             } => interactive_mapper(username, token.clone(), *sort).await,
 
-            Self::Radio {
-                username,
-                token,
-                unlistened,
-            } => create_radio_mix(username, token.clone(), *unlistened).await,
+            Self::Radio(val) => val.command.run().await,
         }
     }
 }
