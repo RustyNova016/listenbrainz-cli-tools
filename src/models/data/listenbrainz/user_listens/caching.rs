@@ -23,7 +23,7 @@ impl Cached for UserListens {
 
 impl UserListens {
     pub async fn get_from_cache(username: &str) -> color_eyre::Result<Option<Self>> {
-        Self::get_cache().get(&username.to_lowercase()).await
+        Ok(Self::get_cache().get(&username.to_lowercase()).await?)
     }
 
     pub async fn get_from_cache_or_new(username: &str) -> color_eyre::Result<Self> {
