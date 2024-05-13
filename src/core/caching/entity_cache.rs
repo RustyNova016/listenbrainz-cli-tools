@@ -1,4 +1,5 @@
 use std::sync::Arc;
+use cacache_serde::SerdeCacacheTidy;
 
 use chashmap::CHashMap;
 use color_eyre::eyre::Context;
@@ -10,10 +11,6 @@ use crate::core::caching::CACHE_LOCATION;
 use crate::core::entity_traits::fetchable::Fetchable;
 use crate::core::entity_traits::insertable::Insertable;
 use crate::core::entity_traits::updatable::Updatable;
-
-use super::serde_cacache::tidy::SerdeCacacheTidy;
-
-use crate::core::caching::serde_cacache::error::Error;
 
 #[derive(Debug)]
 pub struct EntityCache<V> {
@@ -39,10 +36,10 @@ where
         Ok(())
     }
 
-    pub async fn get(&self, key: &str) -> Result<Option<V>, Error> {
+    pub async fn get(&self, key: &str) -> Result<Option<V>, cacache_serde::Error> {
         match self.cache.get_or_option(&key.to_string()).await {
             Ok(val) => Ok(val),
-            Err(Error::CacheDeserializationError(_)) => Ok(None), // Schema probably changed. Which means we need make the cache hit fail
+            Err(cacache_serde::Error::CacheDeserializationError(_)) => Ok(None), // Schema probably changed. Which means we need make the cache hit fail
             Err(val) => Err(val),
         }
     }
