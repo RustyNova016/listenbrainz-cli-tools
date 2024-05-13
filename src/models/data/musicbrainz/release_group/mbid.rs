@@ -1,11 +1,11 @@
 use crate::core::entity_traits::cached::Cached;
 use crate::core::entity_traits::mbid::MBID;
 use crate::models::data::musicbrainz::release_group::ReleaseGroup;
-use derive_more::{Deref, DerefMut, From, Into};
+use derive_more::{Deref, DerefMut, Display, From, Into};
 use serde::{Deserialize, Serialize};
 
 #[derive(
-    Debug, Clone, PartialEq, Eq, Deref, DerefMut, Into, From, Serialize, Deserialize, Hash,
+    Debug, Clone, PartialEq, Eq, Deref, DerefMut, Into, From, Serialize, Deserialize, Hash, Display,
 )]
 pub struct ReleaseGroupMBID(String);
 

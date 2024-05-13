@@ -6,7 +6,7 @@ use itertools::Itertools;
 use serde::{Deserialize, Serialize};
 
 use crate::models::cli::common::SortListensBy;
-use crate::models::data::musicbrainz::recording::id::RecordingMBID;
+use crate::models::data::musicbrainz::recording::mbid::RecordingMBID;
 
 use super::Listen;
 

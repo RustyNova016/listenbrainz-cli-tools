@@ -6,6 +6,7 @@ use serde::{Deserialize, Serialize};
 use crate::models::data::musicbrainz::artist_credit::collection::ArtistCredits;
 use crate::models::data::musicbrainz::release_group::mbid::ReleaseGroupMBID;
 
+use self::mbid::ReleaseMBID;
 use self::media::Media;
 
 pub mod external;
@@ -21,7 +22,7 @@ pub mod track;
 
 #[derive(Debug, Clone, Eq, PartialEq, Deserialize, Serialize, Getters)]
 pub struct Release {
-    id: String,
+    id: ReleaseMBID,
     title: String,
     status_id: Option<String>,
     //status: Option<ReleaseStatus>,

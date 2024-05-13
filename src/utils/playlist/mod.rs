@@ -1,3 +1,4 @@
+use crate::models::data::musicbrainz::recording::mbid::RecordingMBID;
 use derive_builder::Builder;
 use listenbrainz::raw::request::{
     PlaylistCreate, PlaylistCreatePlaylist, PlaylistCreatePlaylistExtension,
@@ -11,7 +12,7 @@ pub struct PlaylistStub {
     description: Option<String>,
     username: Option<String>,
     public: bool,
-    tracks: Vec<String>,
+    tracks: Vec<RecordingMBID>,
 }
 
 impl PlaylistStub {
@@ -19,7 +20,7 @@ impl PlaylistStub {
         title: String,
         username: Option<String>,
         public: bool,
-        tracks: Vec<String>,
+        tracks: Vec<RecordingMBID>,
         description: Option<String>,
     ) -> Self {
         Self {

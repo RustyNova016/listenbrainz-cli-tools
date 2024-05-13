@@ -1,7 +1,7 @@
 pub mod convertion;
 pub mod external;
 pub mod get_or_fetch;
-pub mod id;
+pub mod mbid;
 
 use crate::models::data::musicbrainz::release::mbid::ReleaseMBID;
 use derive_getters::Getters;
@@ -10,6 +10,8 @@ use musicbrainz_rs::entity::alias::Alias;
 use musicbrainz_rs::entity::genre::Genre;
 use musicbrainz_rs::entity::tag::Tag;
 use serde::{Deserialize, Serialize};
+
+use self::mbid::RecordingMBID;
 
 use super::artist_credit::collection::ArtistCredits;
 use super::HasMbid;
@@ -31,7 +33,7 @@ impl Recording {
 
 #[derive(Debug, Clone, Eq, PartialEq, Deserialize, Serialize, Getters)]
 pub struct Recording {
-    pub id: String,
+    pub id: RecordingMBID,
     pub title: String,
     pub artist_credit: Option<ArtistCredits>,
     releases: Option<Vec<ReleaseMBID>>,
@@ -50,7 +52,7 @@ pub struct Recording {
 impl From<musicbrainz_rs::entity::recording::Recording> for Recording {
     fn from(recording: musicbrainz_rs::entity::recording::Recording) -> Self {
         Self {
-            id: recording.id,
+            id: recording.id.into(),
             title: recording.title,
             artist_credit: recording.artist_credit.map(|coll| coll.into()),
             releases: recording.releases.map(|releases| {
