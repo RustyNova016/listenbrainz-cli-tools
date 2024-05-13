@@ -50,7 +50,7 @@ impl Artist {
             recordings
                 .entities
                 .into_iter()
-                .map(|recoding| recoding.id)
+                .map(|recoding| recoding.id.into())
                 .collect_vec(),
         );
 
