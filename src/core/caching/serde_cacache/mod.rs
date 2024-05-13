@@ -1,7 +1,9 @@
+pub mod error;
 use std::fmt::Display;
 use std::marker::PhantomData;
 use std::path::PathBuf;
 
+use crate::core::caching::serde_cacache::error::Error;
 use cacache::Integrity;
 use serde::de::DeserializeOwned;
 use serde::Serialize;
@@ -27,13 +29,13 @@ where
     }
 
     /// Set an item in the cache
-    pub async fn set(&self, key: &K, data: &V) -> color_eyre::Result<Integrity> {
+    pub async fn set(&self, key: &K, data: &V) -> Result<Integrity, Error> {
         let serialized = rmp_serde::to_vec(data)?;
         Ok(cacache::write(&self.name, key.to_string(), serialized).await?)
     }
 
     /// Get an item and return an option if it isn't found. This is more akin to a [`HashMap`](std::collections::HashMap)
-    pub async fn get(&self, key: &K) -> color_eyre::Result<Option<V>> {
+    pub async fn get(&self, key: &K) -> Result<Option<V>, Error> {
         let read = cacache::read(&self.name, key.to_string()).await;
 
         match read {
@@ -47,7 +49,7 @@ where
     }
 
     /// Get an item from the cache.
-    pub async fn get_as_result(&self, key: &K) -> color_eyre::Result<V> {
+    pub async fn get_as_result(&self, key: &K) -> Result<V, Error> {
         let read: Vec<u8> = cacache::read(&self.name, key.to_string()).await?;
         Ok(rmp_serde::from_slice(&read)?)
     }
