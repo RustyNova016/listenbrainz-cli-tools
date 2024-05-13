@@ -1,14 +1,17 @@
-pub mod stats;
-mod underrated;
+use std::ops::Deref;
+use std::sync::Arc;
 
-use super::Listen;
-use crate::models::cli::common::SortListensBy;
-use crate::models::data::musicbrainz::recording::id::RecordingMBID;
 use chrono::{DateTime, Utc};
 use itertools::Itertools;
 use serde::{Deserialize, Serialize};
-use std::ops::Deref;
-use std::sync::Arc;
+
+use crate::models::cli::common::SortListensBy;
+use crate::models::data::musicbrainz::recording::id::RecordingMBID;
+
+use super::Listen;
+
+pub mod stats;
+mod underrated;
 
 /// Wrapper for a vector of listens
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]

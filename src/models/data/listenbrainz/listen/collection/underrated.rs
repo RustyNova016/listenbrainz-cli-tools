@@ -8,7 +8,7 @@ use rust_decimal_macros::dec;
 use serde::{Deserialize, Serialize};
 
 use crate::core::display::progress_bar::ProgressBarCli;
-use crate::models::cli::common::SortSorterBy;
+use crate::models::cli::common::{GroupByTarget, SortSorterBy};
 use crate::models::data::listenbrainz::listen::collection::ListenCollection;
 use crate::models::data::musicbrainz::recording::id::RecordingMBID;
 
@@ -18,7 +18,9 @@ impl ListenCollection {
     ) -> color_eyre::Result<Vec<(Decimal, RecordingMBID)>> {
         let unique_recordings = self.get_listened_recordings();
         let recording_stats = self
-            .get_recording_statistics()
+            .get_statistics_of(GroupByTarget::Recording)
+            .await
+            .context("Couldn't calculate recording statistics")?
             .into_sorted_vec(SortSorterBy::Count)
             .into_iter()
             .enumerate()

@@ -1,24 +1,13 @@
 use crate::core::entity_traits::fetchable::FetchableAndCachable;
+use crate::core::statistics::statistic_sorter::StatisticSorter;
 use crate::models::cli::common::SortSorterBy;
-use crate::models::data::listenbrainz::user_listens::UserListens;
 use crate::models::data::musicbrainz::artist::Artist;
 use crate::utils::cli_paging::CLIPager;
 
-pub async fn stats_artist(username: &str) {
-    // Get the listens
-    let user_listens = UserListens::get_user_with_refresh(username)
-        .await
-        .expect("Couldn't fetch the new listens");
-
-    let stats = user_listens
-        .get_listens()
-        .get_artist_statistics()
-        .await
-        .expect("Couldn't sort the listens");
-
+pub async fn stats_artist(stats: StatisticSorter, sort_by: SortSorterBy) {
     let mut pager = CLIPager::new(5);
 
-    for (key, data) in stats.into_sorted_vec(SortSorterBy::Count) {
+    for (key, data) in stats.into_sorted_vec(sort_by) {
         let artist = Artist::get_cached_or_fetch(&key).await.unwrap();
 
         let pager_continue = pager.execute(|| {

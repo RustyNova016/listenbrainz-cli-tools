@@ -1,31 +1,53 @@
 use std::ops::Deref;
-use std::time::Duration;
 
-use indicatif::{ProgressBar, ProgressStyle};
 use itertools::Itertools;
 
+use crate::core::display::progress_bar::ProgressBarCli;
 use crate::core::entity_traits::mbid::VecIExt;
 use crate::core::entity_traits::relations::has_release_group::HasReleaseGroup;
 use crate::core::statistics::statistic_sorter::StatisticSorter;
+use crate::models::cli::common::GroupByTarget;
 use crate::models::data::listenbrainz::listen::collection::ListenCollection;
-use crate::utils::logger::Logger;
 
 impl ListenCollection {
-    pub fn get_recording_statistics(&self) -> StatisticSorter {
+    pub async fn get_statistics_of(
+        &self,
+        target: GroupByTarget,
+    ) -> color_eyre::Result<StatisticSorter> {
         let mapped = self.get_mapped_listens();
-
-        let mut progress_bar = ProgressBar::new(mapped.len().try_into().unwrap());
-        progress_bar = progress_bar.with_style(
-            ProgressStyle::with_template(
-                "[Calculating recording statistics] {wide_bar} {pos}/{len} | {eta_precise}",
-            )
-            .unwrap(),
+        let progress_bar = ProgressBarCli::new(
+            mapped.len() as u64,
+            Some(&format!("Calculating {} statistics", target.to_str())),
         );
-        progress_bar.enable_steady_tick(Duration::from_secs(1));
-        Logger::add_global_pg(progress_bar.clone());
 
         let counter = StatisticSorter::new();
-        for listen in mapped {
+
+        match target {
+            GroupByTarget::Recording => {
+                mapped.get_recording_statistics(&counter, &progress_bar);
+            }
+            GroupByTarget::Artist => {
+                mapped
+                    .get_artist_statistics(&counter, &progress_bar)
+                    .await?;
+            }
+            GroupByTarget::Release => {
+                mapped
+                    .get_release_statistics(&counter, &progress_bar)
+                    .await?;
+            }
+            GroupByTarget::ReleaseGroup => {
+                mapped
+                    .get_release_group_statistics(&counter, &progress_bar)
+                    .await?;
+            }
+        }
+
+        Ok(counter)
+    }
+
+    fn get_recording_statistics(self, counter: &StatisticSorter, progress_bar: &ProgressBarCli) {
+        for listen in self.into_iter() {
             counter.insert(
                 listen
                     .clone()
@@ -37,26 +59,14 @@ impl ListenCollection {
             );
             progress_bar.inc(1);
         }
-
-        Logger::remove_global_pg(progress_bar);
-        counter
     }
 
-    pub async fn get_artist_statistics(&self) -> color_eyre::Result<StatisticSorter> {
-        let mapped = self.get_mapped_listens();
-
-        let mut progress_bar = ProgressBar::new(mapped.len().try_into().unwrap());
-        progress_bar = progress_bar.with_style(
-            ProgressStyle::with_template(
-                "[Calculating artist statistics] {wide_bar} {pos}/{len} | {eta_precise}",
-            )
-            .unwrap(),
-        );
-        progress_bar.enable_steady_tick(Duration::from_secs(1));
-        Logger::add_global_pg(progress_bar.clone());
-
-        let counter = StatisticSorter::new();
-        for listen in mapped {
+    pub async fn get_artist_statistics(
+        self,
+        counter: &StatisticSorter,
+        progress_bar: &ProgressBarCli,
+    ) -> color_eyre::Result<()> {
+        for listen in self {
             let artist_ids = listen
                 .clone()
                 .get_mapping_data()
@@ -70,26 +80,15 @@ impl ListenCollection {
             }
             progress_bar.inc(1);
         }
-
-        Logger::remove_global_pg(progress_bar);
-        Ok(counter)
+        Ok(())
     }
 
-    pub async fn get_release_statistics(&self) -> color_eyre::Result<StatisticSorter> {
-        let mapped = self.get_mapped_listens();
-
-        let mut progress_bar = ProgressBar::new(mapped.len().try_into().unwrap());
-        progress_bar = progress_bar.with_style(
-            ProgressStyle::with_template(
-                "[Calculating release statistics] {wide_bar} {pos}/{len} | {eta_precise}",
-            )
-            .unwrap(),
-        );
-        progress_bar.enable_steady_tick(Duration::from_secs(1));
-        Logger::add_global_pg(progress_bar.clone());
-
-        let counter = StatisticSorter::new();
-        for listen in mapped {
+    pub async fn get_release_statistics(
+        self,
+        counter: &StatisticSorter,
+        progress_bar: &ProgressBarCli,
+    ) -> color_eyre::Result<()> {
+        for listen in self {
             let releases_ids = listen
                 .clone()
                 .get_mapping_data()
@@ -106,25 +105,15 @@ impl ListenCollection {
             progress_bar.inc(1);
         }
 
-        Logger::remove_global_pg(progress_bar);
-        Ok(counter)
+        Ok(())
     }
 
-    pub async fn get_release_group_statistics(&self) -> color_eyre::Result<StatisticSorter> {
-        let mapped = self.get_mapped_listens();
-
-        let mut progress_bar = ProgressBar::new(mapped.len().try_into().unwrap());
-        progress_bar = progress_bar.with_style(
-            ProgressStyle::with_template(
-                "[Calculating release group statistics] {wide_bar} {pos}/{len} | {eta_precise}",
-            )
-            .unwrap(),
-        );
-        progress_bar.enable_steady_tick(Duration::from_secs(1));
-        Logger::add_global_pg(progress_bar.clone());
-
-        let counter = StatisticSorter::new();
-        for listen in mapped {
+    pub async fn get_release_group_statistics(
+        self,
+        counter: &StatisticSorter,
+        progress_bar: &ProgressBarCli,
+    ) -> color_eyre::Result<()> {
+        for listen in self {
             let releases = listen
                 .clone()
                 .get_mapping_data()
@@ -150,7 +139,6 @@ impl ListenCollection {
             progress_bar.inc(1);
         }
 
-        Logger::remove_global_pg(progress_bar);
-        Ok(counter)
+        Ok(())
     }
 }
