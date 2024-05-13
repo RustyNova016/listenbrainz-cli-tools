@@ -117,25 +117,12 @@ where
             return Ok(());
         };
 
-        let indexes = cacache::list_sync(&self.name);
-
-        // We check if the cache content is reused somewhere. If it isn't, it is safe to clean
-        let mut content_usage_count = 0;
-        for index in indexes {
-            if index?.integrity == metadata_of_entry.integrity {
-                content_usage_count += 1;
-            }
-
-            if content_usage_count > 1 {
-                break;
-            }
-        }
-
+        // All entries have been entered with their key, making all the duplicates uniques.
+        // So it's safe* to just delete the hash
+        //
+        // Hash collisions may still occure, but if we worry about those, we should worry about using cacache in the first place
         cacache::remove(&self.name, key.to_string()).await?;
-
-        if content_usage_count < 2 {
-            cacache::remove_hash(&self.name, &metadata_of_entry.integrity).await?;
-        }
+        cacache::remove_hash(&self.name, &metadata_of_entry.integrity).await?;
 
         Ok(())
     }
