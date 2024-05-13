@@ -1,4 +1,5 @@
 pub mod error;
+pub mod tidy;
 use std::fmt::Display;
 use std::marker::PhantomData;
 use std::path::PathBuf;

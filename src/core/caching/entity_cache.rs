@@ -11,12 +11,13 @@ use crate::core::entity_traits::fetchable::Fetchable;
 use crate::core::entity_traits::insertable::Insertable;
 use crate::core::entity_traits::updatable::Updatable;
 
-use super::serde_cacache::SerdeCacache;
+use super::serde_cacache::tidy::SerdeCacacheTidy;
+
 use crate::core::caching::serde_cacache::error::Error;
 
 #[derive(Debug)]
 pub struct EntityCache<V> {
-    cache: SerdeCacache<String, V>,
+    cache: SerdeCacacheTidy<String, V>,
     watch_cache: CHashMap<String, Arc<Semaphore>>,
 }
 
@@ -28,7 +29,7 @@ where
         let mut location = CACHE_LOCATION.clone();
         location.push(name);
         Self {
-            cache: SerdeCacache::new(location),
+            cache: SerdeCacacheTidy::new(location),
             watch_cache: CHashMap::new(),
         }
     }
@@ -39,7 +40,7 @@ where
     }
 
     pub async fn get(&self, key: &str) -> Result<Option<V>, Error> {
-        match self.cache.get(&key.to_string()).await {
+        match self.cache.get_or_option(&key.to_string()).await {
             Ok(val) => Ok(val),
             Err(Error::CacheDeserializationError(_)) => Ok(None), // Schema probably changed. Which means we need make the cache hit fail
             Err(val) => Err(val),
