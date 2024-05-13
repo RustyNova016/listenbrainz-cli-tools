@@ -10,7 +10,7 @@ impl From<ReleaseMS> for Release {
             barcode: value.barcode,
             country: value.country,
             disambiguation: value.disambiguation,
-            id: value.id,
+            id: value.id.into(),
             media: value
                 .media
                 .map(|medias| medias.into_iter().map_into().collect_vec()),

@@ -23,7 +23,7 @@ pub async fn underrated_mix(username: String, token: String) {
         format!("{username}'s underrated mix"),
         Some(username.clone()),
         true,
-        bests.iter().map(|x| x.1.clone().into()).collect_vec(),
+        bests.iter().map(|x| x.1.clone()).collect_vec(),
         Some(format!("A playlist containing all the tracks that {username} listen to, 
             but seemingly no one else does. Come take a listen if you want to find hidden gems!<br>
             <br>

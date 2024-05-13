@@ -8,6 +8,12 @@ use musicbrainz_rs::entity::lifespan::LifeSpan;
 use musicbrainz_rs::entity::tag::Tag;
 use serde::{Deserialize, Serialize};
 
+use self::mbid::ArtistMBID;
+
+use super::recording::mbid::RecordingMBID;
+use super::release::mbid::ReleaseMBID;
+use super::release_group::mbid::ReleaseGroupMBID;
+
 pub mod caching;
 pub mod fetching;
 pub mod mbid;
@@ -15,7 +21,7 @@ pub mod mbid;
 #[derive(Debug, Clone, Eq, PartialEq, Deserialize, Serialize)]
 #[serde(rename_all = "kebab-case")]
 pub struct Artist {
-    pub id: String,
+    pub id: ArtistMBID,
     pub name: String,
     pub sort_name: String,
     pub disambiguation: String,
@@ -24,10 +30,10 @@ pub struct Artist {
     //pub area: Option<Area>,
     //pub begin_area: Option<Area>,
     //pub relations: Option<Vec<String>>,
-    pub releases: Option<Vec<String>>,
+    pub releases: Option<Vec<ReleaseMBID>>,
     pub works: Option<Vec<String>>,
-    pub release_groups: Option<Vec<String>>,
-    recordings: Option<Vec<String>>,
+    pub release_groups: Option<Vec<ReleaseGroupMBID>>,
+    recordings: Option<Vec<RecordingMBID>>,
     pub aliases: Option<Vec<Alias>>,
     pub tags: Option<Vec<Tag>>,
     pub genres: Option<Vec<Genre>>,
@@ -40,7 +46,7 @@ pub struct Artist {
 impl From<musicbrainz_rs::entity::artist::Artist> for Artist {
     fn from(artist: musicbrainz_rs::entity::artist::Artist) -> Self {
         Self {
-            id: artist.id,
+            id: artist.id.into(),
             name: artist.name,
             aliases: artist.aliases,
             annotation: artist.annotation,
@@ -53,18 +59,21 @@ impl From<musicbrainz_rs::entity::artist::Artist> for Artist {
             recordings: artist.recordings.map(|recodings| {
                 recodings
                     .into_iter()
-                    .map(|recording| recording.id)
+                    .map(|recording| recording.id.into())
                     .collect_vec()
             }),
             release_groups: artist.release_groups.map(|release_groups| {
                 release_groups
                     .into_iter()
-                    .map(|release_group| release_group.id)
+                    .map(|release_group| release_group.id.into())
                     .collect_vec()
             }),
-            releases: artist
-                .releases
-                .map(|releases| releases.into_iter().map(|release| release.id).collect_vec()),
+            releases: artist.releases.map(|releases| {
+                releases
+                    .into_iter()
+                    .map(|release| release.id.into())
+                    .collect_vec()
+            }),
             sort_name: artist.sort_name,
             tags: artist.tags,
             works: artist

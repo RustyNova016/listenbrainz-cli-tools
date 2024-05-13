@@ -10,7 +10,7 @@ use serde::{Deserialize, Serialize};
 use crate::core::display::progress_bar::ProgressBarCli;
 use crate::models::cli::common::{GroupByTarget, SortSorterBy};
 use crate::models::data::listenbrainz::listen::collection::ListenCollection;
-use crate::models::data::musicbrainz::recording::id::RecordingMBID;
+use crate::models::data::musicbrainz::recording::mbid::RecordingMBID;
 
 impl ListenCollection {
     pub async fn get_underrated_recordings(
