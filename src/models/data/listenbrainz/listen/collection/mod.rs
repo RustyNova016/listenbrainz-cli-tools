@@ -1,3 +1,4 @@
+pub mod listen_rate;
 use std::ops::Deref;
 use std::sync::Arc;
 
