@@ -41,6 +41,14 @@ impl ListenCollection {
             .cloned()
     }
 
+    /// Returns the oldest listen in the collection.
+    pub fn get_oldest_listen(&self) -> Option<Arc<Listen>> {
+        self.data
+            .iter()
+            .min_by_key(|listen| listen.listened_at)
+            .cloned()
+    }
+
     /// Returns all the unmapped listens
     pub fn get_unmapped_listens(&self) -> Self {
         self.data

@@ -39,20 +39,23 @@ impl StatisticSorter {
     }
 
     pub fn into_sorted_vec(self, sort_by: SortSorterBy) -> Vec<(String, ListenCollection)> {
-        let mut out = self
-            .listens
-            .into_iter()
-            .map(|item| (item.0, item.1.into_inner().unwrap()))
-            .collect_vec();
+        let mut out = self.into_vec();
 
         match sort_by {
             SortSorterBy::Count => {
                 out.sort_by_key(|item| item.1.len());
                 out.reverse();
             }
-            SortSorterBy::Name | SortSorterBy::Oldest => {} //TODO
+            SortSorterBy::Name | SortSorterBy::Oldest => {} // TODO
         }
 
         out
+    }
+
+    pub fn into_vec(self) -> Vec<(String, ListenCollection)> {
+        self.listens
+            .into_iter()
+            .map(|item| (item.0, item.1.into_inner().unwrap()))
+            .collect_vec()
     }
 }
