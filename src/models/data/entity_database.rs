@@ -7,6 +7,7 @@ use super::listenbrainz::user_listens::UserListens;
 use super::musicbrainz::artist::Artist;
 use super::musicbrainz::recording::Recording;
 use super::musicbrainz::release::Release;
+use super::musicbrainz::work::Work;
 use crate::core::caching::entity_cache::EntityCache;
 use crate::models::data::musicbrainz::release_group::ReleaseGroup;
 
@@ -19,6 +20,7 @@ pub struct EntityDatabase {
     releases: Arc<EntityCache<Release>>,
     recordings: Arc<EntityCache<Recording>>,
     release_groups: Arc<EntityCache<ReleaseGroup>>,
+    works: Arc<EntityCache<Work>>,
 
     user_listens: Arc<EntityCache<UserListens>>,
 }
@@ -30,6 +32,7 @@ impl Default for EntityDatabase {
             releases: Arc::new(EntityCache::new("releases")),
             recordings: Arc::new(EntityCache::new("recordings")),
             release_groups: Arc::new(EntityCache::new("release_groups")),
+            works: Arc::new(EntityCache::new("works")),
 
             user_listens: Arc::new(EntityCache::new("user_listens")),
         }
