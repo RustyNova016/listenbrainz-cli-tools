@@ -1,3 +1,4 @@
+pub mod work;
 use std::ops::Deref;
 
 pub mod artist;
