@@ -58,6 +58,9 @@ listenbrainz-cli-tools stats -u <username> -t <target>
 Target is the entity type to group the stats by. Currently, those entities stats are implemented:
 - Recordings (`recording`)
 - Artists (`artist`)
+- Releases (`release`)
+- Release Groups (`release_group`)
+- Works (`work`)
 
 ## Radio
 

@@ -1,3 +1,4 @@
+pub mod relation;
 pub mod work;
 use std::ops::Deref;
 

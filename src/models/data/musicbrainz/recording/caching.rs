@@ -35,6 +35,7 @@ impl Updatable for Recording {
             annotation: newer.annotation.or(self.annotation),
             genres: newer.genres.or(self.genres),
             aliases: self.aliases,
+            relations: newer.relations.or(self.relations),
         }
     }
 }
