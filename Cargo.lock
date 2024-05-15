@@ -1602,8 +1602,6 @@ dependencies = [
 [[package]]
 name = "musicbrainz_rs"
 version = "0.5.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "8baffdd450f73b33d47c91b509eebc25233c8e0f896f9c0c83d72f53b4e9fb63"
 dependencies = [
  "chrono",
  "lucene_query_builder",

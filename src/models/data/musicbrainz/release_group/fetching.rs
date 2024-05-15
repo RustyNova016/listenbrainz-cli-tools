@@ -9,14 +9,14 @@ use musicbrainz_rs::Fetch;
 impl Fetchable for ReleaseGroup {
     #[allow(refining_impl_trait)]
     async fn fetch(key: &str) -> color_eyre::Result<InsertChildren<ReleaseGroupMS>> {
-        println_mus(format!("Getting data for release group MBID: {}", &key));
+        println_mus(format!("Getting data for work MBID: {}", &key));
 
         Ok(ReleaseGroupMS::fetch()
             .id(key)
             .with_releases()
             .execute()
             .await
-            .context("Failed to fetch release group from MusicBrainz")?
+            .context("Failed to fetch work from MusicBrainz")?
             .into())
     }
 }

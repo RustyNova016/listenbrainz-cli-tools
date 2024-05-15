@@ -27,9 +27,17 @@ impl From<RelationMS> for Relation {
 impl From<RelationContent> for RelationTarget {
     fn from(value: RelationContent) -> Self {
         match value {
+            RelationContent::Area(_) => Self::Area(),
             RelationContent::Artist(val) => Self::Artist(val.id.into()),
+            RelationContent::Event(_) => Self::Event(),
+            RelationContent::Label(_) => Self::Label(),
+            RelationContent::Place(_) => Self::Place(),
             RelationContent::Recording(val) => Self::Recording(val.id.into()),
-            _ => Self::Unknown(),
+            RelationContent::Release(val) => Self::Release(val.id.into()),
+            RelationContent::ReleaseGroup(val) => Self::ReleaseGroup(val.id.into()),
+            RelationContent::Series(_) => Self::Series(),
+            RelationContent::Url(_) => Self::Url(),
+            RelationContent::Work(val) => Self::Work(val.id.into()),
         }
     }
 }
