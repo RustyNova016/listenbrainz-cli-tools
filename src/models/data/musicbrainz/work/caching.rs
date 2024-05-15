@@ -39,6 +39,7 @@ impl Updatable for Work {
             languages: newer.languages.or(self.languages),
             type_id: newer.type_id.or(self.type_id),
             work_type: newer.work_type.or(self.work_type),
+            relations: newer.relations.or(self.relations),
         }
     }
 }

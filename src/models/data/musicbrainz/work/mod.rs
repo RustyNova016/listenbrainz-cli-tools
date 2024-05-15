@@ -13,9 +13,11 @@ use serde::Serialize;
 
 use self::mbid::WorkMBID;
 
+use super::relation::Relation;
+
 pub mod external;
 
-#[derive(Debug, Clone, Eq, PartialEq, Deserialize, Serialize, Getters)]
+#[derive(Debug, Clone, PartialEq, Eq, Deserialize, Serialize, Getters)]
 pub struct Work {
     id: WorkMBID,
     title: String,
@@ -26,9 +28,9 @@ pub struct Work {
     iswcs: Option<Vec<String>>,
     attributes: Option<Vec<WorkAttribute>>,
     disambiguation: Option<String>,
-    //relations: Option<Vec<Relation>>,
+    relations: Option<Vec<Relation>>,
     tags: Option<Vec<Tag>>,
-    //rating: Option<Rating>,
+    //rating: Option<Rating>, TODO: Create own struct that have Eq
     aliases: Option<Vec<Alias>>,
     genres: Option<Vec<Genre>>,
     annotation: Option<String>,
