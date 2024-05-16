@@ -93,3 +93,17 @@ listenbrainz-cli-tools radio underrated -u <username> -t <token>
 > The mix is made by calculating a score for each listen. This score is composed of two values:<br>
 > - The rank in RustyNova's top 1000 recording of all time (First place get 100 points, second get 999.9, etc...)<br>
 > - The percentage of the recording's listens being from RustyNova (Made with this formula: (user listens / worldwide listens) *100)<br>
+
+### Listen rate
+
+This algorythm bases itself on your listen rate of recording to get more forgotten tracks. 
+
+Usage:
+```shell
+listenbrainz-cli-tools radio rate -u <username> -t <token> --min-rate=<Number of listens...> --min-per=<... Per range> --min=<Minimum listens (Default: 3)>
+```
+
+Exemple usage:
+```shell
+listenbrainz-cli-tools radio rate -u <username> -t <token> --min-rate=3 --min-per=year --min=10
+```
