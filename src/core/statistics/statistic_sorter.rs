@@ -3,6 +3,7 @@ use std::sync::{Arc, Mutex};
 
 use crate::models::cli::common::SortSorterBy;
 use chashmap::{CHashMap, ReadGuard};
+use color_eyre::owo_colors::colors::css::SlateBlue;
 use derive_new::new;
 use itertools::Itertools;
 
@@ -59,3 +60,4 @@ impl StatisticSorter {
             .collect_vec()
     }
 }
+
