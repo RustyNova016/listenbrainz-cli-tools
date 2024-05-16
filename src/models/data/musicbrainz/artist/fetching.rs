@@ -11,6 +11,7 @@ impl Fetchable for Artist {
     #[allow(refining_impl_trait)]
     async fn fetch(key: &str) -> color_eyre::Result<InsertChildren<ArtistMS>> {
         let _permit = MB_FETCH_LIMITER.acquire().await?;
+
         println_mus(format!("Getting data for artist MBID: {}", &key));
 
         Ok(ArtistMS::fetch()

@@ -10,6 +10,8 @@ use musicbrainz_rs::Fetch;
 impl Fetchable for Release {
     #[allow(refining_impl_trait)]
     async fn fetch(key: &str) -> color_eyre::Result<InsertChildren<ReleaseMS>> {
+        let _permit = MB_FETCH_LIMITER.acquire().await?;
+
         println_mus(format!("Getting data for release MBID: {}", &key));
 
         Ok(ReleaseMS::fetch()

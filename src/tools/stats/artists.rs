@@ -1,7 +1,3 @@
-use std::sync::Arc;
-
-use indicatif::ProgressBar;
-
 use crate::core::entity_traits::fetchable::FetchableAndCachable;
 use crate::core::statistics::statistic_sorter::StatisticSorter;
 use crate::models::cli::common::SortSorterBy;
