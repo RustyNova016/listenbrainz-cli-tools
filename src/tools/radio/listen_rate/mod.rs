@@ -1,3 +1,5 @@
+use chrono::prelude::Utc;
+use chrono::Duration;
 use itertools::Itertools;
 use listenbrainz::raw::Client;
 
@@ -14,11 +16,35 @@ pub async fn listen_rate_radio(
     token: &str,
     min_rate: Option<ListenRate>,
     min_listens: Option<u64>,
+    cooldown: u64,
 ) {
-    let mut scores = UserListens::get_user_with_refresh(username)
+    let mut listens = UserListens::get_user_with_refresh(username)
         .await
         .expect("Couldn't fetch the new listens")
-        .get_listens()
+        .get_mapped_listens();
+
+    let deadline = Utc::now() - Duration::hours(cooldown as i64);
+    let blacklisted_recordings = listens
+        .get_listened_after(&deadline)
+        .into_iter()
+        .map(|listen| {
+            listen
+                .get_mapping_data()
+                .as_ref()
+                .expect("The listen should be mapped!")
+                .recording_mbid()
+                .clone()
+        })
+        .collect_vec();
+
+    // Filter out all the listens of blacklisted recordings
+    listens.retain(|listen| {
+        listen.get_mapping_data().as_ref().is_some_and(|mapping| {
+            !blacklisted_recordings.contains(&mapping.recording_mbid.clone())
+        })
+    });
+
+    let mut scores = listens
         .get_listen_rates()
         .await
         .expect("Couldn't calculate the listens rates");
