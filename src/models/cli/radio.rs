@@ -29,6 +29,9 @@ pub enum Radios {
         /// Use this flag to only get unlistened recordings
         #[clap(long, action=ArgAction::SetTrue)]
         unlistened: bool,
+        ///// The amount of hours needed to wait after a recording have been given before it is resuggested
+        //#[arg(short, long, default_value_t = 0)]
+        //cooldown: u64
     },
 
     /// Generate a playlist containing your underrated listens
@@ -63,6 +66,10 @@ pub enum Radios {
         /// Minimum listen count
         #[arg(long)]
         min: Option<u64>,
+
+        /// The amount of hours needed to wait after a recording have been given before it is resuggested
+        #[arg(short, long, default_value_t = 0)]
+        cooldown: u64,
     },
 }
 
@@ -73,6 +80,7 @@ impl Radios {
                 username,
                 token,
                 unlistened,
+                //cooldown
             } => create_radio_mix(username, token.clone(), *unlistened).await,
 
             Self::Underrated { username, token } => {
@@ -85,6 +93,7 @@ impl Radios {
                 min_rate,
                 min_per,
                 min,
+                cooldown,
             } => {
                 let mut rate = None;
 
@@ -98,7 +107,7 @@ impl Radios {
                     }
                 }
 
-                listen_rate_radio(username, token, rate, *min).await;
+                listen_rate_radio(username, token, rate, *min, *cooldown).await;
             }
         }
     }
