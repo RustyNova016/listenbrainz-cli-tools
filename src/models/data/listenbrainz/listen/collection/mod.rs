@@ -1,3 +1,4 @@
+pub mod listen_rate;
 use std::ops::Deref;
 use std::sync::Arc;
 
@@ -37,6 +38,14 @@ impl ListenCollection {
         self.data
             .iter()
             .max_by_key(|listen| listen.listened_at)
+            .cloned()
+    }
+
+    /// Returns the oldest listen in the collection.
+    pub fn get_oldest_listen(&self) -> Option<Arc<Listen>> {
+        self.data
+            .iter()
+            .min_by_key(|listen| listen.listened_at)
             .cloned()
     }
 
