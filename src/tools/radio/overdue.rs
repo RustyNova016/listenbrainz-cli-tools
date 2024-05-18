@@ -4,17 +4,14 @@ use itertools::Itertools;
 use listenbrainz::raw::Client;
 
 use crate::core::entity_traits::fetchable::FetchableAndCachable;
-use crate::core::statistics::listen_rate::ListenRate;
-use crate::core::statistics::listen_rate::ListenRateRange;
 use crate::models::data::listenbrainz::user_listens::UserListens;
 use crate::models::data::musicbrainz::recording::Recording;
 use crate::utils::playlist::PlaylistStub;
 use crate::utils::println_cli;
 
-pub async fn listen_rate_radio(
+pub async fn overdue_radio(
     username: &str,
     token: &str,
-    min_rate: Option<ListenRate>,
     min_listens: Option<u64>,
     cooldown: u64,
 ) {
@@ -50,18 +47,12 @@ pub async fn listen_rate_radio(
         .expect("Couldn't calculate the listens rates");
 
     // Filter minimum
-    scores.retain(|rate| *rate.1.listen_count() > min_listens.unwrap_or(3_u64));
-
-    // Filter minimum rate
-    if let Some(min_rate) = min_rate {
-        scores.retain(|rate| {
-            rate.1.get_listen_rate(ListenRateRange::Year)
-                >= min_rate.get_listen_rate(ListenRateRange::Year)
-        });
-    }
+    scores.retain(|rate| rate.1.listen_count() > &min_listens.unwrap_or(3_u64));
 
     // Sort
-    scores.sort_by_cached_key(|rate| rate.1.get_listen_rate(ListenRateRange::Year));
+    scores.sort_by_cached_key(|rate| {
+        rate.1.get_estimated_date_of_next_listen(&rate.0) - Utc::now()
+    });
 
     let chunked = scores.chunks(50).collect_vec();
     let bests = chunked
@@ -70,17 +61,19 @@ pub async fn listen_rate_radio(
 
     for rate in *bests {
         println_cli(format!(
-            "Adding [{}]. Yearly listens is: {}",
+            "Adding [{}]. \n - Last listen was the: {} \n - Average time between listens: {} \n - Estimated date of next listen: {}",
             Recording::get_cached_or_fetch(rate.1.recording())
                 .await
                 .unwrap()
                 .title,
-            rate.1.get_listen_rate(ListenRateRange::Year)
+            rate.0.get_latest_listen().map(|listen| listen.listened_at).unwrap_or(Utc::now()),
+            rate.1.get_average_time_between_listens(),
+            rate.1.get_estimated_date_of_next_listen(&rate.0)
         ));
     }
 
     let playlist_stub = PlaylistStub::new(
-        "Radio: Listen Rate".to_string(),
+        "Radio: Overdue listens".to_string(),
         Some(username.to_string()),
         true,
         bests.iter().map(|rate| rate.1.recording().clone().into()).collect_vec(), // TODO: Remove cast to recordingmbid
