@@ -15,6 +15,9 @@ impl Fetchable for Recording {
             .id(key)
             .with_artists()
             .with_releases()
+            .with_work_relations()
+            .with_aliases()
+            .with_work_level_relations()
             .execute()
             .await
             .context("Failed to fetch recording from MusicBrainz")?

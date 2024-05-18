@@ -11,7 +11,7 @@ use super::Work;
 impl Fetchable for Work {
     #[allow(refining_impl_trait)]
     async fn fetch(key: &str) -> color_eyre::Result<InsertChildren<WorkMS>> {
-        println_mus(format!("Getting data for release group MBID: {}", &key));
+        println_mus(format!("Getting data for work MBID: {}", &key));
 
         Ok(WorkMS::fetch()
             .id(key)

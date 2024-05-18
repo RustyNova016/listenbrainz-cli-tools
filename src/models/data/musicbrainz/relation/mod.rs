@@ -1,4 +1,6 @@
 pub mod converters;
+use derive_more::IsVariant;
+use derive_more::Unwrap;
 use std::collections::HashMap;
 
 use chrono::NaiveDate;
@@ -8,6 +10,9 @@ use serde::Serialize;
 
 use super::artist::mbid::ArtistMBID;
 use super::recording::mbid::RecordingMBID;
+use super::release::mbid::ReleaseMBID;
+use super::release_group::mbid::ReleaseGroupMBID;
+use super::work::mbid::WorkMBID;
 
 #[derive(Debug, Clone, Eq, PartialEq, Deserialize, Serialize, Getters)]
 pub struct Relation {
@@ -26,11 +31,17 @@ pub struct Relation {
     relation_type: String,
 }
 
-#[derive(Debug, Clone, Eq, PartialEq, Deserialize, Serialize)]
+#[derive(Debug, Clone, Eq, PartialEq, Deserialize, Serialize, IsVariant, Unwrap)]
 pub enum RelationTarget {
     Artist(ArtistMBID),
+    Area(),  //TODO
+    Event(), //TODO
+    Label(), //TODO
+    Place(), //TODO
     Recording(RecordingMBID),
-
-    //TODO: Remove at 1.0!
-    Unknown(),
+    Release(ReleaseMBID),
+    ReleaseGroup(ReleaseGroupMBID),
+    Series(), //TODO
+    Url(),    //TODO
+    Work(WorkMBID),
 }
