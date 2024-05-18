@@ -83,7 +83,7 @@ pub async fn listen_rate_radio(
         "Radio: Listen Rate".to_string(),
         Some(username.to_string()),
         true,
-        bests.iter().map(|rate| rate.recording().clone().into()).collect_vec(), // TODO: Remove cast to recordingmbid
+        bests.iter().map(|rate| rate.1.recording().clone()).collect_vec(), // TODO: Remove cast to recordingmbid
         Some(format!("A playlist containing all the tracks that {username} listen to, 
             but seemingly no one else does. Come take a listen if you want to find hidden gems!<br>
             <br>
