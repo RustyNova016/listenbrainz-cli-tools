@@ -17,7 +17,7 @@ musicbrainz_rs = { path = "../musicbrainz_rs"} # For easy development
 
 derive_builder = "0.20.0"
 inquire = "0.7.5"
-itertools = "0.12.0"
+itertools = "0.13.0"
 prettytable-rs = { version = "0.10.0" }
 color-eyre = "0.6.3"
 rust_decimal = "1.35.0"
