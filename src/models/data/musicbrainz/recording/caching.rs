@@ -2,8 +2,10 @@ use std::sync::Arc;
 
 use crate::core::entity_traits::cached::Cached;
 use crate::core::entity_traits::has_id::HasID;
+use crate::core::entity_traits::mbid::HasMBID;
 use crate::core::entity_traits::updatable::Updatable;
 use crate::models::data::entity_database::ENTITY_DATABASE;
+use crate::models::data::musicbrainz::recording::mbid::RecordingMBID;
 use crate::models::data::musicbrainz::recording::Recording;
 
 impl HasID for Recording {
@@ -11,6 +13,13 @@ impl HasID for Recording {
         self.id.to_string()
     }
 }
+
+impl HasMBID<RecordingMBID> for Recording {
+    fn get_mbid(&self) -> RecordingMBID {
+        self.id.clone()
+    }
+}
+
 impl Cached for Recording {
     fn get_cache() -> Arc<crate::core::caching::entity_cache::EntityCache<Self>>
     where

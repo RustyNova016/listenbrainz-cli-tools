@@ -15,16 +15,15 @@ use self::mbid::RecordingMBID;
 
 use super::artist_credit::collection::ArtistCredits;
 use super::relation::Relation;
-use super::HasMbid;
 
 pub mod caching;
 pub mod fetching;
 
-impl HasMbid for Recording {
-    fn get_mbid(&self) -> &str {
-        &self.id
-    }
-}
+// impl HasMbid for Recording {
+//     fn get_mbid(&self) -> &str {
+//         &self.id
+//     }
+// }
 
 impl Recording {
     pub fn get_artist_credits(&self) -> Option<ArtistCredits> {

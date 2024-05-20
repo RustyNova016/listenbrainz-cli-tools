@@ -3,15 +3,24 @@ use std::sync::Arc;
 use crate::core::caching::entity_cache::EntityCache;
 use crate::core::entity_traits::cached::Cached;
 use crate::core::entity_traits::has_id::HasID;
+use crate::core::entity_traits::mbid::HasMBID;
 use crate::core::entity_traits::updatable::Updatable;
 use crate::models::data::entity_database::ENTITY_DATABASE;
 use crate::models::data::musicbrainz::artist::Artist;
+use crate::models::data::musicbrainz::artist::mbid::ArtistMBID;
 
 impl HasID for Artist {
     fn get_id(&self) -> String {
         self.id.to_string()
     }
 }
+
+impl HasMBID<ArtistMBID> for Artist {
+    fn get_mbid(&self) -> ArtistMBID {
+        self.id.clone()
+    }
+}
+
 
 impl Cached for Artist {
     fn get_cache() -> Arc<EntityCache<Self>>
@@ -41,6 +50,7 @@ impl Updatable for Artist {
             releases: newer.releases.or(self.releases),
             sort_name: newer.sort_name,
             works: newer.works.or(self.works),
+            relations: newer.relations.or(self.relations),
         }
     }
 }

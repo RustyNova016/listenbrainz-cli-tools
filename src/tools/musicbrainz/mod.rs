@@ -3,7 +3,6 @@ use itertools::Itertools;
 use crate::core::entity_traits::fetchable::FetchableAndCachable;
 use crate::core::entity_traits::has_id::HasID;
 use crate::core::entity_traits::mbid::VecIExt;
-use crate::core::entity_traits::updatable::Updatable;
 use crate::models::data::musicbrainz::work::Work;
 
 pub async fn search_link() {
