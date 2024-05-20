@@ -2,6 +2,7 @@ use clap::Parser;
 use color_eyre::eyre::Ok;
 
 use models::cli::Cli;
+use crate::models::data::entity_database::ENTITY_DATABASE;
 
 use crate::utils::println_cli;
 
@@ -19,6 +20,10 @@ async fn main() -> color_eyre::Result<()> {
     let cli = Cli::parse();
 
     println!("Hello!");
+    
+    println_cli("Cleaning some old entries...");
+    ENTITY_DATABASE.invalidate_last_entries(100, 10).await?;
+    println_cli("Done!");
 
     cli.command.run().await;
 

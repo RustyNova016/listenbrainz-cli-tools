@@ -3,3 +3,4 @@ pub mod radio;
 
 pub mod stats;
 pub mod unlinked;
+pub mod musicbrainz;

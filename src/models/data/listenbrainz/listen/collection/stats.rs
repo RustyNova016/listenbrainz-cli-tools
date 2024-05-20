@@ -173,6 +173,8 @@ impl ListenCollection {
                 Work::get_cache()
                     .set(new_work.id(), new_work.clone())
                     .await?;
+            } else {
+                work_ids = work_ids.into_iter().unique().collect_vec();
             }
 
             for work_id in work_ids {
