@@ -1,11 +1,10 @@
 use super::Recording;
-use crate::core::entity_traits::mbid::MBID;
+use crate::core::entity_traits::mbid::{HasMBID, IsMbid};
 use crate::core::entity_traits::relations::has_artist_credits::HasArtistCredits;
 use crate::models::data::entity_database::ENTITY_DATABASE;
 use crate::models::data::musicbrainz::artist_credit::collection::ArtistCredits;
 use crate::models::data::musicbrainz::release::mbid::ReleaseMBID;
 use crate::models::data::musicbrainz::work::mbid::WorkMBID;
-use crate::models::data::musicbrainz::HasMbid;
 use color_eyre::eyre::{eyre, Context, OptionExt};
 use itertools::Itertools;
 

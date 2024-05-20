@@ -7,3 +7,4 @@ pub mod insertable_children;
 pub mod mbid;
 pub mod relations;
 pub mod updatable;
+pub mod externals;

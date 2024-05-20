@@ -2,7 +2,7 @@ use color_eyre::eyre::{eyre, Context, OptionExt};
 use itertools::Itertools;
 
 use crate::core::entity_traits::has_id::HasID;
-use crate::core::entity_traits::mbid::MBID;
+use crate::core::entity_traits::mbid::IsMbid;
 use crate::models::data::entity_database::ENTITY_DATABASE;
 
 use super::mbid::WorkMBID;

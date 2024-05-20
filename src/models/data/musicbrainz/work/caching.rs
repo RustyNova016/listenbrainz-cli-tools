@@ -3,8 +3,10 @@ use std::sync::Arc;
 use crate::core::caching::entity_cache::EntityCache;
 use crate::core::entity_traits::cached::Cached;
 use crate::core::entity_traits::has_id::HasID;
+use crate::core::entity_traits::mbid::HasMBID;
 use crate::core::entity_traits::updatable::Updatable;
 use crate::models::data::entity_database::ENTITY_DATABASE;
+use crate::models::data::musicbrainz::work::mbid::WorkMBID;
 
 use super::Work;
 
@@ -13,6 +15,13 @@ impl HasID for Work {
         self.id.to_string()
     }
 }
+
+impl HasMBID<WorkMBID> for Work {
+    fn get_mbid(&self) -> WorkMBID {
+        self.id.clone()
+    }
+}
+
 
 impl Cached for Work {
     fn get_cache() -> Arc<EntityCache<Self>>

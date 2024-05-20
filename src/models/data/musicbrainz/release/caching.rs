@@ -2,14 +2,22 @@ use std::sync::Arc;
 
 use crate::core::entity_traits::cached::Cached;
 use crate::core::entity_traits::has_id::HasID;
+use crate::core::entity_traits::mbid::HasMBID;
 use crate::core::entity_traits::updatable::Updatable;
 use crate::models::data::entity_database::ENTITY_DATABASE;
+use crate::models::data::musicbrainz::release::mbid::ReleaseMBID;
 
 use super::Release;
 
 impl HasID for Release {
     fn get_id(&self) -> String {
         self.id.to_string()
+    }
+}
+
+impl HasMBID<ReleaseMBID> for Release {
+    fn get_mbid(&self) -> ReleaseMBID {
+        self.id.clone()
     }
 }
 
@@ -36,6 +44,14 @@ impl Updatable for Release {
             id: newer.id,
             artist_credit: newer.artist_credit.or(self.artist_credit),
             release_group: newer.release_group.or(self.release_group),
+            relations: newer.relations.or(self.relations),
+            aliases: newer.aliases.or(self.aliases),
+            date: newer.date.or(self.date),
+            genres: newer.genres.or(self.genres),
+            packaging: newer.packaging.or(self.packaging),
+            quality: newer.quality.or(self.quality),
+            status: newer.status.or(self.status),
+            tags: newer.tags.or(self.tags),
         }
     }
 }
