@@ -3,7 +3,7 @@ use std::ops::Deref;
 use itertools::Itertools;
 
 use crate::core::display::progress_bar::ProgressBarCli;
-use crate::core::entity_traits::cached::Cached;
+use crate::core::entity_traits::mb_cached::MBCached;
 use crate::core::entity_traits::mbid::VecIExt;
 use crate::core::entity_traits::relations::has_release_group::HasReleaseGroup;
 use crate::core::statistics::statistic_sorter::StatisticSorter;
@@ -170,9 +170,7 @@ impl ListenCollection {
                 let new_work =
                     Work::create_fake_work(format!("_fake_{}", recording.title), recording.title);
                 work_ids.push(new_work.id().clone());
-                Work::get_cache()
-                    .set(new_work.id(), new_work.clone())
-                    .await?;
+                Work::get_cache().set(&new_work).await?;
             } else {
                 work_ids = work_ids.into_iter().unique().collect_vec();
             }

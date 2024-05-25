@@ -11,14 +11,15 @@ use crate::core::caching::CACHE_LOCATION;
 use crate::core::caching::serde_cacache::error::Error;
 use crate::core::caching::serde_cacache::tidy::SerdeCacacheTidy;
 use crate::core::entity_traits::mbid::{HasMBID, IsMbid};
+use crate::core::entity_traits::updatable::Updatable;
 use crate::models::data::musicbrainz::external_musicbrainz_entity::ExternalMusicBrainzEntityExt;
 use crate::models::data::musicbrainz_database::MUSICBRAINZ_DATABASE;
 
 #[derive(Debug)]
 pub struct MusicbrainzCache<K, V>
-where
-    K: IsMbid<V> + Serialize + DeserializeOwned,
-    V: Serialize + DeserializeOwned + HasMBID<K>,
+    where
+        K: IsMbid<V> + Serialize + DeserializeOwned,
+        V: Serialize + DeserializeOwned + HasMBID<K>  + Updatable + Clone,
 {
     disk_cache: SerdeCacacheTidy<K, V>,
     alias_cache: SerdeCacacheTidy<K, K>,
@@ -32,7 +33,7 @@ where
 impl<K: IsMbid<V>, V> MusicbrainzCache<K, V>
 where
     K: IsMbid<V> + Serialize + DeserializeOwned,
-    V: Serialize + DeserializeOwned + HasMBID<K>,
+    V: Serialize + DeserializeOwned + HasMBID<K>  + Updatable + Clone,
 {
     pub fn new(name: &str) -> Self {
         let mut location = CACHE_LOCATION.clone();
@@ -71,6 +72,19 @@ where
         // TODO: Add tokio::join! for speedup.
         self.alias_cache.set(&mbid, &mbid).await?;
         self.disk_cache.set(&mbid, value).await?;
+        Ok(())
+    }
+
+    pub async fn update(&self, value: &V) -> color_eyre::Result<()> {
+        let mbid = value.get_mbid();
+        let older = self.get(&mbid).await?;
+
+        if let Some(older) = older {
+            self.set(&older.update(value.clone())).await?;
+        } else {
+            self.set(value).await?;
+        }
+
         Ok(())
     }
 

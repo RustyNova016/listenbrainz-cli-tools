@@ -1,9 +1,8 @@
-use color_eyre::eyre::{eyre, Context, OptionExt};
+use color_eyre::eyre::{Context, eyre, OptionExt};
 use itertools::Itertools;
 
-use crate::core::entity_traits::has_id::HasID;
-use crate::core::entity_traits::mbid::IsMbid;
-use crate::models::data::entity_database::ENTITY_DATABASE;
+use crate::core::entity_traits::mbid::{HasMBID, IsMbid};
+use crate::models::data::musicbrainz_database::MUSICBRAINZ_DATABASE;
 
 use super::mbid::WorkMBID;
 use super::Work;
@@ -13,10 +12,9 @@ impl Work {
         Ok(match &self.relations {
             Some(releases) => releases.clone(),
             None => {
-                ENTITY_DATABASE.works().fetch_and_save(self.get_id().to_string())
+                MUSICBRAINZ_DATABASE.works().get_or_fetch(&self.get_mbid())
                     .await
                     .context("Couldn't fetch data from the API")?
-                    .ok_or_eyre(eyre!("Couldn't find any recording with the MBID"))?
                     .relations
                     .ok_or_eyre(eyre!(format!("Work is [`None`] after fetching from the API. Something wrong happened, as it should return a empty vec. \n Is there an include missing somewhere in the API call? Or is the credit not saved? Faulty requested recording ID is: {}", &self.id)))?
             }
