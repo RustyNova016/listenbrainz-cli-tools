@@ -8,3 +8,4 @@ pub mod mbid;
 pub mod relations;
 pub mod updatable;
 pub mod externals;
+pub mod mb_cached;

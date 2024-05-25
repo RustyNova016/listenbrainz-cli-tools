@@ -1,21 +1,22 @@
 use std::sync::Arc;
 use itertools::Itertools;
-use crate::core::entity_traits::fetchable::FetchableAndCachable;
 use crate::core::entity_traits::has_id::HasID;
-use crate::core::entity_traits::mbid::VecIExt;
+use crate::core::entity_traits::mb_cached::MBCached;
+use crate::core::entity_traits::mbid::{HasMBID, VecIExt};
+use crate::models::data::musicbrainz::work::mbid::WorkMBID;
 use crate::models::data::musicbrainz::work::Work;
 
 pub async fn search_link() {
-    let start = "1919e988-9619-45fc-a2dc-91dbf52a85c2";
-    let end = "c768f5dc-7ebb-434d-89c0-3473224af906";
+    let start: WorkMBID = "1919e988-9619-45fc-a2dc-91dbf52a85c2".to_string().into();
+    let end: WorkMBID  = "c768f5dc-7ebb-434d-89c0-3473224af906".to_string().into();
     
-    let star_node = Node::new(Work::get_cached_or_fetch(start).await.unwrap(), None);
+    let star_node = Node::new(Work::get_cached_or_fetch(&start).await.unwrap(), None);
     let mut node_to_searche = vec![Arc::new(star_node)];
     
     loop {
         let current_node = node_to_searche.pop().unwrap();
         
-        if current_node.current.get_id().as_str() == end {
+        if current_node.current.get_mbid() == end {
             let mut curr = current_node.clone();
             loop {
                 println!("{:?} - {}", curr.current.get_id(), curr.current.title());
