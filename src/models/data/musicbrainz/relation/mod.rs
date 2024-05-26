@@ -1,4 +1,6 @@
 pub mod converters;
+pub mod external;
+
 use derive_more::IsVariant;
 use derive_more::Unwrap;
 use std::collections::HashMap;
@@ -29,6 +31,26 @@ pub struct Relation {
     begin: Option<NaiveDate>,
     direction: String,
     relation_type: String,
+}
+
+impl Relation {
+    pub fn is_target_parent(&self) -> bool {
+        let forward_is_child = match self.type_id.as_str() {
+            //TODO: Find all of them
+            // Lyrical quotation
+            "c8283596-6f1f-42db-be9c-def66d387e78"
+            // Musical quotaion
+            | "c5decae0-535c-4730-aa5f-ab78eadd98ba"=> false,
+            
+            _ => true,
+        };
+
+        if &self.direction == "forward" {
+            return !forward_is_child;
+        }
+
+        forward_is_child
+    }
 }
 
 #[derive(Debug, Clone, Eq, PartialEq, Deserialize, Serialize, IsVariant, Unwrap)]

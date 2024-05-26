@@ -2,10 +2,9 @@ use extend::ext;
 use musicbrainz_rs::entity::work::Work;
 
 use crate::core::entity_traits::has_id::HasID;
-use crate::models::data::musicbrainz::external_musicbrainz_entity::{
-    ExternalMusicBrainzEntity, ExternalMusicBrainzEntityExt,
-};
+use crate::models::data::musicbrainz::external_musicbrainz_entity::ExternalMusicBrainzEntity;
 use crate::models::data::musicbrainz::musicbrainz_entity::MusicBrainzEntity;
+use crate::models::data::musicbrainz::relation::external::RelationContentExt;
 
 impl HasID for Work {
     fn get_id(&self) -> String {
@@ -24,8 +23,12 @@ pub impl Work {
 
         if let Some(relations) = self.relations.clone() {
             for relation in relations {
-                result.push(relation.content.flatten_main());
-                result.extend(relation.content.flatten_children());
+                if let Ok(res) = relation.content.flatten_main() {
+                    result.push(res);
+                }
+                if let Ok(res) = relation.content.flatten_children() {
+                    result.extend(res);
+                }
             }
         }
 

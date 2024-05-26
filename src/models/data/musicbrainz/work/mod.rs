@@ -3,7 +3,7 @@ use musicbrainz_rs::entity::alias::Alias;
 use musicbrainz_rs::entity::genre::Genre;
 use musicbrainz_rs::entity::tag::Tag;
 use musicbrainz_rs::entity::work::WorkAttribute;
-use musicbrainz_rs::entity::work::WorkType;
+
 use serde::Deserialize;
 use serde::Serialize;
 
@@ -22,7 +22,7 @@ pub struct Work {
     id: WorkMBID,
     title: String,
     type_id: Option<String>,
-    work_type: Option<WorkType>,
+    //work_type: Option<WorkType>, //TODO: Wait for https://github.com/oknozor/musicbrainz_rs/pull/87
     language: Option<String>,
     languages: Option<Vec<String>>,
     iswcs: Option<Vec<String>>,
@@ -52,7 +52,7 @@ impl Work {
             disambiguation: Some(String::new()),
             language: Some(String::new()),
             type_id: Some(String::new()),
-            work_type: None,
+            //work_type: None,
         }
     }
 }

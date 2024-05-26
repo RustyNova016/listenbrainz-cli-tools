@@ -27,4 +27,10 @@ where
     async fn save(&self) -> color_eyre::Result<()> {
         Self::get_cache().update(self).await
     }
+
+    async fn refresh(&self) -> color_eyre::Result<Self> {
+        Self::get_cache()
+            .force_fetch_and_save(&self.get_mbid())
+            .await
+    }
 }

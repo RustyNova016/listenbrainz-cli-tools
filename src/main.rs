@@ -22,9 +22,7 @@ async fn main() -> color_eyre::Result<()> {
     println!("Hello!");
 
     println_cli("Cleaning some old entries...");
-    MUSICBRAINZ_DATABASE
-        .invalidate_last_entries(100, 10)
-        .await?;
+    MUSICBRAINZ_DATABASE.invalidate_last_entries(10, 10).await?;
     println_cli("Done!");
 
     cli.command.run().await;
