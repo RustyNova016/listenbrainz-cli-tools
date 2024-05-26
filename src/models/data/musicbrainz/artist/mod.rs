@@ -17,7 +17,6 @@ use self::mbid::ArtistMBID;
 
 pub mod caching;
 pub mod external;
-pub mod fetching;
 pub mod getters;
 pub mod mbid;
 

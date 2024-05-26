@@ -1,22 +1,24 @@
-use super::Recording;
-use crate::core::entity_traits::mbid::{HasMBID, IsMbid};
-use crate::core::entity_traits::relations::has_artist_credits::HasArtistCredits;
-use crate::models::data::entity_database::ENTITY_DATABASE;
-use crate::models::data::musicbrainz::artist_credit::collection::ArtistCredits;
-use crate::models::data::musicbrainz::release::mbid::ReleaseMBID;
-use crate::models::data::musicbrainz::work::mbid::WorkMBID;
 use color_eyre::eyre::{eyre, Context, OptionExt};
 use itertools::Itertools;
+
+use crate::core::entity_traits::mbid::{HasMBID, IsMbid};
+use crate::core::entity_traits::relations::has_artist_credits::HasArtistCredits;
+use crate::models::data::musicbrainz::artist_credit::collection::ArtistCredits;
+use crate::models::data::musicbrainz::recording::mbid::RecordingMBID;
+use crate::models::data::musicbrainz::release::mbid::ReleaseMBID;
+use crate::models::data::musicbrainz::work::mbid::WorkMBID;
+use crate::models::data::musicbrainz_database::MUSICBRAINZ_DATABASE;
+
+use super::Recording;
 
 impl Recording {
     pub async fn get_or_fetch_releases_ids(&self) -> color_eyre::Result<Vec<ReleaseMBID>> {
         Ok(match &self.releases {
             Some(releases) => releases.clone(),
             None => {
-                ENTITY_DATABASE.recordings().fetch_and_save(self.get_mbid().to_string())
+                MUSICBRAINZ_DATABASE.recordings().force_fetch_and_save(&self.get_mbid())
                     .await
                     .context("Couldn't fetch data from the API")?
-                    .ok_or_eyre(eyre!("Couldn't find any recording with the MBID"))?
                     .releases
                     .ok_or_eyre(eyre!(format!("Releases is [`None`] after fetching from the API. Something wrong happened, as it should return a empty vec. \n Is there an include missing somewhere in the API call? Or is the credit not saved? Faulty requested recording ID is: {}", &self.id)))?
             }
@@ -27,10 +29,9 @@ impl Recording {
         Ok(match &self.relations {
             Some(releases) => releases.clone(),
             None => {
-                ENTITY_DATABASE.recordings().fetch_and_save(self.get_mbid().to_string())
+                MUSICBRAINZ_DATABASE.recordings().force_fetch_and_save(&self.get_mbid())
                     .await
                     .context("Couldn't fetch data from the API")?
-                    .ok_or_eyre(eyre!("Couldn't find any recording with the MBID"))?
                     .relations
                     .ok_or_eyre(eyre!(format!("Work is [`None`] after fetching from the API. Something wrong happened, as it should return a empty vec. \n Is there an include missing somewhere in the API call? Or is the credit not saved? Faulty requested recording ID is: {}", &self.id)))?
             }
@@ -60,7 +61,7 @@ impl Recording {
     }
 }
 
-impl HasArtistCredits for Recording {
+impl HasArtistCredits<RecordingMBID> for Recording {
     fn get_artist_credits(&self) -> &Option<ArtistCredits> {
         &self.artist_credit
     }

@@ -51,15 +51,25 @@ where
     /// Get an item and return an option if it isn't found. This is more akin to a [`HashMap`](std::collections::HashMap)
     pub async fn get_or_option(&self, key: &K) -> Result<Option<V>, Error> {
         match self.get(key).await {
-            Ok(val) => Ok(Some(val)),
-            Err(Error::EntryNotFound(_, _)) => Ok(None),
-            Err(val) => Err(val),
+            Ok(val) => {
+                //println_cli(format!("Cache hit for {key}"));
+                Ok(Some(val))
+            }
+            Err(Error::EntryNotFound(_, _)) => {
+                //println_cli(format!("Cache miss for {key}"));
+                Ok(None)
+            }
+            Err(val) => {
+                //println_cli(format!("Cache failure for {key}"));
+                Err(val)
+            }
         }
     }
 
     /// Get an item from the cache.
     pub async fn get(&self, key: &K) -> Result<V, Error> {
         let key = key.to_string();
+
         match self.inner_read(&key).await {
             Ok(val) => {
                 let content: (String, V) = rmp_serde::from_slice(&val)?;

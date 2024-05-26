@@ -1,11 +1,10 @@
-use itertools::Itertools;
 use musicbrainz_rs::entity::recording::Recording as RecordingMS;
 use musicbrainz_rs::Browse;
 
-use crate::core::entity_traits::cached::Cached;
-use crate::core::entity_traits::has_id::HasID;
-use crate::core::entity_traits::insertable::{Insertable, IsAutoInsertable};
-use crate::core::entity_traits::insertable_children::InsertChildren;
+use crate::core::entity_traits::mb_cached::MBCached;
+use crate::core::entity_traits::mbid::HasMBID;
+use crate::models::data::musicbrainz::external_musicbrainz_entity::FlattenedMBEntityExt;
+use crate::models::data::musicbrainz::recording::external::RecordingExt;
 use crate::models::data::musicbrainz::recording::Recording;
 use crate::utils::extensions::musicbrainz::BrowseQueryTExt;
 use crate::utils::println_mus;
@@ -35,26 +34,21 @@ impl Artist {
         println_mus(format!("Getting {}'s recordings: {}", self.name, self.id));
         let recordings = RecordingMS::browse()
             .by_artist(&self.id)
-            //.with_artists() // Broken! MusicBrainzRS consider that the includes are the same between fetch and browse!
+            //.with_artists() //TODO: Broken! MusicBrainzRS consider that the includes are the same between fetch and browse!
             //.with_releases()
             .execute_all(100)
             .await?;
 
-        for recording in recordings.entities.clone() {
-            InsertChildren::from(recording.clone())
-                .insert_into_cache_as(recording.get_id())
-                .await?;
+        let mut recording_ids = Vec::new();
+        for recording in recordings.entities.into_iter() {
+            let flattened = recording.flattened();
+            recording_ids.push(flattened.0.get_mbid().unwrap_recording());
+            flattened.insert_into_cache().await?;
         }
 
-        self.recordings = Some(
-            recordings
-                .entities
-                .into_iter()
-                .map(|recoding| recoding.id.into())
-                .collect_vec(),
-        );
+        self.recordings = Some(recording_ids);
 
-        self.insert_into_cache().await?;
+        self.save().await?;
         Ok(())
     }
 }

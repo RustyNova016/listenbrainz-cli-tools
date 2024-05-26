@@ -1,4 +1,3 @@
-
 pub mod artist;
 pub mod artist_credit;
 pub mod external_musicbrainz_entity;
@@ -7,8 +6,8 @@ pub mod musicbrainz_entity;
 pub mod recording;
 pub mod relation;
 pub mod release;
-pub mod work;
 pub mod release_group;
+pub mod work;
 
 /// Type of the entity having this MBID
 #[derive(Debug, Clone, Copy)]

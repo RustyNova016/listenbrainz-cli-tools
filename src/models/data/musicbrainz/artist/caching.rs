@@ -1,13 +1,13 @@
 use std::sync::Arc;
 
-use crate::core::caching::entity_cache::EntityCache;
-use crate::core::entity_traits::cached::Cached;
+use crate::core::caching::musicbrainz_cache::MusicbrainzCache;
 use crate::core::entity_traits::has_id::HasID;
+use crate::core::entity_traits::mb_cached::MBCached;
 use crate::core::entity_traits::mbid::HasMBID;
 use crate::core::entity_traits::updatable::Updatable;
-use crate::models::data::entity_database::ENTITY_DATABASE;
-use crate::models::data::musicbrainz::artist::Artist;
 use crate::models::data::musicbrainz::artist::mbid::ArtistMBID;
+use crate::models::data::musicbrainz::artist::Artist;
+use crate::models::data::musicbrainz_database::MUSICBRAINZ_DATABASE;
 
 impl HasID for Artist {
     fn get_id(&self) -> String {
@@ -21,13 +21,9 @@ impl HasMBID<ArtistMBID> for Artist {
     }
 }
 
-
-impl Cached for Artist {
-    fn get_cache() -> Arc<EntityCache<Self>>
-    where
-        Self: Sized,
-    {
-        ENTITY_DATABASE.artists().clone()
+impl MBCached<ArtistMBID> for Artist {
+    fn get_cache() -> Arc<MusicbrainzCache<ArtistMBID, Self>> {
+        MUSICBRAINZ_DATABASE.artists().clone()
     }
 }
 

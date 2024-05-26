@@ -1,11 +1,12 @@
 use std::sync::Arc;
 
-use crate::core::entity_traits::cached::Cached;
+use crate::core::caching::musicbrainz_cache::MusicbrainzCache;
 use crate::core::entity_traits::has_id::HasID;
+use crate::core::entity_traits::mb_cached::MBCached;
 use crate::core::entity_traits::mbid::HasMBID;
 use crate::core::entity_traits::updatable::Updatable;
-use crate::models::data::entity_database::ENTITY_DATABASE;
 use crate::models::data::musicbrainz::release::mbid::ReleaseMBID;
+use crate::models::data::musicbrainz_database::MUSICBRAINZ_DATABASE;
 
 use super::Release;
 
@@ -21,12 +22,9 @@ impl HasMBID<ReleaseMBID> for Release {
     }
 }
 
-impl Cached for Release {
-    fn get_cache() -> Arc<crate::core::caching::entity_cache::EntityCache<Self>>
-    where
-        Self: Sized,
-    {
-        ENTITY_DATABASE.releases().clone()
+impl MBCached<ReleaseMBID> for Release {
+    fn get_cache() -> Arc<MusicbrainzCache<ReleaseMBID, Self>> {
+        MUSICBRAINZ_DATABASE.releases().clone()
     }
 }
 
@@ -49,7 +47,7 @@ impl Updatable for Release {
             date: newer.date.or(self.date),
             genres: newer.genres.or(self.genres),
             packaging: newer.packaging.or(self.packaging),
-            quality: newer.quality.or(self.quality),
+            //quality: newer.quality.or(self.quality),
             status: newer.status.or(self.status),
             tags: newer.tags.or(self.tags),
         }

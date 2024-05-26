@@ -23,4 +23,8 @@ where
             }
         }
     }
+
+    async fn save(&self) -> color_eyre::Result<()> {
+        Self::get_cache().update(self).await
+    }
 }

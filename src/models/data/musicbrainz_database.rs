@@ -1,7 +1,7 @@
 use std::mem::discriminant;
 use std::sync::Arc;
-use color_eyre::Report;
 
+use color_eyre::Report;
 use derive_getters::Getters;
 use once_cell::sync::Lazy;
 
@@ -64,7 +64,10 @@ impl MusicBrainzDatabase {
     pub async fn add_alias(&self, alias: &MBID, main: &MBID) -> color_eyre::Result<()> {
         // Check if both are the same variant
         if discriminant(alias) != discriminant(main) {
-            return Err(Report::from(Error::MBIDAliasError(alias.clone(), main.clone())));
+            return Err(Report::from(Error::MBIDAliasError(
+                alias.clone(),
+                main.clone(),
+            )));
         }
 
         let main = main.clone();
