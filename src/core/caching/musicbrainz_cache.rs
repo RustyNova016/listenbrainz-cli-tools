@@ -7,19 +7,20 @@ use serde::de::DeserializeOwned;
 use serde::Serialize;
 use tokio::sync::{RwLock, RwLockWriteGuard, Semaphore};
 
-use crate::core::caching::CACHE_LOCATION;
 use crate::core::caching::serde_cacache::error::Error;
 use crate::core::caching::serde_cacache::tidy::SerdeCacacheTidy;
+use crate::core::caching::CACHE_LOCATION;
 use crate::core::entity_traits::mbid::{HasMBID, IsMbid};
 use crate::core::entity_traits::updatable::Updatable;
-use crate::models::data::musicbrainz::external_musicbrainz_entity::ExternalMusicBrainzEntityExt;
-use crate::models::data::musicbrainz_database::MUSICBRAINZ_DATABASE;
+use crate::models::data::musicbrainz::external_musicbrainz_entity::{
+    ExternalMusicBrainzEntityExt, FlattenedMBEntityExt,
+};
 
 #[derive(Debug)]
 pub struct MusicbrainzCache<K, V>
-    where
-        K: IsMbid<V> + Serialize + DeserializeOwned,
-        V: Serialize + DeserializeOwned + HasMBID<K>  + Updatable + Clone,
+where
+    K: IsMbid<V> + Serialize + DeserializeOwned,
+    V: Serialize + DeserializeOwned + HasMBID<K> + Updatable + Clone,
 {
     disk_cache: SerdeCacacheTidy<K, V>,
     alias_cache: SerdeCacacheTidy<K, K>,
@@ -33,7 +34,7 @@ pub struct MusicbrainzCache<K, V>
 impl<K: IsMbid<V>, V> MusicbrainzCache<K, V>
 where
     K: IsMbid<V> + Serialize + DeserializeOwned,
-    V: Serialize + DeserializeOwned + HasMBID<K>  + Updatable + Clone,
+    V: Serialize + DeserializeOwned + HasMBID<K> + Updatable + Clone,
 {
     pub fn new(name: &str) -> Self {
         let mut location = CACHE_LOCATION.clone();
@@ -51,14 +52,40 @@ where
     }
 
     pub async fn get(&self, mbid: &K) -> Result<Option<V>, Error> {
-        let mbid = self.get_primary_mbid_alias(mbid).await?;
+        let new_mbid = self.get_primary_mbid_alias(mbid).await?;
+
+        //if new_mbid.to_string() != mbid.to_string() {
+        //    println_cli(format!("    Aliasing {mbid} -> {new_mbid}"))
+        //}
+
+        let mbid = new_mbid;
 
         let lock = self.get_lock(&mbid);
         let _read_lock = lock.read().await;
 
         match self.disk_cache.get_or_option(&mbid).await {
-            Ok(val) => Ok(val),
-            Err(Error::CacheDeserializationError(_)) => Ok(None), // Schema probably changed. Which means we need make the cache hit fail
+            // Cache hit
+            Ok(Some(val)) => {
+                //println_cli(format!("Cache hit for mbid {mbid}"));
+                Ok(Some(val))
+            }
+
+            // Cache miss
+            Ok(None) => {
+                //println_cli(format!("Cache miss for mbid {mbid}"));
+                Ok(None)
+            }
+
+            // Something went wrong while deserializing the struct
+            // Schema probably changed. Which means we need make the cache hit fail
+            Err(Error::CacheDeserializationError(_err)) => {
+                //println_cli(
+                //    format!("Cache hit but with deserialization error for mbid {mbid}").yellow(),
+                //);
+                //println_cli(err);
+                Ok(None)
+            }
+
             Err(val) => Err(val),
         }
     }
@@ -79,6 +106,8 @@ where
         let mbid = value.get_mbid();
         let older = self.get(&mbid).await?;
 
+        //println_cli(format!("Updating {mbid}"));
+
         if let Some(older) = older {
             self.set(&older.update(value.clone())).await?;
         } else {
@@ -88,7 +117,11 @@ where
         Ok(())
     }
 
-    pub async fn invalidate_last_entries(&self, k: usize, keep_min: usize) -> color_eyre::Result<()> {
+    pub async fn invalidate_last_entries(
+        &self,
+        k: usize,
+        keep_min: usize,
+    ) -> color_eyre::Result<()> {
         self.disk_cache.delete_last_entries(k, keep_min).await?;
         Ok(())
     }
@@ -104,7 +137,11 @@ where
         Ok(())
     }
 
-    pub async fn set_with_lock<'a>(&self, value: &V, _lock: RwLockWriteGuard<'a, String>) -> Result<(), Error> {
+    pub async fn set_with_lock<'a>(
+        &self,
+        value: &V,
+        _lock: RwLockWriteGuard<'a, String>,
+    ) -> Result<(), Error> {
         let mbid = value.get_mbid();
 
         // TODO: Add tokio::join! for speedup.
@@ -152,7 +189,7 @@ where
             .fetch_locks
             .get(&key.to_string())
             .expect("Couldn't get a new semaphore"))
-            .clone();
+        .clone();
     }
 
     pub async fn get_or_fetch(&self, mbid: &K) -> color_eyre::Result<V> {
@@ -173,17 +210,39 @@ where
 
         // So now, we are sure the cache is empty, and that we're the only one doing this operation application wide.
         // Then it's time to fetch!
+
+        Self::fetch_and_save(mbid).await?;
+
+        Ok(self
+            .get(mbid)
+            .await?
+            .expect("Fetched data should be in the cache"))
+    }
+
+    async fn fetch_and_save(mbid: &K) -> color_eyre::Result<()> {
         let fetch_result = mbid.fetch().await?;
         let converted_fetch = fetch_result.flattened();
 
-        // Let's take care of the main data
-        converted_fetch.0.save_to_cache().await?;
-        MUSICBRAINZ_DATABASE.add_alias(&mbid.clone().into_mbid(), &converted_fetch.0.get_mbid()).await?;
+        converted_fetch
+            .insert_into_cache_with_alias(&mbid.clone().into_mbid())
+            .await
+    }
 
-        for extra in converted_fetch.1 {
-            extra.save_to_cache().await?;
-        }
+    /// Fetch an item, bypassing the cache. This also save the request.
+    /// Only one request is allowed at a time, so a Semaphore permit is required.
+    /// If none is provided, it will get assigned automatically.
+    ///
+    /// ⚠️ Waiting for a permit doesn't cancel the request. It only delays it.
+    /// If the intention is to only fetch once, see [`Self::get_or_fetch`]
+    pub async fn force_fetch_and_save(&self, mbid: &K) -> color_eyre::Result<V> {
+        let lock = self.get_fetch_lock(mbid);
+        let _permit = lock.acquire().await.context("Couldn't get permit")?;
 
-        Ok(self.get(mbid).await?.expect("Fetched data should be in the cache"))
+        Self::fetch_and_save(mbid).await?;
+
+        Ok(self
+            .get(mbid)
+            .await?
+            .expect("Fetched data should be in the cache"))
     }
 }

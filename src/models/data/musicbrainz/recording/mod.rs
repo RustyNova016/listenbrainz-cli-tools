@@ -17,7 +17,6 @@ use super::artist_credit::collection::ArtistCredits;
 use super::relation::Relation;
 
 pub mod caching;
-pub mod fetching;
 
 // impl HasMbid for Recording {
 //     fn get_mbid(&self) -> &str {

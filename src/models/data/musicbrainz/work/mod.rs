@@ -1,8 +1,3 @@
-pub mod caching;
-pub mod converter;
-pub mod fetching;
-pub mod getters;
-pub mod mbid;
 use derive_getters::Getters;
 use musicbrainz_rs::entity::alias::Alias;
 use musicbrainz_rs::entity::genre::Genre;
@@ -12,11 +7,15 @@ use musicbrainz_rs::entity::work::WorkType;
 use serde::Deserialize;
 use serde::Serialize;
 
-use self::mbid::WorkMBID;
-
 use super::relation::Relation;
 
+use self::mbid::WorkMBID;
+
+pub mod caching;
+pub mod converter;
 pub mod external;
+pub mod getters;
+pub mod mbid;
 
 #[derive(Debug, Clone, PartialEq, Eq, Deserialize, Serialize, Getters)]
 pub struct Work {

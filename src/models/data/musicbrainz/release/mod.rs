@@ -2,7 +2,7 @@ use chrono::NaiveDate;
 use derive_getters::Getters;
 use musicbrainz_rs::entity::alias::Alias;
 use musicbrainz_rs::entity::genre::Genre;
-use musicbrainz_rs::entity::release::{ReleasePackaging, ReleaseQuality, ReleaseStatus};
+use musicbrainz_rs::entity::release::{ReleasePackaging, ReleaseStatus};
 use musicbrainz_rs::entity::tag::Tag;
 use serde::{Deserialize, Serialize};
 
@@ -19,7 +19,6 @@ pub mod external;
 
 pub mod caching;
 pub mod converters;
-pub mod fetching;
 pub mod get_or_fetch;
 pub mod getters;
 pub mod mbid;
@@ -34,7 +33,7 @@ pub struct Release {
     status: Option<ReleaseStatus>,
     date: Option<NaiveDate>,
     country: Option<String>,
-    quality: Option<ReleaseQuality>,
+    //quality: Option<ReleaseQuality>, //TODO: Mirror renaming #[serde(rename_all(deserialize = "lowercase"))]
     barcode: Option<String>,
     disambiguation: Option<String>,
     packaging_id: Option<String>,
@@ -50,13 +49,13 @@ pub struct Release {
     annotation: Option<String>,
 }
 
-impl HasArtistCredits for Release {
+impl HasArtistCredits<ReleaseMBID> for Release {
     fn get_artist_credits(&self) -> &Option<ArtistCredits> {
         &self.artist_credit
     }
 }
 
-impl HasReleaseGroup for Release {
+impl HasReleaseGroup<ReleaseMBID> for Release {
     fn get_release_group(&self) -> &Option<ReleaseGroupMBID> {
         &self.release_group
     }

@@ -66,12 +66,12 @@ pub enum Commands {
 
     /// Generate playlists
     Radio(CliRadios),
-    
+
     Cache {
-        id: String
+        id: String,
     },
-    
-    Search{},
+
+    Search {},
 }
 
 impl Commands {
@@ -94,10 +94,10 @@ impl Commands {
             } => interactive_mapper(username, token.clone(), *sort).await,
 
             Self::Radio(val) => val.command.run().await,
-            
-            Self::Cache {id} => {ENTITY_DATABASE.remove(id).await.unwrap()}
-            
-            Self::Search {} => {search_link().await}
+
+            Self::Cache { id } => ENTITY_DATABASE.remove(id).await.unwrap(),
+
+            Self::Search {} => search_link().await,
         }
     }
 }

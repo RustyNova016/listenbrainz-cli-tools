@@ -22,21 +22,21 @@ pub enum MBID {
 impl IsMbid<MusicBrainzEntity> for MBID {
     async fn get_or_fetch_entity(&self) -> color_eyre::Result<MusicBrainzEntity> {
         Ok(match self {
-            Self::Artist(val) => {val.get_or_fetch_entity().await?.into()}
-            Self::Release(val) => {val.get_or_fetch_entity().await?.into()}
-            Self::Work(val) => {val.get_or_fetch_entity().await?.into()}
-            Self::ReleaseGroup(val) => {val.get_or_fetch_entity().await?.into()}
-            Self::Recording(val) => {val.get_or_fetch_entity().await?.into()}
+            Self::Artist(val) => val.get_or_fetch_entity().await?.into(),
+            Self::Release(val) => val.get_or_fetch_entity().await?.into(),
+            Self::Work(val) => val.get_or_fetch_entity().await?.into(),
+            Self::ReleaseGroup(val) => val.get_or_fetch_entity().await?.into(),
+            Self::Recording(val) => val.get_or_fetch_entity().await?.into(),
         })
     }
 
     async fn fetch(&self) -> color_eyre::Result<ExternalMusicBrainzEntity> {
         match self {
-            Self::Artist(val) => {val.fetch().await}
-            Self::Release(val) => {val.fetch().await}
-            Self::Work(val) => {val.fetch().await}
-            Self::ReleaseGroup(val) => {val.fetch().await}
-            Self::Recording(val) => {val.fetch().await}
+            Self::Artist(val) => val.fetch().await,
+            Self::Release(val) => val.fetch().await,
+            Self::Work(val) => val.fetch().await,
+            Self::ReleaseGroup(val) => val.fetch().await,
+            Self::Recording(val) => val.fetch().await,
         }
     }
 

@@ -1,7 +1,7 @@
 use derive_more::{From, IsVariant, Unwrap};
 use serde::{Deserialize, Serialize};
 
-use crate::core::entity_traits::mbid::{HasMBID};
+use crate::core::entity_traits::mbid::HasMBID;
 use crate::models::data::musicbrainz::artist::Artist;
 use crate::models::data::musicbrainz::mbid::MBID;
 use crate::models::data::musicbrainz::recording::Recording;
@@ -36,11 +36,11 @@ impl MusicBrainzEntity {
 impl HasMBID<MBID> for MusicBrainzEntity {
     fn get_mbid(&self) -> MBID {
         match self {
-            Self::Artist(val) => {val.get_mbid().into()}
-            Self::ReleaseGroup(val) => {val.get_mbid().into()}
-            Self::Release(val) => {val.get_mbid().into()}
-            Self::Recording(val) => {val.get_mbid().into()}
-            Self::Work(val) => {val.get_mbid().into()}
+            Self::Artist(val) => val.get_mbid().into(),
+            Self::ReleaseGroup(val) => val.get_mbid().into(),
+            Self::Release(val) => val.get_mbid().into(),
+            Self::Recording(val) => val.get_mbid().into(),
+            Self::Work(val) => val.get_mbid().into(),
         }
     }
 }

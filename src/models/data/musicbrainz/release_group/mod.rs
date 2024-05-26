@@ -15,7 +15,6 @@ use crate::models::data::musicbrainz::release_group::mbid::ReleaseGroupMBID;
 mod caching;
 mod converters;
 pub(crate) mod external;
-mod fetching;
 pub mod mbid;
 
 #[derive(Debug, Clone, Eq, PartialEq, Deserialize, Serialize, Getters)]
@@ -38,7 +37,7 @@ pub struct ReleaseGroup {
     annotation: Option<String>,
 }
 
-impl HasArtistCredits for ReleaseGroup {
+impl HasArtistCredits<ReleaseGroupMBID> for ReleaseGroup {
     fn get_artist_credits(&self) -> &Option<ArtistCredits> {
         &self.artist_credit
     }

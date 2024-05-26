@@ -1,5 +1,12 @@
-use crate::core::entity_traits::cached::Cached;
-use crate::core::entity_traits::fetchable::FetchableAndCachable;
+use std::ops::Deref;
+
+use color_eyre::eyre;
+use itertools::Itertools;
+use listenbrainz::raw::Client;
+use rand::prelude::SliceRandom;
+use rand::thread_rng;
+
+use crate::core::entity_traits::mb_cached::MBCached;
 use crate::core::entity_traits::relations::has_artist_credits::HasArtistCredits;
 use crate::models::data::listenbrainz::listen::collection::ListenCollection;
 use crate::models::data::listenbrainz::listen::Listen;
@@ -7,12 +14,6 @@ use crate::models::data::listenbrainz::user_listens::UserListens;
 use crate::models::data::musicbrainz::artist::Artist;
 use crate::models::data::musicbrainz::recording::Recording;
 use crate::utils::playlist::PlaylistStub;
-use color_eyre::eyre;
-use itertools::Itertools;
-use listenbrainz::raw::Client;
-use rand::prelude::SliceRandom;
-use rand::thread_rng;
-use std::ops::Deref;
 
 pub async fn create_radio_mix(username: &str, token: String, unlistened: bool) {
     let listens = UserListens::get_user_with_refresh(username)
@@ -70,7 +71,8 @@ impl RadioCircle {
         let Some(mapping_data) = listen.get_mapping_data() else {
             return eyre::Ok(None);
         };
-        let recording = Recording::get_cached_or_fetch(mapping_data.recording_mbid()).await?;
+        let recording =
+            Recording::get_cached_or_fetch(&mapping_data.recording_mbid().clone().into()).await?; //TODO: Use MBID
 
         for artist_id in recording.get_or_fetch_artist_credits().await?.iter() {
             let artist = Artist::get_cache().get_or_fetch(artist_id.artist()).await?;

@@ -1,5 +1,5 @@
-use thiserror::Error;
 use crate::models::data::musicbrainz::mbid::MBID;
+use thiserror::Error;
 
 #[derive(Error, Debug)]
 pub enum Error {

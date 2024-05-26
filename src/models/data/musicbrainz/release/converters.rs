@@ -24,7 +24,7 @@ impl From<ReleaseMS> for Release {
                 .release_group
                 .map(|release_group| release_group.id.into()),
             status: value.status,
-            quality: value.quality,
+            //quality: value.quality,
             packaging: value.packaging,
             genres: value.genres,
             date: value.date,
@@ -32,7 +32,7 @@ impl From<ReleaseMS> for Release {
             relations: value
                 .relations
                 .map(|relations| relations.into_iter().map_into().collect_vec()),
-            tags: value.tags
+            tags: value.tags,
         }
     }
 }
