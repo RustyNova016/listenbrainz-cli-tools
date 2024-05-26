@@ -1,7 +1,7 @@
 use crate::models::data::musicbrainz::external_musicbrainz_entity::ExternalMusicBrainzEntity;
 use crate::models::data::musicbrainz::mbid::MBID;
 use extend::ext;
-use std::fmt::Display;
+use std::fmt::{Debug, Display};
 use std::future::Future;
 
 pub trait IsMbid<T>: Display + Clone {
@@ -26,6 +26,6 @@ pub impl<T, I: IsMbid<T>> Vec<I> {
     }
 }
 
-pub trait HasMBID<K: IsMbid<Self>>: Sized {
+pub trait HasMBID<K: IsMbid<Self>>: Sized + Debug + Clone {
     fn get_mbid(&self) -> K;
 }

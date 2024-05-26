@@ -23,14 +23,23 @@ impl IsMbid<ReleaseGroup> for ReleaseGroupMBID {
     }
 
     async fn fetch(&self) -> color_eyre::Result<ExternalMusicBrainzEntity> {
-        println_mus(format!("Getting data for work MBID: {}", &self));
+        println_mus(format!("Getting data for release group MBID: {}", &self));
 
         Ok(ReleaseGroupMS::fetch()
             .id(self)
+            .with_artists()
+            .with_annotations()
+            .with_aliases()
+            .with_genres()
+            .with_ratings()
             .with_releases()
+            //.with_release_group_relations() //FIXME: error decoding response body: no variant of enum RelationContent found in flattened data at line 1 column 751
+            .with_series_relations()
+            .with_url_relations()
+            .with_tags()
             .execute()
             .await
-            .context("Failed to fetch work from MusicBrainz")?
+            .context("Failed to fetch release group from MusicBrainz")?
             .into_entity())
     }
 

@@ -3,6 +3,7 @@ use std::sync::Arc;
 
 use chashmap::CHashMap;
 use color_eyre::eyre::Context;
+use color_eyre::owo_colors::OwoColorize;
 use serde::de::DeserializeOwned;
 use serde::Serialize;
 use tokio::sync::{RwLock, RwLockWriteGuard, Semaphore};
@@ -12,9 +13,9 @@ use crate::core::caching::serde_cacache::tidy::SerdeCacacheTidy;
 use crate::core::caching::CACHE_LOCATION;
 use crate::core::entity_traits::mbid::{HasMBID, IsMbid};
 use crate::core::entity_traits::updatable::Updatable;
-use crate::models::data::musicbrainz::external_musicbrainz_entity::{
-    ExternalMusicBrainzEntityExt, FlattenedMBEntityExt,
-};
+use crate::models::data::musicbrainz::external_musicbrainz_entity::FlattenedMBEntityExt;
+use crate::models::data::musicbrainz::relation::external::RelationContentExt;
+use crate::utils::println_cli;
 
 #[derive(Debug)]
 pub struct MusicbrainzCache<K, V>
@@ -82,6 +83,7 @@ where
                 //println_cli(
                 //    format!("Cache hit but with deserialization error for mbid {mbid}").yellow(),
                 //);
+                println_cli(format!("Couldn't retrieve cache data for mbid {mbid}").yellow());
                 //println_cli(err);
                 Ok(None)
             }
@@ -238,7 +240,11 @@ where
         let lock = self.get_fetch_lock(mbid);
         let _permit = lock.acquire().await.context("Couldn't get permit")?;
 
+        //println_cli(format!("Pre refresh: {:#?}", self.get(mbid).await?));
+
         Self::fetch_and_save(mbid).await?;
+
+        //println_cli(format!("Post refresh: {:#?}", self.get(mbid).await?));
 
         Ok(self
             .get(mbid)

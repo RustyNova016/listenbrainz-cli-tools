@@ -16,7 +16,7 @@ pub trait HasReleaseGroup<K: IsMbid<Self> + Serialize + DeserializeOwned>:
         Ok(match &self.get_release_group() {
             Some(credits) => credits.clone(),
             None => {
-                Self::get_cache().force_fetch_and_save(&self.get_mbid())
+                self.refresh()
                     .await
                     .context("Couldn't fetch data from the API")?
                     .get_release_group()
@@ -37,7 +37,7 @@ pub trait HasReleaseGroups<K: IsMbid<Self> + Serialize + DeserializeOwned>:
         Ok(match &self.get_release_groups() {
             Some(credits) => credits.clone(),
             None => {
-                Self::get_cache().force_fetch_and_save(&self.get_mbid())
+                self.refresh()
                     .await
                     .context("Couldn't fetch data from the API")?
                     .get_release_groups()

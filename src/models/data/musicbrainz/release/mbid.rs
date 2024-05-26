@@ -27,7 +27,6 @@ impl IsMbid<Release> for ReleaseMBID {
 
         Ok(ReleaseMS::fetch()
             .id(self)
-            .with_recordings()
             .with_artists()
             .with_artist_credits()
             .with_release_groups()
@@ -35,6 +34,10 @@ impl IsMbid<Release> for ReleaseMBID {
             .with_aliases()
             .with_annotations()
             .with_artist_relations()
+            .with_recordings()
+            .with_recording_level_relations()
+            //.with_work_level_relations() https://github.com/oknozor/musicbrainz_rs/pull/87
+            //.with_work_relations()
             .execute()
             .await
             .context("Failed to fetch release from MusicBrainz")?

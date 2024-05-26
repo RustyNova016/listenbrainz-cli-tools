@@ -1,16 +1,16 @@
 use chrono::{DateTime, TimeDelta, Utc};
 use color_eyre::eyre::eyre;
 use color_eyre::Report;
-use listenbrainz::raw::Client;
 use listenbrainz::raw::response::UserListensResponse;
+use listenbrainz::raw::Client;
 use once_cell::sync::Lazy;
 use tokio::sync::RwLock;
 
 use crate::core::display::progress_bar::ProgressBarCli;
 use crate::core::entity_traits::cached::Cached;
 use crate::core::entity_traits::insertable::Insertable;
-use crate::utils::{println_cli, println_lis};
 use crate::utils::extensions::UserListensPayloadExt;
+use crate::utils::{println_cli, println_lis};
 
 use super::UserListens;
 

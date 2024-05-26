@@ -1,13 +1,13 @@
+use crate::core::entity_traits::mb_cached::MBCached;
 use color_eyre::eyre::{eyre, Context, OptionExt};
 use itertools::Itertools;
 
-use crate::core::entity_traits::mbid::{HasMBID, IsMbid};
+use crate::core::entity_traits::mbid::IsMbid;
 use crate::core::entity_traits::relations::has_artist_credits::HasArtistCredits;
 use crate::models::data::musicbrainz::artist_credit::collection::ArtistCredits;
 use crate::models::data::musicbrainz::recording::mbid::RecordingMBID;
 use crate::models::data::musicbrainz::release::mbid::ReleaseMBID;
 use crate::models::data::musicbrainz::work::mbid::WorkMBID;
-use crate::models::data::musicbrainz_database::MUSICBRAINZ_DATABASE;
 
 use super::Recording;
 
@@ -16,7 +16,7 @@ impl Recording {
         Ok(match &self.releases {
             Some(releases) => releases.clone(),
             None => {
-                MUSICBRAINZ_DATABASE.recordings().force_fetch_and_save(&self.get_mbid())
+                self.refresh()
                     .await
                     .context("Couldn't fetch data from the API")?
                     .releases
@@ -29,11 +29,11 @@ impl Recording {
         Ok(match &self.relations {
             Some(releases) => releases.clone(),
             None => {
-                MUSICBRAINZ_DATABASE.recordings().force_fetch_and_save(&self.get_mbid())
+                self.refresh()
                     .await
                     .context("Couldn't fetch data from the API")?
                     .relations
-                    .ok_or_eyre(eyre!(format!("Work is [`None`] after fetching from the API. Something wrong happened, as it should return a empty vec. \n Is there an include missing somewhere in the API call? Or is the credit not saved? Faulty requested recording ID is: {}", &self.id)))?
+                    .ok_or_eyre(eyre!(format!("Relation is [`None`] after fetching from the API. Something wrong happened, as it should return a empty vec. \n Is there an include missing somewhere in the API call? Or is the credit not saved? Faulty requested recording ID is: {}", &self.id)))?
             }
         }.into_iter().filter(|relation| relation.content().is_work()).map(|relation| relation.content().clone().unwrap_work()).collect_vec())
     }
