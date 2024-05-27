@@ -7,9 +7,11 @@ use derive_new::new;
 use rust_decimal::prelude::Decimal;
 use crate::models::data::listenbrainz::listen::collection::ListenCollection;
 
+use crate::models::data::musicbrainz::recording::mbid::RecordingMBID;
+
 #[derive(Debug, Clone, Getters, PartialEq, Eq, new)]
 pub struct ListenRate {
-    recording: String, // TODO: Convert to RecordingMBID
+    recording: RecordingMBID,
     listen_count: u64,
     duration: Duration,
 }

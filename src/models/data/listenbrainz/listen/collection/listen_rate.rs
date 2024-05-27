@@ -23,9 +23,13 @@ impl ListenCollection {
                         .expect("It should have at least one listen")
                         .get_listened_at();
 
-                let rate = ListenRate::new(recording_id, listens.len() as u64, duration);
+                        let rate = ListenRate::new(
+                            recording_id.into(), //TODO: Use MBID
+                            listens.len() as u64,
+                            duration,
+                        );
 
-                (listens, rate)
+                        (listens, rate)
             })
             .collect_vec())
     }

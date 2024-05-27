@@ -120,7 +120,7 @@ impl Radios {
                 if let Some(min_rate) = min_rate {
                     if let Some(min_per) = min_per {
                         rate = Some(ListenRate::new(
-                            "*".to_string(),
+                            "*".to_string().into(),
                             *min_rate,
                             min_per.get_duration(),
                         ));
