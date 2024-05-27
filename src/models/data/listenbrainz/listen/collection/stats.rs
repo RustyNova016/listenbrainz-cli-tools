@@ -26,7 +26,9 @@ impl ListenCollection {
 
         match target {
             GroupByTarget::Recording => {
-                mapped.get_recording_statistics(&counter, &progress_bar);
+                mapped
+                    .get_recording_statistics(&counter, &progress_bar)
+                    .await?;
             }
             GroupByTarget::Artist => {
                 mapped
@@ -51,22 +53,28 @@ impl ListenCollection {
         Ok(counter)
     }
 
-    fn get_recording_statistics(self, counter: &StatisticSorter, progress_bar: &ProgressBarCli) {
+    async fn get_recording_statistics(
+        self,
+        counter: &StatisticSorter,
+        progress_bar: &ProgressBarCli,
+    ) -> color_eyre::Result<()> {
         for listen in self.into_iter() {
             counter.insert(
                 listen
-                    .clone()
-                    .get_mapping_data()
-                    .as_ref()
+                    .get_primary_recording_id()
+                    .await?
                     .expect("The listen should be mapped")
-                    .recording_mbid(),
+                    .to_string()
+                    .as_str(),
                 listen,
             );
             progress_bar.inc(1);
         }
+
+        Ok(())
     }
 
-    pub async fn get_artist_statistics(
+    async fn get_artist_statistics(
         self,
         counter: &StatisticSorter,
         progress_bar: &ProgressBarCli,
@@ -89,7 +97,7 @@ impl ListenCollection {
         Ok(())
     }
 
-    pub async fn get_release_statistics(
+    async fn get_release_statistics(
         self,
         counter: &StatisticSorter,
         progress_bar: &ProgressBarCli,
@@ -114,7 +122,7 @@ impl ListenCollection {
         Ok(())
     }
 
-    pub async fn get_release_group_statistics(
+    async fn get_release_group_statistics(
         self,
         counter: &StatisticSorter,
         progress_bar: &ProgressBarCli,
@@ -148,7 +156,7 @@ impl ListenCollection {
         Ok(())
     }
 
-    pub async fn get_work_statistics(
+    async fn get_work_statistics(
         self,
         counter: &StatisticSorter,
         progress_bar: &ProgressBarCli,

@@ -4,6 +4,7 @@ use std::sync::Arc;
 use color_eyre::Report;
 use derive_getters::Getters;
 use once_cell::sync::Lazy;
+use tokio::try_join;
 
 use crate::core::caching::musicbrainz_cache::MusicbrainzCache;
 use crate::models::data::musicbrainz::artist::mbid::ArtistMBID;
@@ -50,13 +51,13 @@ impl MusicBrainzDatabase {
         k: usize,
         keep_min: usize,
     ) -> color_eyre::Result<()> {
-        self.artists.invalidate_last_entries(k, keep_min).await?;
-        self.releases.invalidate_last_entries(k, keep_min).await?;
-        self.recordings.invalidate_last_entries(k, keep_min).await?;
-        self.release_groups
-            .invalidate_last_entries(k, keep_min)
-            .await?;
-        self.works.invalidate_last_entries(k, keep_min).await?;
+        try_join!(
+            self.artists.invalidate_last_entries(k, keep_min),
+            self.releases.invalidate_last_entries(k, keep_min),
+            self.recordings.invalidate_last_entries(k, keep_min),
+            self.release_groups.invalidate_last_entries(k, keep_min),
+            self.works.invalidate_last_entries(k, keep_min)
+        )?;
 
         Ok(())
     }

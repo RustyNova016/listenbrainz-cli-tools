@@ -16,6 +16,7 @@ use crate::core::entity_traits::updatable::Updatable;
 use crate::models::data::musicbrainz::external_musicbrainz_entity::FlattenedMBEntityExt;
 use crate::models::data::musicbrainz::relation::external::RelationContentExt;
 use crate::utils::println_cli;
+use crate::utils::println_cli_warn;
 
 #[derive(Debug)]
 pub struct MusicbrainzCache<K, V>
@@ -155,8 +156,28 @@ where
     pub async fn get_primary_mbid_alias(&self, mbid: &K) -> Result<K, Error> {
         match self.alias_cache.get_or_option(mbid).await {
             Ok(Some(val)) => Ok(val),
-            Ok(None) | Err(Error::CacheDeserializationError(_)) => Ok(mbid.clone()),
+            Ok(None) | Err(Error::CacheDeserializationError(_)) => {
+                // TODO: Debug only warning
+                println_cli_warn("Trying to fetch the primary alias of MBID resulted in `None`. Returning input instead");
+                Ok(mbid.clone())
+            }
             Err(val) => Err(val),
+        }
+    }
+
+    pub async fn get_or_fetch_primary_mbid_alias(&self, mbid: &K) -> color_eyre::Result<K> {
+        match self.alias_cache.get_or_option(mbid).await {
+            Ok(Some(val)) => Ok(val),
+            Ok(None) | Err(Error::CacheDeserializationError(_)) => {
+                self.force_fetch_and_save(mbid).await?;
+
+                Ok(self
+                    .alias_cache
+                    .get_or_option(mbid)
+                    .await?
+                    .expect("Couldn't retrieve the primary alias of MBID after fetching"))
+            }
+            Err(val) => Err(val.into()),
         }
     }
 

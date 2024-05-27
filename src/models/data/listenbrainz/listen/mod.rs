@@ -13,7 +13,7 @@ use super::messybrainz::MessyBrainzData;
 pub mod collection;
 pub mod convertion;
 pub mod getters;
-mod mapped_listen;
+pub mod mapped_listen;
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub struct Listen {

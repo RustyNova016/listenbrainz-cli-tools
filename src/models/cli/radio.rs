@@ -72,7 +72,7 @@ pub enum Radios {
         #[arg(short, long, default_value_t = 0)]
         cooldown: u64,
     },
-    
+
     /// Generate playlists based on recording that the user should have listened to by now according to the user's listen rate
     Overdue {
         /// Name of the user to fetch unlinked listen from
@@ -90,7 +90,7 @@ pub enum Radios {
         /// The amount of hours needed to wait after a recording have been given before it is re-suggested
         #[arg(short, long, default_value_t = 0)]
         cooldown: u64,
-    }
+    },
 }
 
 impl Radios {
@@ -129,8 +129,13 @@ impl Radios {
 
                 listen_rate_radio(username, token, rate, *min, *cooldown).await;
             }
-            
-            Self::Overdue { username, token, min, cooldown } => {
+
+            Self::Overdue {
+                username,
+                token,
+                min,
+                cooldown,
+            } => {
                 overdue_radio(username, token, *min, *cooldown).await;
             }
         }

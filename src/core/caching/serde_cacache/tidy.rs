@@ -6,6 +6,7 @@ use std::sync::Arc;
 
 use cacache::{Integrity, Metadata};
 use chashmap::CHashMap;
+use futures::future::try_join_all;
 use itertools::Itertools;
 use serde::de::DeserializeOwned;
 use serde::Serialize;
@@ -175,11 +176,15 @@ where
         let entries_to_delete = entries
             .into_iter()
             .k_smallest_by_key(k, |entry| entry.time)
+            .map(|entry_to_delete| async move {
+                println!("Deleting: {}", entry_to_delete.key);
+                let data = self.inner_delete_entry(&entry_to_delete.key).await;
+                println!("Deleted: {}", entry_to_delete.key);
+                data
+            })
             .collect_vec();
 
-        for entry_to_delete in entries_to_delete {
-            self.inner_delete_entry(&entry_to_delete.key).await?;
-        }
+        try_join_all(entries_to_delete).await?;
 
         Ok(())
     }

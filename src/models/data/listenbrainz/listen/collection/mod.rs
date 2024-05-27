@@ -1,3 +1,4 @@
+mod converters;
 pub mod filters;
 pub mod listen_rate;
 pub mod recording;
@@ -118,7 +119,7 @@ impl ListenCollection {
     }
 
     /// Return the list of unique recordings ids that have been listened to.
-    pub fn get_listened_recordings_mbids(&self) -> Vec<RecordingMBID> {
+    pub fn get_listened_recordings_mbids_naive(&self) -> Vec<RecordingMBID> {
         self.get_mapped_listens()
             .into_iter()
             .map(|listen| {

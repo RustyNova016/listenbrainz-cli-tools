@@ -6,13 +6,14 @@ use serde::{Deserialize, Serialize};
 use crate::core::entity_traits::mb_cached::MBCached;
 use crate::core::entity_traits::relations::has_artist_credits::HasArtistCredits;
 use crate::models::data::musicbrainz::artist::mbid::ArtistMBID;
+use crate::models::data::musicbrainz::recording::mbid::RecordingMBID;
 use crate::models::data::musicbrainz::recording::Recording;
 use crate::utils::extensions::UserListensMBIDMappingExt;
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, Getters)]
 pub struct MappingData {
     /// The MBID of the recordings
-    pub recording_mbid: String, // TODO: use Recording MSID
+    pub recording_mbid: String, // TODO: use Recording MBID
 
     /// Name of the recording
     pub recording_name: String,
@@ -45,6 +46,10 @@ impl MappingData {
                 .get_artist_ids(),
             Some(artists) => artists.clone(),
         })
+    }
+
+    pub fn get_recording_mbid(&self) -> RecordingMBID {
+        self.recording_mbid.clone().into() // TODO: Use MBID
     }
 }
 

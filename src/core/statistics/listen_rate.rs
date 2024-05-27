@@ -1,11 +1,11 @@
-use std::ops::Div;
+use crate::models::data::listenbrainz::listen::collection::ListenCollection;
 use chrono::{DateTime, Duration, Utc};
 use clap::ValueEnum;
 use derive_getters::Getters;
 use derive_more::IsVariant;
 use derive_new::new;
 use rust_decimal::prelude::Decimal;
-use crate::models::data::listenbrainz::listen::collection::ListenCollection;
+use std::ops::Div;
 
 use crate::models::data::musicbrainz::recording::mbid::RecordingMBID;
 
@@ -22,13 +22,20 @@ impl ListenRate {
             / Decimal::from(self.duration.num_seconds());
         Decimal::from(*self.listen_count()) * multiplier
     }
-    
+
     pub fn get_average_time_between_listens(&self) -> Duration {
         self.duration.div(*self.listen_count() as i32)
     }
-    
-    pub fn get_estimated_date_of_next_listen(&self, listen_collection: &ListenCollection) -> DateTime<Utc> {
-        let latest_listen_date = listen_collection.get_latest_listen().map(|listen| listen.listened_at).unwrap_or(Utc::now());
+
+    pub fn get_estimated_date_of_next_listen(
+        &self,
+        listen_collection: &ListenCollection,
+    ) -> DateTime<Utc> {
+        //TODO: Directly give latest_listen_date instead of giving the lisen coll
+        let latest_listen_date = listen_collection
+            .get_latest_listen()
+            .map(|listen| listen.listened_at)
+            .unwrap_or_else(Utc::now);
         latest_listen_date + self.get_average_time_between_listens()
     }
 }

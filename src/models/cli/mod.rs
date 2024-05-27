@@ -4,12 +4,13 @@ use crate::models::cli::common::{GroupByTarget, SortListensBy, SortSorterBy};
 use crate::models::cli::radio::CliRadios;
 use crate::models::data::entity_database::ENTITY_DATABASE;
 use crate::tools::interactive_mapper::interactive_mapper;
+use crate::tools::lookup::lookup;
 use crate::tools::musicbrainz::search_link;
 use crate::tools::stats::stats_command;
 use crate::tools::unlinked::unmapped_command;
 
 pub mod common;
-mod radio;
+pub mod radio;
 
 /// Tools for Listenbrainz
 #[derive(Parser, Debug, Clone)]
@@ -72,6 +73,16 @@ pub enum Commands {
     },
 
     Search {},
+
+    Lookup {
+        /// Recording ID
+        #[arg(short, long)]
+        id: String,
+
+        /// Name of the user to fetch stats listen from
+        #[arg(short, long)]
+        username: String,
+    },
 }
 
 impl Commands {
@@ -98,6 +109,8 @@ impl Commands {
             Self::Cache { id } => ENTITY_DATABASE.remove(id).await.unwrap(),
 
             Self::Search {} => search_link().await,
+
+            Self::Lookup { id, username } => lookup(username, id.to_string().into()).await,
         }
     }
 }
