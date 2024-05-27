@@ -1,6 +1,7 @@
 use super::Release;
 use crate::core::entity_traits::fetchable::Fetchable;
 use crate::core::entity_traits::insertable_children::InsertChildren;
+use crate::core::fetching::global_fetch_limiter::MB_FETCH_LIMITER;
 use crate::utils::println_mus;
 use color_eyre::eyre::Context;
 use musicbrainz_rs::entity::release::Release as ReleaseMS;
@@ -9,6 +10,8 @@ use musicbrainz_rs::Fetch;
 impl Fetchable for Release {
     #[allow(refining_impl_trait)]
     async fn fetch(key: &str) -> color_eyre::Result<InsertChildren<ReleaseMS>> {
+        let _permit = MB_FETCH_LIMITER.acquire().await?;
+
         println_mus(format!("Getting data for release MBID: {}", &key));
 
         Ok(ReleaseMS::fetch()
