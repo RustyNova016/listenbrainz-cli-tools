@@ -12,7 +12,7 @@ use crate::utils::extensions::UserListensMBIDMappingExt;
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, Getters)]
 pub struct MappingData {
     /// The MBID of the recordings
-    pub recording_mbid: String,
+    pub recording_mbid: String, // TODO: use Recording MSID
 
     /// Name of the recording
     pub recording_name: String,

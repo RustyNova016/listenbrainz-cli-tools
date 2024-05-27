@@ -1,4 +1,6 @@
-use std::ops::Deref;
+pub mod filters;
+pub mod listen_rate;
+pub mod recording;
 use std::sync::Arc;
 
 use chrono::{DateTime, Utc};
@@ -13,9 +15,13 @@ use super::Listen;
 pub mod stats;
 mod underrated;
 
+use derive_more::*;
+
 /// Wrapper for a vector of listens
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, Deref, DerefMut, IntoIterator)]
 pub struct ListenCollection {
+    #[deref]
+    #[deref_mut]
     data: Vec<Arc<Listen>>,
 }
 
@@ -37,6 +43,14 @@ impl ListenCollection {
         self.data
             .iter()
             .max_by_key(|listen| listen.listened_at)
+            .cloned()
+    }
+
+    /// Returns the oldest listen in the collection.
+    pub fn get_oldest_listen(&self) -> Option<Arc<Listen>> {
+        self.data
+            .iter()
+            .min_by_key(|listen| listen.listened_at)
             .cloned()
     }
 
@@ -104,7 +118,7 @@ impl ListenCollection {
     }
 
     /// Return the list of unique recordings ids that have been listened to.
-    pub fn get_listened_recordings(&self) -> Vec<RecordingMBID> {
+    pub fn get_listened_recordings_mbids(&self) -> Vec<RecordingMBID> {
         self.get_mapped_listens()
             .into_iter()
             .map(|listen| {
@@ -121,28 +135,11 @@ impl ListenCollection {
     }
 }
 
-impl Deref for ListenCollection {
-    type Target = Vec<Arc<Listen>>;
-
-    fn deref(&self) -> &Self::Target {
-        &self.data
-    }
-}
-
 impl FromIterator<Arc<Listen>> for ListenCollection {
     fn from_iter<T: IntoIterator<Item = Arc<Listen>>>(iter: T) -> Self {
         Self {
-            data: iter.into_iter().collect(),
+            data: iter.into_iter().collect_vec(),
         }
-    }
-}
-
-impl IntoIterator for ListenCollection {
-    type Item = Arc<Listen>;
-    type IntoIter = std::vec::IntoIter<Self::Item>;
-
-    fn into_iter(self) -> Self::IntoIter {
-        self.data.into_iter()
     }
 }
 
