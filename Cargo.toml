@@ -10,7 +10,11 @@ rust-version = "1.75"
 
 [dependencies]
 listenbrainz = { branch = "8.0-experimental+popularity", git = "https://github.com/RustyNova016/listenbrainz-rs.git" } # Upstream version of the listenbrainz crate
-musicbrainz_rs = { version = "0.5.0" }
+
+# Upstream version of the musicbrainz crate. Use "listenbrainz-cli-tools_master" for main builds, "listenbrainz-cli-tools_dev" for dev builds
+musicbrainz_rs = { branch = "listenbrainz-cli-tools_master", git = "https://github.com/RustyNova016/musicbrainz_rs.git" }
+#musicbrainz_rs = { path = "../musicbrainz_rs"} # For easy development
+
 derive_builder = "0.20.0"
 inquire = "0.7.5"
 itertools = "0.13.0"

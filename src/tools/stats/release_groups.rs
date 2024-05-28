@@ -1,4 +1,4 @@
-use crate::core::entity_traits::fetchable::FetchableAndCachable;
+use crate::core::entity_traits::mb_cached::MBCached;
 use crate::core::entity_traits::relations::has_artist_credits::HasArtistCredits;
 use crate::core::statistics::statistic_sorter::StatisticSorter;
 use crate::models::cli::common::SortSorterBy;
@@ -9,7 +9,9 @@ pub async fn stats_release_groups(stats: StatisticSorter, sort_by: SortSorterBy)
     let mut pager = CLIPager::new(5);
 
     for (key, data) in stats.into_sorted_vec(sort_by) {
-        let release_group = ReleaseGroup::get_cached_or_fetch(&key).await.unwrap();
+        let release_group = ReleaseGroup::get_cached_or_fetch(&key.clone().into())
+            .await
+            .unwrap(); // TODO: Use MBIDs
 
         let artist_credit_string = release_group
             .get_or_fetch_artist_credits()

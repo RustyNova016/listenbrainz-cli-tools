@@ -1,8 +1,6 @@
 use crate::models::data::musicbrainz::artist::mbid::ArtistMBID;
 use derive_getters::Getters;
 use serde::{Deserialize, Serialize};
-
-pub mod caching;
 pub mod collection;
 pub mod converters;
 
