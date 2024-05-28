@@ -3,7 +3,7 @@ use chrono::Duration;
 use itertools::Itertools;
 use listenbrainz::raw::Client;
 
-use crate::core::entity_traits::mb_cached::MBCached;
+use crate::core::entity_traits::fetchable::FetchableAndCachable;
 use crate::core::statistics::listen_rate::ListenRate;
 use crate::core::statistics::listen_rate::ListenRateRange;
 use crate::models::data::listenbrainz::user_listens::UserListens;
@@ -83,7 +83,7 @@ pub async fn listen_rate_radio(
         "Radio: Listen Rate".to_string(),
         Some(username.to_string()),
         true,
-        bests.iter().map(|x| x.recording().clone()).collect_vec(), // TODO: Remove cast to recordingmbid
+        bests.iter().map(|x| x.recording().clone().into()).collect_vec(), // TODO: Remove cast to recordingmbid
         Some(format!("A playlist containing all the tracks that {username} listen to, 
             but seemingly no one else does. Come take a listen if you want to find hidden gems!<br>
             <br>

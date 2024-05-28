@@ -5,11 +5,9 @@ use derive_more::IsVariant;
 use derive_new::new;
 use rust_decimal::prelude::Decimal;
 
-use crate::models::data::musicbrainz::recording::mbid::RecordingMBID;
-
 #[derive(Debug, Clone, Getters, PartialEq, Eq, new)]
 pub struct ListenRate {
-    recording: RecordingMBID,
+    recording: String, // TODO: Convert to RecordingMBID
     listen_count: u64,
     duration: Duration,
 }

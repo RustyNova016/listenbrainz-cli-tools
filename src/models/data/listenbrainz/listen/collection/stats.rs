@@ -3,13 +3,11 @@ use std::ops::Deref;
 use itertools::Itertools;
 
 use crate::core::display::progress_bar::ProgressBarCli;
-use crate::core::entity_traits::mb_cached::MBCached;
 use crate::core::entity_traits::mbid::VecIExt;
 use crate::core::entity_traits::relations::has_release_group::HasReleaseGroup;
 use crate::core::statistics::statistic_sorter::StatisticSorter;
 use crate::models::cli::common::GroupByTarget;
 use crate::models::data::listenbrainz::listen::collection::ListenCollection;
-use crate::models::data::musicbrainz::work::Work;
 
 impl ListenCollection {
     pub async fn get_statistics_of(
@@ -42,9 +40,6 @@ impl ListenCollection {
                 mapped
                     .get_release_group_statistics(&counter, &progress_bar)
                     .await?;
-            }
-            GroupByTarget::Work => {
-                mapped.get_work_statistics(&counter, &progress_bar).await?;
             }
         }
 
@@ -85,7 +80,6 @@ impl ListenCollection {
             }
             progress_bar.inc(1);
         }
-
         Ok(())
     }
 
@@ -142,43 +136,6 @@ impl ListenCollection {
             for release_groups_id in release_groups_ids {
                 counter.insert(release_groups_id.deref(), listen.clone());
             }
-            progress_bar.inc(1);
-        }
-
-        Ok(())
-    }
-
-    pub async fn get_work_statistics(
-        self,
-        counter: &StatisticSorter,
-        progress_bar: &ProgressBarCli,
-    ) -> color_eyre::Result<()> {
-        for listen in self {
-            let recording = listen
-                .clone()
-                .get_mapping_data()
-                .as_ref()
-                .expect("The listen should be mapped")
-                .get_or_fetch_recording()
-                .await?;
-
-            let mut work_ids = recording.get_or_fetch_work_ids_with_parents().await?;
-
-            // If the work is empty, this probably mean it wasn't added on musicbrainz.
-            // We'll add a fake one to simulate it, altough it may not be accurate
-            if work_ids.is_empty() {
-                let new_work =
-                    Work::create_fake_work(format!("_fake_{}", recording.title), recording.title);
-                work_ids.push(new_work.id().clone());
-                Work::get_cache().set(&new_work).await?;
-            } else {
-                work_ids = work_ids.into_iter().unique().collect_vec();
-            }
-
-            for work_id in work_ids {
-                counter.insert(&work_id, listen.clone());
-            }
-
             progress_bar.inc(1);
         }
 

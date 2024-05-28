@@ -1,10 +1,7 @@
-pub mod work;
 use crate::models::cli::common::{GroupByTarget, SortSorterBy};
 use crate::models::data::listenbrainz::user_listens::UserListens;
 use crate::tools::stats::release_groups::stats_release_groups;
 use crate::utils::println_cli;
-
-use self::work::stats_works;
 
 mod artists;
 mod recordings;
@@ -40,9 +37,6 @@ pub async fn stats_command(username: &str, target: GroupByTarget, sort_by: SortS
         }
         GroupByTarget::ReleaseGroup => {
             stats_release_groups(stats, sort_by).await;
-        }
-        GroupByTarget::Work => {
-            stats_works(stats, sort_by).await;
         }
     }
 }

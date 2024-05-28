@@ -1,13 +1,10 @@
-use std::sync::Arc;
-
-use crate::core::caching::musicbrainz_cache::MusicbrainzCache;
+use crate::core::caching::entity_cache::EntityCache;
+use crate::core::entity_traits::cached::Cached;
 use crate::core::entity_traits::has_id::HasID;
-use crate::core::entity_traits::mb_cached::MBCached;
-use crate::core::entity_traits::mbid::HasMBID;
 use crate::core::entity_traits::updatable::Updatable;
-use crate::models::data::musicbrainz::release_group::mbid::ReleaseGroupMBID;
+use crate::models::data::entity_database::ENTITY_DATABASE;
 use crate::models::data::musicbrainz::release_group::ReleaseGroup;
-use crate::models::data::musicbrainz_database::MUSICBRAINZ_DATABASE;
+use std::sync::Arc;
 
 impl HasID for ReleaseGroup {
     fn get_id(&self) -> String {
@@ -15,15 +12,12 @@ impl HasID for ReleaseGroup {
     }
 }
 
-impl HasMBID<ReleaseGroupMBID> for ReleaseGroup {
-    fn get_mbid(&self) -> ReleaseGroupMBID {
-        self.id.clone()
-    }
-}
-
-impl MBCached<ReleaseGroupMBID> for ReleaseGroup {
-    fn get_cache() -> Arc<MusicbrainzCache<ReleaseGroupMBID, Self>> {
-        MUSICBRAINZ_DATABASE.release_groups().clone()
+impl Cached for ReleaseGroup {
+    fn get_cache() -> Arc<EntityCache<Self>>
+    where
+        Self: Sized,
+    {
+        ENTITY_DATABASE.release_groups().clone()
     }
 }
 
@@ -44,7 +38,6 @@ impl Updatable for ReleaseGroup {
             releases: newer.releases.or(self.releases),
             annotation: newer.annotation.or(self.annotation),
             artist_credit: newer.artist_credit.or(self.artist_credit),
-            relations: newer.relations.or(self.relations),
         }
     }
 }

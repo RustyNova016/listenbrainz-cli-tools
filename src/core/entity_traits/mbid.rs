@@ -1,19 +1,13 @@
-use crate::models::data::musicbrainz::external_musicbrainz_entity::ExternalMusicBrainzEntity;
-use crate::models::data::musicbrainz::mbid::MBID;
 use extend::ext;
-use std::fmt::{Debug, Display};
-use std::future::Future;
 
-pub trait IsMbid<T>: Display + Clone {
-    fn get_or_fetch_entity(&self) -> impl Future<Output = color_eyre::Result<T>> + Send;
-
-    fn fetch(&self) -> impl Future<Output = color_eyre::Result<ExternalMusicBrainzEntity>> + Send;
-
-    fn into_mbid(self) -> MBID;
+pub trait MBID<T> {
+    fn get_or_fetch_entity(
+        &self,
+    ) -> impl std::future::Future<Output = color_eyre::Result<T>> + Send;
 }
 
 #[ext]
-pub impl<T, I: IsMbid<T>> Vec<I> {
+pub impl<T, I: MBID<T>> Vec<I> {
     #[allow(async_fn_in_trait)]
     async fn get_or_fetch_entities(&self) -> color_eyre::Result<Vec<T>> {
         let mut result = Vec::new();
@@ -24,8 +18,4 @@ pub impl<T, I: IsMbid<T>> Vec<I> {
 
         Ok(result)
     }
-}
-
-pub trait HasMBID<K: IsMbid<Self>>: Sized + Debug + Clone {
-    fn get_mbid(&self) -> K;
 }

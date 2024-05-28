@@ -1,10 +1,6 @@
 use chrono::{DateTime, TimeDelta, Utc};
-use color_eyre::eyre::eyre;
-use color_eyre::Report;
 use listenbrainz::raw::response::UserListensResponse;
 use listenbrainz::raw::Client;
-use once_cell::sync::Lazy;
-use tokio::sync::RwLock;
 
 use crate::core::display::progress_bar::ProgressBarCli;
 use crate::core::entity_traits::cached::Cached;
@@ -14,15 +10,13 @@ use crate::utils::{println_cli, println_lis};
 
 use super::UserListens;
 
-static FETCH_COUNT: Lazy<RwLock<u64>> = Lazy::new(|| RwLock::new(999));
-
 impl UserListens {
     pub async fn get_user_with_refresh(username: &str) -> color_eyre::Result<Self> {
         println_cli("Getting new user listens...");
         Self::fetch_latest(username).await?;
 
         println_cli("Updating unmapped listens...");
-        //Self::update_unlinked_of_user(username).await?; //TODO: Put back on
+        Self::update_unlinked_of_user(username).await?;
 
         Ok(Self::get_from_cache(username)
             .await
@@ -41,32 +35,12 @@ impl UserListens {
             before_date.timestamp()
         ));
 
-        // We give it 20 tries
-        for _i in 0..20 {
-            let result = Client::new().user_listens(
-                user,
-                None,
-                Some(before_date.timestamp()),
-                Some(*FETCH_COUNT.read().await),
-            );
+        let result =
+            Client::new().user_listens(user, None, Some(before_date.timestamp()), Some(999))?;
 
-            match result {
-                Ok(data) => {
-                    data.insert_into_cache_as(user.to_lowercase()).await?;
-                    return Ok(data);
-                }
-                Err(listenbrainz::Error::Http(_val)) => {
-                    println_lis("Io error, retrying");
-                    let count = *FETCH_COUNT.read().await;
+        result.insert_into_cache_as(user.to_lowercase()).await?;
 
-                    // Retry with shorter count
-                    *FETCH_COUNT.write().await = count.div_ceil(2);
-                }
-                Err(val) => return Err(Report::from(val)),
-            }
-        }
-
-        Err(eyre!("Maximum tries exceded"))
+        Ok(result)
     }
 
     /// Fetch the latest listens that aren't yet in the cache. If it fetched more than needed, entries will get updated

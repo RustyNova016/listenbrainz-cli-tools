@@ -1,18 +1,15 @@
-use std::collections::HashMap;
-
+pub mod getters;
+use super::messybrainz::MessyBrainzData;
+use crate::core::entity_traits::fetchable::FetchableAndCachable;
+use crate::models::data::listenbrainz::mapping_data::MappingData;
+use crate::models::data::musicbrainz::recording::Recording;
 use chrono::{DateTime, Utc};
 use color_eyre::eyre::Context;
 use serde::{Deserialize, Serialize};
-
-use crate::core::entity_traits::mb_cached::MBCached;
-use crate::models::data::listenbrainz::mapping_data::MappingData;
-use crate::models::data::musicbrainz::recording::Recording;
-
-use super::messybrainz::MessyBrainzData;
+use std::collections::HashMap;
 
 pub mod collection;
 pub mod convertion;
-pub mod getters;
 mod mapped_listen;
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
@@ -61,7 +58,7 @@ impl Listen {
     pub async fn get_recording_data(&self) -> color_eyre::Result<Option<Recording>> {
         match &self.mapping_data {
             Some(mapping) => Ok(Some(
-                Recording::get_cached_or_fetch(&mapping.recording_mbid().clone().into()).await?, //TODO: Use MBID
+                Recording::get_cached_or_fetch(mapping.recording_mbid()).await?,
             )),
             None => Ok(None),
         }
