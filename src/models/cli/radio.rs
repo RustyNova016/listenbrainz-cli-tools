@@ -5,6 +5,7 @@ use crate::core::statistics::listen_rate::ListenRate;
 use crate::core::statistics::listen_rate::ListenRateRange;
 use crate::tools::radio::circles::create_radio_mix;
 use crate::tools::radio::listen_rate::listen_rate_radio;
+use crate::tools::radio::overdue::overdue_radio;
 use crate::tools::radio::underrated::underrated_mix;
 
 #[derive(Parser, Debug, Clone)]
@@ -67,7 +68,26 @@ pub enum Radios {
         #[arg(long)]
         min: Option<u64>,
 
-        /// The amount of hours needed to wait after a recording have been given before it is resuggested
+        /// The amount of hours needed to wait after a recording have been given before it is re-suggested
+        #[arg(short, long, default_value_t = 0)]
+        cooldown: u64,
+    },
+
+    /// Generate playlists based on recording that the user should have listened to by now according to the user's listen rate
+    Overdue {
+        /// Name of the user to fetch unlinked listen from
+        #[arg(short, long)]
+        username: String,
+
+        /// User token
+        #[arg(short, long)]
+        token: String,
+
+        /// Minimum listen count
+        #[arg(long)]
+        min: Option<u64>,
+
+        /// The amount of hours needed to wait after a recording have been given before it is re-suggested
         #[arg(short, long, default_value_t = 0)]
         cooldown: u64,
     },
@@ -100,7 +120,7 @@ impl Radios {
                 if let Some(min_rate) = min_rate {
                     if let Some(min_per) = min_per {
                         rate = Some(ListenRate::new(
-                            "*".to_string(),
+                            "*".to_string().into(),
                             *min_rate,
                             min_per.get_duration(),
                         ));
@@ -108,6 +128,15 @@ impl Radios {
                 }
 
                 listen_rate_radio(username, token, rate, *min, *cooldown).await;
+            }
+
+            Self::Overdue {
+                username,
+                token,
+                min,
+                cooldown,
+            } => {
+                overdue_radio(username, token, *min, *cooldown).await;
             }
         }
     }

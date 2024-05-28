@@ -3,7 +3,7 @@ use chrono::Duration;
 use itertools::Itertools;
 use listenbrainz::raw::Client;
 
-use crate::core::entity_traits::fetchable::FetchableAndCachable;
+use crate::core::entity_traits::mb_cached::MBCached;
 use crate::core::statistics::listen_rate::ListenRate;
 use crate::core::statistics::listen_rate::ListenRateRange;
 use crate::models::data::listenbrainz::user_listens::UserListens;
@@ -50,18 +50,18 @@ pub async fn listen_rate_radio(
         .expect("Couldn't calculate the listens rates");
 
     // Filter minimum
-    scores.retain(|rate| *rate.listen_count() > min_listens.unwrap_or(3_u64));
+    scores.retain(|rate| *rate.1.listen_count() > min_listens.unwrap_or(3_u64));
 
     // Filter minimum rate
     if let Some(min_rate) = min_rate {
         scores.retain(|rate| {
-            rate.get_listen_rate(ListenRateRange::Year)
+            rate.1.get_listen_rate(ListenRateRange::Year)
                 >= min_rate.get_listen_rate(ListenRateRange::Year)
         });
     }
 
     // Sort
-    scores.sort_by_cached_key(|rate| rate.get_listen_rate(ListenRateRange::Year));
+    scores.sort_by_cached_key(|rate| rate.1.get_listen_rate(ListenRateRange::Year));
 
     let chunked = scores.chunks(50).collect_vec();
     let bests = chunked
@@ -71,11 +71,11 @@ pub async fn listen_rate_radio(
     for rate in *bests {
         println_cli(format!(
             "Adding [{}]. Yearly listens is: {}",
-            Recording::get_cached_or_fetch(rate.recording())
+            Recording::get_cached_or_fetch(rate.1.recording())
                 .await
                 .unwrap()
                 .title,
-            rate.get_listen_rate(ListenRateRange::Year)
+            rate.1.get_listen_rate(ListenRateRange::Year)
         ));
     }
 
@@ -83,7 +83,7 @@ pub async fn listen_rate_radio(
         "Radio: Listen Rate".to_string(),
         Some(username.to_string()),
         true,
-        bests.iter().map(|x| x.recording().clone().into()).collect_vec(), // TODO: Remove cast to recordingmbid
+        bests.iter().map(|rate| rate.1.recording().clone()).collect_vec(), // TODO: Remove cast to recordingmbid
         Some(format!("A playlist containing all the tracks that {username} listen to, 
             but seemingly no one else does. Come take a listen if you want to find hidden gems!<br>
             <br>

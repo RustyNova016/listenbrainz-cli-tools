@@ -7,7 +7,7 @@ use crate::models::cli::common::GroupByTarget;
 use super::ListenCollection;
 
 impl ListenCollection {
-    pub async fn get_listen_rates(&self) -> color_eyre::Result<Vec<ListenRate>> {
+    pub async fn get_listen_rates(&self) -> color_eyre::Result<Vec<(Self, ListenRate)>> {
         let stats = self.get_statistics_of(GroupByTarget::Recording).await?;
         let now = Utc::now();
 
@@ -21,7 +21,13 @@ impl ListenCollection {
                         .expect("It should have at least one listen")
                         .get_listened_at();
 
-                ListenRate::new(recording_id, listens.len() as u64, duration)
+                let rate = ListenRate::new(
+                    recording_id.into(), //TODO: Use MBID
+                    listens.len() as u64,
+                    duration,
+                );
+
+                (listens, rate)
             })
             .collect_vec())
     }

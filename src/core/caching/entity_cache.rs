@@ -60,6 +60,20 @@ where
             .expect("Couldn't get a new semaphore"))
         .clone();
     }
+
+    pub async fn remove(&self, id: &str) -> color_eyre::Result<()> {
+        self.cache.remove(&id.to_string()).await?;
+        Ok(())
+    }
+
+    pub async fn invalidate_last_entries(
+        &self,
+        k: usize,
+        keep_min: usize,
+    ) -> color_eyre::Result<()> {
+        self.cache.delete_last_entries(k, keep_min).await?;
+        Ok(())
+    }
 }
 
 impl<V> EntityCache<V>

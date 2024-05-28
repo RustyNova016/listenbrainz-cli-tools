@@ -1,5 +1,3 @@
-pub mod external;
-pub mod getters;
 use itertools::Itertools;
 use musicbrainz_rs::entity::alias::Alias;
 use musicbrainz_rs::entity::artist::{ArtistType, Gender};
@@ -8,14 +6,18 @@ use musicbrainz_rs::entity::lifespan::LifeSpan;
 use musicbrainz_rs::entity::tag::Tag;
 use serde::{Deserialize, Serialize};
 
-use self::mbid::ArtistMBID;
+use crate::models::data::musicbrainz::relation::Relation;
+use crate::models::data::musicbrainz::work::mbid::WorkMBID;
 
 use super::recording::mbid::RecordingMBID;
 use super::release::mbid::ReleaseMBID;
 use super::release_group::mbid::ReleaseGroupMBID;
 
+use self::mbid::ArtistMBID;
+
 pub mod caching;
-pub mod fetching;
+pub mod external;
+pub mod getters;
 pub mod mbid;
 
 #[derive(Debug, Clone, Eq, PartialEq, Deserialize, Serialize)]
@@ -29,10 +31,10 @@ pub struct Artist {
     pub gender: Option<Gender>,
     //pub area: Option<Area>,
     //pub begin_area: Option<Area>,
-    //pub relations: Option<Vec<String>>,
-    pub releases: Option<Vec<ReleaseMBID>>,
-    pub works: Option<Vec<String>>,
-    pub release_groups: Option<Vec<ReleaseGroupMBID>>,
+    relations: Option<Vec<Relation>>,
+    releases: Option<Vec<ReleaseMBID>>,
+    works: Option<Vec<WorkMBID>>,
+    release_groups: Option<Vec<ReleaseGroupMBID>>,
     recordings: Option<Vec<RecordingMBID>>,
     pub aliases: Option<Vec<Alias>>,
     pub tags: Option<Vec<Tag>>,
@@ -56,30 +58,15 @@ impl From<musicbrainz_rs::entity::artist::Artist> for Artist {
             gender: artist.gender,
             genres: artist.genres,
             life_span: artist.life_span,
-            recordings: artist.recordings.map(|recodings| {
-                recodings
-                    .into_iter()
-                    .map(|recording| recording.id.into())
-                    .collect_vec()
-            }),
-            release_groups: artist.release_groups.map(|release_groups| {
-                release_groups
-                    .into_iter()
-                    .map(|release_group| release_group.id.into())
-                    .collect_vec()
-            }),
-            releases: artist.releases.map(|releases| {
-                releases
-                    .into_iter()
-                    .map(|release| release.id.into())
-                    .collect_vec()
-            }),
+            recordings: None,
+            release_groups: None,
+            releases: None,
             sort_name: artist.sort_name,
             tags: artist.tags,
-            works: artist
-                .works
-                .map(|works| works.into_iter().map(|work| work.id).collect_vec()),
-            //relations: artist.relations.map(|relations| relations.into_iter().map(|relation| relation.).collect_vec()),
+            works: None,
+            relations: artist
+                .relations
+                .map(|relations| relations.into_iter().map_into().collect_vec()),
         }
     }
 }

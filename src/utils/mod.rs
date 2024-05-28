@@ -1,4 +1,5 @@
 pub mod playlist;
+use color_eyre::owo_colors::OwoColorize;
 use derive_builder::Builder;
 use listenbrainz::raw::response::{UserListensListen, UserListensResponse};
 use listenbrainz::raw::Client;
@@ -100,6 +101,10 @@ pub fn println_cli<T: Display>(string: T) {
     let static_clone = STATIC_LOGGER.clone();
     let logger = static_clone.lock().unwrap();
     logger.println_cli(string);
+}
+
+pub fn println_cli_warn<T: Display>(string: T) {
+    println_cli(format!("[Warning] {string}").yellow());
 }
 
 pub fn println_lis<T: Display>(string: T) {

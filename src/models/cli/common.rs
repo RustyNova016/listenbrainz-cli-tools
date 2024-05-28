@@ -40,6 +40,7 @@ pub enum GroupByTarget {
     Artist,
     Release,
     ReleaseGroup,
+    Work,
 }
 
 impl GroupByTarget {
@@ -49,6 +50,7 @@ impl GroupByTarget {
             Self::Artist => "artist",
             Self::Release => "release",
             Self::ReleaseGroup => "release_group",
+            Self::Work => "work",
         }
     }
 }
