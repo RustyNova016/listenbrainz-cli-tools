@@ -27,9 +27,6 @@ impl From<ReleaseGroupMS> for ReleaseGroup {
             secondary_type_ids: value.secondary_type_ids,
             secondary_types: value.secondary_types,
             primary_type_id: value.primary_type_id,
-            relations: value
-                .relations
-                .map(|relations| relations.into_iter().map_into().collect_vec()),
         }
     }
 }

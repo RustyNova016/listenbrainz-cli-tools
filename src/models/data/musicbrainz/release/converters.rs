@@ -23,16 +23,6 @@ impl From<ReleaseMS> for Release {
             release_group: value
                 .release_group
                 .map(|release_group| release_group.id.into()),
-            status: value.status,
-            //quality: value.quality,
-            packaging: value.packaging,
-            genres: value.genres,
-            date: value.date,
-            aliases: value.aliases,
-            relations: value
-                .relations
-                .map(|relations| relations.into_iter().map_into().collect_vec()),
-            tags: value.tags,
         }
     }
 }

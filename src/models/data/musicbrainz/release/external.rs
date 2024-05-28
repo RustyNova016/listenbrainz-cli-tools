@@ -1,12 +1,9 @@
-use extend::ext;
 use musicbrainz_rs::entity::release::Release;
 
+use crate::core::entity_traits::cached::Cached;
 use crate::core::entity_traits::has_id::HasID;
-use crate::models::data::musicbrainz::artist::external::ArtistExt;
-use crate::models::data::musicbrainz::external_musicbrainz_entity::ExternalMusicBrainzEntity;
-use crate::models::data::musicbrainz::musicbrainz_entity::MusicBrainzEntity;
-use crate::models::data::musicbrainz::relation::external::RelationContentExt;
-use crate::models::data::musicbrainz::release_group::external::ReleaseGroupExt;
+use crate::core::entity_traits::insertable::{Insertable, IsAutoInsertable};
+use crate::core::entity_traits::insertable_children::InsertableWithChildren;
 
 impl HasID for Release {
     fn get_id(&self) -> String {
@@ -14,46 +11,36 @@ impl HasID for Release {
     }
 }
 
-#[ext]
-pub impl Release {
-    fn flatten_main(&self) -> MusicBrainzEntity {
-        MusicBrainzEntity::Release(super::Release::from(self.clone()))
+impl Insertable for Release {
+    async fn insert_into_cache_as(&self, key: String) -> color_eyre::Result<()> {
+        crate::models::data::musicbrainz::release::Release::get_cache()
+            .update(&key, self.clone().into())
+            .await?;
+
+        Ok(())
     }
+}
 
-    fn flatten_children(&self) -> Vec<MusicBrainzEntity> {
-        let mut result: Vec<MusicBrainzEntity> = Vec::new();
+impl InsertableWithChildren for Release {
+    async fn insert_with_children(&self, key: String) -> color_eyre::Result<()> {
+        self.insert_into_cache_as(key).await?;
 
-        if let Some(artist_credits) = self.artist_credit.clone() {
-            for artist_credit in artist_credits {
-                result.push(artist_credit.artist.flatten_main());
-                result.extend(artist_credit.artist.flatten_children());
+        if let Some(data) = self.artist_credit.clone() {
+            for item in &data {
+                item.insert_into_cache().await?;
             }
         }
 
-        if let Some(release_group) = self.release_group.clone() {
-            result.push(release_group.flatten_main());
-            result.extend(release_group.flatten_children());
-        }
-
-        if let Some(relations) = self.relations.clone() {
-            for relation in relations {
-                if let Ok(res) = relation.content.flatten_main() {
-                    result.push(res);
-                }
-                if let Ok(res) = relation.content.flatten_children() {
-                    result.extend(res);
-                }
+        if let Some(data) = self.media.clone() {
+            for item in &data {
+                item.insert_into_cache().await?;
             }
         }
 
-        result
-    }
+        if let Some(data) = self.release_group.clone() {
+            data.insert_into_cache().await?;
+        }
 
-    fn flattened(&self) -> (MusicBrainzEntity, Vec<MusicBrainzEntity>) {
-        (self.flatten_main(), self.flatten_children())
-    }
-
-    fn into_entity(self) -> ExternalMusicBrainzEntity {
-        ExternalMusicBrainzEntity::Release(Box::new(self))
+        Ok(())
     }
 }

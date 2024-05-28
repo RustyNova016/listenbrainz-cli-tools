@@ -14,15 +14,16 @@ use serde::{Deserialize, Serialize};
 use self::mbid::RecordingMBID;
 
 use super::artist_credit::collection::ArtistCredits;
-use super::relation::Relation;
+use super::HasMbid;
 
 pub mod caching;
+pub mod fetching;
 
-// impl HasMbid for Recording {
-//     fn get_mbid(&self) -> &str {
-//         &self.id
-//     }
-// }
+impl HasMbid for Recording {
+    fn get_mbid(&self) -> &str {
+        &self.id
+    }
+}
 
 impl Recording {
     pub fn get_artist_credits(&self) -> Option<ArtistCredits> {
@@ -40,7 +41,7 @@ pub struct Recording {
     length: Option<u32>,
     disambiguation: Option<String>,
     isrcs: Option<Vec<String>>,
-    relations: Option<Vec<Relation>>,
+    //relations: Option<Vec<Relation>>,
     aliases: Option<Vec<Alias>>,
     tags: Option<Vec<Tag>>,
     //rating: Option<Rating>,
@@ -68,9 +69,6 @@ impl From<musicbrainz_rs::entity::recording::Recording> for Recording {
             tags: recording.tags,
             isrcs: recording.isrcs,
             disambiguation: recording.disambiguation,
-            relations: recording
-                .relations
-                .map(|relations| relations.into_iter().map_into().collect_vec()),
         }
     }
 }
