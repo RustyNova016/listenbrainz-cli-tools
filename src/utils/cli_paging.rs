@@ -14,23 +14,28 @@ impl CLIPager {
         }
     }
 
-    pub fn execute<F>(&mut self, f: F) -> bool
-    where
-        F: Fn(),
-    {
-        f();
-
+    pub fn count_once(&mut self) -> bool {
         self.count += 1;
 
         if self.count == self.max_count {
             if Self::ask_continue() {
                 self.count = 0;
+                return true;
             } else {
                 return false;
             }
         }
 
         true
+    }
+
+    pub fn execute<F>(&mut self, f: F) -> bool
+    where
+        F: Fn(),
+    {
+        f();
+
+        self.count_once()
     }
 
     fn ask_continue() -> bool {
@@ -40,7 +45,10 @@ impl CLIPager {
             let ans: Result<&str, InquireError> = Select::new("", options).prompt();
 
             match ans {
-                Ok(choice) => return choice == "Next",
+                Ok(choice) => {
+                    println!();
+                    return choice == "Next"
+                },
                 _ => println!("There was an error, please try again"),
             }
         }

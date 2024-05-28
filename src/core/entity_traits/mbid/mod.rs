@@ -19,6 +19,8 @@ where
     fn fetch(&self) -> impl Future<Output = color_eyre::Result<ExternalMusicBrainzEntity>> + Send;
 
     fn into_mbid(self) -> MBID;
+
+    fn get_link(&self) -> String;
 }
 
 #[ext]

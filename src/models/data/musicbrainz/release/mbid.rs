@@ -47,4 +47,8 @@ impl IsMbid<Release> for ReleaseMBID {
     fn into_mbid(self) -> MBID {
         MBID::Release(self)
     }
+
+    fn get_link(&self) -> String {
+        format!("https://musicbrainz.org/release/{self}")
+    }
 }

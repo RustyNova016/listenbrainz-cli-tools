@@ -40,6 +40,16 @@ impl IsMbid<MusicBrainzEntity> for MBID {
         }
     }
 
+    fn get_link(&self) -> String {
+        match self {
+            Self::Artist(val) => val.get_link(),
+            Self::Release(val) => val.get_link(),
+            Self::Work(val) => val.get_link(),
+            Self::ReleaseGroup(val) => val.get_link(),
+            Self::Recording(val) => val.get_link(),
+        }
+    }
+
     fn into_mbid(self) -> MBID {
         self
     }

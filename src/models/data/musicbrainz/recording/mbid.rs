@@ -44,4 +44,8 @@ impl IsMbid<Recording> for RecordingMBID {
     fn into_mbid(self) -> MBID {
         MBID::Recording(self)
     }
+
+    fn get_link(&self) -> String {
+        format!("https://musicbrainz.org/recording/{self}")
+    }
 }

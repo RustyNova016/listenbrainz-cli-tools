@@ -37,4 +37,8 @@ impl IsMbid<Artist> for ArtistMBID {
     fn into_mbid(self) -> MBID {
         MBID::Artist(self)
     }
+
+    fn get_link(&self) -> String {
+        format!("https://musicbrainz.org/artist/{self}")
+    }
 }
