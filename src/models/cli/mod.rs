@@ -1,4 +1,6 @@
+pub mod config;
 use clap::{Parser, Subcommand};
+use config::ConfigCli;
 
 use crate::models::cli::common::{GroupByTarget, SortListensBy, SortSorterBy};
 use crate::models::cli::radio::CliRadios;
@@ -72,6 +74,8 @@ pub enum Commands {
         id: String,
     },
 
+    Config(ConfigCli),
+
     Search {},
 
     Lookup {
@@ -86,7 +90,7 @@ pub enum Commands {
 }
 
 impl Commands {
-    pub async fn run(&self) {
+    pub async fn run(&self) -> color_eyre::Result<()> {
         match self {
             Self::Unmapped { username, sort } => {
                 unmapped_command(&username.to_lowercase(), *sort).await;
@@ -106,11 +110,15 @@ impl Commands {
 
             Self::Radio(val) => val.command.run().await,
 
-            Self::Cache { id } => ENTITY_DATABASE.remove(id).await.unwrap(),
+            Self::Cache { id } => ENTITY_DATABASE.remove(id).await?,
+
+            Self::Config(val) => val.command.run().await?,
 
             Self::Search {} => search_link().await,
 
             Self::Lookup { id, username } => lookup(username, id.to_string().into()).await,
         }
+
+        Ok(())
     }
 }
