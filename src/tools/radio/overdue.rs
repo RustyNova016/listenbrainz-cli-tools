@@ -1,8 +1,12 @@
+use std::cmp::Reverse;
+
 use chrono::prelude::Utc;
 use chrono::Duration;
 use humantime::format_duration;
 use itertools::Itertools;
 use listenbrainz::raw::Client;
+use rust_decimal::prelude::Decimal;
+use rust_decimal::prelude::FromPrimitive;
 
 use crate::core::entity_traits::mb_cached::MBCached;
 use crate::models::data::listenbrainz::user_listens::UserListens;
@@ -10,7 +14,13 @@ use crate::models::data::musicbrainz::recording::Recording;
 use crate::utils::playlist::PlaylistStub;
 use crate::utils::println_cli;
 
-pub async fn overdue_radio(username: &str, token: &str, min_listens: Option<u64>, cooldown: u64) {
+pub async fn overdue_radio(
+    username: &str,
+    token: &str,
+    min_listens: Option<u64>,
+    cooldown: u64,
+    overdue_factor: bool,
+) {
     let mut listens = UserListens::get_user_with_refresh(username)
         .await
         .expect("Couldn't fetch the new listens")
@@ -38,8 +48,19 @@ pub async fn overdue_radio(username: &str, token: &str, min_listens: Option<u64>
     scores.retain(|rate| rate.1.listen_count() > &min_listens.unwrap_or(3_u64));
 
     // Sort
-    scores
-        .sort_by_cached_key(|rate| rate.1.get_estimated_date_of_next_listen(&rate.0) - Utc::now());
+    if !overdue_factor {
+        scores.sort_by_cached_key(|rate| {
+            rate.1.get_estimated_date_of_next_listen(&rate.0) - Utc::now()
+        });
+    } else {
+        scores.sort_by_cached_key(|rate| {
+            Reverse(
+                Decimal::from_i64(rate.1.get_overdue_by(&rate.0).num_seconds()).unwrap()
+                    / Decimal::from_i64(rate.1.get_average_time_between_listens().num_seconds())
+                        .unwrap(),
+            )
+        });
+    }
 
     let chunked = scores.chunks(50).collect_vec();
     let bests = chunked
@@ -48,7 +69,7 @@ pub async fn overdue_radio(username: &str, token: &str, min_listens: Option<u64>
 
     for rate in *bests {
         println_cli(format!(
-            "Adding [{}] ({}). \n - Last listen was the: {} \n - Average time between listens: {} \n - Estimated date of next listen: {}",
+            "Adding [{}] ({}). \n - Last listen was the: {} \n - Average time between listens: {} \n - Estimated date of next listen: {} \n - Time overdue: {} \n - Overdue Factor: {}",
             Recording::get_cached_or_fetch(rate.1.recording())
                 .await
                 .unwrap()
@@ -56,7 +77,9 @@ pub async fn overdue_radio(username: &str, token: &str, min_listens: Option<u64>
                 rate.1.recording(),
             rate.0.get_latest_listen().map(|listen| listen.listened_at).unwrap_or_else(Utc::now),
             format_duration(rate.1.get_average_time_between_listens().abs().to_std().unwrap()),
-            rate.1.get_estimated_date_of_next_listen(&rate.0)
+            rate.1.get_estimated_date_of_next_listen(&rate.0),
+            format_duration(rate.1.get_overdue_by(&rate.0).abs().to_std().unwrap()),
+            rate.1.get_overdue_by(&rate.0).num_seconds() as f64 / rate.1.get_average_time_between_listens().num_seconds() as f64
         ));
     }
 

@@ -91,6 +91,10 @@ pub enum Radios {
         /// The amount of hours needed to wait after a recording have been given before it is re-suggested
         #[arg(short, long, default_value_t = 0)]
         cooldown: u64,
+
+        /// Sort the recordings by the time overdue / the average time between listens
+        #[arg(short, long, default_value_t = false)]
+        overdue_factor: bool,
     },
 }
 
@@ -154,12 +158,14 @@ impl Radios {
                 token,
                 min,
                 cooldown,
+                overdue_factor,
             } => {
                 overdue_radio(
                     username,
                     &Config::get_token_or_argument(username, token),
                     *min,
-                    *cooldown,
+                    *cooldown, 
+                    *overdue_factor
                 )
                 .await;
             }
