@@ -8,6 +8,8 @@ use crate::tools::interactive_mapper::interactive_mapper;
 use crate::tools::stats::stats_command;
 use crate::tools::unlinked::unmapped_command;
 
+use super::config::Config;
+
 pub mod common;
 pub mod radio;
 
@@ -57,7 +59,7 @@ pub enum Commands {
 
         /// User token
         #[arg(short, long)]
-        token: String,
+        token: Option<String>,
 
         /// Sort the listens by type
         #[arg(short, long)]
@@ -103,7 +105,14 @@ impl Commands {
                 username,
                 token,
                 sort,
-            } => interactive_mapper(username, token.clone(), *sort).await,
+            } => {
+                interactive_mapper(
+                    username,
+                    Config::get_token_or_argument(username, token),
+                    *sort,
+                )
+                .await;
+            }
 
             Self::Radio(val) => val.command.run().await,
             //Self::Cache { id } => ENTITY_DATABASE.remove(id).await.unwrap(),

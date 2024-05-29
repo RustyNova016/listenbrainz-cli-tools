@@ -1,5 +1,5 @@
+use std::io;
 use thiserror::Error;
-
 use crate::models::data::musicbrainz::mbid::MBID;
 
 #[derive(Error, Debug)]
@@ -9,9 +9,14 @@ pub enum Error {
     #[error("MBID {1:?} couldn't be aliased to MBID {0:?}")]
     MBIDAliasError(MBID, MBID),
 
-    #[error("Couldn't parse the string for any MBID. If you are sure that there is one, but see this error, please send a ticket."
-    )]
+    #[error("Couldn't parse the string for any MBID. If you are sure that there is one, but see this error, please send a ticket.")]
     MBIDStringParsingError,
+
+    #[error("An error occured when trying to load the configuration file.")]
+    ConfigLoadError(io::Error),
+
+    #[error("Couldn't load the configuration file. The configuration schema is incorrect")]
+    ConfigLoadDeserializationError(serde_json::Error),
 }
 
 impl Error {}
