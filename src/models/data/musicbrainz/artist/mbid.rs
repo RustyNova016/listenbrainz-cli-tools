@@ -12,7 +12,7 @@ use crate::models::data::musicbrainz::external_musicbrainz_entity::ExternalMusic
 use crate::models::data::musicbrainz::mbid::MBID;
 use crate::utils::println_mus;
 
-#[derive(Debug, Clone, PartialEq, Eq, Deref, DerefMut, From, Serialize, Deserialize, Display)]
+#[derive(Debug, Clone, PartialEq, Eq, Deref, DerefMut, From, Serialize, Deserialize, Display, Hash)]
 pub struct ArtistMBID(String);
 
 impl IsMbid<Artist> for ArtistMBID {

@@ -1,4 +1,7 @@
+pub mod self_edits;
 use derive_getters::Getters;
+use self_edits::SelfEdit;
+use self_edits::SelfEditAction;
 use serde::Deserialize;
 use serde::Serialize;
 use std::collections::HashMap;
@@ -8,12 +11,17 @@ use std::io::ErrorKind;
 
 use crate::core::caching::CONFIG_FILE;
 
+use super::cli::config::SelfEditActionValue;
+use super::cli::config::SelfEditType;
+use super::data::musicbrainz::mbid::MBID;
+use super::data::musicbrainz::recording::mbid::RecordingMBID;
 use super::error::Error;
 
 #[derive(Debug, Serialize, Deserialize, Getters, Default)]
 pub struct Config {
     /// Saved usertokens
     tokens: HashMap<String, String>,
+    self_edits: HashMap<MBID, SelfEdit>
 }
 
 impl Config {
@@ -58,5 +66,16 @@ impl Config {
             Ok(None) => Ok(Self::default()),
             Err(err) => Err(Error::ConfigLoadError(err)),
         }
+    }
+
+    pub fn set_edit(edited_mbid: String, on: SelfEditType, action: SelfEditActionValue, edit_target: Option<String>)  {
+        let mut config = Self::load().unwrap();
+        let edited_mbid = MBID::Recording(edited_mbid.into());
+        let mut edit = config.self_edits.get(&edited_mbid).cloned().unwrap_or_default();
+
+        edit.set_action(on, action, edit_target.map(RecordingMBID::from).map(MBID::Recording));
+
+        config.self_edits.insert(edited_mbid, edit);
+        config.save();
     }
 }

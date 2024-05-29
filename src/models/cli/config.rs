@@ -1,5 +1,7 @@
 use clap::Parser;
 use clap::Subcommand;
+use clap::ValueEnum;
+use derive_more::*;
 
 use crate::models::config::Config;
 
@@ -19,6 +21,16 @@ pub enum ConfigCommands {
         /// User token
         token: String,
     },
+
+    Edit {
+        edited_mbid: String,
+
+        on: SelfEditType,
+
+        action: SelfEditActionValue,
+
+        edit_target: Option<String>,
+    }
 }
 
 impl ConfigCommands {
@@ -33,4 +45,19 @@ impl ConfigCommands {
 
         Ok(())
     }
+}
+
+#[derive(Debug, IsVariant, Unwrap, Clone, ValueEnum)]
+pub enum SelfEditType {
+    RadioSeeding,
+    RadioInsert,
+    StatCounting
+}
+
+#[derive(Debug, IsVariant, Unwrap, Clone, Default, ValueEnum)]
+pub enum SelfEditActionValue {
+    MergeInto,
+    Abort,
+    #[default]
+    None
 }
