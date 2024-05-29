@@ -38,6 +38,11 @@ impl ListenRate {
             .unwrap_or_else(Utc::now);
         latest_listen_date + self.get_average_time_between_listens()
     }
+
+    pub fn get_overdue_by(&self, listen_collection: &ListenCollection) -> Duration {
+        //TODO: Directly give latest_listen_date instead of giving the lisen coll
+        Utc::now() - self.get_estimated_date_of_next_listen(listen_collection)
+    }
 }
 
 #[derive(ValueEnum, Clone, Debug, Copy, IsVariant)]
