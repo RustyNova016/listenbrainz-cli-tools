@@ -15,20 +15,29 @@ use super::IsClippyError;
 pub struct MissingWorkError {
     recording_id: RecordingMBID,
     recording: Recording,
-    recording_string: String
+    recording_string: String,
 }
 
 impl IsClippyError for MissingWorkError {
     async fn check_for_error(id: MBID) -> color_eyre::Result<Option<Self>> {
-        let MBID::Recording(id) = id else {return Ok(None);};
+        let MBID::Recording(id) = id else {
+            return Ok(None);
+        };
         let recording = id.get_or_fetch_entity().await?;
 
-        if recording.relations().as_ref().is_some_and(|rels| rels.find_relation_type_id(PERFORMANCE_RELATIONSHIP).is_some()) {
+        if recording.relations().as_ref().is_some_and(|rels| {
+            rels.find_relation_type_id(PERFORMANCE_RELATIONSHIP)
+                .is_some()
+        }) {
             return Ok(None);
         }
 
         let recording_string = recording.get_title_with_credits().await?;
-        Ok(Some(Self { recording_id: id, recording, recording_string }))
+        Ok(Some(Self {
+            recording_id: id,
+            recording,
+            recording_string,
+        }))
     }
 
     fn get_title(&self) -> String {
@@ -54,4 +63,3 @@ impl IsClippyError for MissingWorkError {
         additions
     }
 }
-

@@ -1,14 +1,14 @@
-use color_eyre::eyre::Context;
-use derive_more::{Deref, DerefMut, Display, From, Into};
-use musicbrainz_rs::entity::url::Url;
-use musicbrainz_rs::Fetch;
-use serde::{Deserialize, Serialize};
 use crate::core::entity_traits::mbid::IsMbid;
 use crate::models::data::musicbrainz::external_musicbrainz_entity::ExternalMusicBrainzEntity;
 use crate::models::data::musicbrainz::mbid::MBID;
 use crate::models::data::musicbrainz::url::URL;
 use crate::models::data::musicbrainz::work::Work;
 use crate::utils::println_mus;
+use color_eyre::eyre::Context;
+use derive_more::{Deref, DerefMut, Display, From, Into};
+use musicbrainz_rs::entity::url::Url;
+use musicbrainz_rs::Fetch;
+use serde::{Deserialize, Serialize};
 
 #[derive(
     Debug, Clone, PartialEq, Eq, Deref, DerefMut, Into, From, Serialize, Deserialize, Hash, Display,

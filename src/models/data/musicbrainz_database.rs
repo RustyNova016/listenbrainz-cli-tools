@@ -99,7 +99,7 @@ impl MusicBrainzDatabase {
                 self.recordings
                     .insert_alias(alias, &main.unwrap_recording())
                     .await?;
-            },
+            }
             MBID::URL(alias) => self.urls.insert_alias(alias, &main.unwrap_url()).await?,
         }
 

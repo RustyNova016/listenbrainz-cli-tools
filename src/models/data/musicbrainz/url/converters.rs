@@ -5,7 +5,7 @@ impl From<Url> for super::URL {
         Self {
             id: value.id,
             tags: value.tags,
-            resource: value.resource
+            resource: value.resource,
         }
     }
 }

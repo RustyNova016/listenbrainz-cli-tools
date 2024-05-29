@@ -1,14 +1,16 @@
-pub mod type_ids;
 pub mod collection;
 pub mod converters;
 pub mod external;
 pub mod has_relationships;
+pub mod inspections;
+pub mod type_ids;
 
 use super::artist::mbid::ArtistMBID;
 use super::recording::mbid::RecordingMBID;
 use super::release::mbid::ReleaseMBID;
 use super::release_group::mbid::ReleaseGroupMBID;
 use super::work::mbid::WorkMBID;
+use crate::models::data::musicbrainz::url::mbid::URLMBID;
 use chrono::NaiveDate;
 use derive_getters::Getters;
 use derive_more::IsVariant;
@@ -16,7 +18,6 @@ use derive_more::Unwrap;
 use serde::Deserialize;
 use serde::Serialize;
 use std::collections::HashMap;
-use crate::models::data::musicbrainz::url::mbid::URLMBID;
 
 #[derive(Debug, Clone, Eq, PartialEq, Deserialize, Serialize, Getters)]
 pub struct Relation {
@@ -65,7 +66,6 @@ pub enum RelationTarget {
     Release(ReleaseMBID),
     ReleaseGroup(ReleaseGroupMBID),
     Series(), //TODO
-    Url(URLMBID),    
+    Url(URLMBID),
     Work(WorkMBID),
 }
-

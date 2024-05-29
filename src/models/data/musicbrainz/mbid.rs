@@ -12,7 +12,9 @@ use crate::models::data::musicbrainz::release_group::mbid::ReleaseGroupMBID;
 use crate::models::data::musicbrainz::url::mbid::URLMBID;
 use crate::models::data::musicbrainz::work::mbid::WorkMBID;
 
-#[derive(Debug, Clone, PartialEq, Eq, From, Serialize, Deserialize, Display, IsVariant, Unwrap, Hash)]
+#[derive(
+    Debug, Clone, PartialEq, Eq, From, Serialize, Deserialize, Display, IsVariant, Unwrap, Hash,
+)]
 pub enum MBID {
     Artist(ArtistMBID),
     Release(ReleaseMBID),
@@ -60,4 +62,3 @@ impl IsMbid<MusicBrainzEntity> for MBID {
         }
     }
 }
-

@@ -14,7 +14,6 @@ pub enum ClippyError {
     MissingWork,
 }
 
-
 pub trait IsClippyError: Sized {
     async fn check_for_error(id: MBID) -> color_eyre::Result<Option<Self>>;
 
@@ -32,14 +31,19 @@ pub trait IsClippyError: Sized {
 
         let mut description_indent = "   | ".to_string().cyan().to_string();
         description_indent = description_indent.bold().to_string();
-        let description_content: String = self.get_description().split("\n").map(|string| format!("{}{}\n",description_indent, string)).collect();
-        let description = format!("{description_indent}\n{description_content}{description_indent}");
+        let description_content: String = self
+            .get_description()
+            .split("\n")
+            .map(|string| format!("{}{}\n", description_indent, string))
+            .collect();
+        let description =
+            format!("{description_indent}\n{description_content}{description_indent}");
 
         format!("{line1}\n{line2}\n{description}\n")
     }
 
-    async fn check_and_print(id: MBID)  -> color_eyre::Result<bool> {
-        let result  = Self::check_for_error(id).await?;
+    async fn check_and_print(id: MBID) -> color_eyre::Result<bool> {
+        let result = Self::check_for_error(id).await?;
 
         if let Some(err) = result {
             println!("{}", err.to_formated());

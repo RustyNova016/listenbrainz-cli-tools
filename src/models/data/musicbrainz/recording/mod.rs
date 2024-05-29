@@ -1,3 +1,4 @@
+pub mod inspections;
 use derive_getters::Getters;
 use itertools::Itertools;
 use musicbrainz_rs::entity::alias::Alias;

@@ -1,4 +1,3 @@
-use std::sync::Arc;
 use crate::core::caching::musicbrainz_cache::MusicbrainzCache;
 use crate::core::entity_traits::has_id::HasID;
 use crate::core::entity_traits::mb_cached::MBCached;
@@ -9,6 +8,7 @@ use crate::models::data::musicbrainz::url::URL;
 use crate::models::data::musicbrainz::work::mbid::WorkMBID;
 use crate::models::data::musicbrainz::work::Work;
 use crate::models::data::musicbrainz_database::MUSICBRAINZ_DATABASE;
+use std::sync::Arc;
 
 impl HasID for URL {
     fn get_id(&self) -> String {
@@ -33,7 +33,7 @@ impl Updatable for URL {
         Self {
             id: newer.id,
             resource: newer.resource,
-            tags: newer.tags.or(self.tags)
+            tags: newer.tags.or(self.tags),
         }
     }
 }

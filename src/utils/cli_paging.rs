@@ -47,8 +47,8 @@ impl CLIPager {
             match ans {
                 Ok(choice) => {
                     println!();
-                    return choice == "Next"
-                },
+                    return choice == "Next";
+                }
                 _ => println!("There was an error, please try again"),
             }
         }

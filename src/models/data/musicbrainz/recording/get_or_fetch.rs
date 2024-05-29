@@ -25,9 +25,12 @@ impl Recording {
             }
         })
     }
-    
+
     pub async fn get_or_fetch_releases(&self) -> color_eyre::Result<Vec<Release>> {
-        self.get_or_fetch_releases_ids().await?.get_or_fetch_entities().await
+        self.get_or_fetch_releases_ids()
+            .await?
+            .get_or_fetch_entities()
+            .await
     }
 
     pub async fn get_or_fetch_work_ids(&self) -> color_eyre::Result<Vec<WorkMBID>> {
