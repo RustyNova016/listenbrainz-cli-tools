@@ -3,6 +3,8 @@ use clap::{Parser, Subcommand};
 use crate::models::cli::common::{GroupByTarget, SortListensBy, SortSorterBy};
 use crate::models::cli::radio::CliRadios;
 use crate::models::data::entity_database::ENTITY_DATABASE;
+use crate::tools::clippy;
+use crate::tools::clippy::clippy_tool;
 use crate::tools::interactive_mapper::interactive_mapper;
 use crate::tools::lookup::lookup;
 use crate::tools::musicbrainz::search_link;
@@ -83,6 +85,8 @@ pub enum Commands {
         #[arg(short, long)]
         username: String,
     },
+
+    Clippy {},
 }
 
 impl Commands {
@@ -111,6 +115,8 @@ impl Commands {
             Self::Search {} => search_link().await,
 
             Self::Lookup { id, username } => lookup(username, id.to_string().into()).await,
+
+            Self::Clippy {} => clippy_tool().await,
         }
     }
 }

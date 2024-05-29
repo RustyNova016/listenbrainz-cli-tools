@@ -13,7 +13,7 @@ use crate::models::data::musicbrainz::release::Release;
 use crate::utils::println_mus;
 
 #[derive(
-    Debug, Clone, PartialEq, Eq, Deref, DerefMut, Into, From, Serialize, Deserialize, Display,
+    Debug, Clone, PartialEq, Eq, Deref, DerefMut, Into, From, Serialize, Deserialize, Display, Hash,
 )]
 pub struct ReleaseMBID(String);
 
@@ -46,5 +46,9 @@ impl IsMbid<Release> for ReleaseMBID {
 
     fn into_mbid(self) -> MBID {
         MBID::Release(self)
+    }
+
+    fn get_link(&self) -> String {
+        format!("https://musicbrainz.org/release/{self}")
     }
 }

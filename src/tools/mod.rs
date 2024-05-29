@@ -1,3 +1,4 @@
+pub mod clippy;
 pub mod interactive_mapper;
 pub mod lookup;
 pub mod radio;

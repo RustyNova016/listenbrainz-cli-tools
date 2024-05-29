@@ -48,4 +48,8 @@ impl IsMbid<Work> for WorkMBID {
     fn into_mbid(self) -> MBID {
         MBID::Work(self)
     }
+
+    fn get_link(&self) -> String {
+        format!("https://musicbrainz.org/work/{self}")
+    }
 }

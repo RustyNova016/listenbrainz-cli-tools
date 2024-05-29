@@ -2,6 +2,7 @@ pub mod is_cached_mbid;
 use crate::models::data::musicbrainz::external_musicbrainz_entity::ExternalMusicBrainzEntity;
 use crate::models::data::musicbrainz::mbid::MBID;
 use extend::ext;
+use itertools::Itertools;
 use serde::de::DeserializeOwned;
 use serde::Serialize;
 use std::fmt::{Debug, Display};
@@ -19,6 +20,8 @@ where
     fn fetch(&self) -> impl Future<Output = color_eyre::Result<ExternalMusicBrainzEntity>> + Send;
 
     fn into_mbid(self) -> MBID;
+
+    fn get_link(&self) -> String;
 }
 
 #[ext]
@@ -36,6 +39,10 @@ where
         }
 
         Ok(result)
+    }
+
+    fn into_mbids(self) -> Vec<MBID> {
+        self.into_iter().map(|id| id.into_mbid()).collect_vec()
     }
 }
 
