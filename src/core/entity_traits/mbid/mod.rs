@@ -6,6 +6,7 @@ use serde::de::DeserializeOwned;
 use serde::Serialize;
 use std::fmt::{Debug, Display};
 use std::future::Future;
+use itertools::Itertools;
 
 use super::updatable::Updatable;
 
@@ -38,6 +39,10 @@ where
         }
 
         Ok(result)
+    }
+    
+    fn into_mbids(self) -> Vec<MBID> {
+        self.into_iter().map(|id| id.into_mbid()).collect_vec()
     }
 }
 

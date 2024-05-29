@@ -1,10 +1,3 @@
-pub mod convertion;
-pub mod external;
-pub mod get_or_fetch;
-pub mod mbid;
-
-use crate::core::entity_traits::relations::has_artist_credits::HasArtistCredits;
-use crate::models::data::musicbrainz::release::mbid::ReleaseMBID;
 use derive_getters::Getters;
 use itertools::Itertools;
 use musicbrainz_rs::entity::alias::Alias;
@@ -12,12 +5,20 @@ use musicbrainz_rs::entity::genre::Genre;
 use musicbrainz_rs::entity::tag::Tag;
 use serde::{Deserialize, Serialize};
 
-use self::mbid::RecordingMBID;
+use crate::core::entity_traits::relations::has_artist_credits::HasArtistCredits;
+use crate::models::data::musicbrainz::release::mbid::ReleaseMBID;
 
 use super::artist_credit::collection::ArtistCredits;
 use super::relation::Relation;
 
+use self::mbid::RecordingMBID;
+
 pub mod caching;
+pub mod convertion;
+pub mod external;
+pub mod get_or_fetch;
+pub mod getters;
+pub mod mbid;
 
 // impl HasMbid for Recording {
 //     fn get_mbid(&self) -> &str {
@@ -51,7 +52,10 @@ pub struct Recording {
 
 impl Recording {
     pub async fn get_title_with_credits(&self) -> color_eyre::Result<String> {
-        let credit = self.get_or_fetch_artist_credits().await?.get_artist_credit_as_string();//.unwrap_or_else(|| "[unknown]".to_string());
+        let credit = self
+            .get_or_fetch_artist_credits()
+            .await?
+            .get_artist_credit_as_string(); //.unwrap_or_else(|| "[unknown]".to_string());
         Ok(format!("{} by {}", self.title, credit))
     }
 }

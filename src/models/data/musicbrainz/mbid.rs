@@ -1,4 +1,5 @@
 use derive_more::{Display, From, IsVariant, Unwrap};
+use extend::ext;
 use serde::{Deserialize, Serialize};
 
 use crate::core::entity_traits::mbid::IsMbid;
@@ -8,15 +9,17 @@ use crate::models::data::musicbrainz::musicbrainz_entity::MusicBrainzEntity;
 use crate::models::data::musicbrainz::recording::mbid::RecordingMBID;
 use crate::models::data::musicbrainz::release::mbid::ReleaseMBID;
 use crate::models::data::musicbrainz::release_group::mbid::ReleaseGroupMBID;
+use crate::models::data::musicbrainz::url::mbid::URLMBID;
 use crate::models::data::musicbrainz::work::mbid::WorkMBID;
 
-#[derive(Debug, Clone, PartialEq, Eq, From, Serialize, Deserialize, Display, IsVariant, Unwrap)]
+#[derive(Debug, Clone, PartialEq, Eq, From, Serialize, Deserialize, Display, IsVariant, Unwrap, Hash)]
 pub enum MBID {
     Artist(ArtistMBID),
     Release(ReleaseMBID),
-    Work(WorkMBID),
     ReleaseGroup(ReleaseGroupMBID),
     Recording(RecordingMBID),
+    URL(URLMBID),
+    Work(WorkMBID),
 }
 
 impl IsMbid<MusicBrainzEntity> for MBID {
@@ -27,6 +30,7 @@ impl IsMbid<MusicBrainzEntity> for MBID {
             Self::Work(val) => val.get_or_fetch_entity().await?.into(),
             Self::ReleaseGroup(val) => val.get_or_fetch_entity().await?.into(),
             Self::Recording(val) => val.get_or_fetch_entity().await?.into(),
+            Self::URL(val) => val.get_or_fetch_entity().await?.into(),
         })
     }
 
@@ -37,7 +41,12 @@ impl IsMbid<MusicBrainzEntity> for MBID {
             Self::Work(val) => val.fetch().await,
             Self::ReleaseGroup(val) => val.fetch().await,
             Self::Recording(val) => val.fetch().await,
+            Self::URL(val) => val.fetch().await,
         }
+    }
+
+    fn into_mbid(self) -> MBID {
+        self
     }
 
     fn get_link(&self) -> String {
@@ -47,10 +56,8 @@ impl IsMbid<MusicBrainzEntity> for MBID {
             Self::Work(val) => val.get_link(),
             Self::ReleaseGroup(val) => val.get_link(),
             Self::Recording(val) => val.get_link(),
+            Self::URL(val) => val.get_link(),
         }
     }
-
-    fn into_mbid(self) -> MBID {
-        self
-    }
 }
+

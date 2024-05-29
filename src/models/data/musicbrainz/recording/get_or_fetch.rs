@@ -2,11 +2,12 @@ use crate::core::entity_traits::mb_cached::MBCached;
 use color_eyre::eyre::{eyre, Context, OptionExt};
 use itertools::Itertools;
 
-use crate::core::entity_traits::mbid::IsMbid;
+use crate::core::entity_traits::mbid::{IsMbid, VecIExt};
 use crate::core::entity_traits::relations::has_artist_credits::HasArtistCredits;
 use crate::models::data::musicbrainz::artist_credit::collection::ArtistCredits;
 use crate::models::data::musicbrainz::recording::mbid::RecordingMBID;
 use crate::models::data::musicbrainz::release::mbid::ReleaseMBID;
+use crate::models::data::musicbrainz::release::Release;
 use crate::models::data::musicbrainz::work::mbid::WorkMBID;
 
 use super::Recording;
@@ -23,6 +24,10 @@ impl Recording {
                     .ok_or_eyre(eyre!(format!("Releases is [`None`] after fetching from the API. Something wrong happened, as it should return a empty vec. \n Is there an include missing somewhere in the API call? Or is the credit not saved? Faulty requested recording ID is: {}", &self.id)))?
             }
         })
+    }
+    
+    pub async fn get_or_fetch_releases(&self) -> color_eyre::Result<Vec<Release>> {
+        self.get_or_fetch_releases_ids().await?.get_or_fetch_entities().await
     }
 
     pub async fn get_or_fetch_work_ids(&self) -> color_eyre::Result<Vec<WorkMBID>> {

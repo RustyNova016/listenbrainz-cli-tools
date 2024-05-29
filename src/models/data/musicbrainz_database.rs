@@ -13,6 +13,8 @@ use crate::models::data::musicbrainz::recording::mbid::RecordingMBID;
 use crate::models::data::musicbrainz::release::mbid::ReleaseMBID;
 use crate::models::data::musicbrainz::release_group::mbid::ReleaseGroupMBID;
 use crate::models::data::musicbrainz::release_group::ReleaseGroup;
+use crate::models::data::musicbrainz::url::mbid::URLMBID;
+use crate::models::data::musicbrainz::url::URL;
 use crate::models::data::musicbrainz::work::mbid::WorkMBID;
 use crate::models::error::Error;
 
@@ -30,6 +32,7 @@ pub struct MusicBrainzDatabase {
     releases: Arc<MusicbrainzCache<ReleaseMBID, Release>>,
     recordings: Arc<MusicbrainzCache<RecordingMBID, Recording>>,
     release_groups: Arc<MusicbrainzCache<ReleaseGroupMBID, ReleaseGroup>>,
+    urls: Arc<MusicbrainzCache<URLMBID, URL>>,
     works: Arc<MusicbrainzCache<WorkMBID, Work>>,
 }
 
@@ -40,6 +43,7 @@ impl MusicBrainzDatabase {
             MBID::Release(id) => self.releases.remove(id).await?,
             MBID::Recording(id) => self.recordings.remove(id).await?,
             MBID::ReleaseGroup(id) => self.release_groups.remove(id).await?,
+            MBID::URL(id) => self.urls.remove(id).await?,
             MBID::Work(id) => self.works.remove(id).await?,
         }
 
@@ -56,6 +60,7 @@ impl MusicBrainzDatabase {
             self.releases.invalidate_last_entries(k, keep_min),
             self.recordings.invalidate_last_entries(k, keep_min),
             self.release_groups.invalidate_last_entries(k, keep_min),
+            self.urls.invalidate_last_entries(k, keep_min),
             self.works.invalidate_last_entries(k, keep_min)
         )?;
 
@@ -94,7 +99,8 @@ impl MusicBrainzDatabase {
                 self.recordings
                     .insert_alias(alias, &main.unwrap_recording())
                     .await?;
-            }
+            },
+            MBID::URL(alias) => self.urls.insert_alias(alias, &main.unwrap_url()).await?,
         }
 
         Ok(())
@@ -109,6 +115,7 @@ impl Default for MusicBrainzDatabase {
             recordings: Arc::new(MusicbrainzCache::new("recordings")),
             release_groups: Arc::new(MusicbrainzCache::new("release_groups")),
             works: Arc::new(MusicbrainzCache::new("works")),
+            urls: Arc::new(MusicbrainzCache::new("urls")),
         }
     }
 }

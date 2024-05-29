@@ -40,7 +40,7 @@ impl IsClippyError for MissingWorkError {
     }
 
     fn get_description(&self) -> String {
-        let description = "All recordings should have works associated to it. It isn't enforced, but it helps a lot for power users!\n
+        let description = "All recordings should have works associated to it. It is quite useful to track references and similar but different recordings.\n
         You can associate a work with a \"recording of\" (Recording - Work) relationship".to_string().replace("\n\n.*", "\n");
 
         let regex = Regex::new(r"(?m)\n\n\s*").unwrap();

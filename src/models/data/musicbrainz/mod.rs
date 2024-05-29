@@ -8,6 +8,7 @@ pub mod relation;
 pub mod release;
 pub mod release_group;
 pub mod work;
+pub mod url;
 
 /// Type of the entity having this MBID
 #[derive(Debug, Clone, Copy)]

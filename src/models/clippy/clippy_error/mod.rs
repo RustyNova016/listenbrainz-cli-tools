@@ -1,4 +1,6 @@
 pub mod missing_work;
+pub mod release;
+
 use std::fmt::format;
 use std::fmt::Display;
 
