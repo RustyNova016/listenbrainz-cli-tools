@@ -8,6 +8,8 @@ use std::io::ErrorKind;
 
 use crate::core::caching::CONFIG_FILE;
 
+use super::error::Error;
+
 #[derive(Debug, Serialize, Deserialize, Getters, Default)]
 pub struct Config {
     /// Saved usertokens
@@ -17,6 +19,19 @@ pub struct Config {
 impl Config {
     pub fn set_token(&mut self, username: String, token: String) {
         self.tokens.insert(username, token);
+    }
+
+    pub fn get_token_or_argument(username: &str, arg: &Option<String>) -> String {
+        if let Some(arg) = arg {
+            return arg.clone();
+        }
+
+        let config = Self::load().unwrap();
+        if let Some(token) = config.tokens.get(username) {
+            return token.clone();
+        }
+
+        panic!("No token was provided. To properly run, this command need an user token.")
     }
 
     pub fn save(&self) -> color_eyre::Result<()> {
@@ -35,11 +50,13 @@ impl Config {
         }
     }
 
-    pub fn load() -> color_eyre::Result<Self> {
-        if let Some(data) = Self::get_config_reader()? {
-            Ok(serde_json::from_reader(data)?)
-        } else {
-            Ok(Self::default())
+    pub fn load() -> Result<Self, Error> {
+        match Self::get_config_reader() {
+            Ok(Some(data)) => {
+                serde_json::from_reader(data).map_err(Error::ConfigLoadDeserializationError)
+            }
+            Ok(None) => Ok(Self::default()),
+            Err(err) => Err(Error::ConfigLoadError(err)),
         }
     }
 }
