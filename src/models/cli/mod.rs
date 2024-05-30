@@ -2,10 +2,7 @@ use clap::{Parser, Subcommand};
 
 use crate::models::cli::common::{GroupByTarget, SortListensBy, SortSorterBy};
 use crate::models::cli::radio::CliRadios;
-use crate::models::data::entity_database::ENTITY_DATABASE;
 use crate::tools::interactive_mapper::interactive_mapper;
-use crate::tools::lookup::lookup;
-use crate::tools::musicbrainz::search_link;
 use crate::tools::stats::stats_command;
 use crate::tools::unlinked::unmapped_command;
 
@@ -68,21 +65,21 @@ pub enum Commands {
     /// Generate playlists
     Radio(CliRadios),
 
-    Cache {
-        id: String,
-    },
+    //Cache {
+    //    id: String,
+    //},
 
-    Search {},
+    //Search {},
 
-    Lookup {
-        /// Recording ID
-        #[arg(short, long)]
-        id: String,
+    //Lookup {
+    //    /// Recording ID
+    //    #[arg(short, long)]
+    //    id: String,
 
-        /// Name of the user to fetch stats listen from
-        #[arg(short, long)]
-        username: String,
-    },
+    //    /// Name of the user to fetch stats listen from
+    //    #[arg(short, long)]
+    //    username: String,
+    //},
 }
 
 impl Commands {
@@ -106,11 +103,11 @@ impl Commands {
 
             Self::Radio(val) => val.command.run().await,
 
-            Self::Cache { id } => ENTITY_DATABASE.remove(id).await.unwrap(),
+            //Self::Cache { id } => ENTITY_DATABASE.remove(id).await.unwrap(),
 
-            Self::Search {} => search_link().await,
+            //Self::Search {} => search_link().await,
 
-            Self::Lookup { id, username } => lookup(username, id.to_string().into()).await,
+            //Self::Lookup { id, username } => lookup(username, id.to_string().into()).await,
         }
     }
 }
