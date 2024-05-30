@@ -55,8 +55,7 @@ impl PlaylistStub {
                         additional_metadata: None,
                     },
                 },
-                //TODO: update listenbrainz_rs
-                //  annotation: self.description
+                annotation: self.description,
             },
         }
     }

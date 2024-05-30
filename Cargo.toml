@@ -9,11 +9,15 @@ rust-version = "1.75"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-listenbrainz = { branch = "8.0-experimental+popularity", git = "https://github.com/RustyNova016/listenbrainz-rs.git" } # Upstream version of the listenbrainz crate
+# Replace with the `listenbrainz` crate for main builds
+listenbrainz = { branch = "main", git = "https://github.com/InputUsername/listenbrainz-rs.git" }
 
 # Upstream version of the musicbrainz crate. Use "listenbrainz-cli-tools_master" for main builds, "listenbrainz-cli-tools_dev" for dev builds
-musicbrainz_rs = { branch = "listenbrainz-cli-tools_master", git = "https://github.com/RustyNova016/musicbrainz_rs.git" }
-#musicbrainz_rs = { path = "../musicbrainz_rs"} # For easy development
+# This fixes:
+# - https://github.com/RustyNova016/listenbrainz-cli-tools/issues/97
+#musicbrainz_rs = { branch = "listenbrainz-cli-tools_master", git = "https://github.com/RustyNova016/musicbrainz_rs.git" }
+#musicbrainz_rs = { path = "../musicbrainz_rs"} # For easy development, download the musicbrainz_rs crate for yourself. Don't forget to change it back as PRs will fail
+musicbrainz_rs = "0.5.0"
 
 derive_builder = "0.20.0"
 inquire = "0.7.5"
