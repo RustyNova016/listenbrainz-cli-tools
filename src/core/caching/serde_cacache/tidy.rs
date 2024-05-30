@@ -177,9 +177,13 @@ where
             .into_iter()
             .k_smallest_by_key(k, |entry| entry.time)
             .map(|entry_to_delete| async move {
+                #[cfg(debug)]
                 println!("Deleting: {}", entry_to_delete.key);
                 let data = self.inner_delete_entry(&entry_to_delete.key).await;
+                #[cfg(debug)]
                 println!("Deleted: {}", entry_to_delete.key);
+                #[allow(clippy::let_and_return)]
+                // This fixes clippy complaining for non debug builds
                 data
             })
             .collect_vec();

@@ -1432,7 +1432,7 @@ checksum = "01cda141df6706de531b6c46c3a33ecca755538219bd484262fa09410c13539c"
 [[package]]
 name = "listenbrainz"
 version = "0.7.0"
-source = "git+https://github.com/RustyNova016/listenbrainz-rs.git?branch=8.0-experimental+popularity#791636acaedfa5ae0dd67069e2c3294bdaa288f2"
+source = "git+https://github.com/InputUsername/listenbrainz-rs.git?branch=main#18cd5a8d2ae7f1e0808b9d073a47580f0047e984"
 dependencies = [
  "attohttpc",
  "serde",
@@ -1610,7 +1610,8 @@ dependencies = [
 [[package]]
 name = "musicbrainz_rs"
 version = "0.5.0"
-source = "git+https://github.com/RustyNova016/musicbrainz_rs.git?branch=listenbrainz-cli-tools_master#9b4a512c449ed661b99d7c7ec5b3bdb7bc0a3872"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "8baffdd450f73b33d47c91b509eebc25233c8e0f896f9c0c83d72f53b4e9fb63"
 dependencies = [
  "chrono",
  "lucene_query_builder",
