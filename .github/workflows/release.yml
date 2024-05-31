@@ -9,6 +9,8 @@ jobs:
             outputs:
                   tag: ${{ steps.get-latest-tag.outputs.tag }}
             steps:
+                  - uses: actions/checkout@v4
+                  
                   - uses: actions-ecosystem/action-get-latest-tag@v1
                     id: get-latest-tag
 
