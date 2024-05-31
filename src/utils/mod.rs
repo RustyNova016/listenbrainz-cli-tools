@@ -1,4 +1,5 @@
 pub mod playlist;
+pub mod regex;
 use color_eyre::owo_colors::OwoColorize;
 use derive_builder::Builder;
 use listenbrainz::raw::response::{UserListensListen, UserListensResponse};

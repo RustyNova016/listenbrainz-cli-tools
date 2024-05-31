@@ -6,6 +6,7 @@ use serde::{Deserialize, Serialize};
 
 use crate::core::entity_traits::mb_cached::MBCached;
 use crate::models::data::listenbrainz::mapping_data::MappingData;
+use crate::models::data::musicbrainz::recording::mbid::RecordingMBID;
 use crate::models::data::musicbrainz::recording::Recording;
 
 use super::messybrainz::MessyBrainzData;
@@ -86,5 +87,14 @@ impl Listen {
             .context("Listenbrainz returned an error")?;
 
         Ok(())
+    }
+
+    pub fn set_recording_mapping(&mut self, recording_id: RecordingMBID) {
+        self.mapping_data = Some(MappingData {
+            artist_credit: None,
+            artist_mbid: None,
+            recording_mbid: recording_id.to_string(),
+            recording_name: recording_id.to_string(),
+        });
     }
 }

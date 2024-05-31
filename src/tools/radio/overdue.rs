@@ -9,6 +9,8 @@ use rust_decimal::prelude::Decimal;
 use rust_decimal::prelude::FromPrimitive;
 
 use crate::core::entity_traits::mb_cached::MBCached;
+use crate::models::cli::config::SelfEditContext;
+use crate::models::config::Config;
 use crate::models::data::listenbrainz::user_listens::UserListens;
 use crate::models::data::musicbrainz::recording::Recording;
 use crate::utils::playlist::PlaylistStub;
@@ -21,10 +23,12 @@ pub async fn overdue_radio(
     cooldown: u64,
     overdue_factor: bool,
 ) {
+    let config = Config::load().unwrap();
     let mut listens = UserListens::get_user_with_refresh(username)
         .await
         .expect("Couldn't fetch the new listens")
-        .get_mapped_listens();
+        .get_mapped_listens()
+        .apply_configuration(&config, &SelfEditContext::RadioSeeding);
 
     let deadline = Utc::now() - Duration::hours(cooldown as i64);
     let blacklisted_recordings = listens

@@ -1,27 +1,39 @@
 pub mod self_edits;
 use derive_getters::Getters;
+use once_cell::sync::Lazy;
+use self_edits::EditMap;
 use self_edits::SelfEdit;
-use self_edits::SelfEditAction;
 use serde::Deserialize;
 use serde::Serialize;
 use std::collections::HashMap;
 use std::fs::File;
 use std::io;
 use std::io::ErrorKind;
+use std::sync::Arc;
+use tokio::sync::RwLock;
 
 use crate::core::caching::CONFIG_FILE;
 
 use super::cli::config::SelfEditActionValue;
-use super::cli::config::SelfEditType;
+use super::cli::config::SelfEditContext;
 use super::data::musicbrainz::mbid::MBID;
 use super::data::musicbrainz::recording::mbid::RecordingMBID;
 use super::error::Error;
 
+pub(crate) static CONFIG: Lazy<Arc<RwLock<Config>>> = Lazy::new(|| {
+    Arc::new(RwLock::new(
+        Config::load().expect("Couldn't load the configuration"),
+    ))
+});
+
 #[derive(Debug, Serialize, Deserialize, Getters, Default)]
 pub struct Config {
     /// Saved usertokens
+    #[serde(default)]
     tokens: HashMap<String, String>,
-    self_edits: HashMap<MBID, SelfEdit>
+
+    #[serde(default)]
+    self_edits: EditMap,
 }
 
 impl Config {
@@ -34,8 +46,7 @@ impl Config {
             return arg.clone();
         }
 
-        let config = Self::load().unwrap();
-        if let Some(token) = config.tokens.get(username) {
+        if let Some(token) = CONFIG.blocking_write().tokens.get(username) {
             return token.clone();
         }
 
@@ -68,14 +79,26 @@ impl Config {
         }
     }
 
-    pub fn set_edit(edited_mbid: String, on: SelfEditType, action: SelfEditActionValue, edit_target: Option<String>)  {
-        let mut config = Self::load().unwrap();
-        let edited_mbid = MBID::Recording(edited_mbid.into());
-        let mut edit = config.self_edits.get(&edited_mbid).cloned().unwrap_or_default();
+    pub fn set_edit(
+        edited_mbid: MBID,
+        on: SelfEditContext,
+        action: SelfEditActionValue,
+        edit_target: Option<MBID>,
+    ) {
+        let mut config = Self::load().expect("Couldn't load the configuration");
+        let mut edit = config
+            .self_edits
+            .get(&edited_mbid)
+            .cloned()
+            .unwrap_or_default();
 
-        edit.set_action(on, action, edit_target.map(RecordingMBID::from).map(MBID::Recording));
+        edit.set_action(
+            on,
+            action,
+            edit_target,
+        );
 
         config.self_edits.insert(edited_mbid, edit);
-        config.save();
+        config.save().expect("Couldn't save the configuration");
     }
 }

@@ -4,6 +4,8 @@ use clap::ValueEnum;
 use derive_more::*;
 
 use crate::models::config::Config;
+use crate::models::data::musicbrainz::mbid::mbid_kind::MBIDKind;
+use crate::models::data::musicbrainz::mbid::MBID;
 
 #[derive(Parser, Debug, Clone)]
 #[command(version, about, long_about = None)]
@@ -25,12 +27,12 @@ pub enum ConfigCommands {
     Edit {
         edited_mbid: String,
 
-        on: SelfEditType,
+        on: SelfEditContext,
 
         action: SelfEditActionValue,
 
         edit_target: Option<String>,
-    }
+    },
 }
 
 impl ConfigCommands {
@@ -41,17 +43,31 @@ impl ConfigCommands {
                 conf.set_token(username.clone(), token.clone());
                 conf.save()?;
             }
+
+            Self::Edit {
+                edited_mbid,
+                on,
+                action,
+                edit_target,
+            } => {
+                Config::set_edit(
+                    MBID::from_string( edited_mbid, MBIDKind::Recording)?,
+                    *on,
+                    action.clone(),
+                    edit_target.as_ref().map(|id| MBID::from_string( id, MBIDKind::Recording)).transpose()?,
+                );
+            }
         }
 
         Ok(())
     }
 }
 
-#[derive(Debug, IsVariant, Unwrap, Clone, ValueEnum)]
-pub enum SelfEditType {
+#[derive(Debug, IsVariant, Unwrap, Clone, ValueEnum, Copy)]
+pub enum SelfEditContext {
     RadioSeeding,
     RadioInsert,
-    StatCounting
+    StatCounting,
 }
 
 #[derive(Debug, IsVariant, Unwrap, Clone, Default, ValueEnum)]
@@ -59,5 +75,5 @@ pub enum SelfEditActionValue {
     MergeInto,
     Abort,
     #[default]
-    None
+    None,
 }
