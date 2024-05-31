@@ -1,4 +1,6 @@
-on: release
+on:
+  push:
+    branches: [ "master" ]
 name: Build Release
 
 jobs:
