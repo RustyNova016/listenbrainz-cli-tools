@@ -27,8 +27,7 @@ jobs:
 
     steps:
       - uses: actions/checkout@master
-      - name: Compile and release
-      
+        
       - uses: xhaiker/rust-release.action@v1.0.0
         name: build ${{ matrix.name }}
         with:
