@@ -52,9 +52,9 @@ jobs:
         id: get-latest-tag
         
       - name: Release
-        uses: softprops/action-gh-release@v2
+        uses: softprops/action-gh-release@v1
         with:
-          files: target/release/listenbrainz-cli-tools.exe
-          tag_name: ${{ steps.get-latest-tag.outputs.tag }}
+                   files: target/release/listenbrainz-cli-tools.exe
+                   tag_name: ${{ steps.get-latest-tag.outputs.tag }}
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+                   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
