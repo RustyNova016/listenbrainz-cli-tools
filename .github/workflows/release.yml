@@ -33,7 +33,7 @@ jobs:
 
   release-windows:
     name: Create Release Windows
-    runs-on: windows-latest
+    runs-on: ubuntu-latest
     strategy:
       fail-fast: false
     steps:
@@ -46,7 +46,7 @@ jobs:
           override: true
 
       - name: Build
-        run: cargo build --all --release
+        run: cargo build --all --release --target x86_64-pc-windows-gnu      
 
       - uses: actions-ecosystem/action-get-latest-tag@v1
         id: get-latest-tag
