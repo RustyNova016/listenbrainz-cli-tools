@@ -92,11 +92,7 @@ impl Config {
             .cloned()
             .unwrap_or_default();
 
-        edit.set_action(
-            on,
-            action,
-            edit_target,
-        );
+        edit.set_action(on, action, edit_target);
 
         config.self_edits.insert(edited_mbid, edit);
         config.save().expect("Couldn't save the configuration");
