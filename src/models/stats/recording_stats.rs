@@ -13,7 +13,7 @@ use crate::models::data::listenbrainz::listen::Listen;
 use crate::core::statistics::generic_statistic_holder::GenericStatisticHolder;
 use crate::core::statistics::stat_sorter::StatSorter;
 use crate::core::statistics::statistic_holder::StatisticHolder;
-use crate::core::statistics::statistic_sorter::StatisticSorter;
+use crate::core::statistics::statistic_sorter_trait::StatisticSorter;
 
 #[derive(Debug, Default, Eq, PartialEq, Clone)]
 pub struct RecordingStatsSorter {
@@ -33,16 +33,16 @@ impl StatSorter for RecordingStatsSorter {
         &mut self.listens
     }
 
+    fn into_vec(self) -> Vec<(String, ListenCollection)> {
+        self.listens.into_iter().collect_vec()
+    }
+
     async fn push(&mut self, value: Arc<Listen>) -> Result<()> {
         if let Some(mapping_info) = &value.mapping_data {
-            self.get_mut(&mapping_info.recording_mbid).push(value)
+            self.get_mut(&mapping_info.recording_mbid).push(value);
         }
 
         Ok(())
-    }
-
-    fn into_vec(self) -> Vec<(String, ListenCollection)> {
-        self.listens.into_iter().collect_vec()
     }
 }
 

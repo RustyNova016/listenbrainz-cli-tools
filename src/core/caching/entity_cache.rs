@@ -11,11 +11,13 @@ use crate::core::entity_traits::fetchable::Fetchable;
 use crate::core::entity_traits::insertable::Insertable;
 use crate::core::entity_traits::updatable::Updatable;
 
-use super::serde_cacache::SerdeCacache;
+use super::serde_cacache::tidy::SerdeCacacheTidy;
+
+use crate::core::caching::serde_cacache::error::Error;
 
 #[derive(Debug)]
 pub struct EntityCache<V> {
-    cache: SerdeCacache<String, V>,
+    cache: SerdeCacacheTidy<String, V>,
     watch_cache: CHashMap<String, Arc<Semaphore>>,
 }
 
@@ -27,7 +29,7 @@ where
         let mut location = CACHE_LOCATION.clone();
         location.push(name);
         Self {
-            cache: SerdeCacache::new(location),
+            cache: SerdeCacacheTidy::new(location),
             watch_cache: CHashMap::new(),
         }
     }
@@ -37,8 +39,12 @@ where
         Ok(())
     }
 
-    pub async fn get(&self, key: &str) -> color_eyre::Result<Option<V>> {
-        self.cache.get(&key.to_string()).await
+    pub async fn get(&self, key: &str) -> Result<Option<V>, Error> {
+        match self.cache.get_or_option(&key.to_string()).await {
+            Ok(val) => Ok(val),
+            Err(Error::CacheDeserializationError(_)) => Ok(None), // Schema probably changed. Which means we need make the cache hit fail
+            Err(val) => Err(val),
+        }
     }
 
     fn get_semaphore(&self, key: &str) -> Arc<Semaphore> {
@@ -54,6 +60,20 @@ where
             .expect("Couldn't get a new semaphore"))
         .clone();
     }
+
+    pub async fn remove(&self, id: &str) -> color_eyre::Result<()> {
+        self.cache.remove(&id.to_string()).await?;
+        Ok(())
+    }
+
+    pub async fn invalidate_last_entries(
+        &self,
+        k: usize,
+        keep_min: usize,
+    ) -> color_eyre::Result<()> {
+        self.cache.delete_last_entries(k, keep_min).await?;
+        Ok(())
+    }
 }
 
 impl<V> EntityCache<V>
@@ -65,13 +85,13 @@ where
     /// If none is provided, it will get assigned automatically.
     ///
     /// ⚠️ Waiting for a permit doesn't cancel the request. It only delays it.
-    /// If the intention is to only fetch once, see [Self::get_or_fetch]
+    /// If the intention is to only fetch once, see [`Self::get_or_fetch`]
     pub async fn fetch_and_save(&self, key: String) -> color_eyre::Result<Option<V>> {
         let semaphore = self.get_semaphore(&key);
         let permit = semaphore.acquire().await.context("Couldn't get permit")?;
 
         self.fetch_and_save_with_permit(&key, &permit).await?;
-        self.get(&key).await
+        Ok(self.get(&key).await?)
     }
 
     async fn fetch_and_save_with_permit<'a>(

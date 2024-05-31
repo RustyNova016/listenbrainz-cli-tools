@@ -3,6 +3,7 @@ use color_eyre::eyre::Ok;
 
 use models::cli::Cli;
 
+use crate::models::data::musicbrainz_database::MUSICBRAINZ_DATABASE;
 use crate::utils::println_cli;
 
 pub mod models;
@@ -19,6 +20,10 @@ async fn main() -> color_eyre::Result<()> {
     let cli = Cli::parse();
 
     println!("Hello!");
+
+    println_cli("Cleaning some old entries...");
+    MUSICBRAINZ_DATABASE.invalidate_last_entries(10, 10).await?;
+    println_cli("Done!");
 
     cli.command.run().await;
 

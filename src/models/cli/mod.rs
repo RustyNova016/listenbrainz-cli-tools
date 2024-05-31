@@ -1,13 +1,13 @@
-use clap::ArgAction;
 use clap::{Parser, Subcommand};
 
 use crate::models::cli::common::{GroupByTarget, SortListensBy, SortSorterBy};
+use crate::models::cli::radio::CliRadios;
 use crate::tools::interactive_mapper::interactive_mapper;
-use crate::tools::radio::create_radio_mix;
 use crate::tools::stats::stats_command;
 use crate::tools::unlinked::unmapped_command;
 
 pub mod common;
+pub mod radio;
 
 /// Tools for Listenbrainz
 #[derive(Parser, Debug, Clone)]
@@ -41,6 +41,10 @@ pub enum Commands {
         /// Name of the user to fetch stats listen from
         #[arg(short, long)]
         username: String,
+
+        /// Sort by:
+        #[arg(short, long, default_value_t = SortSorterBy::Count)]
+        sort: SortSorterBy,
     },
 
     /// Map unmapped recordings easily
@@ -59,41 +63,49 @@ pub enum Commands {
     },
 
     /// Generate playlists
-    Radio {
-        /// Name of the user to fetch unlinked listen from
-        #[arg(short, long)]
-        username: String,
+    Radio(CliRadios),
+    //Cache {
+    //    id: String,
+    //},
 
-        /// User token
-        #[arg(short, long)]
-        token: String,
+    //Search {},
 
-        /// Use this flag to only get unlistened recordings
-        #[clap(long, action=ArgAction::SetTrue)]
-        unlistened: bool,
-    },
+    //Lookup {
+    //    /// Recording ID
+    //    #[arg(short, long)]
+    //    id: String,
+
+    //    /// Name of the user to fetch stats listen from
+    //    #[arg(short, long)]
+    //    username: String,
+    //},
 }
 
 impl Commands {
     pub async fn run(&self) {
         match self {
-            Commands::Unmapped { username, sort } => {
-                unmapped_command(&username.to_lowercase(), *sort).await
+            Self::Unmapped { username, sort } => {
+                unmapped_command(&username.to_lowercase(), *sort).await;
             }
-            Commands::Stats { username, target } => {
-                stats_command(&username.to_lowercase(), *target).await
+            Self::Stats {
+                username,
+                target,
+                sort,
+            } => {
+                stats_command(&username.to_lowercase(), *target, *sort).await;
             }
-            Commands::Mapping {
+            Self::Mapping {
                 username,
                 token,
                 sort,
             } => interactive_mapper(username, token.clone(), *sort).await,
 
-            Commands::Radio {
-                username,
-                token,
-                unlistened,
-            } => create_radio_mix(username, token.clone(), *unlistened).await,
+            Self::Radio(val) => val.command.run().await,
+            //Self::Cache { id } => ENTITY_DATABASE.remove(id).await.unwrap(),
+
+            //Self::Search {} => search_link().await,
+
+            //Self::Lookup { id, username } => lookup(username, id.to_string().into()).await,
         }
     }
 }

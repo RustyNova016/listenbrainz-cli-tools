@@ -1,7 +1,7 @@
-use super::media::Media;
-use super::Release;
 use itertools::Itertools;
 use musicbrainz_rs::entity::release::Release as ReleaseMS;
+
+use super::Release;
 
 impl From<ReleaseMS> for Release {
     fn from(value: ReleaseMS) -> Self {
@@ -10,13 +10,29 @@ impl From<ReleaseMS> for Release {
             barcode: value.barcode,
             country: value.country,
             disambiguation: value.disambiguation,
-            id: value.id,
+            id: value.id.into(),
             media: value
                 .media
-                .map(|medias| medias.into_iter().map(Media::from).collect_vec()),
+                .map(|medias| medias.into_iter().map_into().collect_vec()),
             packaging_id: value.packaging_id,
             status_id: value.status_id,
             title: value.title,
+            artist_credit: value
+                .artist_credit
+                .map(|artist_credits| artist_credits.into()),
+            release_group: value
+                .release_group
+                .map(|release_group| release_group.id.into()),
+            status: value.status,
+            //quality: value.quality,
+            packaging: value.packaging,
+            genres: value.genres,
+            date: value.date,
+            aliases: value.aliases,
+            relations: value
+                .relations
+                .map(|relations| relations.into_iter().map_into().collect_vec()),
+            tags: value.tags,
         }
     }
 }

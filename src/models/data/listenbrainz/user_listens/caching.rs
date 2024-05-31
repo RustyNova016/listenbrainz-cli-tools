@@ -16,19 +16,19 @@ impl HasID for UserListens {
 }
 
 impl Cached for UserListens {
-    fn get_cache() -> Arc<EntityCache<UserListens>> {
-        ENTITY_DATABASE.user_listens()
+    fn get_cache() -> Arc<EntityCache<Self>> {
+        ENTITY_DATABASE.user_listens().clone()
     }
 }
 
 impl UserListens {
-    pub async fn get_from_cache(username: &str) -> color_eyre::Result<Option<UserListens>> {
-        Self::get_cache().get(&username.to_lowercase()).await
+    pub async fn get_from_cache(username: &str) -> color_eyre::Result<Option<Self>> {
+        Ok(Self::get_cache().get(&username.to_lowercase()).await?)
     }
 
-    pub async fn get_from_cache_or_new(username: &str) -> color_eyre::Result<UserListens> {
+    pub async fn get_from_cache_or_new(username: &str) -> color_eyre::Result<Self> {
         Ok(Self::get_from_cache(username)
             .await?
-            .unwrap_or(UserListens::new(username)))
+            .unwrap_or_else(|| Self::new(username)))
     }
 }

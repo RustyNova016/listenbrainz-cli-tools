@@ -5,7 +5,7 @@ use super::ArtistCredit;
 impl From<ArtistCreditMS> for ArtistCredit {
     fn from(value: ArtistCreditMS) -> Self {
         Self {
-            artist: value.artist.id,
+            artist: value.artist.id.into(),
             joinphrase: value.joinphrase,
             name: value.name,
         }
