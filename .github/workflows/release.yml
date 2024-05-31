@@ -1,15 +1,32 @@
 name: release
-
 on:
-  release:
-    types: [created]
-
+  push:
+    tags:
+      - "v*"
+      
 jobs:
   release:
-    name: release ${{ matrix.target }}
+    name: Create Release
     runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@master
+      - name: Create Release
+        uses: actions/create-release@latest
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: ${{ github.ref }}
+          draft: false
+          prerelease: false
+
+  publish:
+    name: publish ${{ matrix.name }}
+    needs:
+      - release
     strategy:
-      fail-fast: false
+      fail-fast: true
       matrix:
         include:
           - target: x86_64-pc-windows-gnu
@@ -24,13 +41,14 @@ jobs:
             suffix: darwin-x86_64
             archive: tar.gz
             name: x86_64-apple-darwin
-
+    runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@master
-        
+      - name: Clone test repository
+        uses: actions/checkout@v4
       - uses: xhaiker/rust-release.action@v1.0.0
         name: build ${{ matrix.name }}
         with:
+          release: ${{ github.ref_name }}
           rust_target: ${{ matrix.target }}
           archive_suffix: ${{ matrix.suffix }}
           archive_types: ${{ matrix.archive }}
