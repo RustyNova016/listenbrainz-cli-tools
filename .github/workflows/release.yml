@@ -33,7 +33,7 @@ jobs:
 
   release-windows:
     name: Create Release Windows
-    runs-on: ubuntu-latest
+    runs-on: windows-latest
     strategy:
       fail-fast: false
     steps:
