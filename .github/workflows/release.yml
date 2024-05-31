@@ -7,7 +7,7 @@ jobs:
             name: Get Release Tag
             runs-on: ubuntu-latest
             outputs:
-                  tag: ${{ jobs.get-latest-tag.outputs.tag }}
+                  tag: ${{ steps.get-latest-tag.outputs.tag }}
             steps:
                   - uses: actions-ecosystem/action-get-latest-tag@v1
                     id: get-latest-tag
