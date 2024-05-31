@@ -1,7 +1,8 @@
+name: release
+
 on:
-  push:
-    branches: [ "master" ]
-name: Build Release
+  release:
+    types: [created]
 
 jobs:
   release:
@@ -10,13 +11,30 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        target: [x86_64-pc-windows-gnu, x86_64-unknown-linux-musl, x86_64-apple-darwin]
+        include:
+          - target: x86_64-pc-windows-gnu
+            suffix: windows-x86_64
+            archive: zip
+            name: x86_64-pc-windows-gnu
+          - target: x86_64-unknown-linux-gnu
+            suffix: linux-x86_64
+            archive: tar.xz
+            name: x86_64-unknown-linux-gnu
+          - target: x86_64-apple-darwin
+            suffix: darwin-x86_64
+            archive: tar.gz
+            name: x86_64-apple-darwin
+
     steps:
       - uses: actions/checkout@master
       - name: Compile and release
-        uses: rust-build/rust-build.action@v1.4.5
-        env:
-          GITHUB_TOKEN: ${{ secrets.RELEASE_PLZ_TOKEN }}
+      
+      - uses: xhaiker/rust-release.action@v1.0.0
+        name: build ${{ matrix.name }}
         with:
-          RUSTTARGET: ${{ matrix.target }}
-          EXTRA_FILES: "README.md LICENSE"
+          rust_target: ${{ matrix.target }}
+          archive_suffix: ${{ matrix.suffix }}
+          archive_types: ${{ matrix.archive }}
+          extra_files: "README.md LICENSE"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
