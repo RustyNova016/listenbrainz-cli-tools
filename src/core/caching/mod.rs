@@ -1,5 +1,7 @@
 pub mod entity_cache;
+pub mod musicbrainz_cache;
 pub mod serde_cacache;
+
 use directories::BaseDirs;
 use once_cell::sync::Lazy;
 use std::fs;

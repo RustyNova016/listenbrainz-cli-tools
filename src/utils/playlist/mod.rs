@@ -1,23 +1,34 @@
+use crate::models::data::musicbrainz::recording::mbid::RecordingMBID;
+use derive_builder::Builder;
 use listenbrainz::raw::request::{
     PlaylistCreate, PlaylistCreatePlaylist, PlaylistCreatePlaylistExtension,
     PlaylistCreatePlaylistExtensionInner, PlaylistCreatePlaylistTrack,
 };
 
-#[derive(Clone)]
+#[derive(Clone, Builder)]
 pub struct PlaylistStub {
     title: String,
+    #[allow(dead_code)] // Temporary fix
+    description: Option<String>,
     username: Option<String>,
     public: bool,
-    tracks: Vec<String>,
+    tracks: Vec<RecordingMBID>,
 }
 
 impl PlaylistStub {
-    pub fn new(title: String, username: Option<String>, public: bool, tracks: Vec<String>) -> Self {
+    pub fn new(
+        title: String,
+        username: Option<String>,
+        public: bool,
+        tracks: Vec<RecordingMBID>,
+        description: Option<String>,
+    ) -> Self {
         Self {
             title,
             username,
             public,
             tracks,
+            description,
         }
     }
 
@@ -29,7 +40,7 @@ impl PlaylistStub {
                     .tracks
                     .iter()
                     .map(|id| PlaylistCreatePlaylistTrack {
-                        identifier: format!("https://musicbrainz.org/recording/{}", id),
+                        identifier: format!("https://musicbrainz.org/recording/{id}"),
                     })
                     .collect(),
                 extension: PlaylistCreatePlaylistExtension {
@@ -44,6 +55,7 @@ impl PlaylistStub {
                         additional_metadata: None,
                     },
                 },
+                annotation: self.description,
             },
         }
     }

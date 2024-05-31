@@ -12,7 +12,7 @@ use std::fmt::{Display, Formatter};
 use std::sync::Arc;
 
 pub async fn interactive_mapper(username: &str, token: String, sort: Option<SortListensBy>) {
-    println_cli(format!("Fetching unmapped for user {}", username));
+    println_cli(format!("Fetching unmapped for user {username}"));
     let mut unmappeds: ListenCollection = UserListens::get_user_with_refresh(username)
         .await
         .expect("Couldn't fetch the new listens")

@@ -1,6 +1,7 @@
 use std::sync::Arc;
 
 use chrono::{DateTime, Utc};
+use derive_getters::Getters;
 use listenbrainz::raw::response::{UserListensListen, UserListensPayload};
 use serde::{Deserialize, Serialize};
 
@@ -12,9 +13,10 @@ use super::listen::Listen;
 pub mod caching;
 pub mod fetching;
 
-#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq, Getters)]
 pub struct UserListens {
     username: String,
+    #[getter(rename = "get_listens")]
     listens: ListenCollection,
 }
 
@@ -48,15 +50,15 @@ impl UserListens {
         self.remove_timerange(
             &data
                 .get_date_of_oldest_listen_of_payload()
-                .unwrap_or(Utc::now()),
+                .unwrap_or_else(Utc::now),
             &data
                 .get_date_of_latest_listen_of_payload()
-                .unwrap_or(Utc::now()),
+                .unwrap_or_else(Utc::now),
             true,
         );
 
         for lb_listen in data.listens {
-            self.insert_lb_listen(lb_listen)
+            self.insert_lb_listen(lb_listen);
         }
     }
 
@@ -69,14 +71,14 @@ impl UserListens {
         end: &DateTime<Utc>,
         inclusive: bool,
     ) {
-        self.listens.remove_timerange(start, end, inclusive)
+        self.listens.remove_timerange(start, end, inclusive);
     }
 
     /// Uncached and unchecked insert of a listenbrain listen into the struct
     ///
     /// ⚠️ This doesn't affect the cache ⚠️
     pub fn insert_lb_listen(&mut self, data: UserListensListen) {
-        self.listens.push(Arc::new(data.into()))
+        self.listens.push(Arc::new(data.into()));
     }
 
     /// Returns all the unmapped listens

@@ -1,6 +1,7 @@
 use std::ops::Deref;
 use std::sync::Arc;
 
+use crate::models::data::musicbrainz::artist::mbid::ArtistMBID;
 use itertools::Itertools;
 use serde::{Deserialize, Serialize};
 
@@ -18,10 +19,25 @@ impl Deref for ArtistCredits {
 }
 
 impl ArtistCredits {
-    pub fn get_artist_ids(&self) -> Vec<String> {
+    pub fn get_artist_ids(&self) -> Vec<ArtistMBID> {
         self.iter()
             .map(|credit| credit.artist.clone())
             .collect_vec()
+    }
+
+    pub fn get_artist_credit_as_string(&self) -> String {
+        let mut credit_string = String::new();
+        for artist_credit in &self.0 {
+            credit_string.push_str(artist_credit.name());
+            credit_string.push_str(
+                artist_credit
+                    .joinphrase()
+                    .as_ref()
+                    .unwrap_or(&String::new()),
+            );
+        }
+
+        credit_string
     }
 }
 

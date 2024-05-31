@@ -26,7 +26,7 @@ pub impl<'a, T: Send> BrowseQuery<T> {
             let response = new_request.execute().await?;
             total_elements = Some(response.count);
             current_offset += limit as u16;
-            elements.extend(response.entities)
+            elements.extend(response.entities);
         }
 
         Ok(BrowseResult {

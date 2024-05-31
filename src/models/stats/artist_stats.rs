@@ -1,5 +1,6 @@
+use crate::core::entity_traits::relations::has_artist_credits::HasArtistCredits;
 use crate::core::statistics::statistic_holder::StatisticHolder;
-use crate::core::statistics::statistic_sorter::StatisticSorter;
+use crate::core::statistics::statistic_sorter_trait::StatisticSorter;
 use chashmap::CHashMap;
 use itertools::Itertools;
 use std::sync::{Arc, Mutex};

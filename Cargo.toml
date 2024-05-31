@@ -9,40 +9,83 @@ rust-version = "1.75"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-listenbrainz = { branch = "8.0-experimental", git = "https://github.com/RustyNova016/listenbrainz-rs.git"} # Upstream version of the listenbrainz crate
-musicbrainz_rs = { version = "0.5.0" }
+# Main crate
+#listenbrainz = "0.7.0"
+# Self maintained upstream version
+listenbrainz = {version = "0.7.2", package = "listenbrainz_rs_nova"} # Fork with fixes
+#listenbrainz = { branch = "main", git = "https://github.com/InputUsername/listenbrainz-rs.git" }
+
+# Upstream version of the musicbrainz crate. Use "listenbrainz-cli-tools_master" for main builds, "listenbrainz-cli-tools_dev" for dev builds
+# This fixes:
+# - https://github.com/RustyNova016/listenbrainz-cli-tools/issues/97
+#musicbrainz_rs = "5.0.0" # Original musicbrainz_rs crate. It currently seems unmaintained, and need some PRs to pass
+musicbrainz_rs = {version = "0.5.1", package = "musicbrainz_rs_nova"} # Fork with fixes
+#musicbrainz_rs = { branch = "listenbrainz-cli-tools_master", git = "https://github.com/RustyNova016/musicbrainz_rs.git" }
+#musicbrainz_rs = { path = "../musicbrainz_rs"} # For easy development, download the musicbrainz_rs crate for yourself. Don't forget to change it back as PRs will fail
+
 derive_builder = "0.20.0"
 inquire = "0.7.5"
-itertools = "0.12.0"
+itertools = "0.13.0"
 prettytable-rs = { version = "0.10.0" }
 color-eyre = "0.6.3"
 rust_decimal = "1.35.0"
-clap = { version = "4.5.4", features = ["unicode", "wrap_help", "derive"]}
+clap = { version = "4.5.4", features = ["unicode", "wrap_help", "derive"] }
 clap_complete = "4.5.2"
 chrono = "0.4.38"
-cached = { version = "0.50.0", features = ["disk_store"] }
+cached = { version = "0.51.3", features = ["disk_store"] }
 moka = { version = "0.12.7", features = ["sync"] }
-serde = { version = "1.0.200", features = ["rc"] }
-serde_json = "1.0.116"
+serde = { version = "1.0.203", features = ["rc"] }
+serde_json = "1.0.117"
 lazy_static = "1.4.0"
 once_cell = "1.19.0"
 extend = "1.2.0"
 directories = "5.0.1"
 chashmap = "2.2.2"
-indicatif = { version = "0.17.8", features = ["rayon", "improved_unicode"] }
-tokio = {version = "1.37.0", features = ["full"]}
+indicatif = { version = "0.17.8", features = ["rayon", "improved_unicode", "futures"] }
+tokio = { version = "1.37.0", features = ["full"] }
 rayon = "1.10.0"
-reqwest = {version = "0.12.4", features = ["json"]}
+reqwest = { version = "0.12.4", features = ["json"] }
 cacache = { version = "13.0.0", default-features = false, features = ["tokio-runtime", "mmap"] }
 rmp-serde = "1.3.0"
 rand = "0.8.5"
-thiserror = "1.0.59"
+thiserror = "1.0.61"
 derive_more = { version = "0.99.17" }
+derive-new = "0.6.0"
+derive-getters = "0.4.0"
+rust_decimal_macros = "1.34.2"
+futures = "0.3.30"
+humantime = "2.1.0"
 
 # The profile that 'cargo dist' will build with
 [profile.dist]
 inherits = "release"
 lto = "thin"
+
+[lints.rust]
+unsafe_code = "forbid"
+async_fn_in_trait = { level = "allow", priority = 1 }
+
+[lints.clippy]
+#pedantic = "deny"
+#nursery = "deny"
+#perf = "warn"
+#cargo = "warn"
+
+# Applied
+enum_glob_use = { level = "deny", priority = 1 }
+semicolon_if_nothing_returned = { level = "warn", priority = 1 }
+use_self = { level = "warn", priority = 1 }
+or_fun_call = { level = "warn", priority = 1 }
+match_same_arms = { level = "warn", priority = 1 }
+manual_string_new = { level = "warn", priority = 1 }
+doc_markdown = { level = "warn", priority = 1 }
+uninlined_format_args = { level = "warn", priority = 1 }
+explicit_iter_loop = { level = "warn", priority = 1 }
+#unwrap_used = { level = "warn", priority = 1 } # Fix needed in separate PR
+
+# Won't apply
+must_use_candidate = { level = "allow", priority = 1 }
+map_unwrap_or = { level = "allow", priority = 1 }
 
 # Config for 'cargo dist'
 [workspace.metadata.dist]
