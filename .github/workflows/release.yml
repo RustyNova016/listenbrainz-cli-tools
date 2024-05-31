@@ -1,6 +1,5 @@
-on:
-  release:
-    types: [created]
+on: release
+name: Build Release
 
 jobs:
   release:
