@@ -20,11 +20,14 @@ jobs:
       - name: Build
         run: cargo build --all --release
 
+      - uses: actions-ecosystem/action-get-latest-tag@v1
+        id: get-latest-tag
         
       - name: Release
         uses: softprops/action-gh-release@v2
         with:
           files: target/release/listenbrainz-cli-tools
+          tag_name: ${{ steps.get-latest-tag.outputs.tag }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -50,5 +53,6 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           files: target/release/listenbrainz-cli-tools.exe
+          tag_name: ${{ steps.get-latest-tag.outputs.tag }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
