@@ -1,7 +1,7 @@
 use std::cmp::Reverse;
 
-use chrono::prelude::Utc;
 use chrono::Duration;
+use chrono::prelude::Utc;
 use humantime::format_duration;
 use itertools::Itertools;
 use listenbrainz::raw::Client;
@@ -9,6 +9,7 @@ use rust_decimal::prelude::Decimal;
 use rust_decimal::prelude::FromPrimitive;
 
 use crate::core::entity_traits::mb_cached::MBCached;
+use crate::core::radio::apply_radio_insert_config;
 use crate::models::cli::config::SelfEditContext;
 use crate::models::config::Config;
 use crate::models::data::listenbrainz::user_listens::UserListens;
@@ -66,6 +67,14 @@ pub async fn overdue_radio(
         });
     }
 
+    let playlist = apply_radio_insert_config(
+        scores
+            .iter()
+            .map(|score| score.1.recording().clone())
+            .collect_vec(),
+    )
+    .await;
+
     let chunked = scores.chunks(50).collect_vec();
     let bests = chunked
         .first()
@@ -91,7 +100,7 @@ pub async fn overdue_radio(
         "Radio: Overdue listens".to_string(),
         Some(username.to_string()),
         true,
-        bests.iter().map(|rate| rate.1.recording().clone()).collect_vec(), // TODO: Remove cast to recordingmbid
+        playlist,
         Some(format!("A playlist containing all the tracks that {username} listen to, 
             but seemingly no one else does. Come take a listen if you want to find hidden gems!<br>
             <br>

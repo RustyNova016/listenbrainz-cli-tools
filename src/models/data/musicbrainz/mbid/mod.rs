@@ -1,6 +1,3 @@
-pub mod converters;
-pub mod mbid_kind;
-pub mod mbid_merge;
 use derive_more::{Display, From, IsVariant, Unwrap};
 use serde::{Deserialize, Serialize};
 
@@ -12,6 +9,10 @@ use crate::models::data::musicbrainz::recording::mbid::RecordingMBID;
 use crate::models::data::musicbrainz::release::mbid::ReleaseMBID;
 use crate::models::data::musicbrainz::release_group::mbid::ReleaseGroupMBID;
 use crate::models::data::musicbrainz::work::mbid::WorkMBID;
+
+pub mod converters;
+pub mod mbid_kind;
+pub mod mbid_merge;
 
 #[derive(
     Debug, Clone, PartialEq, Eq, From, Serialize, Deserialize, Display, IsVariant, Unwrap, Hash,

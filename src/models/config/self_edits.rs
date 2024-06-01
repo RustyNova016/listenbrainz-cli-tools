@@ -1,15 +1,17 @@
 use std::collections::HashMap;
 use std::hash::Hash;
-use std::result;
 
-use crate::models::cli::config::SelfEditActionValue;
-use crate::models::cli::config::SelfEditContext;
-use crate::models::data::musicbrainz::mbid::MBID;
+use color_eyre::owo_colors::OwoColorize;
 use derive_getters::Getters;
 use derive_more::*;
 use itertools::Itertools;
 use serde::Deserialize;
 use serde::Serialize;
+
+use crate::models::cli::config::SelfEditActionValue;
+use crate::models::cli::config::SelfEditContext;
+use crate::models::data::musicbrainz::mbid::MBID;
+use crate::utils::println_cli;
 
 #[derive(Debug, Serialize, Deserialize, Getters, Default, Clone)]
 pub struct SelfEdit {
@@ -96,6 +98,26 @@ impl EditMap {
         }
 
         results
+    }
+
+    pub fn apply_action_for_context(&self, id: MBID, context: &SelfEditContext) -> Option<MBID> {
+        let Some(edit) = self.get(&id) else {
+            return Some(id);
+        };
+
+        match edit.get_action(&context) {
+            SelfEditAction::None => Some(id),
+            SelfEditAction::MergeInto(val) => {
+                #[cfg(debug_assertions)]
+                println_cli(format!("Merging {id} into {val}").blue());
+                Some(val.clone())
+            }
+            SelfEditAction::Abort => {
+                #[cfg(debug_assertions)]
+                println_cli(format!("Ignoring {id}'s existence").blue());
+                None
+            }
+        }
     }
 }
 
