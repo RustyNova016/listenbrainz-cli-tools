@@ -122,14 +122,14 @@ It thens put together a playlist made out of recordings you should have listened
 
 Usage:
 ```shell
-listenbrainz-cli-tools radio rate -u <username> -t <token> --min=<Minimum listens (Default: 3)>
+listenbrainz-cli-tools radio overdue -u <username> -t <token> --min=<Minimum listens (Default: 3)>
 ```
 
 Another mode is the "Overdue factor". Instead of sorting by date, the listens are sorted by how many estimated listens should have happened by now (Time elapsed since last listen / Average time per listens)
 
 Usage:
 ```shell
-listenbrainz-cli-tools radio rate -u <username> -t <token> --min=<Minimum listens (Default: 3)> -o
+listenbrainz-cli-tools radio overdue -u <username> -t <token> --min=<Minimum listens (Default: 3)> -o
 ```
 
 # Other infos
