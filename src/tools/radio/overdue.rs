@@ -73,7 +73,7 @@ pub async fn overdue_radio(
             Recording::get_cached_or_fetch(rate.1.recording())
                 .await
                 .unwrap()
-                .title,
+                .title(),
                 rate.1.recording(),
             rate.0.get_latest_listen().map(|listen| listen.listened_at).unwrap_or_else(Utc::now),
             format_duration(rate.1.get_average_time_between_listens().abs().to_std().unwrap()),

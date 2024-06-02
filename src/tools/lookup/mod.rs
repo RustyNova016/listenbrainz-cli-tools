@@ -22,7 +22,7 @@ pub async fn lookup(username: &str, id: RecordingMBID) {
         .get_or_fetch_entity()
         .await
         .expect("Couldn't fetch recording");
-    let recording_title = recording.title.clone();
+    let recording_title = recording.title().clone();
 
     let artist_credits = recording
         .clone()

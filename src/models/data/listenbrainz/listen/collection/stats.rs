@@ -175,8 +175,10 @@ impl ListenCollection {
             // If the work is empty, this probably mean it wasn't added on musicbrainz.
             // We'll add a fake one to simulate it, altough it may not be accurate
             if work_ids.is_empty() {
-                let new_work =
-                    Work::create_fake_work(format!("_fake_{}", recording.title), recording.title);
+                let new_work = Work::create_fake_work(
+                    format!("_fake_{}", recording.title()),
+                    recording.title().clone(),
+                );
                 work_ids.push(new_work.id().clone());
                 Work::get_cache().set(&new_work).await?;
             } else {
