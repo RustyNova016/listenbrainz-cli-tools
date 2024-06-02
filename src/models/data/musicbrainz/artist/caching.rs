@@ -5,8 +5,8 @@ use crate::core::entity_traits::has_id::HasID;
 use crate::core::entity_traits::mb_cached::MBCached;
 use crate::core::entity_traits::mbid::HasMBID;
 use crate::core::entity_traits::updatable::Updatable;
-use crate::models::data::musicbrainz::artist::mbid::ArtistMBID;
 use crate::models::data::musicbrainz::artist::Artist;
+use crate::models::data::musicbrainz::artist::mbid::ArtistMBID;
 use crate::models::data::musicbrainz_database::MUSICBRAINZ_DATABASE;
 
 impl HasID for Artist {
