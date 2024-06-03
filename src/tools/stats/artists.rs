@@ -13,7 +13,7 @@ pub async fn stats_artist(stats: StatisticSorter, sort_by: SortSorterBy) {
             .unwrap(); // TODO: Use MBIDs
 
         let pager_continue = pager.execute(|| {
-            println!("[{}] - {}", data.len(), artist.name);
+            println!("[{}] - {}", data.len(), artist.name());
         });
 
         if !pager_continue {

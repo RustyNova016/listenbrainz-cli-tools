@@ -1,7 +1,7 @@
-use crate::core::entity_traits::mb_cached::MBCached;
 use color_eyre::eyre::{eyre, Context, OptionExt};
 use itertools::Itertools;
 
+use crate::core::entity_traits::mb_cached::MBCached;
 use crate::core::entity_traits::mbid::IsMbid;
 use crate::core::entity_traits::relations::has_artist_credits::HasArtistCredits;
 use crate::models::data::musicbrainz::artist_credit::collection::ArtistCredits;

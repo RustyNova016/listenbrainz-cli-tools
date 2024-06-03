@@ -1,19 +1,29 @@
 [package]
 name = "listenbrainz-cli-tools"
-version = "0.1.0"
+version = "0.1.1"
 edition = "2021"
 repository = "https://github.com/RustyNova016/listenbrainz-cli-tools"
 publish = true
+license = "MIT"
+description = "A CLI app containing a set of useful tools for Listenbrainz"
 rust-version = "1.75"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-listenbrainz = { branch = "8.0-experimental+popularity", git = "https://github.com/RustyNova016/listenbrainz-rs.git" } # Upstream version of the listenbrainz crate
+# Main crate
+#listenbrainz = "0.7.0"
+# Self maintained upstream version
+listenbrainz = {version = "0.7.2", package = "listenbrainz_rs_nova"} # Fork with fixes
+#listenbrainz = { branch = "main", git = "https://github.com/InputUsername/listenbrainz-rs.git" }
 
 # Upstream version of the musicbrainz crate. Use "listenbrainz-cli-tools_master" for main builds, "listenbrainz-cli-tools_dev" for dev builds
-musicbrainz_rs = { branch = "listenbrainz-cli-tools_master", git = "https://github.com/RustyNova016/musicbrainz_rs.git" }
-#musicbrainz_rs = { path = "../musicbrainz_rs"} # For easy development
+# This fixes:
+# - https://github.com/RustyNova016/listenbrainz-cli-tools/issues/97
+#musicbrainz_rs = "5.0.0" # Original musicbrainz_rs crate. It currently seems unmaintained, and need some PRs to pass
+musicbrainz_rs = {version = "0.5.1", package = "musicbrainz_rs_nova"} # Fork with fixes
+#musicbrainz_rs = { branch = "listenbrainz-cli-tools_master", git = "https://github.com/RustyNova016/musicbrainz_rs.git" }
+#musicbrainz_rs = { path = "../musicbrainz_rs"} # For easy development, download the musicbrainz_rs crate for yourself. Don't forget to change it back as PRs will fail
 
 derive_builder = "0.20.0"
 inquire = "0.7.5"
@@ -34,7 +44,7 @@ extend = "1.2.0"
 directories = "5.0.1"
 chashmap = "2.2.2"
 indicatif = { version = "0.17.8", features = ["rayon", "improved_unicode", "futures"] }
-tokio = { version = "1.37.0", features = ["full"] }
+tokio = { version = "1.38.0", features = ["full"] }
 rayon = "1.10.0"
 reqwest = { version = "0.12.4", features = ["json"] }
 cacache = { version = "13.0.0", default-features = false, features = ["tokio-runtime", "mmap"] }

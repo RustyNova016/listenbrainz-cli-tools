@@ -45,7 +45,7 @@ impl Listen {
     }
 
     /// If mapped, return the recording MBID
-    pub fn get_recording_mbid(&self) -> Option<&String> {
+    pub fn get_recording_mbid_as_string(&self) -> Option<&String> {
         self.mapping_data
             .as_ref()
             .map(|mapping| &mapping.recording_mbid)
