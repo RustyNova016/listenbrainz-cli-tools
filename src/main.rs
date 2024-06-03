@@ -6,12 +6,10 @@ use models::cli::Cli;
 use crate::models::data::musicbrainz_database::MUSICBRAINZ_DATABASE;
 use crate::utils::println_cli;
 
+pub mod core;
 pub mod models;
-
 /// This is the module containing all the different tools of this app
 pub mod tools;
-
-pub mod core;
 pub mod utils;
 
 #[tokio::main]
