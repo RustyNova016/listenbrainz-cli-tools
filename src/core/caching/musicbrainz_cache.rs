@@ -15,7 +15,7 @@ use crate::core::entity_traits::mbid::{HasMBID, IsMbid};
 use crate::core::entity_traits::updatable::Updatable;
 use crate::models::data::musicbrainz::external_musicbrainz_entity::FlattenedMBEntityExt;
 use crate::models::data::musicbrainz::relation::external::RelationContentExt;
-use crate::utils::println_cli;
+use crate::utils::{println_cli, println_cli_warn};
 
 #[derive(Debug)]
 pub struct MusicbrainzCache<K, V>
@@ -156,7 +156,7 @@ where
         match self.alias_cache.get_or_option(mbid).await {
             Ok(Some(val)) => Ok(val),
             Ok(None) | Err(Error::CacheDeserializationError(_)) => {
-                #[cfg(debug)]
+                #[cfg(debug_assertions)]
                 println_cli_warn("Trying to fetch the primary alias of MBID resulted in `None`. Returning input instead");
                 Ok(mbid.clone())
             }

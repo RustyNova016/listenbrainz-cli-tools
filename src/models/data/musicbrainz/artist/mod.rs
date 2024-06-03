@@ -1,3 +1,4 @@
+use derive_getters::Getters;
 use itertools::Itertools;
 use musicbrainz_rs::entity::alias::Alias;
 use musicbrainz_rs::entity::artist::{ArtistType, Gender};
@@ -20,15 +21,15 @@ pub mod external;
 pub mod getters;
 pub mod mbid;
 
-#[derive(Debug, Clone, Eq, PartialEq, Deserialize, Serialize)]
+#[derive(Debug, Clone, Eq, PartialEq, Deserialize, Serialize, Getters)]
 #[serde(rename_all = "kebab-case")]
 pub struct Artist {
-    pub id: ArtistMBID,
-    pub name: String,
-    pub sort_name: String,
-    pub disambiguation: String,
-    pub artist_type: Option<ArtistType>,
-    pub gender: Option<Gender>,
+    id: ArtistMBID,
+    name: String,
+    sort_name: String,
+    disambiguation: String,
+    artist_type: Option<ArtistType>,
+    gender: Option<Gender>,
     //pub area: Option<Area>,
     //pub begin_area: Option<Area>,
     relations: Option<Vec<Relation>>,
@@ -36,13 +37,13 @@ pub struct Artist {
     works: Option<Vec<WorkMBID>>,
     release_groups: Option<Vec<ReleaseGroupMBID>>,
     recordings: Option<Vec<RecordingMBID>>,
-    pub aliases: Option<Vec<Alias>>,
-    pub tags: Option<Vec<Tag>>,
-    pub genres: Option<Vec<Genre>>,
+    aliases: Option<Vec<Alias>>,
+    tags: Option<Vec<Tag>>,
+    genres: Option<Vec<Genre>>,
     //pub rating: Option<Rating>,
-    pub country: Option<String>,
-    pub annotation: Option<String>,
-    pub life_span: Option<LifeSpan>,
+    country: Option<String>,
+    annotation: Option<String>,
+    life_span: Option<LifeSpan>,
 }
 
 impl From<musicbrainz_rs::entity::artist::Artist> for Artist {

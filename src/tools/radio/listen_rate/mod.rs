@@ -74,7 +74,7 @@ pub async fn listen_rate_radio(
             Recording::get_cached_or_fetch(rate.1.recording())
                 .await
                 .unwrap()
-                .title,
+                .title(),
             rate.1.get_listen_rate(ListenRateRange::Year)
         ));
     }
