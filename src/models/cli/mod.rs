@@ -68,6 +68,9 @@ pub enum Commands {
 
     /// Generate playlists
     Radio(CliRadios),
+
+    Config(ConfigCli),
+    
     //Cache {
     //    id: String,
     //},

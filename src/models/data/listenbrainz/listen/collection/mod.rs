@@ -141,7 +141,7 @@ impl ListenCollection {
         let mut results = Vec::new();
 
         for listen in self.into_iter() {
-            let Some(recording_string) = listen.get_recording_mbid() else {
+            let Some(recording_string) = listen.get_recording_mbid_as_string() else {
                 results.push(listen);
                 continue;
             };

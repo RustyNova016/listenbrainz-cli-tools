@@ -10,6 +10,7 @@ use std::fs::File;
 use std::io;
 use std::io::ErrorKind;
 use std::sync::Arc;
+use derive_more::Constructor;
 use tokio::sync::RwLock;
 
 use crate::core::caching::CONFIG_FILE;
@@ -26,7 +27,7 @@ pub(crate) static CONFIG: Lazy<Arc<RwLock<Config>>> = Lazy::new(|| {
     ))
 });
 
-#[derive(Debug, Serialize, Deserialize, Getters, Default)]
+#[derive(Debug, Serialize, Deserialize, Getters, Default, Constructor)]
 pub struct Config {
     /// Saved usertokens
     #[serde(default)]
