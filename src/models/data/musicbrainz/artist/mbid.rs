@@ -6,8 +6,8 @@ use serde::{Deserialize, Serialize};
 
 use crate::core::entity_traits::mb_cached::MBCached;
 use crate::core::entity_traits::mbid::IsMbid;
-use crate::models::data::musicbrainz::artist::Artist;
 use crate::models::data::musicbrainz::artist::external::ArtistExt;
+use crate::models::data::musicbrainz::artist::Artist;
 use crate::models::data::musicbrainz::external_musicbrainz_entity::ExternalMusicBrainzEntity;
 use crate::models::data::musicbrainz::mbid::MBID;
 use crate::utils::println_mus;

@@ -52,7 +52,7 @@ pub struct RecordingStatisticSorter {
 
 impl StatisticSorter<String, GenericStatisticHolder<String>> for RecordingStatisticSorter {
     async fn insert_listen(&self, listen: Arc<Listen>) -> Result<()> {
-        let Some(recording_mbid) = listen.get_recording_mbid() else {
+        let Some(recording_mbid) = listen.get_recording_mbid_as_string() else {
             return Ok(());
         };
 

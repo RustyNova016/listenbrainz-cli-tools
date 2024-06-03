@@ -1,4 +1,4 @@
-use color_eyre::eyre::{Context, eyre, OptionExt};
+use color_eyre::eyre::{eyre, Context, OptionExt};
 use itertools::Itertools;
 
 use crate::core::entity_traits::mb_cached::MBCached;
