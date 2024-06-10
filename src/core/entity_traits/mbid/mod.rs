@@ -1,4 +1,6 @@
 pub mod is_cached_mbid;
+pub mod assigned_to_mbid;
+
 use crate::models::data::musicbrainz::external_musicbrainz_entity::ExternalMusicBrainzEntity;
 use crate::models::data::musicbrainz::mbid::MBID;
 use extend::ext;

@@ -17,7 +17,16 @@ impl From<UserListensListen> for Listen {
             user: value.user_name.clone(),
             listened_at,
             messybrainz_data: MessyBrainzData::from(value.clone()),
-            mapping_data: value.track_metadata.mbid_mapping.map(MappingData::from),
+            mapping_data: value
+                .track_metadata
+                .mbid_mapping
+                .clone()
+                .map(MappingData::from),
+            mapped_recording_id: value
+                .track_metadata
+                .mbid_mapping
+                .clone()
+                .map(|data| data.recording_mbid.into()),
         }
     }
 }

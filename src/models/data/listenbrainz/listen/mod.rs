@@ -2,10 +2,12 @@ use std::collections::HashMap;
 
 use chrono::{DateTime, Utc};
 use color_eyre::eyre::Context;
+use derive_getters::Getters;
 use serde::{Deserialize, Serialize};
 
 use crate::core::entity_traits::mb_cached::MBCached;
 use crate::models::data::listenbrainz::mapping_data::MappingData;
+use crate::models::data::musicbrainz::recording::mbid::RecordingMBID;
 use crate::models::data::musicbrainz::recording::Recording;
 
 use super::messybrainz::MessyBrainzData;
@@ -15,7 +17,7 @@ pub mod convertion;
 pub mod getters;
 pub mod mapped_listen;
 
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, Getters)]
 pub struct Listen {
     /// The username of the user who listened to it
     pub user: String,
@@ -28,6 +30,8 @@ pub struct Listen {
 
     /// Data of the mapping
     pub mapping_data: Option<MappingData>,
+
+    mapped_recording_id: Option<RecordingMBID>,
 }
 
 impl Listen {
@@ -86,5 +90,15 @@ impl Listen {
             .context("Listenbrainz returned an error")?;
 
         Ok(())
+    }
+
+    pub fn set_recording_mapping(&mut self, recording_id: RecordingMBID) {
+        self.mapping_data = Some(MappingData {
+            artist_credit: None,
+            artist_mbid: None,
+            recording_mbid: recording_id.to_string(),
+            recording_name: recording_id.to_string(),
+        });
+        self.mapped_recording_id = Some(recording_id);
     }
 }

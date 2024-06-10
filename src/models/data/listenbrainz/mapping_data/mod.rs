@@ -19,7 +19,7 @@ pub struct MappingData {
     pub recording_name: String,
 
     /// Artists MBID
-    artist_mbid: Option<Vec<ArtistMBID>>,
+    pub artist_mbid: Option<Vec<ArtistMBID>>,
 
     /// Artist credits:
     pub artist_credit: Option<String>,

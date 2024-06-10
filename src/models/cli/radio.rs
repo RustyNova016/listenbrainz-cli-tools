@@ -3,6 +3,7 @@ use clap::{Parser, Subcommand};
 
 use crate::core::statistics::listen_rate::ListenRate;
 use crate::core::statistics::listen_rate::ListenRateRange;
+use crate::models::config::Config;
 use crate::tools::radio::circles::create_radio_mix;
 use crate::tools::radio::listen_rate::listen_rate_radio;
 use crate::tools::radio::overdue::overdue_radio;
@@ -25,7 +26,7 @@ pub enum Radios {
 
         /// User token
         #[arg(short, long)]
-        token: String,
+        token: Option<String>,
 
         /// Use this flag to only get unlistened recordings
         #[clap(long, action=ArgAction::SetTrue)]
@@ -43,7 +44,7 @@ pub enum Radios {
 
         /// User token
         #[arg(short, long)]
-        token: String,
+        token: Option<String>,
     },
 
     /// Generate playlists depending on the listen rate of recordings
@@ -54,7 +55,7 @@ pub enum Radios {
 
         /// User token
         #[arg(short, long)]
-        token: String,
+        token: Option<String>,
 
         /// Minimum listen rate
         #[arg(long)]
@@ -81,7 +82,7 @@ pub enum Radios {
 
         /// User token
         #[arg(short, long)]
-        token: String,
+        token: Option<String>,
 
         /// Minimum listen count
         #[arg(long)]
@@ -105,10 +106,21 @@ impl Radios {
                 token,
                 unlistened,
                 //cooldown
-            } => create_radio_mix(username, token.clone(), *unlistened).await,
+            } => {
+                create_radio_mix(
+                    username,
+                    Config::get_token_or_argument(username, token),
+                    *unlistened,
+                )
+                .await;
+            }
 
             Self::Underrated { username, token } => {
-                underrated_mix(username.clone(), token.clone()).await;
+                underrated_mix(
+                    username.clone(),
+                    Config::get_token_or_argument(username, token),
+                )
+                .await;
             }
 
             Self::Rate {
@@ -131,7 +143,14 @@ impl Radios {
                     }
                 }
 
-                listen_rate_radio(username, token, rate, *min, *cooldown).await;
+                listen_rate_radio(
+                    username,
+                    &Config::get_token_or_argument(username, token),
+                    rate,
+                    *min,
+                    *cooldown,
+                )
+                .await;
             }
 
             Self::Overdue {
@@ -139,9 +158,16 @@ impl Radios {
                 token,
                 min,
                 cooldown,
-                overdue_factor: delay_factor,
+                overdue_factor,
             } => {
-                overdue_radio(username, token, *min, *cooldown, *delay_factor).await;
+                overdue_radio(
+                    username,
+                    &Config::get_token_or_argument(username, token),
+                    *min,
+                    *cooldown,
+                    *overdue_factor,
+                )
+                .await;
             }
         }
     }

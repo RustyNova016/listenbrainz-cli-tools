@@ -1,3 +1,4 @@
+pub mod config;
 mod converters;
 pub mod filters;
 pub mod listen_rate;
@@ -9,6 +10,7 @@ use itertools::Itertools;
 use serde::{Deserialize, Serialize};
 
 use crate::models::cli::common::SortListensBy;
+use crate::models::data::musicbrainz::mbid::mbid_merge::MBIDMerge;
 use crate::models::data::musicbrainz::recording::mbid::RecordingMBID;
 
 use super::Listen;
@@ -133,6 +135,28 @@ impl ListenCollection {
             .unique()
             .map_into()
             .collect_vec()
+    }
+
+    pub fn transmute_listens(self, merges: Vec<MBIDMerge<RecordingMBID>>) {
+        let mut results = Vec::new();
+
+        for listen in self.into_iter() {
+            let Some(recording_string) = listen.get_recording_mbid_as_string() else {
+                results.push(listen);
+                continue;
+            };
+
+            let recording: RecordingMBID = recording_string.clone().into();
+
+            let Some(merge) = merges.iter().find(|merge| merge.from() == &recording) else {
+                results.push(listen);
+                continue;
+            };
+
+            let mut new_listen = listen.as_ref().clone();
+            new_listen.set_recording_mapping(merge.to().clone());
+            results.push(Arc::new(new_listen));
+        }
     }
 }
 

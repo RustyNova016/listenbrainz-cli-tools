@@ -12,8 +12,11 @@ use crate::models::data::musicbrainz::work::mbid::WorkMBID;
 
 pub mod converters;
 pub mod mbid_kind;
+pub mod mbid_merge;
 
-#[derive(Debug, Clone, PartialEq, Eq, From, Serialize, Deserialize, Display, IsVariant, Unwrap)]
+#[derive(
+    Debug, Clone, PartialEq, Eq, From, Serialize, Deserialize, Display, IsVariant, Unwrap, Hash,
+)]
 pub enum MBID {
     Artist(ArtistMBID),
     Release(ReleaseMBID),

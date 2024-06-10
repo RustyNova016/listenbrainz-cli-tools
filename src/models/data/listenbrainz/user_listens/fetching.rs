@@ -56,11 +56,13 @@ impl UserListens {
                     return Ok(data);
                 }
                 Err(listenbrainz::Error::Http(_val)) => {
-                    println_lis("Io error, retrying");
                     let count = *FETCH_COUNT.read().await;
+                    let new_count = count.div_ceil(2);
 
                     // Retry with shorter count
                     *FETCH_COUNT.write().await = count.div_ceil(2);
+
+                    println_lis(format!("Io error, retrying with count: {new_count}"));
                 }
                 Err(val) => return Err(Report::from(val)),
             }
