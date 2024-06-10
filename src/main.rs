@@ -23,7 +23,10 @@ async fn main() -> color_eyre::Result<()> {
     MUSICBRAINZ_DATABASE.invalidate_last_entries(10, 10).await?;
     println_cli("Done!");
 
-    cli.command.run().await;
+    cli.command
+        .run()
+        .await
+        .expect("An error occured in the app");
 
     println_cli("Have a nice day!");
     Ok(())

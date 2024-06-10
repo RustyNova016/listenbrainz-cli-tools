@@ -1,4 +1,5 @@
 use clap::{Parser, Subcommand};
+use config::ConfigCli;
 
 use crate::models::cli::common::{GroupByTarget, SortListensBy, SortSorterBy};
 use crate::models::cli::radio::CliRadios;
@@ -6,7 +7,10 @@ use crate::tools::interactive_mapper::interactive_mapper;
 use crate::tools::stats::stats_command;
 use crate::tools::unlinked::unmapped_command;
 
+use super::config::Config;
+
 pub mod common;
+pub mod config;
 pub mod radio;
 
 /// Tools for Listenbrainz
@@ -55,7 +59,7 @@ pub enum Commands {
 
         /// User token
         #[arg(short, long)]
-        token: String,
+        token: Option<String>,
 
         /// Sort the listens by type
         #[arg(short, long)]
@@ -64,10 +68,11 @@ pub enum Commands {
 
     /// Generate playlists
     Radio(CliRadios),
+
     //Cache {
     //    id: String,
     //},
-
+    Config(ConfigCli),
     //Search {},
 
     //Lookup {
@@ -82,7 +87,7 @@ pub enum Commands {
 }
 
 impl Commands {
-    pub async fn run(&self) {
+    pub async fn run(&self) -> color_eyre::Result<()> {
         match self {
             Self::Unmapped { username, sort } => {
                 unmapped_command(&username.to_lowercase(), *sort).await;
@@ -98,14 +103,23 @@ impl Commands {
                 username,
                 token,
                 sort,
-            } => interactive_mapper(username, token.clone(), *sort).await,
+            } => {
+                interactive_mapper(
+                    username,
+                    Config::get_token_or_argument(username, token),
+                    *sort,
+                )
+                .await;
+            }
 
             Self::Radio(val) => val.command.run().await,
             //Self::Cache { id } => ENTITY_DATABASE.remove(id).await.unwrap(),
 
-            //Self::Search {} => search_link().await,
-
+            //Self::Cache { id } => ENTITY_DATABASE.remove(id).await?,
+            Self::Config(val) => val.command.run().await?,
             //Self::Lookup { id, username } => lookup(username, id.to_string().into()).await,
         }
+
+        Ok(())
     }
 }
