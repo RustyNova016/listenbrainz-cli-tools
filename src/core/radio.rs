@@ -70,8 +70,9 @@ impl ListenSeeds {
             .get_listens()
             .clone();
 
-        let mut results = Vec::new();
+        let blacklisted = self.get_recordings_in_cooldown(&listens).await;
 
+        let mut results = Vec::new();
         for listen in listens {
             if listen.is_mapped() && !self.mapped {
                 continue;
@@ -84,6 +85,16 @@ impl ListenSeeds {
             let Some(new_listen) = self.remap_listen(listen).await else {
                 continue;
             };
+
+            if new_listen
+                .mapped_recording_id()
+                .as_ref()
+                .is_some_and(|id| blacklisted.contains(id))
+            {
+                continue;
+            }
+
+            results.push(new_listen)
         }
 
         ListenCollection::from_iter(results)
@@ -105,7 +116,7 @@ impl ListenSeeds {
         Some(Arc::new(new_listen))
     }
 
-    async fn get_recordings_in_cooldown(self, listens: &ListenCollection) -> Vec<RecordingMBID> {
+    async fn get_recordings_in_cooldown(&self, listens: &ListenCollection) -> Vec<RecordingMBID> {
         let deadline = Utc::now() - Duration::hours(self.cooldown as i64);
 
         let mut blacklist = Vec::new();

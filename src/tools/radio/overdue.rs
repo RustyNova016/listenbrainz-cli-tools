@@ -1,6 +1,5 @@
 use std::cmp::Reverse;
 
-use chrono::Duration;
 use chrono::prelude::Utc;
 use humantime::format_duration;
 use itertools::Itertools;
@@ -9,10 +8,7 @@ use rust_decimal::prelude::Decimal;
 use rust_decimal::prelude::FromPrimitive;
 
 use crate::core::entity_traits::mb_cached::MBCached;
-use crate::core::radio::apply_radio_insert_config;
-use crate::models::cli::config::SelfEditContext;
-use crate::models::config::Config;
-use crate::models::data::listenbrainz::user_listens::UserListens;
+use crate::core::radio::{apply_radio_insert_config, ListenSeedsBuilder};
 use crate::models::data::musicbrainz::recording::Recording;
 use crate::utils::playlist::PlaylistStub;
 use crate::utils::println_cli;
@@ -24,27 +20,16 @@ pub async fn overdue_radio(
     cooldown: u64,
     overdue_factor: bool,
 ) {
-    let config = Config::load().unwrap();
-    let mut listens = UserListens::get_user_with_refresh(username)
-        .await
-        .expect("Couldn't fetch the new listens")
-        .get_mapped_listens()
-        .apply_configuration(&config, &SelfEditContext::RadioSeeding);
+    let mut seeds_builder = ListenSeedsBuilder::default();
+    seeds_builder.username(username.to_string());
+    seeds_builder.cooldown(cooldown);
+    seeds_builder.mapped(true);
+    seeds_builder.unmapped(false);
 
-    let deadline = Utc::now() - Duration::hours(cooldown as i64);
-    let blacklisted_recordings = listens
-        .get_listened_after(&deadline)
-        .get_listened_recordings_mbids()
-        .await
-        .unwrap();
+    let seeder = seeds_builder.build().unwrap();
+    let seeds = seeder.get_seeds().await;
 
-    // Filter out all the listens of blacklisted recordings
-    listens = listens
-        .filter_recordings(&blacklisted_recordings, true, false)
-        .await
-        .unwrap();
-
-    let mut scores = listens
+    let mut scores = seeds
         .get_listen_rates()
         .await
         .expect("Couldn't calculate the listens rates");
