@@ -2,10 +2,12 @@ use std::collections::HashMap;
 
 use chrono::{DateTime, Utc};
 use color_eyre::eyre::Context;
+use derive_getters::Getters;
 use serde::{Deserialize, Serialize};
 
 use crate::core::entity_traits::mb_cached::MBCached;
 use crate::models::data::listenbrainz::mapping_data::MappingData;
+use crate::models::data::musicbrainz::recording::mbid::RecordingMBID;
 use crate::models::data::musicbrainz::recording::Recording;
 
 use super::messybrainz::MessyBrainzData;
@@ -15,15 +17,15 @@ pub mod convertion;
 pub mod getters;
 pub mod mapped_listen;
 
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, Getters)]
 pub struct Listen {
     /// The username of the user who listened to it
-    pub user: String,
+    user: String,
 
     /// Time of when the listen happened
     pub listened_at: DateTime<Utc>,
 
-    /// Data that have been sent to listenbrainz durring listen submition
+    /// Data that have been sent to listenbrainz during listen submition
     pub messybrainz_data: MessyBrainzData,
 
     /// Data of the mapping
@@ -48,13 +50,6 @@ impl Listen {
         self.mapping_data
             .as_ref()
             .map(|mapping| &mapping.recording_mbid)
-    }
-
-    /// Return true if the listen is mapped to this recording MBID
-    pub fn is_mapped_to_recording(&self, mbid: &str) -> bool {
-        self.mapping_data
-            .as_ref()
-            .is_some_and(|mapping| mapping.recording_mbid == mbid)
     }
 
     /// Return the recording's data from Musicbrainz from its mapping
@@ -86,5 +81,10 @@ impl Listen {
             .context("Listenbrainz returned an error")?;
 
         Ok(())
+    }
+
+    // Return the recording MBID without checks for cannon mbid
+    pub fn recording_mbid_unchecked(&self) -> Option<RecordingMBID> {
+        self.mapping_data.as_ref().map(|data| data.recording_mbid.clone().into())
     }
 }
