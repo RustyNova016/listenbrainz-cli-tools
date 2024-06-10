@@ -1,4 +1,3 @@
-pub mod config;
 use clap::{Parser, Subcommand};
 use config::ConfigCli;
 
@@ -11,6 +10,7 @@ use crate::tools::unlinked::unmapped_command;
 use super::config::Config;
 
 pub mod common;
+pub mod config;
 pub mod radio;
 
 /// Tools for Listenbrainz
@@ -69,12 +69,10 @@ pub enum Commands {
     /// Generate playlists
     Radio(CliRadios),
 
-    Cache {
-        id: String,
-    },
-
+    //Cache {
+    //    id: String,
+    //},
     Config(ConfigCli),
-
     //Search {},
 
     //Lookup {
@@ -117,10 +115,8 @@ impl Commands {
             Self::Radio(val) => val.command.run().await,
             //Self::Cache { id } => ENTITY_DATABASE.remove(id).await.unwrap(),
 
-            Self::Cache { id } => ENTITY_DATABASE.remove(id).await?,
-
+            //Self::Cache { id } => ENTITY_DATABASE.remove(id).await?,
             Self::Config(val) => val.command.run().await?,
-
             //Self::Lookup { id, username } => lookup(username, id.to_string().into()).await,
         }
 

@@ -23,7 +23,7 @@ pub static CONFIG_FILE: Lazy<PathBuf> = Lazy::new(|| {
         .config_dir()
         .to_path_buf();
     path.push("listenbrainz_cli_tools");
-    fs::create_dir_all(&path).expect("Couldn't create cache directory");
+    fs::create_dir_all(&path).expect("Couldn't create config directory");
     path.push("config.json");
     path
 });

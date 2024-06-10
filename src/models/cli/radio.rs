@@ -164,7 +164,7 @@ impl Radios {
                     username,
                     &Config::get_token_or_argument(username, token),
                     *min,
-                    *cooldown, 
+                    *cooldown,
                     *delay_factor,
                 )
                 .await;

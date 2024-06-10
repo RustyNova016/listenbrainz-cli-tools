@@ -1,6 +1,6 @@
+use crate::models::data::musicbrainz::mbid::MBID;
 use std::io;
 use thiserror::Error;
-use crate::models::data::musicbrainz::mbid::MBID;
 
 #[derive(Error, Debug)]
 #[allow(clippy::enum_variant_names)]
