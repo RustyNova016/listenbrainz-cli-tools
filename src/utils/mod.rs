@@ -110,6 +110,10 @@ pub fn println_cli_warn<T: Display>(string: T) {
     println_cli(format!("[Warning] {string}").yellow());
 }
 
+pub fn println_cli_info<T: Display>(string: T) {
+    println_cli(format!("[Info] {string}").yellow());
+}
+
 pub fn println_lis<T: Display>(string: T) {
     let static_clone = STATIC_LOGGER.clone();
     let logger = static_clone.lock().unwrap();

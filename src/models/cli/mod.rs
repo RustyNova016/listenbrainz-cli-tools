@@ -1,3 +1,5 @@
+pub mod cache;
+use cache::CacheCommand;
 use clap::{Parser, Subcommand};
 use config::ConfigCli;
 
@@ -69,9 +71,7 @@ pub enum Commands {
     /// Generate playlists
     Radio(CliRadios),
 
-    //Cache {
-    //    id: String,
-    //},
+    Cache(CacheCommand),
     Config(ConfigCli),
     //Search {},
 
@@ -113,9 +113,7 @@ impl Commands {
             }
 
             Self::Radio(val) => val.command.run().await,
-            //Self::Cache { id } => ENTITY_DATABASE.remove(id).await.unwrap(),
-
-            //Self::Cache { id } => ENTITY_DATABASE.remove(id).await?,
+            Self::Cache(val) => val.run().await?,
             Self::Config(val) => val.command.run().await?,
             //Self::Lookup { id, username } => lookup(username, id.to_string().into()).await,
         }
