@@ -4,6 +4,7 @@ use std::ops::Deref;
 use std::path::PathBuf;
 use std::sync::Arc;
 
+use cacache::RemoveOpts;
 use cacache::{Integrity, Metadata};
 use chashmap::CHashMap;
 use futures::future::try_join_all;
@@ -128,18 +129,25 @@ where
         let _activate_lock = self.cache_lock.write().await;
         let _write_lock = lock.write().await;
 
-        let Some(metadata_of_entry) = cacache::metadata(&self.name, key.to_string()).await? else {
-            return Ok(());
-        };
-
         // All entries have been entered with their key, making all the duplicates uniques.
         // So it's safe* to just delete the hash
         //
         // Hash collisions may still occure, but if we worry about those, we should worry about using cacache in the first place
-        cacache::remove(&self.name, key.to_string()).await?;
-        cacache::remove_hash(&self.name, &metadata_of_entry.integrity).await?;
+        let deletion_res = RemoveOpts::new()
+            .remove_fully(true)
+            .remove(&self.name, key.to_string())
+            .await;
 
-        Ok(())
+        match deletion_res {
+            Ok(_) => Ok(()),
+            Err(cacache::Error::IoError(err, stri)) => {
+                match err.kind() {
+                    std::io::ErrorKind::NotFound => Ok(()), // This is fine. We wanted it deleted.
+                    _ => Err(cacache::Error::IoError(err, stri)),
+                }
+            }
+            Err(err) => Err(err),
+        }
     }
 
     pub async fn delete_last_entries(
