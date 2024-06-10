@@ -34,7 +34,7 @@ jobs:
           toolchain: ${{ matrix.rust }}
           override: true
 
-      - uses: Swatinem/rust-cache@v1
+      - uses: Swatinem/rust-cache@v2
 
       - uses: taiki-e/install-action@cargo-hack
 
@@ -59,7 +59,7 @@ jobs:
           profile: minimal
           components: clippy
 
-      - uses: Swatinem/rust-cache@v1
+      - uses: Swatinem/rust-cache@v2
 
       - name: Run clippy
         uses: actions-rs/cargo@v1
@@ -79,7 +79,7 @@ jobs:
           override: true
           profile: minimal
 
-      - uses: Swatinem/rust-cache@v1
+      - uses: Swatinem/rust-cache@v2
 
       - name: Run rustdoc
         env:
@@ -102,7 +102,7 @@ jobs:
           profile: minimal
           components: rustfmt
 
-      - uses: Swatinem/rust-cache@v1
+      - uses: Swatinem/rust-cache@v2
 
       - name: Run rustfmt
         uses: actions-rs/cargo@v1
