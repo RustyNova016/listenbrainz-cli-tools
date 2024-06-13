@@ -4,7 +4,7 @@ use clap::{Parser, Subcommand};
 use config::ConfigCli;
 
 use crate::models::cli::common::{GroupByTarget, SortListensBy, SortSorterBy};
-use crate::models::cli::radio::CliRadios;
+use crate::models::cli::radio::RadioCommand;
 use crate::tools::interactive_mapper::interactive_mapper;
 use crate::tools::stats::stats_command;
 use crate::tools::unlinked::unmapped_command;
@@ -69,7 +69,7 @@ pub enum Commands {
     },
 
     /// Generate playlists
-    Radio(CliRadios),
+    Radio(RadioCommand),
 
     Cache(CacheCommand),
     Config(ConfigCli),
@@ -112,7 +112,7 @@ impl Commands {
                 .await;
             }
 
-            Self::Radio(val) => val.command.run().await,
+            Self::Radio(val) => val.run().await?,
             Self::Cache(val) => val.run().await?,
             Self::Config(val) => val.command.run().await?,
             //Self::Lookup { id, username } => lookup(username, id.to_string().into()).await,

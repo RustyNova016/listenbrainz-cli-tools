@@ -1,3 +1,4 @@
+pub mod getters;
 use derive_getters::Getters;
 use musicbrainz_rs::entity::alias::Alias;
 use musicbrainz_rs::entity::genre::Genre;
