@@ -1,10 +1,16 @@
-use itertools::Itertools;
-use listenbrainz::raw::Client;
-
+use crate::core::entity_traits::mbid::IsMbid;
 use crate::models::data::listenbrainz::user_listens::UserListens;
+use crate::models::data::musicbrainz::mbid::extensions::VecTExt;
+use crate::models::radio::RadioConfig;
 use crate::utils::playlist::PlaylistStub;
+use futures::stream;
+use futures::StreamExt;
 
-pub async fn underrated_mix(username: String, token: String) {
+pub async fn underrated_mix(
+    username: String,
+    token: String,
+    config: RadioConfig,
+) -> color_eyre::Result<()> {
     // Get the listens
     let scores = UserListens::get_user_with_refresh(&username)
         .await
@@ -14,16 +20,16 @@ pub async fn underrated_mix(username: String, token: String) {
         .await
         .expect("Couldn't calculate the underrated listens");
 
-    let chunked = scores.chunks(50).collect_vec();
-    let bests = chunked
-        .first()
-        .expect("No recordings have been listened to");
+    let scores_as_recording = stream::iter(scores.clone())
+        .map(|(_, id)| async move { id.get_or_fetch_entity().await })
+        .buffered(1);
+    let playlist = config.finalize_radio_playlist(scores_as_recording).await?;
 
-    let playlist_stub = PlaylistStub::new(
+    PlaylistStub::new(
         format!("{username}'s underrated mix"),
         Some(username.clone()),
         true,
-        bests.iter().map(|x| x.1.clone()).collect_vec(),
+        playlist.into_mbids(),
         Some(format!("A playlist containing all the tracks that {username} listen to, 
             but seemingly no one else does. Come take a listen if you want to find hidden gems!<br>
             <br>
@@ -33,9 +39,7 @@ pub async fn underrated_mix(username: String, token: String) {
             <br>
             Made with: https://github.com/RustyNova016/listenbrainz-cli-tools"
         )),
-    );
+    ).send(&token).await?;
 
-    Client::new()
-        .playlist_create(&token, playlist_stub.into_jspf())
-        .expect("Couldn't send the playlist");
+    Ok(())
 }

@@ -1,3 +1,4 @@
+pub mod extensions;
 use derive_more::{Display, From, IsVariant, Unwrap};
 use serde::{Deserialize, Serialize};
 

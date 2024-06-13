@@ -1,9 +1,13 @@
+use std::ops::Deref;
+
 use clap::ArgAction;
 use clap::{Parser, Subcommand};
 
 use crate::core::statistics::listen_rate::ListenRate;
 use crate::core::statistics::listen_rate::ListenRateRange;
 use crate::models::config::Config;
+use crate::models::radio::RadioConfig;
+use crate::models::radio::RadioConfigBuilder;
 use crate::tools::radio::circles::create_radio_mix;
 use crate::tools::radio::listen_rate::listen_rate_radio;
 use crate::tools::radio::overdue::overdue_radio;
@@ -11,13 +15,47 @@ use crate::tools::radio::underrated::underrated_mix;
 
 #[derive(Parser, Debug, Clone)]
 #[command(version, about, long_about = None)]
-pub struct CliRadios {
+pub struct RadioCommand {
     #[command(subcommand)]
-    pub command: Radios,
+    pub command: RadioSubcommands,
+
+    #[arg(long)]
+    min_count: Option<u64>,
+
+    #[arg(long)]
+    min_duration: Option<String>,
+}
+
+impl RadioCommand {
+    pub fn get_config(&self) -> RadioConfig {
+        let mut config_builder = RadioConfigBuilder::default();
+
+        if let Some(val) = self.min_count {
+            config_builder.min_count(val);
+        }
+
+        if let Some(val) = self.min_duration.as_ref() {
+            let dura: humantime::Duration = val
+                .clone()
+                .parse()
+                .expect("Couldn't parse mimimum lenght for radio");
+            let std_dura = dura.deref();
+            let chrono_dura = chrono::Duration::from_std(*std_dura).unwrap();
+            config_builder.min_duration(chrono_dura);
+        }
+
+        config_builder.build().expect("Couldn't generate config")
+    }
+
+    pub async fn run(&self) -> color_eyre::Result<()> {
+        let config = self.get_config();
+
+        self.command.run(config).await
+    }
 }
 
 #[derive(Subcommand, Debug, Clone)]
-pub enum Radios {
+pub enum RadioSubcommands {
     /// Radio based on artist that already got listened to
     Circles {
         /// Name of the user to fetch unlinked listen from
@@ -98,8 +136,8 @@ pub enum Radios {
     },
 }
 
-impl Radios {
-    pub async fn run(&self) {
+impl RadioSubcommands {
+    pub async fn run(&self, config: RadioConfig) -> color_eyre::Result<()> {
         match self {
             Self::Circles {
                 username,
@@ -111,6 +149,7 @@ impl Radios {
                     username,
                     Config::get_token_or_argument(username, token),
                     *unlistened,
+                    config,
                 )
                 .await;
             }
@@ -119,8 +158,9 @@ impl Radios {
                 underrated_mix(
                     username.clone(),
                     Config::get_token_or_argument(username, token),
+                    config,
                 )
-                .await;
+                .await?;
             }
 
             Self::Rate {
@@ -149,8 +189,9 @@ impl Radios {
                     rate,
                     *min,
                     *cooldown,
+                    config,
                 )
-                .await;
+                .await?;
             }
 
             Self::Overdue {
@@ -166,9 +207,12 @@ impl Radios {
                     *min,
                     *cooldown,
                     *delay_factor,
+                    config,
                 )
-                .await;
+                .await?;
             }
         }
+
+        Ok(())
     }
 }

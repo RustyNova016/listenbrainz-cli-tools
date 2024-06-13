@@ -13,15 +13,21 @@ use crate::models::data::listenbrainz::listen::Listen;
 use crate::models::data::listenbrainz::user_listens::UserListens;
 use crate::models::data::musicbrainz::artist::Artist;
 use crate::models::data::musicbrainz::recording::Recording;
+use crate::models::radio::RadioConfig;
 use crate::utils::playlist::PlaylistStub;
 
-pub async fn create_radio_mix(username: &str, token: String, unlistened: bool) {
+pub async fn create_radio_mix(
+    username: &str,
+    token: String,
+    unlistened: bool,
+    config: RadioConfig,
+) {
     let listens = UserListens::get_user_with_refresh(username)
         .await
         .expect("Couldn't fetch the new listens")
         .get_mapped_listens();
 
-    let radio = RadioCircle { unlistened };
+    let radio = RadioCircle { unlistened, config };
 
     Client::new()
         .playlist_create(
@@ -37,6 +43,7 @@ pub async fn create_radio_mix(username: &str, token: String, unlistened: bool) {
 
 pub struct RadioCircle {
     unlistened: bool,
+    config: RadioConfig,
 }
 
 impl RadioCircle {
@@ -103,7 +110,8 @@ impl RadioCircle {
                 results.push(recording);
             }
 
-            if results.len() > 50 {
+            // Check if we have enough
+            if self.config.check_min_lenght(&results) {
                 return eyre::Ok(results);
             }
         }
