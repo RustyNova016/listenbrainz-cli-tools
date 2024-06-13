@@ -19,14 +19,15 @@ async fn main() -> color_eyre::Result<()> {
 
     println!("Hello!");
 
-    println_cli("Cleaning some old entries...");
-    MUSICBRAINZ_DATABASE.invalidate_last_entries(10, 10).await?;
-    println_cli("Done!");
-
     cli.command
         .run()
         .await
         .expect("An error occured in the app");
+
+    println_cli("Optional cleanup - This is fine to cancel");
+    println_cli("Cleaning some old entries...");
+    MUSICBRAINZ_DATABASE.invalidate_last_entries(10, 10).await?;
+    println_cli("Done!");
 
     println_cli("Have a nice day!");
     Ok(())
