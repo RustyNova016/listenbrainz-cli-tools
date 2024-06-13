@@ -1,7 +1,7 @@
 use listenbrainz::raw::response::UserListensListen;
 use serde::{Deserialize, Serialize};
 
-use crate::utils::extensions::listenbrainz::UserListensTrackMetadataExt;
+use crate::utils::extensions::listenbrainz_ext::UserListensTrackMetadataExt;
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub struct MessyBrainzData {

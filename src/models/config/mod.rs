@@ -1,14 +1,9 @@
+pub mod recording_timeout;
+use crate::core::entity_traits::config_file::ConfigFile;
 use derive_getters::Getters;
 use serde::Deserialize;
 use serde::Serialize;
 use std::collections::HashMap;
-use std::fs::File;
-use std::io;
-use std::io::ErrorKind;
-
-use crate::core::caching::CONFIG_FILE;
-
-use super::error::Error;
 
 #[derive(Debug, Serialize, Deserialize, Getters, Default)]
 pub struct Config {
@@ -33,30 +28,10 @@ impl Config {
 
         panic!("No token was provided. To properly run, this command need an user token.")
     }
+}
 
-    pub fn save(&self) -> color_eyre::Result<()> {
-        let config_file = File::create(CONFIG_FILE.as_path())?;
-        serde_json::to_writer_pretty(config_file, self)?;
-        Ok(())
-    }
-
-    fn get_config_reader() -> io::Result<Option<File>> {
-        match File::open(CONFIG_FILE.as_path()) {
-            Ok(reader) => Ok(Some(reader)),
-            Err(err) => match err.kind() {
-                ErrorKind::NotFound => Ok(None),
-                _ => Err(err),
-            },
-        }
-    }
-
-    pub fn load() -> Result<Self, Error> {
-        match Self::get_config_reader() {
-            Ok(Some(data)) => {
-                serde_json::from_reader(data).map_err(Error::ConfigLoadDeserializationError)
-            }
-            Ok(None) => Ok(Self::default()),
-            Err(err) => Err(Error::ConfigLoadError(err)),
-        }
+impl ConfigFile for Config {
+    fn file_name() -> &'static str {
+        "config.json"
     }
 }

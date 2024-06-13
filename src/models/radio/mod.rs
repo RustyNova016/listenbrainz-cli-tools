@@ -1,3 +1,6 @@
+use crate::utils::println_cli_info;
+
+use super::config::recording_timeout::RecordingTimeoutConfig;
 use super::data::musicbrainz::recording::Recording;
 use chrono::Duration;
 use derive_builder::Builder;
@@ -41,8 +44,21 @@ impl RadioConfig {
         E: Sync + Send,
     {
         let mut results = Vec::new();
+        let timed_out_recordings = RecordingTimeoutConfig::get_timed_out_recordings()
+            .expect("Couldn't fetch the timeout config");
+        #[cfg(debug_assertions)]
+        println_cli_info(format!("Found {} timeouts", timed_out_recordings.len()));
 
         while let Some(recording) = generator.next().await.transpose()? {
+            if timed_out_recordings.contains(recording.id()) {
+                println_cli_info(format!(
+                    "Ignoring {} ({}). Recording in timeout",
+                    recording.title(),
+                    recording.id()
+                ));
+                continue;
+            }
+
             results.push(recording);
 
             if self.check_min_lenght(&results) {
