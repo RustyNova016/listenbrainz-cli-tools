@@ -1,5 +1,6 @@
 pub mod cached;
 pub mod cached_trait;
+pub mod config_file;
 pub mod externals;
 pub mod fetchable;
 pub mod has_id;

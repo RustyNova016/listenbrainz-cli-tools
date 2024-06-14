@@ -10,7 +10,7 @@ impl MBID {
         Self::from_string_url(value).or_else(|_| Self::from_mbid_string(value, assumed_type))
     }
 
-    pub fn from_mbid_string(value: &str, assumed_type: MBIDKind) -> Result<Self, Error> {
+    fn from_mbid_string(value: &str, assumed_type: MBIDKind) -> Result<Self, Error> {
         if is_string_mbid(value) {
             Ok(assumed_type.to_mbid(value.to_string()))
         } else {
