@@ -1,4 +1,5 @@
 use crate::core::entity_traits::mbid::IsMbid;
+use crate::models::data::listenbrainz::listen::collection::MappedListensCollection::MappedListensCollectionExt;
 use crate::models::data::listenbrainz::user_listens::UserListens;
 use crate::models::data::musicbrainz::mbid::extensions::VecTExt;
 use crate::models::radio::RadioConfig;
@@ -22,11 +23,11 @@ pub async fn overdue_radio(
     let mut listens = UserListens::get_user_with_refresh(username)
         .await
         .expect("Couldn't fetch the new listens")
-        .get_mapped_listens();
+        .get_mapped_listens_as_specialized();
 
     let deadline = Utc::now() - Duration::hours(cooldown as i64);
     let blacklisted_recordings = listens
-        .get_listened_after(&deadline)
+        .retain_ref_listened_after(&deadline)
         .get_listened_recordings_mbids()
         .await
         .unwrap();

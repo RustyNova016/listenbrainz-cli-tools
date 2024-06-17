@@ -1,3 +1,6 @@
+pub mod MappedListensCollection;
+pub mod collection_spe;
+pub mod collection_unspe;
 mod converters;
 pub mod filters;
 pub mod listen_rate;
@@ -20,6 +23,7 @@ use derive_more::*;
 
 /// Wrapper for a vector of listens
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, Deref, DerefMut, IntoIterator)]
+#[deprecated]
 pub struct ListenCollection {
     #[deref]
     #[deref_mut]
