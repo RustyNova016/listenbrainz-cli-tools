@@ -13,6 +13,7 @@ use crate::models::data::musicbrainz::recording::Recording;
 use super::listen_spe::ListenSpe;
 use super::listen_spe::MappedPrimary;
 use super::mapped_primary::MappedListen;
+use super::Listen;
 
 pub type NaiveMappedListen = ListenSpe<MappingData>;
 
@@ -64,7 +65,22 @@ impl NaiveMappedListen {
             listened_at: self.listened_at,
             mapping_data: new_id,
             messybrainz_data: self.messybrainz_data.clone(),
-            user: self.user.clone()
+            user: self.user.clone(),
         })
+    }
+
+    fn into_legacy(self) -> Listen {
+        self.into()
+    }
+}
+
+impl From<NaiveMappedListen> for Listen {
+    fn from(value: NaiveMappedListen) -> Self {
+        Listen {
+            listened_at: value.listened_at,
+            mapping_data: Some(value.mapping_data),
+            user: value.user,
+            messybrainz_data: value.messybrainz_data
+        }
     }
 }

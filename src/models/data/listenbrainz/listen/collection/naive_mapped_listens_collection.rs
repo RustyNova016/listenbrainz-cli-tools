@@ -12,9 +12,14 @@ use itertools::Itertools;
 
 use crate::models::data::listenbrainz::listen::listen_spe::ListenSpe;
 use crate::models::data::listenbrainz::listen::listen_spe::MappedNaive;
+use crate::models::data::listenbrainz::listen::stream::convertion::SExt;
 use crate::models::data::musicbrainz::mbid::generic_mbid::MBIDSpe;
 use crate::models::data::musicbrainz::mbid::generic_mbid::NaiveID;
 use crate::models::data::musicbrainz::recording::mbid::RecordingMBID;
+use crate::utils::extensions::future_ext::cStreamExt;
+use futures::TryStreamExt;
+
+use super::mapped_listen_collection::MappedListenCollection;
 
 pub type MappedNaiveListensCollection = Vec<Arc<ListenSpe<MappedNaive>>>;
 
@@ -98,11 +103,14 @@ pub impl MappedNaiveListensCollection {
         Ok(result)
     }
 
-    async fn as_naive_recording_mbid_stream(
-        &self,
-    ) -> impl Stream<Item = MBIDSpe<RecordingMBID, NaiveID>> {
+    async fn into_primary(self) -> color_eyre::Result<MappedListenCollection> {
         stream::iter(self)
-            .map(|listen| listen.get_recording_mbid())
-            .buffer_unordered(20)
+            .map(|listen| listen.as_ref().clone())
+            .map(|a| a)
+            .into_primary()
+            .and_then(Arc::new)
+            .buffer_unordered_non_future(50)
+            .try_collect()
+            .await
     }
 }

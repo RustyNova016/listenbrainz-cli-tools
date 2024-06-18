@@ -9,11 +9,8 @@ use serde::{Deserialize, Serialize};
 use crate::utils::extensions::UserListensPayloadExt;
 
 use super::listen::collection::collection_unspe::VecListenMappingStateExt;
+use super::listen::collection::naive_mapped_listens_collection::MappedNaiveListensCollection;
 use super::listen::collection::ListenCollection;
-use super::listen::collection::MappedListensCollection::MappedNaiveListensCollection;
-use super::listen::listen_spe::ListenSpe;
-use super::listen::listen_spe::MappedNaive;
-use super::listen::listen_unspe::ListenMappingState;
 use super::listen::Listen;
 
 pub mod caching;

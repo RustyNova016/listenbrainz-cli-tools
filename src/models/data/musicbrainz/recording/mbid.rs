@@ -59,13 +59,18 @@ impl RecordingMBID {
     }
 }
 
-impl<S> MBIDSpe<Recording, S> where S: IdAliasState {
+impl<S> MBIDSpe<Recording, S>
+where
+    S: IdAliasState,
+{
     pub fn into_legacy(self) -> RecordingMBID {
         RecordingMBID(self.deref().to_string())
     }
 
     pub async fn into_primary(self) -> color_eyre::Result<MBIDSpe<Recording, PrimaryID>> {
-        let primary_alias = Recording::get_cache().get_or_fetch_primary_mbid_alias(&self.into_legacy()).await?;
+        let primary_alias = Recording::get_cache()
+            .get_or_fetch_primary_mbid_alias(&self.into_legacy())
+            .await?;
 
         Ok(MBIDSpe::from(primary_alias.to_string()))
     }

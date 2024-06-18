@@ -1,16 +1,19 @@
 use crate::core::entity_traits::mbid::IsMbid;
-use crate::models::data::listenbrainz::listen::collection::MappedListensCollection::MappedListensCollectionExt;
+use crate::models::data::listenbrainz::listen::collection::naive_mapped_listens_collection::MappedNaiveListensCollectionExt;
 use crate::models::data::listenbrainz::user_listens::UserListens;
 use crate::models::data::musicbrainz::mbid::extensions::VecTExt;
 use crate::models::radio::RadioConfig;
 use crate::utils::playlist::PlaylistStub;
 use chrono::prelude::Utc;
 use chrono::Duration;
+use color_eyre::eyre::Context;
 use futures::stream;
 use futures::StreamExt;
 use rust_decimal::prelude::Decimal;
 use rust_decimal::prelude::FromPrimitive;
+use crate::models::data::listenbrainz::listen::collection::mapped_listen_collection::MappedListenCollectionExt;
 use std::cmp::Reverse;
+use crate::models::data::listenbrainz::listen::collection::common::ListenCollectionCommons;
 
 pub async fn overdue_radio(
     username: &str,
@@ -23,22 +26,21 @@ pub async fn overdue_radio(
     let mut listens = UserListens::get_user_with_refresh(username)
         .await
         .expect("Couldn't fetch the new listens")
-        .get_mapped_listens_as_specialized();
+        .get_mapped_listens_as_specialized()
+        .into_primary()
+        .await
+        .context("Couldn't find primary mapping aliases")?;
 
     let deadline = Utc::now() - Duration::hours(cooldown as i64);
     let blacklisted_recordings = listens
-        .retain_ref_listened_after(&deadline)
-        .as_legacy_recording_mbids()
-        .await
-        .unwrap();
+        .clone()
+        .extract_ref_listened_after(&deadline)
+        .into_recordings_mbids();
 
     // Filter out all the listens of blacklisted recordings
-    listens = listens
-        .filter_out_recordings_naive(&blacklisted_recordings)
-        .await
-        .unwrap();
+    listens = listens.remove_listens_of_mbids(&blacklisted_recordings);
 
-    let mut scores = listens
+    let mut scores = listens.into_legacy()
         .get_listen_rates()
         .await
         .expect("Couldn't calculate the listens rates");
