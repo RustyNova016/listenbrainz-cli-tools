@@ -20,12 +20,7 @@ pub enum ListenMappingState {
 impl ListenMappingState {
     pub async fn get_primary_recording_id(&self) -> color_eyre::Result<Option<RecordingMBID>> {
         match self {
-            Self::Mapped(val) => {
-                val.get_primary_recording_id()
-                    .await
-                    .map(Some)
-                    
-            }
+            Self::Mapped(val) => val.get_recording_mbid().await.map(Some),
             Self::Unmapped(_) => Ok(None),
         }
     }
@@ -40,8 +35,7 @@ impl ListenMappingState {
     pub fn as_mapped(&self) -> Option<&Arc<ListenSpe<Mapped>>> {
         match self {
             Self::Mapped(val) => Some(val),
-            _ => None
+            _ => None,
         }
     }
-
 }

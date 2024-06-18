@@ -43,7 +43,13 @@ impl From<ListenSpe<Unmapped>> for ListenMappingState {
 impl From<Listen> for ListenMappingState {
     fn from(value: Listen) -> Self {
         if value.is_mapped() {
-            ListenSpe::new_mapped(value.user, value.listened_at, value.messybrainz_data, value.mapping_data.unwrap()).into()
+            ListenSpe::new_mapped(
+                value.user,
+                value.listened_at,
+                value.messybrainz_data,
+                value.mapping_data.unwrap(),
+            )
+            .into()
         } else {
             ListenSpe::new_unmapped(value.user, value.listened_at, value.messybrainz_data).into()
         }

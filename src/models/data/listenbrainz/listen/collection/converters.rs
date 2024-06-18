@@ -30,6 +30,9 @@ impl ListenCollection {
 
 impl From<ListenCollection> for Vec<ListenMappingState> {
     fn from(value: ListenCollection) -> Self {
-        value.into_iter().map(|listen| listen.as_ref().clone().into()).collect_vec()
+        value
+            .into_iter()
+            .map(|listen| listen.as_ref().clone().into())
+            .collect_vec()
     }
 }

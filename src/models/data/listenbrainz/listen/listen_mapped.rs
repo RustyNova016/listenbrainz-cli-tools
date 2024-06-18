@@ -30,11 +30,11 @@ impl ListenSpe<MappingData> {
         &self.mapping_data.recording_mbid
     }
 
-    pub fn get_recording_mbid(&self) -> RecordingMBID {
+    pub fn get_naive_recording_mbid(&self) -> RecordingMBID {
         self.mapping_data.recording_mbid.clone().into()
     }
 
-    pub async fn get_primary_recording_id(&self) -> color_eyre::Result<RecordingMBID> {
+    pub async fn get_recording_mbid(&self) -> color_eyre::Result<RecordingMBID> {
         self.mapping_data
             .get_recording_mbid()
             .get_or_fetch_primary_mbid_alias()
@@ -43,6 +43,6 @@ impl ListenSpe<MappingData> {
 
     /// Return the recording's data from Musicbrainz from its mapping
     pub async fn get_recording_data(&self) -> color_eyre::Result<Recording> {
-        self.get_recording_mbid().get_or_fetch_entity().await
+        self.get_naive_recording_mbid().get_or_fetch_entity().await
     }
 }

@@ -28,13 +28,13 @@ pub async fn overdue_radio(
     let deadline = Utc::now() - Duration::hours(cooldown as i64);
     let blacklisted_recordings = listens
         .retain_ref_listened_after(&deadline)
-        .get_listened_recordings_mbids()
+        .as_recording_mbids()
         .await
         .unwrap();
 
     // Filter out all the listens of blacklisted recordings
     listens = listens
-        .filter_recordings(&blacklisted_recordings, true, false)
+        .filter_out_recordings_naive(&blacklisted_recordings)
         .await
         .unwrap();
 
