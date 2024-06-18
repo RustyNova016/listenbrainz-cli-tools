@@ -6,7 +6,9 @@ use crate::models::data::listenbrainz::messybrainz::MessyBrainzData;
 use super::listen_spe::ListenSpe;
 use super::listen_spe::Unmapped;
 
-impl ListenSpe<Unmapped> {
+pub type UnmappedListen = ListenSpe<Unmapped>;
+
+impl UnmappedListen {
     pub fn new_unmapped(
         username: String,
         listened_at: DateTime<Utc>,

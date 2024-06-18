@@ -1,6 +1,9 @@
 use std::marker::PhantomData;
 use std::ops::Deref;
 
+use crate::core::entity_traits::mb_cached::MBCached;
+use crate::core::entity_traits::mbid::HasMBID;
+use crate::core::entity_traits::mbid::IsMbid;
 use crate::models::data::musicbrainz::artist::Artist;
 use crate::models::data::musicbrainz::recording::Recording;
 
@@ -28,7 +31,8 @@ impl IdAliasState for PrimaryID {}
 pub trait MBIDSpeMethods<T: IdEntityType, S: IdAliasState> {}
 
 /// `MBIDSpe`'s Common Methods that change depending on the type only
-pub trait MBIDSpeTypeMethods<T: IdEntityType> {}
+pub trait MBIDSpeTypeMethods<T: IdEntityType> {
+}
 
 /// `MBIDSpe`'s Common Methods that change depending on the state only
 pub trait MBIDSpeStateMethods<S: IdAliasState> {}
@@ -41,7 +45,7 @@ impl<T: IdEntityType, S: IdAliasState> Deref for MBIDSpe<T, S> {
     }
 }
 
-impl<T: IdEntityType, S: IdAliasState> From<String> for MBIDSpe<T, S> {
+impl<T, S> From<String> for MBIDSpe<T, S> where T: IdEntityType, S: IdAliasState {
     fn from(value: String) -> Self {
         Self {
             id: value,

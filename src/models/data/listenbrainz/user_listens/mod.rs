@@ -10,9 +10,9 @@ use crate::utils::extensions::UserListensPayloadExt;
 
 use super::listen::collection::collection_unspe::VecListenMappingStateExt;
 use super::listen::collection::ListenCollection;
-use super::listen::collection::MappedListensCollection::MappedListensCollection;
+use super::listen::collection::MappedListensCollection::MappedNaiveListensCollection;
 use super::listen::listen_spe::ListenSpe;
-use super::listen::listen_spe::Mapped;
+use super::listen::listen_spe::MappedNaive;
 use super::listen::listen_unspe::ListenMappingState;
 use super::listen::Listen;
 
@@ -97,7 +97,7 @@ impl UserListens {
         self.listens.get_mapped_listens()
     }
 
-    pub fn get_mapped_listens_as_specialized(&self) -> MappedListensCollection {
+    pub fn get_mapped_listens_as_specialized(&self) -> MappedNaiveListensCollection {
         self.listens
             .clone()
             .into_listen_mapping_state_vec()

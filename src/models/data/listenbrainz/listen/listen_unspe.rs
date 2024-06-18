@@ -3,7 +3,7 @@ use std::sync::Arc;
 use crate::models::data::musicbrainz::recording::mbid::RecordingMBID;
 
 use super::listen_spe::ListenSpe;
-use super::listen_spe::Mapped;
+use super::listen_spe::MappedNaive;
 use super::listen_spe::Unmapped;
 use chrono::DateTime;
 use chrono::Utc;
@@ -14,7 +14,7 @@ use serde::Serialize;
 #[derive(Unwrap, IsVariant, Debug, Deserialize, Serialize, Clone, PartialEq, Eq)]
 pub enum ListenMappingState {
     Unmapped(Arc<ListenSpe<Unmapped>>),
-    Mapped(Arc<ListenSpe<Mapped>>),
+    Mapped(Arc<ListenSpe<MappedNaive>>),
 }
 
 impl ListenMappingState {
@@ -32,7 +32,7 @@ impl ListenMappingState {
         }
     }
 
-    pub fn as_mapped(&self) -> Option<&Arc<ListenSpe<Mapped>>> {
+    pub fn as_mapped(&self) -> Option<&Arc<ListenSpe<MappedNaive>>> {
         match self {
             Self::Mapped(val) => Some(val),
             _ => None,

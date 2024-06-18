@@ -4,7 +4,7 @@ use crate::models::data::listenbrainz::listen::listen_unspe::ListenMappingState;
 use crate::models::data::musicbrainz::recording::mbid::RecordingMBID;
 
 use super::ListenCollection;
-use super::MappedListensCollection::MappedListensCollection;
+use super::MappedListensCollection::MappedNaiveListensCollection;
 
 impl ListenCollection {
     pub async fn get_listened_recordings_mbids(&self) -> color_eyre::Result<Vec<RecordingMBID>> {

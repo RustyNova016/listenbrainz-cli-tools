@@ -23,3 +23,4 @@ where
     T: HasMBID<Self> + MBCached<Self>,
 {
 }
+

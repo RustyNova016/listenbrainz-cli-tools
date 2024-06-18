@@ -1,3 +1,5 @@
+use std::ops::Deref;
+
 use color_eyre::eyre::Context;
 use derive_more::{Deref, DerefMut, Display, From, Into};
 use musicbrainz_rs::entity::recording::Recording as RecordingMS;
@@ -10,6 +12,8 @@ use crate::models::data::musicbrainz::external_musicbrainz_entity::ExternalMusic
 use crate::models::data::musicbrainz::mbid::generic_mbid::IdAliasState;
 use crate::models::data::musicbrainz::mbid::generic_mbid::MBIDSpe;
 use crate::models::data::musicbrainz::mbid::generic_mbid::MBIDSpeTypeMethods;
+use crate::models::data::musicbrainz::mbid::generic_mbid::NaiveID;
+use crate::models::data::musicbrainz::mbid::generic_mbid::PrimaryID;
 use crate::models::data::musicbrainz::mbid::MBID;
 use crate::models::data::musicbrainz::recording::external::RecordingExt;
 use crate::utils::println_mus;
@@ -49,4 +53,20 @@ impl IsMbid<Recording> for RecordingMBID {
     }
 }
 
-impl<S: IdAliasState> MBIDSpeTypeMethods<Recording> for MBIDSpe<Recording, S> {}
+impl RecordingMBID {
+    pub fn into_naive(self) -> MBIDSpe<Recording, NaiveID> {
+        MBIDSpe::from(self.to_string())
+    }
+}
+
+impl<S> MBIDSpe<Recording, S> where S: IdAliasState {
+    pub fn into_legacy(self) -> RecordingMBID {
+        RecordingMBID(self.deref().to_string())
+    }
+
+    pub async fn into_primary(self) -> color_eyre::Result<MBIDSpe<Recording, PrimaryID>> {
+        let primary_alias = Recording::get_cache().get_or_fetch_primary_mbid_alias(&self.into_legacy()).await?;
+
+        Ok(MBIDSpe::from(primary_alias.to_string()))
+    }
+}

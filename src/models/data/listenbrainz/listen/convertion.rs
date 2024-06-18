@@ -7,7 +7,7 @@ use crate::models::data::listenbrainz::mapping_data::MappingData;
 use crate::models::data::listenbrainz::messybrainz::MessyBrainzData;
 
 use super::listen_spe::ListenSpe;
-use super::listen_spe::Mapped;
+use super::listen_spe::MappedNaive;
 use super::listen_spe::Unmapped;
 use super::listen_unspe::ListenMappingState;
 use super::Listen;
@@ -28,8 +28,8 @@ impl From<UserListensListen> for Listen {
     }
 }
 
-impl From<ListenSpe<Mapped>> for ListenMappingState {
-    fn from(value: ListenSpe<Mapped>) -> Self {
+impl From<ListenSpe<MappedNaive>> for ListenMappingState {
+    fn from(value: ListenSpe<MappedNaive>) -> Self {
         Self::Mapped(Arc::new(value))
     }
 }

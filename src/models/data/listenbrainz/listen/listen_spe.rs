@@ -7,6 +7,9 @@ use serde::{Deserialize, Serialize};
 
 use crate::models::data::listenbrainz::mapping_data::MappingData;
 use crate::models::data::listenbrainz::messybrainz::MessyBrainzData;
+use crate::models::data::musicbrainz::mbid::generic_mbid::MBIDSpe;
+use crate::models::data::musicbrainz::mbid::generic_mbid::PrimaryID;
+use crate::models::data::musicbrainz::recording::Recording;
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, Getters)]
 pub struct ListenSpe<S>
@@ -29,11 +32,13 @@ where
 // Typestate
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, Getters)]
 pub struct Unmapped {}
-pub type Mapped = MappingData;
+pub type MappedNaive = MappingData;
+pub type MappedPrimary = MBIDSpe<Recording, PrimaryID>;
 
 pub trait MappingState {}
 impl MappingState for Unmapped {}
-impl MappingState for Mapped {}
+impl MappingState for MappedNaive {}
+impl MappingState for MappedPrimary {}
 
 // Base impls
 impl<S> ListenSpe<S>
