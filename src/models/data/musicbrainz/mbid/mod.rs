@@ -1,4 +1,5 @@
 pub mod extensions;
+pub mod generic_mbid;
 use derive_more::{Display, From, IsVariant, Unwrap};
 use serde::{Deserialize, Serialize};
 

@@ -7,6 +7,9 @@ use serde::{Deserialize, Serialize};
 use crate::core::entity_traits::mb_cached::MBCached;
 use crate::core::entity_traits::mbid::IsMbid;
 use crate::models::data::musicbrainz::external_musicbrainz_entity::ExternalMusicBrainzEntity;
+use crate::models::data::musicbrainz::mbid::generic_mbid::IdAliasState;
+use crate::models::data::musicbrainz::mbid::generic_mbid::MBIDSpe;
+use crate::models::data::musicbrainz::mbid::generic_mbid::MBIDSpeTypeMethods;
 use crate::models::data::musicbrainz::mbid::MBID;
 use crate::models::data::musicbrainz::recording::external::RecordingExt;
 use crate::utils::println_mus;
@@ -45,3 +48,5 @@ impl IsMbid<Recording> for RecordingMBID {
         MBID::Recording(self)
     }
 }
+
+impl<S: IdAliasState> MBIDSpeTypeMethods<Recording> for MBIDSpe<Recording, S> {}
