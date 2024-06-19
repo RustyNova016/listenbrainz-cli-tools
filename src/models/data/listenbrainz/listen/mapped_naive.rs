@@ -1,7 +1,5 @@
 use chrono::DateTime;
 use chrono::Utc;
-
-use crate::core::entity_traits::mbid::is_cached_mbid::IsCachedMBID;
 use crate::core::entity_traits::mbid::IsMbid;
 use crate::models::data::listenbrainz::mapping_data::MappingData;
 use crate::models::data::listenbrainz::messybrainz::MessyBrainzData;
@@ -11,7 +9,6 @@ use crate::models::data::musicbrainz::recording::mbid::RecordingMBID;
 use crate::models::data::musicbrainz::recording::Recording;
 
 use super::listen_spe::ListenSpe;
-use super::listen_spe::MappedPrimary;
 use super::mapped_primary::MappedListen;
 use super::Listen;
 
@@ -45,14 +42,6 @@ impl NaiveMappedListen {
         self.mapping_data.recording_mbid.clone().into()
     }
 
-    #[deprecated]
-    pub async fn get_recording_mbid(&self) -> color_eyre::Result<RecordingMBID> {
-        self.mapping_data
-            .get_recording_mbid()
-            .get_or_fetch_primary_mbid_alias()
-            .await
-    }
-
     /// Return the recording's data from Musicbrainz from its mapping
     pub async fn get_recording_data(&self) -> color_eyre::Result<Recording> {
         self.get_legacy_recording_mbid().get_or_fetch_entity().await
@@ -68,19 +57,15 @@ impl NaiveMappedListen {
             user: self.user.clone(),
         })
     }
-
-    fn into_legacy(self) -> Listen {
-        self.into()
-    }
 }
 
 impl From<NaiveMappedListen> for Listen {
     fn from(value: NaiveMappedListen) -> Self {
-        Listen {
+        Self {
             listened_at: value.listened_at,
             mapping_data: Some(value.mapping_data),
             user: value.user,
-            messybrainz_data: value.messybrainz_data
+            messybrainz_data: value.messybrainz_data,
         }
     }
 }

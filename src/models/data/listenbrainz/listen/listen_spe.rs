@@ -45,10 +45,6 @@ impl<S> ListenSpe<S>
 where
     S: MappingState,
 {
-    pub fn get_listened_at(&self) -> &DateTime<Utc> {
-        &self.listened_at
-    }
-
     pub fn get_messybrain_data(&self) -> &MessyBrainzData {
         &self.messybrainz_data
     }

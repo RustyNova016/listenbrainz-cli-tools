@@ -1,13 +1,10 @@
-use std::sync::Arc;
-
 use color_eyre::eyre::Report;
 use extend::ext;
 use futures::Stream;
 use futures::StreamExt;
 use futures::TryStream;
-use futures::TryStreamExt;
 
-use crate::models::data::listenbrainz::listen::listen_mapped::NaiveMappedListen;
+use crate::models::data::listenbrainz::listen::mapped_naive::NaiveMappedListen;
 use crate::models::data::listenbrainz::listen::mapped_primary::MappedListen;
 
 #[ext]

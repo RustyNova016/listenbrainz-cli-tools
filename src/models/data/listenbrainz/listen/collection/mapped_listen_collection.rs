@@ -1,16 +1,11 @@
-use std::sync::Arc;
-
-use crate::core::statistics::listen_rate::ListenRate;
-use crate::models::cli::common::GroupByTarget;
 use crate::models::data::listenbrainz::listen::listen_spe::ListenSpe;
 use crate::models::data::listenbrainz::listen::listen_spe::MappedPrimary;
-use crate::models::data::listenbrainz::listen::Listen;
 use crate::models::data::musicbrainz::mbid::generic_mbid::MBIDSpe;
 use crate::models::data::musicbrainz::mbid::generic_mbid::PrimaryID;
 use crate::models::data::musicbrainz::recording::Recording;
-use chrono::Utc;
 use extend::ext;
 use itertools::Itertools;
+use std::sync::Arc;
 
 use super::ListenCollection;
 
@@ -25,12 +20,23 @@ pub impl MappedListenCollection {
     }
 
     fn remove_listens_of_mbids(self, blacklist: &[MBIDSpe<Recording, PrimaryID>]) -> Self {
-        self.into_iter().filter(|listen| !blacklist.contains(listen.get_recording_mbid())).collect_vec()
+        self.into_iter()
+            .filter(|listen| !blacklist.contains(listen.get_recording_mbid()))
+            .collect_vec()
     }
 
     fn into_legacy(self) -> ListenCollection {
-        let vec_of_legacy = self.into_iter().map(|listen| Arc::new(listen.as_ref().clone().into_legacy())).collect_vec();
+        let vec_of_legacy = self
+            .into_iter()
+            .map(|listen| Arc::new(listen.as_ref().clone().into_legacy()))
+            .collect_vec();
 
         ListenCollection::from_iter(vec_of_legacy)
+    }
+
+    fn keep_only_recording(self, id: &MBIDSpe<Recording, PrimaryID>) -> Self {
+        self.into_iter()
+            .filter(|listen| listen.get_recording_mbid() == id)
+            .collect_vec()
     }
 }

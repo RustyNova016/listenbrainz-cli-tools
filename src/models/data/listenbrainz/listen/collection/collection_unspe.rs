@@ -10,7 +10,7 @@ use crate::models::data::listenbrainz::listen::listen_unspe::ListenMappingState;
 pub impl Vec<ListenMappingState> {
     fn into_mapped_collection(self) -> Vec<Arc<ListenSpe<MappedNaive>>> {
         self.into_iter()
-            .filter_map(|listen| listen.as_mapped().cloned())
+            .filter_map(|listen| listen.as_mapped_naive().cloned())
             .collect()
     }
 }

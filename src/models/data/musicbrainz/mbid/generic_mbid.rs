@@ -1,9 +1,12 @@
+use serde::Deserialize;
+use serde::Serialize;
+
 use crate::models::data::musicbrainz::artist::Artist;
 use crate::models::data::musicbrainz::recording::Recording;
 use std::marker::PhantomData;
 use std::ops::Deref;
 
-#[derive(Debug, PartialEq, Eq, Clone)]
+#[derive(Debug, PartialEq, Eq, Clone, Deserialize, Serialize)]
 pub struct MBIDSpe<T: IdEntityType, S: IdAliasState> {
     id: String,
 

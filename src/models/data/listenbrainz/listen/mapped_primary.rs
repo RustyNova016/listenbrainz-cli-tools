@@ -3,7 +3,7 @@ use crate::models::data::musicbrainz::mbid::generic_mbid::MBIDSpe;
 use crate::models::data::musicbrainz::mbid::generic_mbid::PrimaryID;
 use crate::models::data::musicbrainz::recording::Recording;
 
-use super::listen_mapped::NaiveMappedListen;
+use super::mapped_naive::NaiveMappedListen;
 use super::listen_spe::ListenSpe;
 use super::listen_spe::MappedPrimary;
 use super::Listen;
@@ -24,7 +24,7 @@ impl MappedListen {
                 recording_mbid: self.mapping_data.to_string(),
                 artist_credit: None,
                 artist_mbid: None,
-                recording_name: String::new()
+                recording_name: String::new(),
             },
         }
     }

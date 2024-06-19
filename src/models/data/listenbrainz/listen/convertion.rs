@@ -1,14 +1,9 @@
-use std::sync::Arc;
 
 use chrono::{TimeZone, Utc};
 use listenbrainz::raw::response::UserListensListen;
-
 use crate::models::data::listenbrainz::mapping_data::MappingData;
 use crate::models::data::listenbrainz::messybrainz::MessyBrainzData;
-
 use super::listen_spe::ListenSpe;
-use super::listen_spe::MappedNaive;
-use super::listen_spe::Unmapped;
 use super::listen_unspe::ListenMappingState;
 use super::Listen;
 
@@ -28,17 +23,7 @@ impl From<UserListensListen> for Listen {
     }
 }
 
-impl From<ListenSpe<MappedNaive>> for ListenMappingState {
-    fn from(value: ListenSpe<MappedNaive>) -> Self {
-        Self::Mapped(Arc::new(value))
-    }
-}
 
-impl From<ListenSpe<Unmapped>> for ListenMappingState {
-    fn from(value: ListenSpe<Unmapped>) -> Self {
-        Self::Unmapped(Arc::new(value))
-    }
-}
 
 impl From<Listen> for ListenMappingState {
     fn from(value: Listen) -> Self {

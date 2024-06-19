@@ -1,42 +1,42 @@
-use crate::models::data::listenbrainz::listen::collection::ListenCollection;
-use crate::models::data::musicbrainz::recording::mbid::RecordingMBID;
+use crate::models::data::listenbrainz::listen::collection::common::ListenCollectionCommons;
+use crate::models::data::listenbrainz::listen::collection::mapped_listen_collection::MappedListenCollection;
+use crate::models::data::listenbrainz::listen::collection::mapped_listen_collection::MappedListenCollectionExt;
+use crate::models::data::musicbrainz::mbid::generic_mbid::MBIDSpe;
+use crate::models::data::musicbrainz::mbid::generic_mbid::PrimaryID;
+use crate::models::data::musicbrainz::recording::Recording;
 
 use chrono::DateTime;
 use chrono::Duration;
 use chrono::Utc;
 use derive_getters::Getters;
-use rust_decimal::Decimal;
 
 #[derive(Debug, Clone, PartialEq, Eq, Getters)]
 pub struct RecordingIDWithListens {
-    recording_id: RecordingMBID,
-    listens: ListenCollection,
+    recording_id: MBIDSpe<Recording, PrimaryID>,
+    listens: MappedListenCollection,
 }
 
 impl RecordingIDWithListens {
-    pub fn new(recording_id: RecordingMBID, listens: ListenCollection) -> Self {
-        //TODO: Perf Testing
-        assert!(
-            listens.has_only_recording(&recording_id),
-            "Tried to insert a listen list that contain a listen from another recording"
-        );
-
+    pub fn new(
+        recording_id: MBIDSpe<Recording, PrimaryID>,
+        listens: MappedListenCollection,
+    ) -> Self {
         Self {
-            recording_id,
-            listens,
+            recording_id: recording_id.clone(),
+            listens: listens.keep_only_recording(&recording_id),
         }
     }
 
     pub fn first_listen_date(&self) -> Option<DateTime<Utc>> {
         self.listens
-            .get_oldest_listen()
-            .map(|listen| *listen.get_listened_at())
+            .oldest_listen()
+            .map(|listen| *listen.listened_at())
     }
 
     pub fn last_listen_date(&self) -> Option<DateTime<Utc>> {
         self.listens
-            .get_latest_listen()
-            .map(|listen| *listen.get_listened_at())
+            .latest_listen()
+            .map(|listen| *listen.listened_at())
     }
 
     pub fn listen_count(&self) -> usize {
@@ -71,14 +71,13 @@ impl RecordingIDWithListens {
         !self.listens.is_empty()
     }
 
-    
-    pub async fn underated_score_single(&self) -> color_eyre::Result<Decimal> {
-        Ok(self
-            .listens()
-            .get_underrated_recordings()
-            .await?
-            .first()
-            .expect("Recording should have a score")
-            .0)
-    }
+    //pub async fn underated_score_single(&self) -> color_eyre::Result<Decimal> {
+    //    Ok(self
+    //        .listens()
+    //        .get_underrated_recordings()
+    //        .await?
+    //        .first()
+    //        .expect("Recording should have a score")
+    //        .0)
+    //}
 }

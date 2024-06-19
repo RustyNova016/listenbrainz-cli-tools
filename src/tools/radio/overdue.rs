@@ -1,4 +1,6 @@
 use crate::core::entity_traits::mbid::IsMbid;
+use crate::models::data::listenbrainz::listen::collection::common::ListenCollectionCommons;
+use crate::models::data::listenbrainz::listen::collection::mapped_listen_collection::MappedListenCollectionExt;
 use crate::models::data::listenbrainz::listen::collection::naive_mapped_listens_collection::MappedNaiveListensCollectionExt;
 use crate::models::data::listenbrainz::user_listens::UserListens;
 use crate::models::data::musicbrainz::mbid::extensions::VecTExt;
@@ -11,9 +13,7 @@ use futures::stream;
 use futures::StreamExt;
 use rust_decimal::prelude::Decimal;
 use rust_decimal::prelude::FromPrimitive;
-use crate::models::data::listenbrainz::listen::collection::mapped_listen_collection::MappedListenCollectionExt;
 use std::cmp::Reverse;
-use crate::models::data::listenbrainz::listen::collection::common::ListenCollectionCommons;
 
 pub async fn overdue_radio(
     username: &str,
@@ -40,7 +40,8 @@ pub async fn overdue_radio(
     // Filter out all the listens of blacklisted recordings
     listens = listens.remove_listens_of_mbids(&blacklisted_recordings);
 
-    let mut scores = listens.into_legacy()
+    let mut scores = listens
+        .into_legacy()
         .get_listen_rates()
         .await
         .expect("Couldn't calculate the listens rates");
