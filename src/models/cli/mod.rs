@@ -1,7 +1,9 @@
 pub mod cache;
+pub mod lookup;
 use cache::CacheCommand;
 use clap::{Parser, Subcommand};
 use config::ConfigCli;
+use lookup::LookupCommand;
 
 use crate::models::cli::common::{GroupByTarget, SortListensBy, SortSorterBy};
 use crate::models::cli::radio::RadioCommand;
@@ -72,18 +74,10 @@ pub enum Commands {
     Radio(RadioCommand),
 
     Cache(CacheCommand),
+
     Config(ConfigCli),
     //Search {},
-
-    //Lookup {
-    //    /// Recording ID
-    //    #[arg(short, long)]
-    //    id: String,
-
-    //    /// Name of the user to fetch stats listen from
-    //    #[arg(short, long)]
-    //    username: String,
-    //},
+    Lookup(LookupCommand),
 }
 
 impl Commands {
@@ -113,11 +107,13 @@ impl Commands {
             }
 
             Self::Radio(val) => val.run().await?,
-            Self::Cache(val) => val.run().await?,
-            Self::Config(val) => val.command.run().await?,
-            //Self::Lookup { id, username } => lookup(username, id.to_string().into()).await,
-        }
 
+            Self::Cache(val) => val.run().await?,
+
+            Self::Config(val) => val.command.run().await?,
+
+            Self::Lookup(val) => val.run().await?,
+        }
         Ok(())
     }
 }

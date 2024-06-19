@@ -6,6 +6,7 @@ use serde::{Deserialize, Serialize};
 
 use crate::core::entity_traits::mb_cached::MBCached;
 use crate::models::data::listenbrainz::mapping_data::MappingData;
+use crate::models::data::musicbrainz::recording::mbid::RecordingMBID;
 use crate::models::data::musicbrainz::recording::Recording;
 
 use super::messybrainz::MessyBrainzData;
@@ -33,6 +34,12 @@ pub struct Listen {
 impl Listen {
     pub fn is_mapped(&self) -> bool {
         self.mapping_data.is_some()
+    }
+
+    pub fn is_mapped_to(&self, recording_id: &RecordingMBID) -> bool {
+        self.mapping_data.as_ref().is_some_and(|mapping| {
+            &Into::<RecordingMBID>::into(mapping.recording_mbid.clone()) == recording_id
+        })
     }
 
     pub fn get_mapping_data(&self) -> &Option<MappingData> {

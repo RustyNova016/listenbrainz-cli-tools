@@ -5,6 +5,7 @@ use chrono::DateTime;
 use chrono::Duration;
 use chrono::Utc;
 use derive_getters::Getters;
+use rust_decimal::prelude::FromPrimitive;
 use rust_decimal::Decimal;
 
 #[derive(Debug, Clone, PartialEq, Eq, Getters)]
@@ -71,7 +72,6 @@ impl RecordingIDWithListens {
         !self.listens.is_empty()
     }
 
-    
     pub async fn underated_score_single(&self) -> color_eyre::Result<Decimal> {
         Ok(self
             .listens()
@@ -80,5 +80,10 @@ impl RecordingIDWithListens {
             .first()
             .expect("Recording should have a score")
             .0)
+    }
+
+    pub fn overdue_score(&self) -> Decimal {
+        Decimal::from_i64(self.overdue_by().num_seconds()).unwrap()
+            / Decimal::from_i64(self.average_duration_between_listens().num_seconds()).unwrap()
     }
 }
