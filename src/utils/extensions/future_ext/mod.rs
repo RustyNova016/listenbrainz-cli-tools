@@ -31,7 +31,9 @@ where
 pub impl<S, T, E> S
 where
     S: Stream<Item = Result<T, E>> + StreamExt, {
-        fn into_try_stream(self) -> impl Stream<Item = Result<T, E>> + StreamExt + TryStream + TryStreamExt
+        async fn try_collect_vec(self) -> Result<Vec<T>, E> {
+            self.try_collect().await
+        }
     }
 
 #[ext(name = cTryStreamExt)]

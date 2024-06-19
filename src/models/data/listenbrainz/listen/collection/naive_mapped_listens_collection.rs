@@ -4,6 +4,7 @@ use async_fn_stream::try_fn_stream;
 use chrono::DateTime;
 use chrono::Utc;
 use extend::ext;
+use futures::future;
 use futures::stream;
 use futures::Stream;
 use futures::StreamExt;
@@ -17,6 +18,7 @@ use crate::models::data::musicbrainz::mbid::generic_mbid::MBIDSpe;
 use crate::models::data::musicbrainz::mbid::generic_mbid::NaiveID;
 use crate::models::data::musicbrainz::recording::mbid::RecordingMBID;
 use crate::utils::extensions::future_ext::cStreamExt;
+use crate::utils::extensions::future_ext::CTryStreamExt;
 use futures::TryStreamExt;
 
 use super::mapped_listen_collection::MappedListenCollection;
@@ -67,7 +69,7 @@ pub impl MappedNaiveListensCollection {
 
     // Methods to retain data
     fn retain_ref_listened_after(&self, date: &DateTime<Utc>) -> Self {
-        self.into_iter()
+        self.iter()
             .filter(|listen| listen.get_listened_at() > date)
             .cloned()
             .collect_vec()
@@ -75,7 +77,7 @@ pub impl MappedNaiveListensCollection {
 
     // Convertion methods
     fn as_legacy_naive_recording_mbids(&self) -> Vec<RecordingMBID> {
-        self.into_iter()
+        self.iter()
             .map(|listen| listen.get_legacy_recording_mbid())
             .collect_vec()
     }
@@ -106,11 +108,10 @@ pub impl MappedNaiveListensCollection {
     async fn into_primary(self) -> color_eyre::Result<MappedListenCollection> {
         stream::iter(self)
             .map(|listen| listen.as_ref().clone())
-            .map(|a| a)
             .into_primary()
-            .and_then(Arc::new)
+            .and_then(|a| future::ok(Arc::new(a)))
             .buffer_unordered_non_future(50)
-            .try_collect()
+            .try_collect_vec()
             .await
     }
 }

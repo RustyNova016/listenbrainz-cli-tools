@@ -15,7 +15,7 @@ pub impl<S> S
 where
     S: Stream<Item = NaiveMappedListen> + StreamExt,
 {
-    fn into_primary(self) -> impl Stream<Item = color_eyre::Result<MappedListen>> + TryStream + TryStreamExt{
+    fn into_primary(self) -> impl TryStream<Ok = MappedListen, Error = Report> {
         self.map(|listen| async move { listen.into_primary_mapping().await })
             .buffer_unordered(1)
     }
