@@ -28,13 +28,11 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Install toolchain
-        uses: actions-rs/toolchain@v1
-        with:
-          toolchain: stable
-          override: true
+      - run: rustup toolchain install stable --profile minimal --no-self-update
 
       - uses: Swatinem/rust-cache@v2
+        with: 
+          key: "(${{ matrix.os }})"
 
       - uses: taiki-e/install-action@cargo-hack
 
@@ -58,13 +56,11 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Install toolchain
-        uses: actions-rs/toolchain@v1
-        with:
-          toolchain: ${{ matrix.rust }}
-          override: true
+      - run: rustup toolchain install stable --profile minimal --no-self-update
 
       - uses: Swatinem/rust-cache@v2
+        with: 
+          key: "(${{ matrix.rust }}, ${{ matrix.os }})"
 
       - uses: taiki-e/install-action@cargo-hack
 
