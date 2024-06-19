@@ -60,7 +60,7 @@ jobs:
 
       - uses: Swatinem/rust-cache@v2
         with: 
-          key: "(${{ matrix.rust }}, ${{ matrix.os }})"
+          key: "(${{ matrix.rust }} - ${{ matrix.os }})"
 
       - uses: taiki-e/install-action@cargo-hack
 
@@ -133,3 +133,11 @@ jobs:
         with:
           command: fmt
           args: --all --check
+
+  msrv:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - uses: Swatinem/rust-cache@v2
+    - uses: taiki-e/install-action@cargo-hack
+    - run: cargo hack check --rust-version --workspace --all-targets --ignore-private
