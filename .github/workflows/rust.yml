@@ -15,12 +15,42 @@ env:
 # https://github.com/allan2/dotenvy/blob/master/.github/workflows/ci.yml
 
 jobs:
-  tests:
+  stable_tests:
     runs-on: ${{ matrix.os }}
+    needs: clippy
     strategy:
       fail-fast: false
       matrix:
-        rust: [stable, beta, nightly]
+        os:
+          - windows-latest
+          - ubuntu-latest
+          - macos-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install toolchain
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+          override: true
+
+      - uses: Swatinem/rust-cache@v2
+
+      - uses: taiki-e/install-action@cargo-hack
+
+      - name: Build tests
+        run: cargo hack build --feature-powerset  --ignore-private
+        
+      - name: Run tests
+        run: cargo hack test --feature-powerset  --ignore-private
+
+  unstable_tests:
+    runs-on: ${{ matrix.os }}
+    needs: stable_tests
+    strategy:
+      fail-fast: false
+      matrix:
+        rust: [beta, nightly]
         os:
           - windows-latest
           - ubuntu-latest
@@ -43,8 +73,6 @@ jobs:
         
       - name: Run tests
         run: cargo hack test --feature-powerset  --ignore-private
-
-
 
   clippy:
     runs-on: ubuntu-latest
