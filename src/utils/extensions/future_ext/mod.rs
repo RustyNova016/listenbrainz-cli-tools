@@ -1,11 +1,9 @@
-
 use extend::ext;
 use futures::future;
 use futures::Stream;
 use futures::StreamExt;
 use futures::TryStream;
 use futures::TryStreamExt;
-
 
 #[ext(name = cStreamExt)]
 pub impl<S, I> S

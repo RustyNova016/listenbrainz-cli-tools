@@ -3,9 +3,9 @@ use crate::models::data::musicbrainz::mbid::generic_mbid::MBIDSpe;
 use crate::models::data::musicbrainz::mbid::generic_mbid::PrimaryID;
 use crate::models::data::musicbrainz::recording::Recording;
 
-use super::mapped_naive::NaiveMappedListen;
 use super::listen_spe::ListenSpe;
 use super::listen_spe::MappedPrimary;
+use super::mapped_naive::NaiveMappedListen;
 use super::Listen;
 
 pub type MappedListen = ListenSpe<MappedPrimary>;

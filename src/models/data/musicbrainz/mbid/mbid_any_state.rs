@@ -10,5 +10,5 @@ use derive_more::*;
 #[derive(Debug, From, Deserialize, Serialize, PartialEq, Eq, Clone, IsVariant, Unwrap)]
 pub enum MBIDAnyState<T: IdEntityType> {
     Naive(MBIDSpe<T, NaiveID>),
-    Primary(MBIDSpe<T, PrimaryID>)
+    Primary(MBIDSpe<T, PrimaryID>),
 }

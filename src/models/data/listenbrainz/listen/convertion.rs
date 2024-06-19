@@ -1,11 +1,10 @@
-
-use chrono::{TimeZone, Utc};
-use listenbrainz::raw::response::UserListensListen;
-use crate::models::data::listenbrainz::mapping_data::MappingData;
-use crate::models::data::listenbrainz::messybrainz::MessyBrainzData;
 use super::listen_spe::ListenSpe;
 use super::listen_unspe::ListenMappingState;
 use super::Listen;
+use crate::models::data::listenbrainz::mapping_data::MappingData;
+use crate::models::data::listenbrainz::messybrainz::MessyBrainzData;
+use chrono::{TimeZone, Utc};
+use listenbrainz::raw::response::UserListensListen;
 
 impl From<UserListensListen> for Listen {
     fn from(value: UserListensListen) -> Self {
@@ -22,8 +21,6 @@ impl From<UserListensListen> for Listen {
         }
     }
 }
-
-
 
 impl From<Listen> for ListenMappingState {
     fn from(value: Listen) -> Self {

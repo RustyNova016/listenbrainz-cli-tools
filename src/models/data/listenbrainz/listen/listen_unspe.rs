@@ -1,4 +1,3 @@
-use std::sync::Arc;
 use super::listen_spe::ListenSpe;
 use super::listen_spe::MappedNaive;
 use super::listen_spe::MappedPrimary;
@@ -9,6 +8,7 @@ use chrono::Utc;
 use derive_more::*;
 use serde::Deserialize;
 use serde::Serialize;
+use std::sync::Arc;
 
 #[derive(Unwrap, IsVariant, Debug, Deserialize, Serialize, Clone, PartialEq, Eq, From)]
 pub enum ListenMappingState {

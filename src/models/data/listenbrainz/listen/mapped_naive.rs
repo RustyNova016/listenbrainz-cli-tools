@@ -1,5 +1,3 @@
-use chrono::DateTime;
-use chrono::Utc;
 use crate::core::entity_traits::mbid::IsMbid;
 use crate::models::data::listenbrainz::mapping_data::MappingData;
 use crate::models::data::listenbrainz::messybrainz::MessyBrainzData;
@@ -7,6 +5,8 @@ use crate::models::data::musicbrainz::mbid::generic_mbid::MBIDSpe;
 use crate::models::data::musicbrainz::mbid::generic_mbid::NaiveID;
 use crate::models::data::musicbrainz::recording::mbid::RecordingMBID;
 use crate::models::data::musicbrainz::recording::Recording;
+use chrono::DateTime;
+use chrono::Utc;
 
 use super::listen_spe::ListenSpe;
 use super::mapped_primary::MappedListen;

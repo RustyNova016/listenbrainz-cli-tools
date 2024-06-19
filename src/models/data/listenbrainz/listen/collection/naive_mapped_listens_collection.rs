@@ -81,10 +81,10 @@ pub impl MappedNaiveListensCollection {
     //        .map(|listen| listen.get_legacy_recording_mbid())
     //        .buffer_unordered(20)
     //}
-//
+    //
     //async fn as_legacy_recording_mbids(&self) -> color_eyre::Result<Vec<RecordingMBID>> {
     //    let mut result = Vec::new();
-//
+    //
     //    while let Some(recording_id) = self
     //        .as_legacy_recording_mbid_stream()
     //        .next()
@@ -93,7 +93,7 @@ pub impl MappedNaiveListensCollection {
     //    {
     //        result.push(recording_id);
     //    }
-//
+    //
     //    Ok(result)
     //}
 
