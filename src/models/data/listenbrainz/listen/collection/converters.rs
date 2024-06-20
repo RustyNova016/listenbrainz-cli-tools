@@ -1,3 +1,6 @@
+use itertools::Itertools;
+
+use crate::models::data::listenbrainz::listen::listen_unspe::ListenMappingState;
 use crate::models::data::musicbrainz::recording::mbid::RecordingMBID;
 
 use super::ListenCollection;
@@ -17,5 +20,18 @@ impl ListenCollection {
         }
 
         Ok(recordings)
+    }
+
+    pub fn into_listen_mapping_state_vec(self) -> Vec<ListenMappingState> {
+        self.into()
+    }
+}
+
+impl From<ListenCollection> for Vec<ListenMappingState> {
+    fn from(value: ListenCollection) -> Self {
+        value
+            .into_iter()
+            .map(|listen| listen.as_ref().clone().into())
+            .collect_vec()
     }
 }

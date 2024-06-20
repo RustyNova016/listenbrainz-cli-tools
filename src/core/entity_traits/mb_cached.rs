@@ -7,6 +7,7 @@ use crate::core::caching::musicbrainz_cache::MusicbrainzCache;
 use crate::core::entity_traits::mbid::{HasMBID, IsMbid};
 use crate::core::entity_traits::updatable::Updatable;
 
+/// Trait for entities that are cached
 pub trait MBCached<K>
 where
     K: IsMbid<Self> + Serialize + DeserializeOwned,
