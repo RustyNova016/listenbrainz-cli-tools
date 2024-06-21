@@ -1,7 +1,9 @@
 pub mod cache;
+pub mod listens;
 use cache::CacheCommand;
 use clap::{Parser, Subcommand};
 use config::ConfigCli;
+use listens::ListenCommand;
 
 use crate::models::cli::common::{GroupByTarget, SortListensBy, SortSorterBy};
 use crate::models::cli::radio::RadioCommand;
@@ -73,6 +75,9 @@ pub enum Commands {
 
     Cache(CacheCommand),
     Config(ConfigCli),
+
+    Listen(ListenCommand)
+
     //Search {},
 
     //Lookup {
@@ -115,6 +120,7 @@ impl Commands {
             Self::Radio(val) => val.run().await?,
             Self::Cache(val) => val.run().await?,
             Self::Config(val) => val.command.run().await?,
+            Self::Listen(val) => val.run().await?,
             //Self::Lookup { id, username } => lookup(username, id.to_string().into()).await,
         }
 
