@@ -24,9 +24,10 @@ pub trait ConfigFile: Serialize + DeserializeOwned + Default {
         path
     }
 
-    fn save(&self) -> color_eyre::Result<()> {
-        let config_file = File::create(Self::path_to_config().as_path())?;
-        serde_json::to_writer_pretty(config_file, self)?;
+    fn save(&self) -> Result<(), Error> {
+        let config_file = File::create(Self::path_to_config().as_path())
+            .map_err(Error::ConfigFileCreationError)?;
+        serde_json::to_writer_pretty(config_file, self).map_err(Error::ConfigFileWriteError)?;
         Ok(())
     }
 

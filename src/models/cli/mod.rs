@@ -109,7 +109,7 @@ impl Commands {
                     Config::get_token_or_argument(username, token),
                     *sort,
                 )
-                .await;
+                .await?;
             }
 
             Self::Radio(val) => val.run().await?,

@@ -34,6 +34,15 @@ pub enum ConfigCommands {
         /// A duration to timeout for
         duration: String,
     },
+
+    BlacklistMapperMSID {
+        /// The msid to blacklist
+        msid: String,
+
+        /// Remove it from the blacklist
+        #[arg(long, action)]
+        remove: bool,
+    },
 }
 
 impl ConfigCommands {
@@ -53,6 +62,14 @@ impl ConfigCommands {
                     MBID::from_string(recording, MBIDKind::Recording)?.unwrap_recording(),
                     Duration::from_human_string(duration)?,
                 )?;
+            }
+
+            Self::BlacklistMapperMSID { msid, remove } => {
+                if !remove {
+                    Config::add_blacklisted_msid(msid.to_string())?;
+                } else {
+                    Config::remove_blacklisted_msid(msid)?;
+                }
             }
         }
 
