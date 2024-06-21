@@ -14,8 +14,8 @@ rust-version = "1.75"
 # Main crate
 #listenbrainz = "0.7.0"
 # Self maintained upstream version
-listenbrainz = {version = "0.7.2", package = "listenbrainz_rs_nova"} # Fork with fixes
-#listenbrainz = { branch = "main", git = "https://github.com/InputUsername/listenbrainz-rs.git" }
+#listenbrainz = {version = "0.7.2", package = "listenbrainz_rs_nova"} # Fork with fixes
+listenbrainz = { branch = "main-nova", package = "listenbrainz_rs_nova", git = "https://github.com/RustyNova016/listenbrainz-rs.git" }
 
 # Upstream version of the musicbrainz crate. Use "listenbrainz-cli-tools_master" for main builds, "listenbrainz-cli-tools_dev" for dev builds
 # This fixes:
@@ -55,6 +55,10 @@ futures = "0.3.30"
 humantime = "2.1.0"
 regex = "1.10.5"
 clap-markdown = "0.1.4"
+strum = "0.26.2"
+strum_macros = "0.26.3"
+tabled = "0.15.0"
+json_to_table = "0.7.0"
 
 # The profile that 'cargo dist' will build with
 [profile.dist]
