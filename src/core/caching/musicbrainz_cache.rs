@@ -277,6 +277,7 @@ where
         .clone();
     }
 
+    #[deprecated]
     pub async fn get_or_fetch(&self, mbid: &K) -> color_eyre::Result<V> {
         // Let's try getting the value:
         if let Ok(Some(result)) = self.get(mbid).await {

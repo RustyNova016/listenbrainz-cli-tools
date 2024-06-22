@@ -3,7 +3,7 @@ use std::sync::Arc;
 use derive_more::{Display, From, IsVariant, Unwrap};
 use serde::{Deserialize, Serialize};
 
-use crate::core::entity_traits::mbid::{HasMBID, IsMbid};
+use crate::core::entity_traits::mbid::IsMbid;
 use crate::models::data::musicbrainz::artist::mbid::ArtistMBID;
 use crate::models::data::musicbrainz::external_musicbrainz_entity::ExternalMusicBrainzEntity;
 use crate::models::data::musicbrainz::musicbrainz_entity::MusicBrainzEntity;

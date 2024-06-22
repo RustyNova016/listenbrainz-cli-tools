@@ -1,3 +1,5 @@
+use std::sync::Arc;
+
 use derive_getters::Getters;
 use itertools::Itertools;
 use listenbrainz::raw::response::UserListensMBIDMapping;
@@ -27,9 +29,9 @@ pub struct MappingData {
 
 impl MappingData {
     /// Get the mapped [`Recording`]
-    pub async fn get_or_fetch_recording(&self) -> color_eyre::Result<Recording> {
+    pub async fn get_or_fetch_recording(&self) -> color_eyre::Result<Arc<Recording>> {
         Recording::get_cache()
-            .get_or_fetch(&self.recording_mbid.clone().into()) //TODO: Use MBID
+            .get_or_fetched(&self.recording_mbid.clone().into()) //TODO: Use MBID
             .await
     }
 
