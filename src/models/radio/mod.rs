@@ -1,12 +1,16 @@
-use crate::utils::println_cli_info;
+use std::borrow::Borrow;
+use std::sync::Arc;
 
-use super::config::recording_timeout::RecordingTimeoutConfig;
-use super::data::musicbrainz::recording::Recording;
 use chrono::Duration;
 use derive_builder::Builder;
 use futures::Stream;
 use futures::StreamExt;
 use once_cell::sync::Lazy;
+
+use crate::utils::println_cli_info;
+
+use super::config::recording_timeout::RecordingTimeoutConfig;
+use super::data::musicbrainz::recording::Recording;
 
 #[derive(Debug, Clone, Builder)]
 #[builder(setter(into))]
@@ -22,12 +26,12 @@ pub struct RadioConfig {
 }
 
 impl RadioConfig {
-    pub fn check_min_lenght(&self, playlist: &[Recording]) -> bool {
+    pub fn check_min_lenght<R: Borrow<Recording>>(&self, playlist: &[R]) -> bool {
         let has_min_count = playlist.len() as u64 >= self.min_count;
         let has_min_duration = Lazy::new(|| {
             playlist
                 .iter()
-                .map(|recording| recording.get_duration().unwrap_or_default())
+                .map(|recording| recording.borrow().get_duration().unwrap_or_default())
                 .sum::<Duration>()
                 >= self.min_duration
         });
@@ -38,9 +42,12 @@ impl RadioConfig {
         }
     }
 
-    pub async fn finalize_radio_playlist<I, E>(&self, mut generator: I) -> Result<Vec<Recording>, E>
+    pub async fn finalize_radio_playlist<I, E>(
+        &self,
+        mut generator: I,
+    ) -> Result<Vec<Arc<Recording>>, E>
     where
-        I: Stream<Item = Result<Recording, E>> + Unpin,
+        I: Stream<Item = Result<Arc<Recording>, E>> + Unpin,
         E: Sync + Send,
     {
         let mut results = Vec::new();

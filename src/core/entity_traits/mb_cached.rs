@@ -15,22 +15,17 @@ where
     fn get_cache() -> Arc<MusicbrainzCache<K, Self>>;
 
     /// Get the data from the cache, or call the API. Any request is deduplicated
-    fn get_cached_or_fetch(key: &K) -> impl std::future::Future<Output = color_eyre::Result<Self>> {
-        async move {
-            match Self::get_cache().get(key).await? {
-                Some(val) => Ok(val),
-                None => Self::get_cache().get_or_fetch(key).await,
-            }
-        }
+    fn get_cached_or_fetch(
+        key: &K,
+    ) -> impl std::future::Future<Output = color_eyre::Result<Arc<Self>>> {
+        async move { Self::get_cache().get_or_fetched(key).await }
     }
 
     async fn save(&self) -> color_eyre::Result<()> {
         Self::get_cache().update(self).await
     }
 
-    async fn refresh(&self) -> color_eyre::Result<Self> {
-        Self::get_cache()
-            .force_fetch_and_save(&self.get_mbid())
-            .await
+    async fn refresh(&self) -> color_eyre::Result<Arc<Self>> {
+        Self::get_cache().force_fetch_entity(&self.get_mbid()).await
     }
 }

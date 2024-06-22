@@ -1,10 +1,11 @@
-use crate::core::entity_traits::mbid::IsMbid;
-use crate::models::data::listenbrainz::user_listens::UserListens;
-use crate::models::data::musicbrainz::mbid::extensions::VecTExt;
-use crate::models::radio::RadioConfig;
-use crate::utils::playlist::PlaylistStub;
 use futures::stream;
 use futures::StreamExt;
+
+use crate::core::entity_traits::mbid::IsMbid;
+use crate::models::data::listenbrainz::user_listens::UserListens;
+use crate::models::data::musicbrainz::mbid::extensions::VecATExt;
+use crate::models::radio::RadioConfig;
+use crate::utils::playlist::PlaylistStub;
 
 pub async fn underrated_mix(
     username: String,

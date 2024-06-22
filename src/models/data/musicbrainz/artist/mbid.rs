@@ -18,12 +18,8 @@ use crate::utils::println_mus;
 pub struct ArtistMBID(String);
 
 impl IsMbid<Artist> for ArtistMBID {
-    async fn get_or_fetch_entity(&self) -> color_eyre::Result<Artist> {
+    async fn get_or_fetch_entity(&self) -> color_eyre::Result<Arc<Artist>> {
         Artist::get_cached_or_fetch(self).await
-    }
-
-    async fn get_or_fetch_entity_arc(&self) -> color_eyre::Result<Arc<Artist>> {
-        Artist::get_cache().get_or_fetched(self).await
     }
 
     async fn fetch(&self) -> color_eyre::Result<ExternalMusicBrainzEntity> {

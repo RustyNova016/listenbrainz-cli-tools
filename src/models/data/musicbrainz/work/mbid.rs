@@ -22,12 +22,8 @@ use super::Work;
 pub struct WorkMBID(String);
 
 impl IsMbid<Work> for WorkMBID {
-    async fn get_or_fetch_entity(&self) -> color_eyre::Result<Work> {
-        Work::get_cache().get_or_fetch(self).await
-    }
-
-    async fn get_or_fetch_entity_arc(&self) -> color_eyre::Result<Arc<Work>> {
-        Work::get_cache().get_or_fetched(self).await
+    async fn get_or_fetch_entity(&self) -> color_eyre::Result<Arc<Work>> {
+        Work::get_cached_or_fetch(self).await
     }
 
     async fn fetch(&self) -> color_eyre::Result<ExternalMusicBrainzEntity> {
