@@ -21,7 +21,7 @@ pub struct ReleaseGroupMBID(String);
 
 impl IsMbid<ReleaseGroup> for ReleaseGroupMBID {
     async fn get_or_fetch_entity(&self) -> color_eyre::Result<Arc<ReleaseGroup>> {
-        ReleaseGroup::get_cached_or_fetch(self).await.into()
+        ReleaseGroup::get_cached_or_fetch(self).await
     }
     async fn fetch(&self) -> color_eyre::Result<ExternalMusicBrainzEntity> {
         println_mus(format!("Getting data for release group MBID: {}", &self));

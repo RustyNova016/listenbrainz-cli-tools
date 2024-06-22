@@ -1,8 +1,10 @@
+use std::sync::Arc;
+
 use musicbrainz_rs::entity::recording::Recording as RecordingMS;
 use musicbrainz_rs::Browse;
 
 use crate::core::entity_traits::mb_cached::MBCached;
-use crate::core::entity_traits::mbid::HasMBID;
+use crate::core::entity_traits::mbid::{HasMBID, IsMbid};
 use crate::models::data::musicbrainz::external_musicbrainz_entity::FlattenedMBEntityExt;
 use crate::models::data::musicbrainz::recording::external::RecordingExt;
 use crate::models::data::musicbrainz::recording::Recording;
@@ -12,7 +14,7 @@ use crate::utils::println_mus;
 use super::Artist;
 
 impl Artist {
-    pub async fn get_all_recordings(&mut self) -> color_eyre::Result<Vec<Recording>> {
+    pub async fn get_all_recordings(&mut self) -> color_eyre::Result<Vec<Arc<Recording>>> {
         let recording_ids = match &self.recordings {
             Some(recordings) => recordings.clone(),
             None => {
@@ -25,7 +27,7 @@ impl Artist {
 
         let mut recordings = Vec::new();
         for id in recording_ids {
-            recordings.push(Recording::get_cache().get_or_fetch(&id).await?);
+            recordings.push(id.get_or_fetch_entity().await?);
         }
         Ok(recordings)
     }
