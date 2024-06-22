@@ -1,3 +1,5 @@
+use std::sync::Arc;
+
 use color_eyre::eyre::Context;
 use derive_more::{Deref, DerefMut, Display, From, Into};
 use musicbrainz_rs::entity::recording::Recording as RecordingMS;
@@ -24,6 +26,10 @@ pub struct RecordingMBID(String);
 impl IsMbid<Recording> for RecordingMBID {
     async fn get_or_fetch_entity(&self) -> color_eyre::Result<Recording> {
         Recording::get_cached_or_fetch(self).await
+    }
+
+    async fn get_or_fetch_entity_arc(&self) -> color_eyre::Result<Arc<Recording>> {
+        Recording::get_cache().get_or_fetched(self).await
     }
 
     async fn fetch(&self) -> color_eyre::Result<ExternalMusicBrainzEntity> {

@@ -19,7 +19,7 @@ impl HasID for Artist {
 #[ext]
 pub impl Artist {
     fn flatten_main(&self) -> MusicBrainzEntity {
-        MusicBrainzEntity::Artist(super::Artist::from(self.clone()))
+        super::Artist::from(self.clone()).into()
     }
 
     fn flatten_children(&self) -> Vec<MusicBrainzEntity> {

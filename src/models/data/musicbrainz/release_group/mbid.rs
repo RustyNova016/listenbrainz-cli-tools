@@ -1,3 +1,11 @@
+use std::sync::Arc;
+
+use color_eyre::eyre::Context;
+use derive_more::{Deref, DerefMut, Display, From, Into};
+use musicbrainz_rs::entity::release_group::ReleaseGroup as ReleaseGroupMS;
+use musicbrainz_rs::Fetch;
+use serde::{Deserialize, Serialize};
+
 use crate::core::entity_traits::mb_cached::MBCached;
 use crate::core::entity_traits::mbid::IsMbid;
 use crate::models::data::musicbrainz::external_musicbrainz_entity::ExternalMusicBrainzEntity;
@@ -5,11 +13,6 @@ use crate::models::data::musicbrainz::mbid::MBID;
 use crate::models::data::musicbrainz::release_group::external::ReleaseGroupExt;
 use crate::models::data::musicbrainz::release_group::ReleaseGroup;
 use crate::utils::println_mus;
-use color_eyre::eyre::Context;
-use derive_more::{Deref, DerefMut, Display, From, Into};
-use musicbrainz_rs::entity::release_group::ReleaseGroup as ReleaseGroupMS;
-use musicbrainz_rs::Fetch;
-use serde::{Deserialize, Serialize};
 
 #[derive(
     Debug, Clone, PartialEq, Eq, Deref, DerefMut, Into, From, Serialize, Deserialize, Hash, Display,
@@ -21,6 +24,9 @@ impl IsMbid<ReleaseGroup> for ReleaseGroupMBID {
         ReleaseGroup::get_cached_or_fetch(self).await
     }
 
+    async fn get_or_fetch_entity_arc(&self) -> color_eyre::Result<Arc<ReleaseGroup>> {
+        ReleaseGroup::get_cache().get_or_fetched(self).await
+    }
     async fn fetch(&self) -> color_eyre::Result<ExternalMusicBrainzEntity> {
         println_mus(format!("Getting data for release group MBID: {}", &self));
 

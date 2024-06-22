@@ -17,7 +17,7 @@ impl HasID for Recording {
 #[ext]
 pub impl Recording {
     fn flatten_main(&self) -> MusicBrainzEntity {
-        MusicBrainzEntity::Recording(super::Recording::from(self.clone()))
+        super::Recording::from(self.clone()).into()
     }
 
     fn flatten_children(&self) -> Vec<MusicBrainzEntity> {

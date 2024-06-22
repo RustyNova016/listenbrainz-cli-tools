@@ -1,6 +1,9 @@
-use crate::models::data::musicbrainz::mbid::MBID;
 use std::io;
+
 use thiserror::Error;
+
+use crate::core::caching::serde_cacache;
+use crate::models::data::musicbrainz::mbid::MBID;
 
 #[derive(Error, Debug)]
 #[allow(clippy::enum_variant_names)]
@@ -24,6 +27,10 @@ pub enum Error {
 
     #[error("Couldn't write the configuration file.")]
     ConfigFileWriteError(serde_json::Error),
+
+    // --- Caching --- //
+    #[error("Error while getting the cache")]
+    CacheError(serde_cacache::error::Error),
 }
 
 impl Error {}

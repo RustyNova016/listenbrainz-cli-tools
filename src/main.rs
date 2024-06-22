@@ -15,6 +15,7 @@ pub mod utils;
 #[tokio::main]
 async fn main() -> color_eyre::Result<()> {
     color_eyre::install()?;
+    console_subscriber::init();
     let cli = Cli::parse();
 
     println!("Hello!");

@@ -15,7 +15,7 @@ impl HasID for Work {
 #[ext]
 pub impl Work {
     fn flatten_main(&self) -> MusicBrainzEntity {
-        MusicBrainzEntity::Work(super::Work::from(self.clone()))
+        super::Work::from(self.clone()).into()
     }
 
     fn flatten_children(&self) -> Vec<MusicBrainzEntity> {

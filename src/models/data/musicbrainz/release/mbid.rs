@@ -1,3 +1,5 @@
+use std::sync::Arc;
+
 use color_eyre::eyre::Context;
 use derive_more::{Deref, DerefMut, Display, From, Into};
 use musicbrainz_rs::entity::release::Release as ReleaseMS;
@@ -20,6 +22,10 @@ pub struct ReleaseMBID(String);
 impl IsMbid<Release> for ReleaseMBID {
     async fn get_or_fetch_entity(&self) -> color_eyre::Result<Release> {
         Release::get_cached_or_fetch(self).await
+    }
+
+    async fn get_or_fetch_entity_arc(&self) -> color_eyre::Result<Arc<Release>> {
+        Release::get_cache().get_or_fetched(self).await
     }
 
     async fn fetch(&self) -> color_eyre::Result<ExternalMusicBrainzEntity> {
