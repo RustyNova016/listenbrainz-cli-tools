@@ -1,3 +1,4 @@
+use std::collections::HashMap;
 use std::ops::Deref;
 use std::sync::Arc;
 
@@ -6,7 +7,7 @@ use color_eyre::eyre::Context;
 use color_eyre::owo_colors::OwoColorize;
 use serde::de::DeserializeOwned;
 use serde::Serialize;
-use tokio::sync::{RwLock, RwLockWriteGuard, Semaphore};
+use tokio::sync::{OnceCell, RwLock, RwLockWriteGuard, Semaphore};
 
 use crate::core::caching::serde_cacache::error::Error;
 use crate::core::caching::serde_cacache::tidy::SerdeCacacheTidy;
@@ -23,6 +24,7 @@ where
     K: IsMbid<V> + Serialize + DeserializeOwned,
     V: Serialize + DeserializeOwned + HasMBID<K> + Updatable + Clone,
 {
+    ram_cache: RwLock<HashMap<String, Arc<OnceCell<Arc<V>>>>>,
     disk_cache: SerdeCacacheTidy<K, V>,
     alias_cache: SerdeCacacheTidy<K, K>,
 
@@ -45,11 +47,71 @@ where
         alias_location.push(format!("{name}_aliases"));
 
         Self {
+            ram_cache: RwLock::new(HashMap::new()),
             disk_cache: SerdeCacacheTidy::new(location),
             alias_cache: SerdeCacacheTidy::new(alias_location),
             value_locks: Arc::new(CHashMap::new()),
             fetch_locks: CHashMap::new(),
         }
+    }
+
+    pub async fn get_from_ram(&self, mbid: &K) -> Option<Arc<V>> {
+        self.ram_cache
+            .read()
+            .await
+            .get(&mbid.to_string())
+            .and_then(|cell| cell.get().cloned())
+    }
+
+    pub async fn get_from_disk(&self, mbid: &K) -> Result<Option<Arc<V>>, Error> {
+        self.disk_cache
+            .get_or_option(mbid)
+            .await
+            .map(|opt| opt.map(|val| Arc::new(val)))
+    }
+
+    pub async fn get_or_fetched(&self, mbid: &K) -> color_eyre::Result<Arc<V>> {
+        let ram_cell = self.get_ram_cell(mbid).await;
+        let disk_cache = self.disk_cache.clone();
+
+        if let Some(data) = ram_cell.get() {
+            return Ok(data.clone());
+        }
+
+        ram_cell
+            .get_or_try_init(|| async move {
+                // First, try init from disk
+                let disk_data = disk_cache
+                    .get_or_option(mbid)
+                    .await
+                    .map(|opt| opt.map(|val| Arc::new(val)))?;
+
+                if let Some(data) = disk_data {
+                    return Ok(data);
+                }
+
+                // No data? Fetch it
+                Self::fetch_and_save(mbid).await?;
+
+                Ok(disk_cache
+                    .get_or_option(mbid)
+                    .await
+                    .map(|opt| opt.map(|val| Arc::new(val)))?
+                    .expect("Fetched data should be in the cache"))
+            })
+            .await
+            .cloned()
+    }
+
+    pub async fn get_ram_cell(&self, mbid: &K) -> Arc<OnceCell<Arc<V>>> {
+        let mut ram_disk = self.ram_cache.write().await;
+
+        if let Some(cell) = ram_disk.get(&mbid.to_string()) {
+            return cell.clone();
+        }
+
+        ram_disk.insert(mbid.to_string(), Arc::new(OnceCell::new()));
+        ram_disk.get(&mbid.to_string()).unwrap().clone()
     }
 
     pub async fn get(&self, mbid: &K) -> Result<Option<V>, Error> {
@@ -135,6 +197,7 @@ where
 
     pub async fn remove(&self, id: &K) -> color_eyre::Result<()> {
         self.alias_cache.remove(id).await?;
+        self.ram_cache.write().await.remove(&id.to_string());
         self.disk_cache.remove(id).await?;
         Ok(())
     }

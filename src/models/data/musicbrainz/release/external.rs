@@ -17,7 +17,7 @@ impl HasID for Release {
 #[ext]
 pub impl Release {
     fn flatten_main(&self) -> MusicBrainzEntity {
-        MusicBrainzEntity::Release(super::Release::from(self.clone()))
+        super::Release::from(self.clone()).into()
     }
 
     fn flatten_children(&self) -> Vec<MusicBrainzEntity> {

@@ -1,4 +1,5 @@
 use std::mem::discriminant;
+use std::sync::Arc;
 
 use derive_more::{From, IsVariant, Unwrap};
 use serde::{Deserialize, Serialize};
@@ -16,11 +17,11 @@ use crate::utils::println_cli_warn;
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, IsVariant, Unwrap, From)]
 pub enum MusicBrainzEntity {
-    Artist(Artist),
-    ReleaseGroup(ReleaseGroup),
-    Release(Release),
-    Recording(Recording),
-    Work(Work),
+    Artist(Arc<Artist>),
+    ReleaseGroup(Arc<ReleaseGroup>),
+    Release(Arc<Release>),
+    Recording(Arc<Recording>),
+    Work(Arc<Work>),
 }
 
 impl MusicBrainzEntity {
@@ -60,11 +61,61 @@ impl Updatable for MusicBrainzEntity {
         }
 
         match self {
-            Self::Artist(val) => val.update(newer.unwrap_artist()).into(),
-            Self::Recording(val) => val.update(newer.unwrap_recording()).into(),
-            Self::Release(val) => val.update(newer.unwrap_release()).into(),
-            Self::ReleaseGroup(val) => val.update(newer.unwrap_release_group()).into(),
-            Self::Work(val) => val.update(newer.unwrap_work()).into(),
+            Self::Artist(val) => val
+                .as_ref()
+                .clone()
+                .update(newer.unwrap_artist().as_ref().clone())
+                .into_generic(),
+            Self::Recording(val) => val
+                .as_ref()
+                .clone()
+                .update(newer.unwrap_recording().as_ref().clone())
+                .into_generic(),
+            Self::Release(val) => val
+                .as_ref()
+                .clone()
+                .update(newer.unwrap_release().as_ref().clone())
+                .into_generic(),
+            Self::ReleaseGroup(val) => val
+                .as_ref()
+                .clone()
+                .update(newer.unwrap_release_group().as_ref().clone())
+                .into_generic(),
+            Self::Work(val) => val
+                .as_ref()
+                .clone()
+                .update(newer.unwrap_work().as_ref().clone())
+                .into_generic(),
         }
+    }
+}
+
+impl From<Artist> for MusicBrainzEntity {
+    fn from(value: Artist) -> Self {
+        Self::Artist(Arc::new(value))
+    }
+}
+
+impl From<Recording> for MusicBrainzEntity {
+    fn from(value: Recording) -> Self {
+        Self::Recording(Arc::new(value))
+    }
+}
+
+impl From<Release> for MusicBrainzEntity {
+    fn from(value: Release) -> Self {
+        Self::Release(Arc::new(value))
+    }
+}
+
+impl From<ReleaseGroup> for MusicBrainzEntity {
+    fn from(value: ReleaseGroup) -> Self {
+        Self::ReleaseGroup(Arc::new(value))
+    }
+}
+
+impl From<Work> for MusicBrainzEntity {
+    fn from(value: Work) -> Self {
+        Self::Work(Arc::new(value))
     }
 }

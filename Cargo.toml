@@ -21,8 +21,8 @@ listenbrainz = {version = "0.7.2", package = "listenbrainz_rs_nova"} # Fork with
 # This fixes:
 # - https://github.com/RustyNova016/listenbrainz-cli-tools/issues/97
 #musicbrainz_rs = "5.0.0" # Original musicbrainz_rs crate. It currently seems unmaintained, and need some PRs to pass
-musicbrainz_rs = {version = "0.5.1", package = "musicbrainz_rs_nova"} # Fork with fixes
-#musicbrainz_rs = { branch = "listenbrainz-cli-tools_master", git = "https://github.com/RustyNova016/musicbrainz_rs.git" }
+#musicbrainz_rs = {version = "0.5.1", package = "musicbrainz_rs_nova"} # Fork with fixes
+musicbrainz_rs = { branch = "feature/ratelimit", package = "musicbrainz_rs_nova", git = "https://github.com/RustyNova016/musicbrainz_rs.git" }
 #musicbrainz_rs = { path = "../musicbrainz_rs"} # For easy development, download the musicbrainz_rs crate for yourself. Don't forget to change it back as PRs will fail
 
 derive_builder = "0.20.0"
@@ -44,7 +44,7 @@ extend = "1.2.0"
 directories = "5.0.1"
 chashmap = "2.2.2"
 indicatif = { version = "0.17.8", features = ["rayon", "improved_unicode", "futures"] }
-tokio = { version = "1.38.0", features = ["full"] }
+tokio = { version = "1.38.0", features = ["full", "tracing"] }
 rayon = "1.10.0"
 reqwest = { version = "0.12.5", features = ["json"] }
 cacache = { version = "13.0.0", default-features = false, features = ["tokio-runtime", "mmap"] }
@@ -58,6 +58,8 @@ rust_decimal_macros = "1.34.2"
 futures = "0.3.30"
 humantime = "2.1.0"
 regex = "1.10.5"
+console-subscriber = "0.3.0"
+
 
 # The profile that 'cargo dist' will build with
 [profile.dist]

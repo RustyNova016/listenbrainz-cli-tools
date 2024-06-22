@@ -1,9 +1,9 @@
-pub mod extensions;
-pub mod generic_mbid;
+use std::sync::Arc;
+
 use derive_more::{Display, From, IsVariant, Unwrap};
 use serde::{Deserialize, Serialize};
 
-use crate::core::entity_traits::mbid::IsMbid;
+use crate::core::entity_traits::mbid::{HasMBID, IsMbid};
 use crate::models::data::musicbrainz::artist::mbid::ArtistMBID;
 use crate::models::data::musicbrainz::external_musicbrainz_entity::ExternalMusicBrainzEntity;
 use crate::models::data::musicbrainz::musicbrainz_entity::MusicBrainzEntity;
@@ -13,6 +13,8 @@ use crate::models::data::musicbrainz::release_group::mbid::ReleaseGroupMBID;
 use crate::models::data::musicbrainz::work::mbid::WorkMBID;
 
 pub mod converters;
+pub mod extensions;
+pub mod generic_mbid;
 pub mod mbid_kind;
 
 #[derive(Debug, Clone, PartialEq, Eq, From, Serialize, Deserialize, Display, IsVariant, Unwrap)]
@@ -27,12 +29,24 @@ pub enum MBID {
 impl IsMbid<MusicBrainzEntity> for MBID {
     async fn get_or_fetch_entity(&self) -> color_eyre::Result<MusicBrainzEntity> {
         Ok(match self {
-            Self::Artist(val) => val.get_or_fetch_entity().await?.into(),
-            Self::Release(val) => val.get_or_fetch_entity().await?.into(),
-            Self::Work(val) => val.get_or_fetch_entity().await?.into(),
-            Self::ReleaseGroup(val) => val.get_or_fetch_entity().await?.into(),
-            Self::Recording(val) => val.get_or_fetch_entity().await?.into(),
+            Self::Artist(val) => val.get_or_fetch_entity().await?.into_generic(),
+            Self::Release(val) => val.get_or_fetch_entity().await?.into_generic(),
+            Self::Work(val) => val.get_or_fetch_entity().await?.into_generic(),
+            Self::ReleaseGroup(val) => val.get_or_fetch_entity().await?.into_generic(),
+            Self::Recording(val) => val.get_or_fetch_entity().await?.into_generic(),
         })
+    }
+
+    async fn get_or_fetch_entity_arc(&self) -> color_eyre::Result<Arc<MusicBrainzEntity>> {
+        Ok(Arc::new(match self {
+            Self::Artist(val) => MusicBrainzEntity::from(val.get_or_fetch_entity_arc().await?),
+            Self::Release(val) => MusicBrainzEntity::from(val.get_or_fetch_entity_arc().await?),
+            Self::Work(val) => MusicBrainzEntity::from(val.get_or_fetch_entity_arc().await?),
+            Self::ReleaseGroup(val) => {
+                MusicBrainzEntity::from(val.get_or_fetch_entity_arc().await?)
+            }
+            Self::Recording(val) => MusicBrainzEntity::from(val.get_or_fetch_entity_arc().await?),
+        }))
     }
 
     async fn fetch(&self) -> color_eyre::Result<ExternalMusicBrainzEntity> {
