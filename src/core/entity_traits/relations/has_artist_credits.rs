@@ -6,6 +6,7 @@ use crate::core::entity_traits::has_id::HasID;
 use crate::core::entity_traits::mb_cached::MBCached;
 use crate::core::entity_traits::mbid::IsMbid;
 use crate::models::data::musicbrainz::artist_credit::collection::ArtistCredits;
+use crate::models::error::Error;
 
 pub trait HasArtistCredits<K: IsMbid<Self> + Serialize + DeserializeOwned>:
     HasID + MBCached<K>
@@ -13,6 +14,10 @@ pub trait HasArtistCredits<K: IsMbid<Self> + Serialize + DeserializeOwned>:
     fn get_artist_credits(&self) -> &Option<ArtistCredits>;
 
     async fn get_or_fetch_artist_credits(&self) -> color_eyre::Result<ArtistCredits> {
+        if let Some(data) = self.get_artist_credits() {
+            return Ok(data.clone());
+        }
+
         Ok(match &self.get_artist_credits() {
             Some(credits) => credits.clone(),
             None => {
@@ -25,5 +30,22 @@ pub trait HasArtistCredits<K: IsMbid<Self> + Serialize + DeserializeOwned>:
                     .clone()
             }
         })
+    }
+
+    /// Force fetch the related entity
+    async fn fetch_artist_credits(&self) -> color_eyre::Result<ArtistCredits> {
+        let refreshed = self
+            .refresh()
+            .await
+            .context("Couldn't fetch data from the API")?;
+
+        Ok(refreshed
+            .get_artist_credits()
+            .as_ref()
+            .ok_or(Error::NoneAfterFetch(
+                "artist_credits".to_string(),
+                self.get_id(),
+            ))
+            .cloned()?)
     }
 }

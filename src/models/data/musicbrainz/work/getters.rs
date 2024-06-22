@@ -3,6 +3,8 @@ use itertools::Itertools;
 
 use crate::core::entity_traits::mb_cached::MBCached;
 use crate::core::entity_traits::mbid::IsMbid;
+use crate::core::entity_traits::relations::has_relationships::HasRelationShips;
+use crate::models::data::musicbrainz::relation::Relation;
 
 use super::mbid::WorkMBID;
 use super::Work;
@@ -45,5 +47,11 @@ impl Work {
         }
 
         Ok(all_work_ids)
+    }
+}
+
+impl HasRelationShips<WorkMBID> for Work {
+    fn get_relationships(&self) -> &Option<Vec<Relation>> {
+        &self.relations
     }
 }

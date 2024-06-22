@@ -1,16 +1,18 @@
-pub mod cache;
-use cache::CacheCommand;
 use clap::{Parser, Subcommand};
+
+use cache::CacheCommand;
 use config::ConfigCli;
 
 use crate::models::cli::common::{GroupByTarget, SortListensBy, SortSorterBy};
 use crate::models::cli::radio::RadioCommand;
 use crate::tools::interactive_mapper::interactive_mapper;
+use crate::tools::musicbrainz::search_link;
 use crate::tools::stats::stats_command;
 use crate::tools::unlinked::unmapped_command;
 
 use super::config::Config;
 
+pub mod cache;
 pub mod common;
 pub mod config;
 pub mod radio;
@@ -73,8 +75,7 @@ pub enum Commands {
 
     Cache(CacheCommand),
     Config(ConfigCli),
-    //Search {},
-
+    Search {},
     //Lookup {
     //    /// Recording ID
     //    #[arg(short, long)]
@@ -115,6 +116,7 @@ impl Commands {
             Self::Radio(val) => val.run().await?,
             Self::Cache(val) => val.run().await?,
             Self::Config(val) => val.command.run().await?,
+            Self::Search {} => search_link().await,
             //Self::Lookup { id, username } => lookup(username, id.to_string().into()).await,
         }
 

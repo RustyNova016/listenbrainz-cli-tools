@@ -1,3 +1,5 @@
+use crate::core::entity_traits::relations::has_relationships::HasRelationShips;
+
 pub mod artist;
 pub mod artist_credit;
 pub mod external_musicbrainz_entity;
