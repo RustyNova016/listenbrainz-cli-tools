@@ -1,10 +1,12 @@
+use std::sync::Arc;
+
+use itertools::Itertools;
+
 use crate::core::entity_traits::has_id::HasID;
 use crate::core::entity_traits::mb_cached::MBCached;
 use crate::core::entity_traits::mbid::{HasMBID, VecIExt};
 use crate::models::data::musicbrainz::work::mbid::WorkMBID;
 use crate::models::data::musicbrainz::work::Work;
-use itertools::Itertools;
-use std::sync::Arc;
 
 pub async fn search_link() {
     let start: WorkMBID = "1919e988-9619-45fc-a2dc-91dbf52a85c2".to_string().into();
@@ -41,12 +43,12 @@ pub async fn search_link() {
 }
 
 pub struct Node {
-    pub current: Work,
+    pub current: Arc<Work>,
     pub previous: Option<Arc<Self>>,
 }
 
 impl Node {
-    pub fn new(work: Work, previous: Option<Arc<Self>>) -> Self {
+    pub fn new(work: Arc<Work>, previous: Option<Arc<Self>>) -> Self {
         Self {
             current: work,
             previous,

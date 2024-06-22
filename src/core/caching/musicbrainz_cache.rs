@@ -114,6 +114,11 @@ where
         ram_disk.get(&mbid.to_string()).unwrap().clone()
     }
 
+    pub async fn force_fetch_entity(&self, mbid: &K) -> color_eyre::Result<Arc<V>> {
+        self.remove(mbid).await?;
+        self.get_or_fetched(mbid).await
+    }
+
     pub async fn get(&self, mbid: &K) -> Result<Option<V>, Error> {
         let new_mbid = self.get_primary_mbid_alias(mbid).await?;
 
@@ -231,13 +236,7 @@ where
         match self.alias_cache.get_or_option(mbid).await {
             Ok(Some(val)) => Ok(val),
             Ok(None) | Err(Error::CacheDeserializationError(_)) => {
-                self.force_fetch_and_save(mbid).await?;
-
-                Ok(self
-                    .alias_cache
-                    .get_or_option(mbid)
-                    .await?
-                    .expect("Couldn't retrieve the primary alias of MBID after fetching"))
+                Ok(self.force_fetch_entity(mbid).await?.get_mbid())
             }
             Err(val) => Err(val.into()),
         }
@@ -319,6 +318,7 @@ where
     ///
     /// ⚠️ Waiting for a permit doesn't cancel the request. It only delays it.
     /// If the intention is to only fetch once, see [`Self::get_or_fetch`]
+    #[deprecated]
     pub async fn force_fetch_and_save(&self, mbid: &K) -> color_eyre::Result<V> {
         let lock = self.get_fetch_lock(mbid);
         let _permit = lock.acquire().await.context("Couldn't get permit")?;

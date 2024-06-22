@@ -1,15 +1,16 @@
-use crate::core::entity_traits::mbid::IsMbid;
-use crate::core::statistics::listen_rate::ListenRate;
-use crate::core::statistics::listen_rate::ListenRateRange;
-use crate::models::data::listenbrainz::user_listens::UserListens;
-use crate::models::data::musicbrainz::mbid::extensions::VecTExt;
-use crate::models::radio::RadioConfig;
-use crate::utils::playlist::PlaylistStub;
 use chrono::prelude::Utc;
 use chrono::Duration;
 use futures::stream;
 use futures::StreamExt;
 use itertools::Itertools;
+
+use crate::core::entity_traits::mbid::IsMbid;
+use crate::core::statistics::listen_rate::ListenRate;
+use crate::core::statistics::listen_rate::ListenRateRange;
+use crate::models::data::listenbrainz::user_listens::UserListens;
+use crate::models::data::musicbrainz::mbid::extensions::VecATExt;
+use crate::models::radio::RadioConfig;
+use crate::utils::playlist::PlaylistStub;
 
 pub async fn listen_rate_radio(
     username: &str,

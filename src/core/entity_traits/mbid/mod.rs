@@ -19,9 +19,7 @@ where
     Self: Display + Clone + Serialize + DeserializeOwned,
     T: HasMBID<Self>,
 {
-    fn get_or_fetch_entity(&self) -> impl Future<Output = color_eyre::Result<T>> + Send;
-
-    fn get_or_fetch_entity_arc(&self) -> impl Future<Output = color_eyre::Result<Arc<T>>> + Send;
+    fn get_or_fetch_entity(&self) -> impl Future<Output = color_eyre::Result<Arc<T>>> + Send;
 
     fn fetch(&self) -> impl Future<Output = color_eyre::Result<ExternalMusicBrainzEntity>> + Send;
 
@@ -35,7 +33,7 @@ where
     I: IsMbid<T>,
 {
     #[allow(async_fn_in_trait)]
-    async fn get_or_fetch_entities(&self) -> color_eyre::Result<Vec<T>> {
+    async fn get_or_fetch_entities(&self) -> color_eyre::Result<Vec<Arc<T>>> {
         let mut result = Vec::new();
 
         for item in self {
