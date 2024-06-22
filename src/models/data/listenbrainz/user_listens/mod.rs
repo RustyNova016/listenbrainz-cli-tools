@@ -8,6 +8,8 @@ use serde::{Deserialize, Serialize};
 
 use crate::utils::extensions::UserListensPayloadExt;
 
+use super::listen::collection::collection_unspe::VecListenMappingStateExt;
+use super::listen::collection::naive_mapped_listens_collection::MappedNaiveListensCollection;
 use super::listen::collection::ListenCollection;
 use super::listen::Listen;
 
@@ -90,6 +92,13 @@ impl UserListens {
     /// Returns all the mapped listens
     pub fn get_mapped_listens(&self) -> ListenCollection {
         self.listens.get_mapped_listens()
+    }
+
+    pub fn get_mapped_listens_as_specialized(&self) -> MappedNaiveListensCollection {
+        self.listens
+            .clone()
+            .into_listen_mapping_state_vec()
+            .into_mapped_collection()
     }
 
     /// Returns the number of listens

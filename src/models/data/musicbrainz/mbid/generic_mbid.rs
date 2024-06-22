@@ -1,10 +1,12 @@
-use std::marker::PhantomData;
-use std::ops::Deref;
+use serde::Deserialize;
+use serde::Serialize;
 
 use crate::models::data::musicbrainz::artist::Artist;
 use crate::models::data::musicbrainz::recording::Recording;
+use std::marker::PhantomData;
+use std::ops::Deref;
 
-#[derive(Debug, PartialEq, Eq)]
+#[derive(Debug, PartialEq, Eq, Clone, Deserialize, Serialize)]
 pub struct MBIDSpe<T: IdEntityType, S: IdAliasState> {
     id: String,
 
@@ -12,15 +14,18 @@ pub struct MBIDSpe<T: IdEntityType, S: IdAliasState> {
     _state: PhantomData<S>,
 }
 
-pub trait IdEntityType {}
+pub trait IdEntityType: Clone {}
 impl IdEntityType for Artist {}
 impl IdEntityType for Recording {}
 
 // Id state
+#[derive(Debug, PartialEq, Eq, Clone)]
 pub struct NaiveID;
+
+#[derive(Debug, PartialEq, Eq, Clone)]
 pub struct PrimaryID;
 
-pub trait IdAliasState {}
+pub trait IdAliasState: Clone {}
 impl IdAliasState for NaiveID {}
 impl IdAliasState for PrimaryID {}
 
@@ -41,7 +46,11 @@ impl<T: IdEntityType, S: IdAliasState> Deref for MBIDSpe<T, S> {
     }
 }
 
-impl<T: IdEntityType, S: IdAliasState> From<String> for MBIDSpe<T, S> {
+impl<T, S> From<String> for MBIDSpe<T, S>
+where
+    T: IdEntityType,
+    S: IdAliasState,
+{
     fn from(value: String) -> Self {
         Self {
             id: value,

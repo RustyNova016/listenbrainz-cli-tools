@@ -1,6 +1,11 @@
+pub mod collection_spe;
+pub mod collection_unspe;
+pub mod common;
 mod converters;
 pub mod filters;
 pub mod listen_rate;
+pub mod mapped_listen_collection;
+pub mod naive_mapped_listens_collection;
 pub mod recording;
 use std::sync::Arc;
 
