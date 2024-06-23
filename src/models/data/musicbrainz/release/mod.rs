@@ -6,8 +6,6 @@ use musicbrainz_rs::entity::release::{ReleasePackaging, ReleaseStatus};
 use musicbrainz_rs::entity::tag::Tag;
 use serde::{Deserialize, Serialize};
 
-use crate::core::entity_traits::relations::has_artist_credits::HasArtistCredits;
-use crate::core::entity_traits::relations::has_release_group::HasReleaseGroup;
 use crate::models::data::musicbrainz::artist_credit::collection::ArtistCredits;
 use crate::models::data::musicbrainz::relation::Relation;
 use crate::models::data::musicbrainz::release_group::mbid::ReleaseGroupMBID;
@@ -23,6 +21,7 @@ pub mod get_or_fetch;
 pub mod getters;
 pub mod mbid;
 pub mod media;
+pub mod relations;
 pub mod track;
 
 #[derive(Debug, Clone, Eq, PartialEq, Deserialize, Serialize, Getters)]
@@ -47,16 +46,4 @@ pub struct Release {
     aliases: Option<Vec<Alias>>,
     genres: Option<Vec<Genre>>,
     annotation: Option<String>,
-}
-
-impl HasArtistCredits<ReleaseMBID> for Release {
-    fn get_artist_credits(&self) -> &Option<ArtistCredits> {
-        &self.artist_credit
-    }
-}
-
-impl HasReleaseGroup<ReleaseMBID> for Release {
-    fn get_release_group(&self) -> &Option<ReleaseGroupMBID> {
-        &self.release_group
-    }
 }

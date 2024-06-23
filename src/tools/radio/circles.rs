@@ -9,7 +9,6 @@ use rand::thread_rng;
 
 use crate::core::entity_traits::mb_cached::MBCached;
 use crate::core::entity_traits::mbid::IsMbid;
-use crate::core::entity_traits::relations::has_artist_credits::HasArtistCredits;
 use crate::models::data::listenbrainz::listen::collection::ListenCollection;
 use crate::models::data::listenbrainz::listen::Listen;
 use crate::models::data::listenbrainz::user_listens::UserListens;

@@ -1,11 +1,9 @@
-pub mod getters;
 use derive_getters::Getters;
 use musicbrainz_rs::entity::alias::Alias;
 use musicbrainz_rs::entity::genre::Genre;
 use musicbrainz_rs::entity::tag::Tag;
 use serde::{Deserialize, Serialize};
 
-use crate::core::entity_traits::relations::has_artist_credits::HasArtistCredits;
 use crate::models::data::musicbrainz::release::mbid::ReleaseMBID;
 
 use super::artist_credit::collection::ArtistCredits;
@@ -17,7 +15,9 @@ pub mod caching;
 pub mod converters;
 pub mod external;
 pub mod get_or_fetch;
+pub mod getters;
 pub mod mbid;
+pub mod relations;
 
 #[derive(Debug, Clone, Eq, PartialEq, Deserialize, Serialize, Getters)]
 pub struct Recording {

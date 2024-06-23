@@ -1,4 +1,3 @@
-use crate::core::entity_traits::relations::has_artist_credits::HasArtistCredits;
 use chrono::NaiveDate;
 use derive_getters::Getters;
 use musicbrainz_rs::entity::alias::Alias;
@@ -16,6 +15,7 @@ mod caching;
 mod converters;
 pub(crate) mod external;
 pub mod mbid;
+mod relations;
 
 #[derive(Debug, Clone, Eq, PartialEq, Deserialize, Serialize, Getters)]
 pub struct ReleaseGroup {
@@ -35,10 +35,4 @@ pub struct ReleaseGroup {
     aliases: Option<Vec<Alias>>,
     genres: Option<Vec<Genre>>,
     annotation: Option<String>,
-}
-
-impl HasArtistCredits<ReleaseGroupMBID> for ReleaseGroup {
-    fn get_artist_credits(&self) -> &Option<ArtistCredits> {
-        &self.artist_credit
-    }
 }

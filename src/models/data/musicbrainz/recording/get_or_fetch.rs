@@ -3,13 +3,8 @@ use itertools::Itertools;
 
 use crate::core::entity_traits::mb_cached::MBCached;
 use crate::core::entity_traits::mbid::IsMbid;
-use crate::core::entity_traits::relations::has_artist_credits::HasArtistCredits;
-use crate::core::entity_traits::relations::has_relationships::HasRelationShips;
-use crate::models::data::musicbrainz::artist_credit::collection::ArtistCredits;
 use crate::models::data::musicbrainz::mbid::generic_mbid::MBIDSpe;
 use crate::models::data::musicbrainz::mbid::generic_mbid::PrimaryID;
-use crate::models::data::musicbrainz::recording::mbid::RecordingMBID;
-use crate::models::data::musicbrainz::relation::Relation;
 use crate::models::data::musicbrainz::release::mbid::ReleaseMBID;
 use crate::models::data::musicbrainz::work::mbid::WorkMBID;
 
@@ -68,17 +63,5 @@ impl Recording {
         }
 
         Ok(result_ids)
-    }
-}
-
-impl HasArtistCredits<RecordingMBID> for Recording {
-    fn get_artist_credits(&self) -> &Option<ArtistCredits> {
-        &self.artist_credit
-    }
-}
-
-impl HasRelationShips<RecordingMBID> for Recording {
-    fn get_relationships(&self) -> &Option<Vec<Relation>> {
-        &self.relations
     }
 }

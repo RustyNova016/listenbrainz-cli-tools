@@ -5,7 +5,6 @@ use itertools::Itertools;
 use crate::core::display::progress_bar::ProgressBarCli;
 use crate::core::entity_traits::mb_cached::MBCached;
 use crate::core::entity_traits::mbid::VecIExt;
-use crate::core::entity_traits::relations::has_release_group::HasReleaseGroup;
 use crate::core::statistics::statistic_sorter::StatisticSorter;
 use crate::models::cli::common::GroupByTarget;
 use crate::models::data::listenbrainz::listen::collection::ListenCollection;
@@ -142,7 +141,7 @@ impl ListenCollection {
 
             let mut release_groups_ids = Vec::new();
             for release in releases {
-                release_groups_ids.push(release.get_or_fetch_release_group().await?);
+                release_groups_ids.push(release.get_or_fetch_release_group_mbid().await?);
             }
 
             release_groups_ids = release_groups_ids.into_iter().unique().collect_vec();

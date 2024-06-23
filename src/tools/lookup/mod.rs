@@ -4,7 +4,6 @@ use chrono::Utc;
 use humantime::format_duration;
 
 use crate::core::entity_traits::mbid::IsMbid;
-use crate::core::entity_traits::relations::has_artist_credits::HasArtistCredits;
 use crate::core::statistics::listen_rate::ListenRate;
 use crate::models::data::listenbrainz::user_listens::UserListens;
 use crate::models::data::musicbrainz::recording::mbid::RecordingMBID;

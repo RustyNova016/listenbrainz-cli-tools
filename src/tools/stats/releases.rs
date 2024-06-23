@@ -1,5 +1,4 @@
 use crate::core::entity_traits::mb_cached::MBCached;
-use crate::core::entity_traits::relations::has_artist_credits::HasArtistCredits;
 use crate::core::statistics::statistic_sorter::StatisticSorter;
 use crate::models::cli::common::SortSorterBy;
 use crate::models::data::musicbrainz::release::Release;

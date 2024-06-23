@@ -3,7 +3,6 @@ use musicbrainz_rs::entity::alias::Alias;
 use musicbrainz_rs::entity::genre::Genre;
 use musicbrainz_rs::entity::tag::Tag;
 use musicbrainz_rs::entity::work::WorkAttribute;
-
 use serde::Deserialize;
 use serde::Serialize;
 
@@ -16,6 +15,7 @@ pub mod converter;
 pub mod external;
 pub mod getters;
 pub mod mbid;
+pub mod relations;
 
 #[derive(Debug, Clone, PartialEq, Eq, Deserialize, Serialize, Getters)]
 pub struct Work {

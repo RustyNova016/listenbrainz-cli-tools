@@ -20,6 +20,7 @@ pub mod caching;
 pub mod external;
 pub mod getters;
 pub mod mbid;
+mod relations;
 
 #[derive(Debug, Clone, Eq, PartialEq, Deserialize, Serialize, Getters)]
 #[serde(rename_all = "kebab-case")]

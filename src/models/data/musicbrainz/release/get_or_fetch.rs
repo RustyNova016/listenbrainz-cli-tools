@@ -3,10 +3,7 @@ use itertools::Itertools;
 
 use crate::core::entity_traits::has_id::HasID;
 use crate::core::entity_traits::mb_cached::MBCached;
-use crate::core::entity_traits::relations::has_relationships::HasRelationShips;
 use crate::models::data::musicbrainz::recording::mbid::RecordingMBID;
-use crate::models::data::musicbrainz::relation::Relation;
-use crate::models::data::musicbrainz::release::mbid::ReleaseMBID;
 use crate::models::data::musicbrainz::release::Release;
 
 impl Release {
@@ -32,11 +29,5 @@ impl Release {
                     .clone()
             }
         })
-    }
-}
-
-impl HasRelationShips<ReleaseMBID> for Release {
-    fn get_relationships(&self) -> &Option<Vec<Relation>> {
-        &self.relations
     }
 }
