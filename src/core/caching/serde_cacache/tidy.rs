@@ -15,6 +15,8 @@ use tokio::sync::RwLock;
 
 use crate::core::caching::serde_cacache::error::Error;
 
+use super::error::is_error_io_not_found;
+
 #[derive(Debug, Clone)]
 pub struct SerdeCacacheTidy<K, V> {
     name: PathBuf,
@@ -199,5 +201,20 @@ where
         try_join_all(entries_to_delete).await?;
 
         Ok(())
+    }
+
+    pub async fn clear(&self) -> cacache::Result<()> {
+        let result = cacache::clear(&self.name).await;
+
+        match result {
+            Ok(val) => Ok(val),
+            Err(err) => {
+                if is_error_io_not_found(&err) {
+                    Ok(())
+                } else {
+                    Err(err)
+                }
+            }
+        }
     }
 }

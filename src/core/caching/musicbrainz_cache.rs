@@ -4,6 +4,7 @@ use std::sync::Arc;
 use chashmap::CHashMap;
 use color_eyre::eyre::Context;
 use color_eyre::owo_colors::OwoColorize;
+use futures::try_join;
 use serde::de::DeserializeOwned;
 use serde::Serialize;
 use tokio::sync::{RwLock, RwLockWriteGuard, Semaphore};
@@ -270,5 +271,11 @@ where
             .get(mbid)
             .await?
             .expect("Fetched data should be in the cache"))
+    }
+
+    pub async fn clear(&self) -> cacache::Result<()> {
+        let _ = try_join!(self.alias_cache.clear(), self.disk_cache.clear())?;
+
+        Ok(())
     }
 }
