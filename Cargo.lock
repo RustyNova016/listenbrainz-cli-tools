@@ -1477,7 +1477,6 @@ dependencies = [
  "indicatif",
  "inquire",
  "itertools",
- "lazy_static",
  "listenbrainz_rs_nova",
  "moka",
  "musicbrainz_rs_nova",
