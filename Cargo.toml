@@ -21,7 +21,7 @@ listenbrainz = {version = "0.7.2", package = "listenbrainz_rs_nova"} # Fork with
 # This fixes:
 # - https://github.com/RustyNova016/listenbrainz-cli-tools/issues/97
 #musicbrainz_rs = "5.0.0" # Original musicbrainz_rs crate. It currently seems unmaintained, and need some PRs to pass
-musicbrainz_rs = {version = "0.5.1", package = "musicbrainz_rs_nova"} # Fork with fixes
+musicbrainz_rs = {version = "0.6.0", package = "musicbrainz_rs_nova"} # Fork with fixes
 #musicbrainz_rs = { branch = "listenbrainz-cli-tools_master", git = "https://github.com/RustyNova016/musicbrainz_rs.git" }
 #musicbrainz_rs = { path = "../musicbrainz_rs"} # For easy development, download the musicbrainz_rs crate for yourself. Don't forget to change it back as PRs will fail
 
