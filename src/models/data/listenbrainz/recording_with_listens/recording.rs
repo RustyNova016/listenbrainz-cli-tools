@@ -4,10 +4,7 @@ use std::sync::Arc;
 use crate::models::data::listenbrainz::listen::collection::ListenCollection;
 use crate::models::data::musicbrainz::recording::Recording;
 
-use chrono::DateTime;
-use chrono::Utc;
 use derive_getters::Getters;
-use derive_new::new;
 
 use super::recording_id::RecordingIDWithListens;
 
