@@ -12,7 +12,7 @@ use crate::models::data::musicbrainz::external_musicbrainz_entity::ExternalMusic
 use crate::models::data::musicbrainz::mbid::generic_mbid::IdAliasState;
 use crate::models::data::musicbrainz::mbid::generic_mbid::MBIDSpe;
 use crate::models::data::musicbrainz::mbid::generic_mbid::MBIDSpeTypeMethods;
-use crate::models::data::musicbrainz::mbid::MBID;
+use crate::models::data::musicbrainz::mbid::MBIDEnum;
 use crate::models::data::musicbrainz::recording::external::RecordingExt;
 use crate::utils::println_mus;
 
@@ -46,8 +46,8 @@ impl IsMbid<Recording> for RecordingMBID {
         )
     }
 
-    fn into_mbid(self) -> MBID {
-        MBID::Recording(self)
+    fn into_mbid(self) -> MBIDEnum {
+        MBIDEnum::Recording(self)
     }
 }
 

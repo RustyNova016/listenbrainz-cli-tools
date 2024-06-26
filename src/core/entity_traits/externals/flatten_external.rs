@@ -1,5 +1,5 @@
-use crate::models::data::musicbrainz::musicbrainz_entity::MusicBrainzEntity;
+use crate::models::data::musicbrainz::musicbrainz_entity::AnyMusicBrainzEntity;
 
 pub trait FlattenExternal {
-    fn flattened(&self) -> (MusicBrainzEntity, Vec<MusicBrainzEntity>);
+    fn flattened(&self) -> (AnyMusicBrainzEntity, Vec<AnyMusicBrainzEntity>);
 }

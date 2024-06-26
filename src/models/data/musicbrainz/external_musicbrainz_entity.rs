@@ -2,19 +2,21 @@ use extend::ext;
 use musicbrainz_rs::entity::relations::RelationContent;
 
 use crate::core::entity_traits::mbid::{HasMBID, IsMbid};
-use crate::models::data::musicbrainz::mbid::MBID;
-use crate::models::data::musicbrainz::musicbrainz_entity::MusicBrainzEntity;
+use crate::models::data::musicbrainz::mbid::MBIDEnum;
+use crate::models::data::musicbrainz::musicbrainz_entity::AnyMusicBrainzEntity;
 use crate::models::data::musicbrainz_database::MUSICBRAINZ_DATABASE;
+use crate::utils::println_cli;
 
 pub type ExternalMusicBrainzEntity = RelationContent;
-pub type FlattenedMBEntity = (MusicBrainzEntity, Vec<MusicBrainzEntity>);
+pub type FlattenedMBEntity = (AnyMusicBrainzEntity, Vec<AnyMusicBrainzEntity>);
 
 #[ext]
 pub impl ExternalMusicBrainzEntity {}
 
 #[ext]
 pub impl FlattenedMBEntity {
-    async fn insert_into_cache_with_alias(self, mbid: &MBID) -> color_eyre::Result<()> {
+    async fn insert_into_cache_with_alias(self, mbid: &MBIDEnum) -> color_eyre::Result<()> {
+        println_cli("add alias 1");
         MUSICBRAINZ_DATABASE
             .add_alias(mbid, &self.0.get_mbid())
             .await?;
@@ -27,14 +29,19 @@ pub impl FlattenedMBEntity {
         //Let's take care of the main data
         let mbid = self.0.get_mbid();
 
-        self.0.save_to_cache().await?;
+        println_cli("first cahce insert");
+        self.0.update_cache().await?;
+
+        
 
         MUSICBRAINZ_DATABASE
             .add_alias(&mbid.clone().into_mbid(), &self.0.get_mbid())
             .await?;
 
+            println_cli("save others");
+
         for extra in self.1 {
-            extra.save_to_cache().await?;
+            extra.update_cache().await?;
         }
 
         Ok(())

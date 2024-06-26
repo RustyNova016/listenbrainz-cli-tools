@@ -8,16 +8,7 @@ pub mod relation;
 pub mod release;
 pub mod release_group;
 pub mod work;
-
-/// Type of the entity having this MBID
-#[derive(Debug, Clone, Copy)]
-pub enum MBIDType {
-    Recording,
-    Artist,
-}
-pub trait HasMbid {
-    fn get_mbid(&self) -> &str;
-}
+pub mod entity;
 
 pub trait HasId {
     fn get_id(&self) -> &str;

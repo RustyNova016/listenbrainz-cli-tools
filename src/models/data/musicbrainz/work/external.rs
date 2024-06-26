@@ -3,7 +3,7 @@ use musicbrainz_rs::entity::work::Work;
 
 use crate::core::entity_traits::has_id::HasID;
 use crate::models::data::musicbrainz::external_musicbrainz_entity::ExternalMusicBrainzEntity;
-use crate::models::data::musicbrainz::musicbrainz_entity::MusicBrainzEntity;
+use crate::models::data::musicbrainz::musicbrainz_entity::AnyMusicBrainzEntity;
 use crate::models::data::musicbrainz::relation::external::RelationContentExt;
 
 impl HasID for Work {
@@ -14,12 +14,12 @@ impl HasID for Work {
 
 #[ext]
 pub impl Work {
-    fn flatten_main(&self) -> MusicBrainzEntity {
+    fn flatten_main(&self) -> AnyMusicBrainzEntity {
         super::Work::from(self.clone()).into()
     }
 
-    fn flatten_children(&self) -> Vec<MusicBrainzEntity> {
-        let mut result: Vec<MusicBrainzEntity> = Vec::new();
+    fn flatten_children(&self) -> Vec<AnyMusicBrainzEntity> {
+        let mut result: Vec<AnyMusicBrainzEntity> = Vec::new();
 
         if let Some(relations) = self.relations.clone() {
             for relation in relations {
@@ -35,7 +35,7 @@ pub impl Work {
         result
     }
 
-    fn flattened(&self) -> (MusicBrainzEntity, Vec<MusicBrainzEntity>) {
+    fn flattened(&self) -> (AnyMusicBrainzEntity, Vec<AnyMusicBrainzEntity>) {
         (self.flatten_main(), self.flatten_children())
     }
 

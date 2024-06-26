@@ -11,7 +11,8 @@ use crate::core::entity_traits::mbid::IsMbid;
 use crate::models::data::musicbrainz::artist::external::ArtistExt;
 use crate::models::data::musicbrainz::artist::Artist;
 use crate::models::data::musicbrainz::external_musicbrainz_entity::ExternalMusicBrainzEntity;
-use crate::models::data::musicbrainz::mbid::MBID;
+use crate::models::data::musicbrainz::mbid::IsMusicbrainzID;
+use crate::models::data::musicbrainz::mbid::MBIDEnum;
 use crate::utils::println_mus;
 
 #[derive(
@@ -38,7 +39,11 @@ impl IsMbid<Artist> for ArtistMBID {
             .into_entity())
     }
 
-    fn into_mbid(self) -> MBID {
-        MBID::Artist(self)
+    fn into_mbid(self) -> MBIDEnum {
+        MBIDEnum::Artist(self)
     }
+}
+
+impl IsMusicbrainzID<Artist> for ArtistMBID {
+    
 }

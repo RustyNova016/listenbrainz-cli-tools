@@ -4,7 +4,7 @@ use musicbrainz_rs::entity::recording::Recording;
 use crate::core::entity_traits::has_id::HasID;
 use crate::models::data::musicbrainz::artist::external::ArtistExt;
 use crate::models::data::musicbrainz::external_musicbrainz_entity::ExternalMusicBrainzEntity;
-use crate::models::data::musicbrainz::musicbrainz_entity::MusicBrainzEntity;
+use crate::models::data::musicbrainz::musicbrainz_entity::AnyMusicBrainzEntity;
 use crate::models::data::musicbrainz::relation::external::RelationContentExt;
 use crate::models::data::musicbrainz::release::external::ReleaseExt;
 
@@ -16,12 +16,12 @@ impl HasID for Recording {
 
 #[ext]
 pub impl Recording {
-    fn flatten_main(&self) -> MusicBrainzEntity {
+    fn flatten_main(&self) -> AnyMusicBrainzEntity {
         super::Recording::from(self.clone()).into()
     }
 
-    fn flatten_children(&self) -> Vec<MusicBrainzEntity> {
-        let mut result: Vec<MusicBrainzEntity> = Vec::new();
+    fn flatten_children(&self) -> Vec<AnyMusicBrainzEntity> {
+        let mut result: Vec<AnyMusicBrainzEntity> = Vec::new();
 
         if let Some(artist_credits) = self.artist_credit.clone() {
             for artist_credit in artist_credits {
@@ -51,7 +51,7 @@ pub impl Recording {
         result
     }
 
-    fn flattened(&self) -> (MusicBrainzEntity, Vec<MusicBrainzEntity>) {
+    fn flattened(&self) -> (AnyMusicBrainzEntity, Vec<AnyMusicBrainzEntity>) {
         (self.flatten_main(), self.flatten_children())
     }
 

@@ -10,7 +10,7 @@ use serde::Serialize;
 use crate::core::entity_traits::mb_cached::MBCached;
 use crate::core::entity_traits::mbid::IsMbid;
 use crate::models::data::musicbrainz::external_musicbrainz_entity::ExternalMusicBrainzEntity;
-use crate::models::data::musicbrainz::mbid::MBID;
+use crate::models::data::musicbrainz::mbid::MBIDEnum;
 use crate::models::data::musicbrainz::work::external::WorkExt;
 use crate::utils::println_mus;
 
@@ -47,7 +47,7 @@ impl IsMbid<Work> for WorkMBID {
             .into_entity())
     }
 
-    fn into_mbid(self) -> MBID {
-        MBID::Work(self)
+    fn into_mbid(self) -> MBIDEnum {
+        MBIDEnum::Work(self)
     }
 }

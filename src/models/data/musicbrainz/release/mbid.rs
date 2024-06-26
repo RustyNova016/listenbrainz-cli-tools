@@ -9,7 +9,7 @@ use serde::{Deserialize, Serialize};
 use crate::core::entity_traits::mb_cached::MBCached;
 use crate::core::entity_traits::mbid::IsMbid;
 use crate::models::data::musicbrainz::external_musicbrainz_entity::ExternalMusicBrainzEntity;
-use crate::models::data::musicbrainz::mbid::MBID;
+use crate::models::data::musicbrainz::mbid::MBIDEnum;
 use crate::models::data::musicbrainz::release::external::ReleaseExt;
 use crate::models::data::musicbrainz::release::Release;
 use crate::utils::println_mus;
@@ -46,7 +46,7 @@ impl IsMbid<Release> for ReleaseMBID {
             .into_entity())
     }
 
-    fn into_mbid(self) -> MBID {
-        MBID::Release(self)
+    fn into_mbid(self) -> MBIDEnum {
+        MBIDEnum::Release(self)
     }
 }

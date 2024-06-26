@@ -7,7 +7,7 @@ use serde::{Deserialize, Serialize};
 use crate::core::entity_traits::mbid::HasMBID;
 use crate::core::entity_traits::updatable::Updatable;
 use crate::models::data::musicbrainz::artist::Artist;
-use crate::models::data::musicbrainz::mbid::MBID;
+use crate::models::data::musicbrainz::mbid::MBIDEnum;
 use crate::models::data::musicbrainz::recording::Recording;
 use crate::models::data::musicbrainz::release::Release;
 use crate::models::data::musicbrainz::release_group::ReleaseGroup;
@@ -15,8 +15,9 @@ use crate::models::data::musicbrainz::work::Work;
 use crate::models::data::musicbrainz_database::MUSICBRAINZ_DATABASE;
 use crate::utils::println_cli_warn;
 
+/// Any entity from Musicbrainz, with the same format as the official database
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, IsVariant, Unwrap, From)]
-pub enum MusicBrainzEntity {
+pub enum AnyMusicBrainzEntity {
     Artist(Arc<Artist>),
     ReleaseGroup(Arc<ReleaseGroup>),
     Release(Arc<Release>),
@@ -24,8 +25,8 @@ pub enum MusicBrainzEntity {
     Work(Arc<Work>),
 }
 
-impl MusicBrainzEntity {
-    pub async fn save_to_cache(&self) -> color_eyre::Result<()> {
+impl AnyMusicBrainzEntity {
+    pub async fn update_cache(&self) -> color_eyre::Result<()> {
         match self.clone() {
             Self::ReleaseGroup(val) => MUSICBRAINZ_DATABASE.release_groups().update(val).await?,
             Self::Release(val) => MUSICBRAINZ_DATABASE.releases().update(val).await?,
@@ -38,8 +39,8 @@ impl MusicBrainzEntity {
     }
 }
 
-impl HasMBID<MBID> for MusicBrainzEntity {
-    fn get_mbid(&self) -> MBID {
+impl HasMBID<MBIDEnum> for AnyMusicBrainzEntity {
+    fn get_mbid(&self) -> MBIDEnum {
         match self {
             Self::Artist(val) => val.get_mbid().into(),
             Self::ReleaseGroup(val) => val.get_mbid().into(),
@@ -50,7 +51,7 @@ impl HasMBID<MBID> for MusicBrainzEntity {
     }
 }
 
-impl Updatable for MusicBrainzEntity {
+impl Updatable for AnyMusicBrainzEntity {
     fn update(self, newer: Self) -> Self {
         // Check if both are the same variant
         if discriminant(&self) != discriminant(&newer) {
@@ -90,32 +91,49 @@ impl Updatable for MusicBrainzEntity {
     }
 }
 
-impl From<Artist> for MusicBrainzEntity {
+impl From<Artist> for AnyMusicBrainzEntity {
     fn from(value: Artist) -> Self {
         Self::Artist(Arc::new(value))
     }
 }
 
-impl From<Recording> for MusicBrainzEntity {
+impl From<Recording> for AnyMusicBrainzEntity {
     fn from(value: Recording) -> Self {
         Self::Recording(Arc::new(value))
     }
 }
 
-impl From<Release> for MusicBrainzEntity {
+impl From<Release> for AnyMusicBrainzEntity {
     fn from(value: Release) -> Self {
         Self::Release(Arc::new(value))
     }
 }
 
-impl From<ReleaseGroup> for MusicBrainzEntity {
+impl From<ReleaseGroup> for AnyMusicBrainzEntity {
     fn from(value: ReleaseGroup) -> Self {
         Self::ReleaseGroup(Arc::new(value))
     }
 }
 
-impl From<Work> for MusicBrainzEntity {
+impl From<Work> for AnyMusicBrainzEntity {
     fn from(value: Work) -> Self {
         Self::Work(Arc::new(value))
     }
+}
+
+impl<V> From<V> for AnyMusicBrainzEntity where V: HasMBID {
+    fn from(value: V) -> Self {
+        match value.get_kind() {
+            MusicbrainzEntityKind::Artist => Self::Artist(value)
+        }
+    }
+}
+
+#[derive(Debug, Clone, Copy)]
+pub enum MusicbrainzEntityKind {
+    Artist,
+    Recording,
+    Release,
+    ReleaseGroup,
+    Work,
 }

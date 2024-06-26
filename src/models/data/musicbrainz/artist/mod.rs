@@ -10,6 +10,7 @@ use serde::{Deserialize, Serialize};
 use crate::models::data::musicbrainz::relation::Relation;
 use crate::models::data::musicbrainz::work::mbid::WorkMBID;
 
+use super::entity::IsMusicbrainzEntity;
 use super::recording::mbid::RecordingMBID;
 use super::release::mbid::ReleaseMBID;
 use super::release_group::mbid::ReleaseGroupMBID;
@@ -69,5 +70,11 @@ impl From<musicbrainz_rs::entity::artist::Artist> for Artist {
                 .relations
                 .map(|relations| relations.into_iter().map_into().collect_vec()),
         }
+    }
+}
+
+impl IsMusicbrainzEntity<ArtistMBID> for Artist {
+    fn get_mbid(&self) -> &ArtistMBID {
+        &self.id
     }
 }

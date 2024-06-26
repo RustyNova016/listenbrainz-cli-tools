@@ -1,5 +1,6 @@
 use crate::models::data::musicbrainz::external_musicbrainz_entity::ExternalMusicBrainzEntity;
-use crate::models::data::musicbrainz::mbid::MBID;
+use crate::models::data::musicbrainz::mbid::MBIDEnum;
+use crate::models::data::musicbrainz::musicbrainz_entity::MusicbrainzEntityKind;
 use extend::ext;
 use serde::de::DeserializeOwned;
 use serde::Serialize;
@@ -8,7 +9,7 @@ use std::future::Future;
 use std::hash::Hash;
 use std::sync::Arc;
 
-use crate::models::data::musicbrainz::musicbrainz_entity::MusicBrainzEntity;
+use crate::models::data::musicbrainz::musicbrainz_entity::AnyMusicBrainzEntity;
 
 use super::updatable::Updatable;
 
@@ -23,7 +24,9 @@ where
 
     fn fetch(&self) -> impl Future<Output = color_eyre::Result<ExternalMusicBrainzEntity>> + Send;
 
-    fn into_mbid(self) -> MBID;
+    fn into_mbid(self) -> MBIDEnum;
+
+    fn get_kind(&self) -> MusicbrainzEntityKind;
 }
 
 #[ext]
@@ -46,13 +49,17 @@ where
 
 pub trait HasMBID<K>
 where
-    Self:
-        Serialize + DeserializeOwned + Updatable + Sized + Debug + Clone + Into<MusicBrainzEntity>,
+    Self:Serialize + DeserializeOwned + Updatable + Sized + Debug + Clone + Into<AnyMusicBrainzEntity>,
+    Arc<Self>: Into<AnyMusicBrainzEntity> + TryFrom<AnyMusicBrainzEntity>,
     K: IsMbid<Self>,
 {
     fn get_mbid(&self) -> K;
 
-    fn into_generic(self) -> MusicBrainzEntity {
+    fn into_generic(self) -> AnyMusicBrainzEntity {
         self.into()
+    }
+
+    fn get_kind(&self) -> MusicbrainzEntityKind {
+        self.get_mbid().get_kind()
     }
 }
