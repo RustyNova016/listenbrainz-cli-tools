@@ -4,6 +4,7 @@ use derive_getters::Getters;
 use once_cell::sync::Lazy;
 
 use crate::core::caching::entity_cache::EntityCache;
+use crate::models::cli::cache::ClearTarget;
 
 use super::listenbrainz::user_listens::UserListens;
 
@@ -20,6 +21,12 @@ impl EntityDatabase {
         self.user_listens.remove(id).await?;
 
         Ok(())
+    }
+
+    pub async fn clear(&self, target: ClearTarget) -> cacache::Result<()> {
+        match target {
+            ClearTarget::All => self.user_listens.clear().await,
+        }
     }
 }
 

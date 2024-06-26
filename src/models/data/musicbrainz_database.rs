@@ -7,6 +7,7 @@ use once_cell::sync::Lazy;
 use tokio::try_join;
 
 use crate::core::caching::musicbrainz_cache::MusicbrainzCache;
+use crate::models::cli::cache::ClearTarget;
 use crate::models::data::musicbrainz::artist::mbid::ArtistMBID;
 use crate::models::data::musicbrainz::mbid::MBID;
 use crate::models::data::musicbrainz::recording::mbid::RecordingMBID;
@@ -94,6 +95,22 @@ impl MusicBrainzDatabase {
                 self.recordings
                     .insert_alias(alias, &main.unwrap_recording())
                     .await?;
+            }
+        }
+
+        Ok(())
+    }
+
+    pub async fn clear(&self, target: &ClearTarget) -> cacache::Result<()> {
+        match target {
+            ClearTarget::All => {
+                let _ = try_join!(
+                    self.artists.clear(),
+                    self.releases.clear(),
+                    self.recordings.clear(),
+                    self.release_groups.clear(),
+                    self.works.clear()
+                )?;
             }
         }
 
