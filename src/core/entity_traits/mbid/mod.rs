@@ -1,12 +1,12 @@
-use std::fmt::{Debug, Display};
-use std::future::Future;
-use std::sync::Arc;
-use std::hash::Hash;
 use crate::models::data::musicbrainz::external_musicbrainz_entity::ExternalMusicBrainzEntity;
 use crate::models::data::musicbrainz::mbid::MBID;
 use extend::ext;
 use serde::de::DeserializeOwned;
 use serde::Serialize;
+use std::fmt::{Debug, Display};
+use std::future::Future;
+use std::hash::Hash;
+use std::sync::Arc;
 
 use crate::models::data::musicbrainz::musicbrainz_entity::MusicBrainzEntity;
 

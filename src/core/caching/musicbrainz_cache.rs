@@ -1,25 +1,23 @@
 use std::collections::HashMap;
-use std::fmt::Display;
 use std::ops::Deref;
 use std::sync::Arc;
 
-use chashmap::CHashMap;
-use color_eyre::eyre::Context;
-use color_eyre::owo_colors::OwoColorize;
-use futures::try_join;
-use serde::de::DeserializeOwned;
-use serde::Serialize;
-use tokio::sync::{OnceCell, RwLock, RwLockWriteGuard, Semaphore};
-use std::hash::Hash;
 use crate::core::caching::serde_cacache::error::Error;
 use crate::core::caching::serde_cacache::tidy::SerdeCacacheTidy;
 use crate::core::caching::CACHE_LOCATION;
 use crate::core::entity_traits::mbid::{HasMBID, IsMbid};
 use crate::core::entity_traits::updatable::Updatable;
 use crate::models::data::musicbrainz::external_musicbrainz_entity::FlattenedMBEntityExt;
-use crate::models::data::musicbrainz::mbid::MBID;
 use crate::models::data::musicbrainz::relation::external::RelationContentExt;
 use crate::utils::{println_cli, println_cli_warn};
+use chashmap::CHashMap;
+use color_eyre::eyre::Context;
+use color_eyre::owo_colors::OwoColorize;
+use futures::try_join;
+use serde::de::DeserializeOwned;
+use serde::Serialize;
+use std::hash::Hash;
+use tokio::sync::{OnceCell, RwLock, RwLockWriteGuard, Semaphore};
 
 #[derive(Debug)]
 pub struct MusicbrainzCache<K, V>
@@ -64,7 +62,7 @@ where
     pub async fn get_entity(&self, id: &K) -> Arc<CachedEntity<K, V>> {
         // Use a read to get the entity
         if let Some(entity) = self.cache_entities.read().await.get(id) {
-            return entity.clone()
+            return entity.clone();
         }
 
         // The entity isn't found. Let's get into exclusive write mode
@@ -72,17 +70,21 @@ where
 
         // While we waited for a write, it may have initialized the entity. Let's recheck
         if let Some(entity) = map.get(id) {
-            return entity.clone()
+            return entity.clone();
         }
 
         // No entity was found so we initialize it
-        let entity = Arc::new(CachedEntity::new(id.clone(), self.disk_cache.clone(), self.alias_cache.clone()));
+        let entity = Arc::new(CachedEntity::new(
+            id.clone(),
+            self.disk_cache.clone(),
+            self.alias_cache.clone(),
+        ));
         map.insert(id.clone(), entity.clone());
-        return entity
+        entity
     }
 
     pub async fn get_load_or_fetch(&self, mbid: &K) -> color_eyre::Result<Arc<V>> {
-        self.get_entity(&mbid).await.get_load_or_fetch().await
+        self.get_entity(mbid).await.get_load_or_fetch().await
     }
 
     pub async fn get_from_ram(&self, mbid: &K) -> Option<Arc<V>> {
@@ -391,16 +393,20 @@ where
     K: IsMbid<V> + Serialize + DeserializeOwned,
     V: Serialize + DeserializeOwned + HasMBID<K> + Updatable + Clone,
 {
-    pub fn new(id: K, disk_cache: Arc<SerdeCacacheTidy<K, V>>, alias_cache: Arc<SerdeCacacheTidy<K, K>>) -> Self {
+    pub fn new(
+        id: K,
+        disk_cache: Arc<SerdeCacacheTidy<K, V>>,
+        alias_cache: Arc<SerdeCacacheTidy<K, K>>,
+    ) -> Self {
         Self {
             alias_cache,
             disk_cache,
             key: id,
-            loaded: RwLock::new(None)
+            loaded: RwLock::new(None),
         }
     }
 
-    pub async fn get_load_or_fetch(&self) -> color_eyre::Result<Arc<V>>{
+    pub async fn get_load_or_fetch(&self) -> color_eyre::Result<Arc<V>> {
         if let Some(val) = self.get().await {
             return Ok(val);
         }
@@ -421,7 +427,10 @@ where
         self.loaded.read().await.clone()
     }
 
-    async fn inner_load<'a>(&self, inner_data: &mut RwLockWriteGuard<'a, Option<Arc<V>>>) -> color_eyre::Result<Option<Arc<V>>> {
+    async fn inner_load<'a>(
+        &self,
+        inner_data: &mut RwLockWriteGuard<'a, Option<Arc<V>>>,
+    ) -> color_eyre::Result<Option<Arc<V>>> {
         let cached = self
             .disk_cache
             .get_or_option(&self.key)
@@ -435,7 +444,10 @@ where
         Ok(cached)
     }
 
-    async fn inner_fetch<'a>(&self, inner_data: &mut RwLockWriteGuard<'a, Option<Arc<V>>>) -> color_eyre::Result<Arc<V>> {
+    async fn inner_fetch<'a>(
+        &self,
+        inner_data: &mut RwLockWriteGuard<'a, Option<Arc<V>>>,
+    ) -> color_eyre::Result<Arc<V>> {
         let fetch_result = self.key.fetch().await?;
         let converted_fetch = fetch_result.flattened();
 
@@ -443,6 +455,9 @@ where
             .insert_into_cache_with_alias(&self.key.clone().into_mbid())
             .await?;
 
-        Ok(self.inner_load(inner_data).await?.expect("Couldn't retrieve data after having inserted it"))
+        Ok(self
+            .inner_load(inner_data)
+            .await?
+            .expect("Couldn't retrieve data after having inserted it"))
     }
 }

@@ -15,7 +15,7 @@ use crate::models::data::musicbrainz::release::Release;
 use crate::utils::println_mus;
 
 #[derive(
-    Debug, Clone, PartialEq, Eq, Deref, DerefMut, Into, From, Serialize, Deserialize, Display, Hash
+    Debug, Clone, PartialEq, Eq, Deref, DerefMut, Into, From, Serialize, Deserialize, Display, Hash,
 )]
 pub struct ReleaseMBID(String);
 

@@ -17,7 +17,9 @@ pub mod extensions;
 pub mod generic_mbid;
 pub mod mbid_kind;
 
-#[derive(Debug, Clone, PartialEq, Eq, From, Serialize, Deserialize, Display, IsVariant, Unwrap, Hash)]
+#[derive(
+    Debug, Clone, PartialEq, Eq, From, Serialize, Deserialize, Display, IsVariant, Unwrap, Hash,
+)]
 pub enum MBID {
     Artist(ArtistMBID),
     Release(ReleaseMBID),

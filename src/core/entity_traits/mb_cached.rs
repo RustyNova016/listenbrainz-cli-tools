@@ -1,7 +1,7 @@
-use std::sync::Arc;
-use std::hash::Hash;
 use serde::de::DeserializeOwned;
 use serde::Serialize;
+use std::hash::Hash;
+use std::sync::Arc;
 
 use crate::core::caching::musicbrainz_cache::MusicbrainzCache;
 use crate::core::entity_traits::mbid::{HasMBID, IsMbid};
