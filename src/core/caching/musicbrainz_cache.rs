@@ -17,7 +17,7 @@ use futures::try_join;
 use serde::de::DeserializeOwned;
 use serde::Serialize;
 use std::hash::Hash;
-use tokio::sync::{OnceCell, RwLock, RwLockWriteGuard, Semaphore};
+use tokio::sync::{RwLock, RwLockWriteGuard, Semaphore};
 
 use super::serde_cacache;
 
@@ -29,7 +29,6 @@ where
 {
     cache_entities: RwLock<HashMap<K, Arc<CachedEntity<K, V>>>>,
 
-    ram_cache: RwLock<HashMap<String, Arc<OnceCell<Arc<V>>>>>,
     disk_cache: Arc<SerdeCacacheTidy<K, V>>,
     alias_cache: Arc<SerdeCacacheTidy<K, K>>,
 
@@ -53,7 +52,6 @@ where
 
         Self {
             cache_entities: RwLock::new(HashMap::new()),
-            ram_cache: RwLock::new(HashMap::new()),
             disk_cache: Arc::new(SerdeCacacheTidy::new(location)),
             alias_cache: Arc::new(SerdeCacacheTidy::new(alias_location)),
             value_locks: Arc::new(CHashMap::new()),
@@ -159,7 +157,6 @@ where
     pub async fn remove(&self, id: &K) -> color_eyre::Result<()> {
         self.cache_entities.write().await.remove(id);
         self.alias_cache.remove(id).await?;
-        self.ram_cache.write().await.remove(&id.to_string());
         self.disk_cache.remove(id).await?;
         Ok(())
     }
