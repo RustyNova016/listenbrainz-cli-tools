@@ -1,7 +1,7 @@
 use std::fmt::{Debug, Display};
 use std::future::Future;
 use std::sync::Arc;
-
+use std::hash::Hash;
 use crate::models::data::musicbrainz::external_musicbrainz_entity::ExternalMusicBrainzEntity;
 use crate::models::data::musicbrainz::mbid::MBID;
 use extend::ext;
@@ -16,7 +16,7 @@ pub mod is_cached_mbid;
 
 pub trait IsMbid<T>
 where
-    Self: Display + Clone + Serialize + DeserializeOwned,
+    Self: Display + Clone + Serialize + DeserializeOwned + Eq + Hash,
     T: HasMBID<Self>,
 {
     fn get_or_fetch_entity(&self) -> impl Future<Output = color_eyre::Result<Arc<T>>> + Send;

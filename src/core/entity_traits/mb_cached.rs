@@ -1,5 +1,5 @@
 use std::sync::Arc;
-
+use std::hash::Hash;
 use serde::de::DeserializeOwned;
 use serde::Serialize;
 
@@ -9,7 +9,7 @@ use crate::core::entity_traits::updatable::Updatable;
 
 pub trait MBCached<K>
 where
-    K: IsMbid<Self> + Serialize + DeserializeOwned,
+    K: IsMbid<Self> + Serialize + DeserializeOwned + Eq + Hash,
     Self: Serialize + DeserializeOwned + HasMBID<K> + Updatable + Clone,
 {
     fn get_cache() -> Arc<MusicbrainzCache<K, Self>>;

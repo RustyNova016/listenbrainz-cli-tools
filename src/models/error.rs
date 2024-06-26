@@ -31,6 +31,10 @@ pub enum Error {
     // --- Caching --- //
     #[error("Error while getting the cache")]
     CacheError(serde_cacache::error::Error),
+
+    // --- Fetching --- //
+    #[error("Cannot find entity in Musicbrainz. It may have been deleted, or simply may not exist at all")]
+    MBNotFound(String),
 }
 
 impl Error {}
