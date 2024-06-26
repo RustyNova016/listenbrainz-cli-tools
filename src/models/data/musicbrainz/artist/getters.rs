@@ -50,7 +50,7 @@ impl Artist {
 
         self.recordings = Some(recording_ids);
 
-        self.save().await?;
+        Arc::new(self.clone()).save().await?;
         Ok(())
     }
 }

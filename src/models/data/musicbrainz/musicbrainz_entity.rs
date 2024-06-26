@@ -26,7 +26,7 @@ pub enum MusicBrainzEntity {
 
 impl MusicBrainzEntity {
     pub async fn save_to_cache(&self) -> color_eyre::Result<()> {
-        match self {
+        match self.clone() {
             Self::ReleaseGroup(val) => MUSICBRAINZ_DATABASE.release_groups().update(val).await?,
             Self::Release(val) => MUSICBRAINZ_DATABASE.releases().update(val).await?,
             Self::Recording(val) => MUSICBRAINZ_DATABASE.recordings().update(val).await?,

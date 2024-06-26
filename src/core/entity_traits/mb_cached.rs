@@ -18,10 +18,10 @@ where
     fn get_cached_or_fetch(
         key: &K,
     ) -> impl std::future::Future<Output = color_eyre::Result<Arc<Self>>> {
-        async move { Self::get_cache().get_or_fetched(key).await }
+        async move { Self::get_cache().get_load_or_fetch(key).await }
     }
 
-    async fn save(&self) -> color_eyre::Result<()> {
+    async fn save(self: Arc<Self>) -> color_eyre::Result<()> {
         Self::get_cache().update(self).await
     }
 

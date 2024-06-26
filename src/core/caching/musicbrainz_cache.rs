@@ -13,11 +13,14 @@ use crate::utils::{println_cli, println_cli_warn};
 use chashmap::CHashMap;
 use color_eyre::eyre::Context;
 use color_eyre::owo_colors::OwoColorize;
+use futures::future;
 use futures::try_join;
 use serde::de::DeserializeOwned;
 use serde::Serialize;
 use std::hash::Hash;
 use tokio::sync::{OnceCell, RwLock, RwLockWriteGuard, Semaphore};
+
+use super::serde_cacache;
 
 #[derive(Debug)]
 pub struct MusicbrainzCache<K, V>
@@ -87,68 +90,9 @@ where
         self.get_entity(mbid).await.get_load_or_fetch().await
     }
 
-    pub async fn get_from_ram(&self, mbid: &K) -> Option<Arc<V>> {
-        self.ram_cache
-            .read()
-            .await
-            .get(&mbid.to_string())
-            .and_then(|cell| cell.get().cloned())
-    }
-
-    pub async fn get_from_disk(&self, mbid: &K) -> Result<Option<Arc<V>>, Error> {
-        self.disk_cache
-            .get_or_option(mbid)
-            .await
-            .map(|opt| opt.map(|val| Arc::new(val)))
-    }
-
-    pub async fn get_or_fetched(&self, mbid: &K) -> color_eyre::Result<Arc<V>> {
-        let ram_cell = self.get_ram_cell(mbid).await;
-        let disk_cache = self.disk_cache.clone();
-
-        if let Some(data) = ram_cell.get() {
-            return Ok(data.clone());
-        }
-
-        ram_cell
-            .get_or_try_init(|| async move {
-                // First, try init from disk
-                let disk_data = disk_cache
-                    .get_or_option(mbid)
-                    .await
-                    .map(|opt| opt.map(|val| Arc::new(val)))?;
-
-                if let Some(data) = disk_data {
-                    return Ok(data);
-                }
-
-                // No data? Fetch it
-                Self::fetch_and_save(mbid).await?;
-
-                Ok(disk_cache
-                    .get_or_option(mbid)
-                    .await
-                    .map(|opt| opt.map(|val| Arc::new(val)))?
-                    .expect("Fetched data should be in the cache"))
-            })
-            .await
-            .cloned()
-    }
-
-    pub async fn get_ram_cell(&self, mbid: &K) -> Arc<OnceCell<Arc<V>>> {
-        let mut ram_disk = self.ram_cache.write().await;
-
-        if let Some(cell) = ram_disk.get(&mbid.to_string()) {
-            return cell.clone();
-        }
-
-        ram_disk.insert(mbid.to_string(), Arc::new(OnceCell::new()));
-        ram_disk.get(&mbid.to_string()).unwrap().clone()
-    }
-
     pub async fn force_fetch_entity(&self, mbid: &K) -> color_eyre::Result<Arc<V>> {
         self.remove(mbid).await?;
-        self.get_or_fetched(mbid).await
+        self.get_load_or_fetch(mbid).await
     }
 
     pub async fn get(&self, mbid: &K) -> Result<Option<V>, Error> {
@@ -191,31 +135,12 @@ where
         }
     }
 
-    pub async fn set(&self, value: &V) -> Result<(), Error> {
-        let mbid = value.get_mbid();
-
-        let lock = self.get_lock(&mbid);
-        let _write_lock = lock.write().await;
-
-        // TODO: Add tokio::join! for speedup.
-        self.alias_cache.set(&mbid, &mbid).await?;
-        self.disk_cache.set(&mbid, value).await?;
-        Ok(())
+    pub async fn set(&self, value: Arc<V>) -> Result<(), Error> {
+        self.get_entity(&value.get_mbid()).await.set(value).await
     }
 
-    pub async fn update(&self, value: &V) -> color_eyre::Result<()> {
-        let mbid = value.get_mbid();
-        let older = self.get(&mbid).await?;
-
-        //println_cli(format!("Updating {mbid}"));
-
-        if let Some(older) = older {
-            self.set(&older.update(value.clone())).await?;
-        } else {
-            self.set(value).await?;
-        }
-
-        Ok(())
+    pub async fn update(&self, value: Arc<V>) -> color_eyre::Result<()> {
+        self.get_entity(&value.get_mbid()).await.update(value).await
     }
 
     pub async fn invalidate_last_entries(
@@ -233,6 +158,7 @@ where
     }
 
     pub async fn remove(&self, id: &K) -> color_eyre::Result<()> {
+        self.cache_entities.write().await.remove(id);
         self.alias_cache.remove(id).await?;
         self.ram_cache.write().await.remove(&id.to_string());
         self.disk_cache.remove(id).await?;
@@ -406,30 +332,53 @@ where
         }
     }
 
+    pub async fn get_or_load(&self) -> color_eyre::Result<Option<Arc<V>>> {
+        let get_result = self.get_or_lock().await;
+
+        match get_result {
+            Ok(val) => Ok(Some(val)),
+            Err(mut write_lock) => self.inner_load(&mut write_lock).await
+        }
+    }
+
+    /// **Get** from the loaded value, or **load** from the cache, or **fetch** from the MB database
     pub async fn get_load_or_fetch(&self) -> color_eyre::Result<Arc<V>> {
-        if let Some(val) = self.get().await {
-            return Ok(val);
-        }
+        let get_result = self.get_or_lock().await;
 
-        let mut write_lock = self.loaded.write().await;
-        if let Some(val) = write_lock.as_ref() {
-            return Ok(val.clone());
+        match get_result {
+            Ok(val) => Ok(val),
+            Err(mut write_lock) => {
+                if let Some(val) = self.inner_load(&mut write_lock).await? {
+                    return Ok(val.clone());
+                }
+        
+                self.inner_fetch(&mut write_lock).await
+            }
         }
-
-        if let Some(val) = self.inner_load(&mut write_lock).await? {
-            return Ok(val.clone());
-        }
-
-        self.inner_fetch(&mut write_lock).await
     }
 
     pub async fn get(&self) -> Option<Arc<V>> {
         self.loaded.read().await.clone()
     }
 
+    /// Tries to get the value, but if none, get a write lock.
+    /// If a write lock is already held, it will recheck if the entity was loaded upon obtaining it.
+    pub async fn get_or_lock<'a>(&'a self) -> Result<Arc<V>, RwLockWriteGuard<'a, Option<Arc<V>>>> {
+        if let Some(val) = self.get().await {
+            return Ok(val);
+        }
+
+        let write_lock = self.loaded.write().await;
+        if let Some(val) = write_lock.as_ref() {
+            return Ok(val.clone());
+        }
+
+        return Err(write_lock)
+    }
+
     async fn inner_load<'a>(
         &self,
-        inner_data: &mut RwLockWriteGuard<'a, Option<Arc<V>>>,
+        write_lock: &mut RwLockWriteGuard<'a, Option<Arc<V>>>,
     ) -> color_eyre::Result<Option<Arc<V>>> {
         let cached = self
             .disk_cache
@@ -438,7 +387,7 @@ where
             .map(|val| Arc::new(val));
 
         if let Some(val) = cached.clone() {
-            inner_data.replace(val);
+            write_lock.replace(val);
         }
 
         Ok(cached)
@@ -446,7 +395,7 @@ where
 
     async fn inner_fetch<'a>(
         &self,
-        inner_data: &mut RwLockWriteGuard<'a, Option<Arc<V>>>,
+        write_lock: &mut RwLockWriteGuard<'a, Option<Arc<V>>>,
     ) -> color_eyre::Result<Arc<V>> {
         let fetch_result = self.key.fetch().await?;
         let converted_fetch = fetch_result.flattened();
@@ -456,8 +405,29 @@ where
             .await?;
 
         Ok(self
-            .inner_load(inner_data)
+            .inner_load(write_lock)
             .await?
             .expect("Couldn't retrieve data after having inserted it"))
+    }
+
+    pub async fn set(&self, value: Arc<V>) -> Result<(), serde_cacache::Error> {
+        let mbid = value.get_mbid();
+
+        // TODO: Add try_join! for speedup.
+        self.loaded.write().await.replace(value.clone());
+        self.alias_cache.set(&mbid, &mbid).await?;
+        self.disk_cache.set(&mbid, value.as_ref()).await?;
+        Ok(())
+    }
+
+    pub async fn update(&self, value: Arc<V>) -> color_eyre::Result<()> {
+        let older_version = self.get_or_load().await?;
+
+        let new_data = match older_version {
+            Some(older) => older.update(value.clone()),
+            None => value
+        };
+
+        Ok(self.set(new_data).await?)
     }
 }
