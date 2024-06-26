@@ -1,5 +1,6 @@
 pub mod artist;
 pub mod artist_credit;
+pub mod entity;
 pub mod external_musicbrainz_entity;
 pub mod mbid;
 pub mod musicbrainz_entity;
@@ -8,16 +9,6 @@ pub mod relation;
 pub mod release;
 pub mod release_group;
 pub mod work;
-
-/// Type of the entity having this MBID
-#[derive(Debug, Clone, Copy)]
-pub enum MBIDType {
-    Recording,
-    Artist,
-}
-pub trait HasMbid {
-    fn get_mbid(&self) -> &str;
-}
 
 pub trait HasId {
     fn get_id(&self) -> &str;

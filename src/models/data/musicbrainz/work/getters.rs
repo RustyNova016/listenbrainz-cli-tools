@@ -1,7 +1,7 @@
-use crate::core::entity_traits::mb_cached::MBCached;
 use color_eyre::eyre::{eyre, Context, OptionExt};
 use itertools::Itertools;
 
+use crate::core::entity_traits::mb_cached::MBCached;
 use crate::core::entity_traits::mbid::IsMbid;
 
 use super::mbid::WorkMBID;
@@ -16,6 +16,7 @@ impl Work {
                     .await
                     .context("Couldn't fetch data from the API")?
                     .relations
+                    .clone()
                     .ok_or_eyre(eyre!(format!("Work is [`None`] after fetching from the API. Something wrong happened, as it should return a empty vec. \n Is there an include missing somewhere in the API call? Or is the credit not saved? Faulty requested work ID is: {}", &self.id)))?
             }
         }.into_iter().filter(|relation| relation.content().is_work() && relation.is_target_parent()).map(|relation| relation.content().clone().unwrap_work()).collect_vec())

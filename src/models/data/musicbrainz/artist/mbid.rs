@@ -1,3 +1,5 @@
+use std::sync::Arc;
+
 use color_eyre::eyre::Context;
 use derive_more::{Deref, DerefMut, Display, From};
 use musicbrainz_rs::entity::artist::Artist as ArtistMS;
@@ -9,14 +11,17 @@ use crate::core::entity_traits::mbid::IsMbid;
 use crate::models::data::musicbrainz::artist::external::ArtistExt;
 use crate::models::data::musicbrainz::artist::Artist;
 use crate::models::data::musicbrainz::external_musicbrainz_entity::ExternalMusicBrainzEntity;
-use crate::models::data::musicbrainz::mbid::MBID;
+use crate::models::data::musicbrainz::mbid::IsMusicbrainzID;
+use crate::models::data::musicbrainz::mbid::MBIDEnum;
 use crate::utils::println_mus;
 
-#[derive(Debug, Clone, PartialEq, Eq, Deref, DerefMut, From, Serialize, Deserialize, Display)]
+#[derive(
+    Debug, Clone, PartialEq, Eq, Deref, DerefMut, From, Serialize, Deserialize, Display, Hash,
+)]
 pub struct ArtistMBID(String);
 
 impl IsMbid<Artist> for ArtistMBID {
-    async fn get_or_fetch_entity(&self) -> color_eyre::Result<Artist> {
+    async fn get_or_fetch_entity(&self) -> color_eyre::Result<Arc<Artist>> {
         Artist::get_cached_or_fetch(self).await
     }
 
@@ -34,7 +39,9 @@ impl IsMbid<Artist> for ArtistMBID {
             .into_entity())
     }
 
-    fn into_mbid(self) -> MBID {
-        MBID::Artist(self)
+    fn into_mbid(self) -> MBIDEnum {
+        MBIDEnum::Artist(self)
     }
 }
+
+impl IsMusicbrainzID<Artist> for ArtistMBID {}

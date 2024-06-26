@@ -3,9 +3,9 @@ use crate::utils::regex::get_mbid_from_url;
 use crate::utils::regex::is_string_mbid;
 
 use super::mbid_kind::MBIDKind;
-use super::MBID;
+use super::MBIDEnum;
 
-impl MBID {
+impl MBIDEnum {
     pub fn from_string(value: &str, assumed_type: MBIDKind) -> Result<Self, Error> {
         Self::from_string_url(value).or_else(|_| Self::from_mbid_string(value, assumed_type))
     }

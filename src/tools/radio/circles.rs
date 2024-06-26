@@ -1,4 +1,5 @@
 use std::ops::Deref;
+use std::sync::Arc;
 
 use color_eyre::eyre;
 use itertools::Itertools;
@@ -7,6 +8,7 @@ use rand::prelude::SliceRandom;
 use rand::thread_rng;
 
 use crate::core::entity_traits::mb_cached::MBCached;
+use crate::core::entity_traits::mbid::IsMbid;
 use crate::core::entity_traits::relations::has_artist_credits::HasArtistCredits;
 use crate::models::data::listenbrainz::listen::collection::ListenCollection;
 use crate::models::data::listenbrainz::listen::Listen;
@@ -51,8 +53,8 @@ impl RadioCircle {
         &self,
         mut artist: Artist,
         listens: &ListenCollection,
-        playlist: &[Recording],
-    ) -> color_eyre::Result<Option<Recording>> {
+        playlist: &[Arc<Recording>],
+    ) -> color_eyre::Result<Option<Arc<Recording>>> {
         let mut recordings = artist.get_all_recordings().await?;
 
         if self.unlistened {
@@ -73,19 +75,19 @@ impl RadioCircle {
         &self,
         listen: &Listen,
         listens: &ListenCollection,
-        playlist: &[Recording],
-    ) -> color_eyre::Result<Option<Recording>> {
+        playlist: &[Arc<Recording>],
+    ) -> color_eyre::Result<Option<Arc<Recording>>> {
         let Some(mapping_data) = listen.get_mapping_data() else {
             return eyre::Ok(None);
         };
         let recording =
             Recording::get_cached_or_fetch(&mapping_data.recording_mbid().clone().into()).await?; //TODO: Use MBID
 
-        for artist_id in recording.get_or_fetch_artist_credits().await?.iter() {
-            let artist = Artist::get_cache().get_or_fetch(artist_id.artist()).await?;
+        for artist_credit in recording.get_or_fetch_artist_credits().await?.iter() {
+            let artist = artist_credit.artist().get_or_fetch_entity().await?;
 
             let result = self
-                .get_recording_of_artist(artist, listens, playlist)
+                .get_recording_of_artist(artist.as_ref().clone(), listens, playlist)
                 .await?;
 
             if let Some(recording) = result {
@@ -96,8 +98,11 @@ impl RadioCircle {
         eyre::Ok(None)
     }
 
-    async fn create_list(&self, listens: &ListenCollection) -> color_eyre::Result<Vec<Recording>> {
-        let mut results = Vec::new();
+    async fn create_list(
+        &self,
+        listens: &ListenCollection,
+    ) -> color_eyre::Result<Vec<Arc<Recording>>> {
+        let mut results: Vec<Arc<Recording>> = Vec::new();
 
         let mut listen_shuffle = listens.deref().clone();
         listen_shuffle.shuffle(&mut thread_rng());

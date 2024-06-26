@@ -26,6 +26,7 @@ impl Recording {
                     .await
                     .context("Couldn't fetch data from the API")?
                     .releases
+                    .clone()
                     .ok_or_eyre(eyre!(format!("Releases is [`None`] after fetching from the API. Something wrong happened, as it should return a empty vec. \n Is there an include missing somewhere in the API call? Or is the credit not saved? Faulty requested recording ID is: {}", &self.id)))?
             }
         })
@@ -39,6 +40,7 @@ impl Recording {
                     .await
                     .context("Couldn't fetch data from the API")?
                     .relations
+                    .clone()
                     .ok_or_eyre(eyre!(format!("Relation is [`None`] after fetching from the API. Something wrong happened, as it should return a empty vec. \n Is there an include missing somewhere in the API call? Or is the credit not saved? Faulty requested recording ID is: {}", &self.id)))?
             }
         }.into_iter().filter(|relation| relation.content().is_work()).map(|relation| relation.content().clone().unwrap_work()).collect_vec())

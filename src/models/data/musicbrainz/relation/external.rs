@@ -4,7 +4,7 @@ use musicbrainz_rs::entity::relations::RelationContent;
 
 use crate::models::data::musicbrainz::artist::external::ArtistExt;
 use crate::models::data::musicbrainz::external_musicbrainz_entity::FlattenedMBEntity;
-use crate::models::data::musicbrainz::musicbrainz_entity::MusicBrainzEntity;
+use crate::models::data::musicbrainz::musicbrainz_entity::AnyMusicBrainzEntity;
 use crate::models::data::musicbrainz::recording::external::RecordingExt;
 use crate::models::data::musicbrainz::release::external::ReleaseExt;
 use crate::models::data::musicbrainz::release_group::external::ReleaseGroupExt;
@@ -23,7 +23,7 @@ pub impl RelationContent {
         Ok((self.flatten_main()?, self.flatten_children()?))
     }
 
-    fn flatten_main(&self) -> color_eyre::Result<MusicBrainzEntity> {
+    fn flatten_main(&self) -> color_eyre::Result<AnyMusicBrainzEntity> {
         //TODO: Remove when implemented
         match self {
             RelationContent::Artist(val) => Ok(val.flatten_main()),
@@ -40,7 +40,7 @@ pub impl RelationContent {
         }
     }
 
-    fn flatten_children(&self) -> color_eyre::Result<Vec<MusicBrainzEntity>> {
+    fn flatten_children(&self) -> color_eyre::Result<Vec<AnyMusicBrainzEntity>> {
         //TODO: Remove when implemented
         match self {
             RelationContent::Artist(val) => Ok(val.flatten_children()),

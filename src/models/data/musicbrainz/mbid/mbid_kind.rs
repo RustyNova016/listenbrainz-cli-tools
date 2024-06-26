@@ -1,4 +1,4 @@
-use super::MBID;
+use super::MBIDEnum;
 
 #[derive(Debug, Clone, Copy)]
 pub enum MBIDKind {
@@ -18,26 +18,26 @@ pub enum MBIDKind {
 }
 
 impl MBIDKind {
-    pub fn to_mbid(&self, data: String) -> MBID {
+    pub fn to_mbid(&self, data: String) -> MBIDEnum {
         match self {
-            Self::Artist => MBID::Artist(data.into()),
-            Self::Recording => MBID::Recording(data.into()),
-            Self::Release => MBID::Release(data.into()),
-            Self::ReleaseGroup => MBID::ReleaseGroup(data.into()),
-            Self::Work => MBID::Work(data.into()),
+            Self::Artist => MBIDEnum::Artist(data.into()),
+            Self::Recording => MBIDEnum::Recording(data.into()),
+            Self::Release => MBIDEnum::Release(data.into()),
+            Self::ReleaseGroup => MBIDEnum::ReleaseGroup(data.into()),
+            Self::Work => MBIDEnum::Work(data.into()),
             _ => todo!(),
         }
     }
 }
 
-impl From<MBID> for MBIDKind {
-    fn from(value: MBID) -> Self {
+impl From<MBIDEnum> for MBIDKind {
+    fn from(value: MBIDEnum) -> Self {
         match value {
-            MBID::Artist(_) => Self::Artist,
-            MBID::Recording(_) => Self::Recording,
-            MBID::Release(_) => Self::Release,
-            MBID::ReleaseGroup(_) => Self::ReleaseGroup,
-            MBID::Work(_) => Self::Work,
+            MBIDEnum::Artist(_) => Self::Artist,
+            MBIDEnum::Recording(_) => Self::Recording,
+            MBIDEnum::Release(_) => Self::Release,
+            MBIDEnum::ReleaseGroup(_) => Self::ReleaseGroup,
+            MBIDEnum::Work(_) => Self::Work,
         }
     }
 }

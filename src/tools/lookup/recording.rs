@@ -2,7 +2,6 @@ use chrono::Duration;
 use chrono::Local;
 use humantime::format_duration;
 use std::io;
-use std::sync::Arc;
 
 use crate::core::entity_traits::mbid::IsMbid;
 use crate::models::data::listenbrainz::recording_with_listens::recording::RecordingWithListens;
@@ -21,7 +20,7 @@ pub async fn lookup_recording(username: &str, id: RecordingMBID) -> color_eyre::
     let recording_listens = listens.get_listens_of_recording(&id);
 
     let recording_info =
-        RecordingWithListens::new(Arc::new(id.get_or_fetch_entity().await?), recording_listens);
+        RecordingWithListens::new(id.get_or_fetch_entity().await?, recording_listens);
 
     if recording_info.is_listened() {
         lookup_recording_listened(recording_info).await?;

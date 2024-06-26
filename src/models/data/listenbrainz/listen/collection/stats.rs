@@ -1,4 +1,5 @@
 use std::ops::Deref;
+use std::sync::Arc;
 
 use itertools::Itertools;
 
@@ -180,7 +181,7 @@ impl ListenCollection {
                     recording.title().clone(),
                 );
                 work_ids.push(new_work.id().clone());
-                Work::get_cache().set(&new_work).await?;
+                Work::get_cache().set(Arc::new(new_work)).await?;
             } else {
                 work_ids = work_ids.into_iter().unique().collect_vec();
             }

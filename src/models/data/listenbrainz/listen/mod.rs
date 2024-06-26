@@ -1,4 +1,5 @@
 use std::collections::HashMap;
+use std::sync::Arc;
 
 use chrono::{DateTime, Utc};
 use color_eyre::eyre::Context;
@@ -65,7 +66,7 @@ impl Listen {
     }
 
     /// Return the recording's data from Musicbrainz from its mapping
-    pub async fn get_recording_data(&self) -> color_eyre::Result<Option<Recording>> {
+    pub async fn get_recording_data(&self) -> color_eyre::Result<Option<Arc<Recording>>> {
         match &self.mapping_data {
             Some(mapping) => Ok(Some(
                 Recording::get_cached_or_fetch(&mapping.recording_mbid().clone().into()).await?, //TODO: Use MBID
