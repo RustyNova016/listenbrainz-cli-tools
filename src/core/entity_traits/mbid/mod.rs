@@ -1,15 +1,16 @@
-use crate::models::data::musicbrainz::external_musicbrainz_entity::ExternalMusicBrainzEntity;
-use crate::models::data::musicbrainz::mbid::MBIDEnum;
-use crate::models::data::musicbrainz::musicbrainz_entity::MusicbrainzEntityKind;
-use extend::ext;
-use serde::de::DeserializeOwned;
-use serde::Serialize;
 use std::fmt::{Debug, Display};
 use std::future::Future;
 use std::hash::Hash;
 use std::sync::Arc;
 
+use extend::ext;
+use serde::de::DeserializeOwned;
+use serde::Serialize;
+
+use crate::models::data::musicbrainz::external_musicbrainz_entity::ExternalMusicBrainzEntity;
+use crate::models::data::musicbrainz::mbid::MBIDEnum;
 use crate::models::data::musicbrainz::musicbrainz_entity::AnyMusicBrainzEntity;
+use crate::models::data::musicbrainz::musicbrainz_entity::MusicbrainzEntityKind;
 
 use super::updatable::Updatable;
 
@@ -49,7 +50,13 @@ where
 
 pub trait HasMBID<K>
 where
-    Self:Serialize + DeserializeOwned + Updatable + Sized + Debug + Clone + Into<AnyMusicBrainzEntity>,
+    Self: Serialize
+        + DeserializeOwned
+        + Updatable
+        + Sized
+        + Debug
+        + Clone
+        + Into<AnyMusicBrainzEntity>,
     Arc<Self>: Into<AnyMusicBrainzEntity> + TryFrom<AnyMusicBrainzEntity>,
     K: IsMbid<Self>,
 {

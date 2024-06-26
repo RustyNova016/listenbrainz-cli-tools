@@ -121,10 +121,13 @@ impl From<Work> for AnyMusicBrainzEntity {
     }
 }
 
-impl<V> From<V> for AnyMusicBrainzEntity where V: HasMBID {
+impl<V> From<V> for AnyMusicBrainzEntity
+where
+    V: HasMBID,
+{
     fn from(value: V) -> Self {
         match value.get_kind() {
-            MusicbrainzEntityKind::Artist => Self::Artist(value)
+            MusicbrainzEntityKind::Artist => Self::Artist(value),
         }
     }
 }

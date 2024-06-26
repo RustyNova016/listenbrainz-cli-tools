@@ -32,13 +32,11 @@ pub impl FlattenedMBEntity {
         println_cli("first cahce insert");
         self.0.update_cache().await?;
 
-        
-
         MUSICBRAINZ_DATABASE
             .add_alias(&mbid.clone().into_mbid(), &self.0.get_mbid())
             .await?;
 
-            println_cli("save others");
+        println_cli("save others");
 
         for extra in self.1 {
             extra.update_cache().await?;

@@ -56,6 +56,6 @@ impl IsMbid<AnyMusicBrainzEntity> for MBIDEnum {
     }
 }
 
-pub struct MBID<K: IsMusicbrainzID<T>, T: IsMusicbrainzEntity> (K);
+pub struct MBID<K: IsMusicbrainzID<T>, T: IsMusicbrainzEntity>(K);
 
 pub trait IsMusicbrainzID<T> {}

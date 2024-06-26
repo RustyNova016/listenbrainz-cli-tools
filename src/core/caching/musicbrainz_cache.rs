@@ -1,21 +1,20 @@
 use std::collections::HashMap;
+use std::hash::Hash;
 use std::sync::Arc;
+
+use futures::try_join;
+use serde::de::DeserializeOwned;
+use serde::Serialize;
+use tokio::sync::{RwLock, RwLockWriteGuard};
 
 use crate::core::caching::serde_cacache::error::Error;
 use crate::core::caching::serde_cacache::tidy::SerdeCacacheTidy;
 use crate::core::caching::CACHE_LOCATION;
 use crate::core::entity_traits::mbid::{HasMBID, IsMbid};
 use crate::core::entity_traits::updatable::Updatable;
-use crate::models::data::musicbrainz::external_musicbrainz_entity::FlattenedMBEntityExt;
 use crate::models::data::musicbrainz::musicbrainz_entity::AnyMusicBrainzEntity;
 use crate::models::data::musicbrainz::relation::external::RelationContentExt;
-use crate::utils::println_cli;
 use crate::utils::println_cli_warn;
-use futures::try_join;
-use serde::de::DeserializeOwned;
-use serde::Serialize;
-use std::hash::Hash;
-use tokio::sync::{RwLock, RwLockWriteGuard};
 
 use super::serde_cacache;
 
@@ -174,7 +173,7 @@ where
     }
 
     /// **Get** from the loaded value, or **load** from the cache.
-    /// 
+    ///
     /// This version create its own read lock in case of a **get**, and create a write lock in case of **load**.
     pub async fn get_or_load(&self) -> color_eyre::Result<Option<Arc<V>>> {
         let get_result = self.get_or_lock().await;
@@ -186,9 +185,12 @@ where
     }
 
     /// **Get** from the loaded value, or **load** from the cache.
-    /// 
+    ///
     /// This version take an external write lock
-    pub async fn get_or_load_with_lock<'a>(&self, mut write_lock: &mut RwLockWriteGuard<'a, Option<Arc<V>>>) -> color_eyre::Result<Option<Arc<V>>> {
+    pub async fn get_or_load_with_lock<'a>(
+        &self,
+        mut write_lock: &mut RwLockWriteGuard<'a, Option<Arc<V>>>,
+    ) -> color_eyre::Result<Option<Arc<V>>> {
         if let Some(val) = write_lock.as_ref() {
             return Ok(Some(val.clone()));
         }
@@ -270,9 +272,9 @@ where
     }
 
     // --- Insert ---
-    
+
     /// Set a value in the value cache, its id in the alias cache and fill self
-    /// 
+    ///
     /// This automatically picks a write lock
     pub async fn set(&self, value: Arc<V>) -> Result<(), serde_cacache::Error> {
         let mbid = value.get_mbid();
@@ -285,9 +287,13 @@ where
     }
 
     /// Set a value in the value cache, its id in the alias cache and fill self
-    /// 
+    ///
     /// This version requiert a write lock
-    pub async fn set_with_lock<'a>(&self, value: Arc<V>, write_lock: &mut RwLockWriteGuard<'a, Option<Arc<V>>>) -> Result<(), serde_cacache::Error> {
+    pub async fn set_with_lock<'a>(
+        &self,
+        value: Arc<V>,
+        write_lock: &mut RwLockWriteGuard<'a, Option<Arc<V>>>,
+    ) -> Result<(), serde_cacache::Error> {
         let mbid = value.get_mbid();
 
         // TODO: Add try_join! for speedup.
@@ -298,7 +304,7 @@ where
     }
 
     // --- Update ---
-    
+
     pub async fn update(&self, value: Arc<V>) -> color_eyre::Result<()> {
         let older_version = self.get_or_load().await?;
 
@@ -310,7 +316,11 @@ where
         Ok(self.set(new_data).await?)
     }
 
-    async fn update_with_lock<'a>(&self, value: Arc<V>, mut write_lock: &mut RwLockWriteGuard<'a, Option<Arc<V>>>)-> color_eyre::Result<()> {
+    async fn update_with_lock<'a>(
+        &self,
+        value: Arc<V>,
+        mut write_lock: &mut RwLockWriteGuard<'a, Option<Arc<V>>>,
+    ) -> color_eyre::Result<()> {
         let older_version = self.get_or_load_with_lock(write_lock).await?;
 
         let new_data = match older_version {
@@ -319,9 +329,12 @@ where
         };
 
         Ok(self.set_with_lock(new_data, &mut write_lock).await?)
-    }   
+    }
 
-    pub async fn update_from_generic_entity(&self, value: AnyMusicBrainzEntity) -> color_eyre::Result<()> {
+    pub async fn update_from_generic_entity(
+        &self,
+        value: AnyMusicBrainzEntity,
+    ) -> color_eyre::Result<()> {
         let converted: Arc<V> = value.try_into()?;
         self.update(converted).await
     }

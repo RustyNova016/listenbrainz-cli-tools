@@ -44,6 +44,4 @@ impl IsMbid<Artist> for ArtistMBID {
     }
 }
 
-impl IsMusicbrainzID<Artist> for ArtistMBID {
-    
-}
+impl IsMusicbrainzID<Artist> for ArtistMBID {}
