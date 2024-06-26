@@ -8,8 +8,6 @@ use extend::ext;
 use serde::de::DeserializeOwned;
 use serde::Serialize;
 
-use crate::models::data::musicbrainz::external_musicbrainz_entity::ExternalMusicBrainzEntity;
-use crate::models::data::musicbrainz::mbid::MBID;
 use crate::models::data::musicbrainz::musicbrainz_entity::MusicBrainzEntity;
 
 use super::updatable::Updatable;
