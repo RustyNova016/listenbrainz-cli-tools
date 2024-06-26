@@ -13,7 +13,6 @@ use crate::utils::{println_cli, println_cli_warn};
 use chashmap::CHashMap;
 use color_eyre::eyre::Context;
 use color_eyre::owo_colors::OwoColorize;
-use futures::future;
 use futures::try_join;
 use serde::de::DeserializeOwned;
 use serde::Serialize;
@@ -363,6 +362,7 @@ where
 
     /// Tries to get the value, but if none, get a write lock.
     /// If a write lock is already held, it will recheck if the entity was loaded upon obtaining it.
+    #[allow(clippy::needless_lifetimes)]
     pub async fn get_or_lock<'a>(&'a self) -> Result<Arc<V>, RwLockWriteGuard<'a, Option<Arc<V>>>> {
         if let Some(val) = self.get().await {
             return Ok(val);
@@ -373,7 +373,7 @@ where
             return Ok(val.clone());
         }
 
-        return Err(write_lock)
+        Err(write_lock)
     }
 
     async fn inner_load<'a>(
