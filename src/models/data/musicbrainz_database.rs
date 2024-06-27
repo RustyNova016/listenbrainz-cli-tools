@@ -1,13 +1,11 @@
 use std::mem::discriminant;
 use std::sync::Arc;
-
 use color_eyre::Report;
 use derive_getters::Getters;
 use once_cell::sync::Lazy;
 use tokio::try_join;
 
 use crate::core::caching::musicbrainz::musicbrainz_cache::MusicbrainzCache;
-use crate::core::caching::musicbrainz::musicbrainz_cache::MusicbrainzCacheLegacy;
 use crate::models::cli::cache::ClearTarget;
 use crate::models::data::musicbrainz::artist::mbid::ArtistMBID;
 use crate::models::data::musicbrainz::mbid::MBID;

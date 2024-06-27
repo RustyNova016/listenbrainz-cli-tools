@@ -1,6 +1,5 @@
 pub mod entity_cache;
 pub mod musicbrainz;
-pub mod musicbrainz_cache;
 pub mod serde_cacache;
 
 use directories::BaseDirs;
