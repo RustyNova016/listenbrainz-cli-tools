@@ -1,4 +1,6 @@
 use std::mem::discriminant;
+use std::ops::Deref;
+use std::sync::Arc;
 
 use derive_more::{From, IsVariant, Unwrap};
 use serde::{Deserialize, Serialize};
@@ -13,6 +15,7 @@ use crate::models::data::musicbrainz::work::Work;
 use crate::models::data::musicbrainz_database::MUSICBRAINZ_DATABASE;
 use crate::utils::println_cli_warn;
 
+use super::entity::any_musicbrainz_entity::AnyMusicBrainzEntity;
 use super::entity::entity_kind::MusicbrainzEntityKind;
 use super::entity::is_musicbrainz_entity::IsMusicbrainzEntity;
 use super::mbid::generic_mbid::MBIDSpe;
@@ -94,13 +97,13 @@ impl IsMusicbrainzEntity for MusicBrainzEntity {
         MBIDSpe::from(id)
     }
 
-    fn into_any(self) -> super::entity::any_musicbrainz_entity::AnyMusicBrainzEntity {
-        match self {
-            Self::Artist(val) => val.into_any(),
-            Self::Recording(val) => val.into_any(),
-            Self::Release(val) => val.into_any(),
-            Self::ReleaseGroup(val) => val.into_any(),
-            Self::Work(val) => val.into_any(),
+    fn into_any(self: Arc<Self>) -> AnyMusicBrainzEntity {
+        match self.deref().clone() {
+            Self::Artist(val) => val.into_arc_and_any(),
+            Self::Recording(val) => val.into_arc_and_any(),
+            Self::Release(val) => val.into_arc_and_any(),
+            Self::ReleaseGroup(val) => val.into_arc_and_any(),
+            Self::Work(val) => val.into_arc_and_any(),
         }
     }
 }
