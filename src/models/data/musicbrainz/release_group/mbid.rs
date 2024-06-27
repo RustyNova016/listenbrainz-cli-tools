@@ -7,6 +7,7 @@ use serde::{Deserialize, Serialize};
 use crate::core::entity_traits::mb_cached::MBCached;
 use crate::core::entity_traits::mbid::IsMbid;
 use crate::models::data::musicbrainz::external_musicbrainz_entity::ExternalMusicBrainzEntity;
+use crate::models::data::musicbrainz::mbid::any_mbid::AnyMBIDType;
 use crate::models::data::musicbrainz::mbid::generic_mbid::{IdAliasState, MBIDSpe};
 use crate::models::data::musicbrainz::mbid::is_musicbrainz_id::IsMusicbrainzID;
 use crate::models::data::musicbrainz::mbid::MBID;
@@ -73,5 +74,14 @@ where
             .await
             .context("Failed to fetch release group from MusicBrainz")?
             .into_entity())
+    }
+}
+
+impl<S> From<MBIDSpe<ReleaseGroup, S>> for AnyMBIDType<S>
+where
+    S: IdAliasState,
+{
+    fn from(value: MBIDSpe<ReleaseGroup, S>) -> Self {
+        Self::ReleaseGroup(value)
     }
 }
