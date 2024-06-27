@@ -12,7 +12,7 @@ use crate::models::data::musicbrainz::recording::Recording;
 use crate::models::data::musicbrainz::release::Release;
 use crate::models::data::musicbrainz::release_group::ReleaseGroup;
 use crate::models::data::musicbrainz::work::Work;
-use crate::models::data::musicbrainz_database::MUSICBRAINZ_DATABASE;
+use crate::models::data::musicbrainz_database_legacy::MUSICBRAINZ_DATABASE_LEGACY;
 use crate::utils::println_cli_warn;
 
 use super::entity::any_musicbrainz_entity::AnyMusicBrainzEntity;
@@ -33,11 +33,11 @@ pub enum MusicBrainzEntity {
 impl MusicBrainzEntity {
     pub async fn save_to_cache(&self) -> color_eyre::Result<()> {
         match self {
-            Self::ReleaseGroup(val) => MUSICBRAINZ_DATABASE.release_groups().update(val).await?,
-            Self::Release(val) => MUSICBRAINZ_DATABASE.releases().update(val).await?,
-            Self::Recording(val) => MUSICBRAINZ_DATABASE.recordings().update(val).await?,
-            Self::Work(val) => MUSICBRAINZ_DATABASE.works().update(val).await?,
-            Self::Artist(val) => MUSICBRAINZ_DATABASE.artists().update(val).await?,
+            Self::ReleaseGroup(val) => MUSICBRAINZ_DATABASE_LEGACY.release_groups().update(val).await?,
+            Self::Release(val) => MUSICBRAINZ_DATABASE_LEGACY.releases().update(val).await?,
+            Self::Recording(val) => MUSICBRAINZ_DATABASE_LEGACY.recordings().update(val).await?,
+            Self::Work(val) => MUSICBRAINZ_DATABASE_LEGACY.works().update(val).await?,
+            Self::Artist(val) => MUSICBRAINZ_DATABASE_LEGACY.artists().update(val).await?,
         }
 
         Ok(())

@@ -19,7 +19,7 @@ use crate::models::data::musicbrainz::relation::external::RelationContentExt;
 use crate::utils::{println_cli, println_cli_warn};
 
 #[derive(Debug)]
-pub struct MusicbrainzCache<K, V>
+pub struct MusicbrainzCacheLegacy<K, V>
 where
     K: IsMbid<V> + Serialize + DeserializeOwned,
     V: Serialize + DeserializeOwned + HasMBID<K> + IsMusicbrainzEntity + Clone,
@@ -33,7 +33,7 @@ where
     fetch_locks: CHashMap<String, Arc<Semaphore>>,
 }
 
-impl<K: IsMbid<V>, V> MusicbrainzCache<K, V>
+impl<K: IsMbid<V>, V> MusicbrainzCacheLegacy<K, V>
 where
     K: IsMbid<V> + Serialize + DeserializeOwned,
     V: Serialize + DeserializeOwned + HasMBID<K> + IsMusicbrainzEntity + Clone,

@@ -1,12 +1,12 @@
 use std::sync::Arc;
 
-use crate::core::caching::musicbrainz_cache::MusicbrainzCache;
+use crate::core::caching::musicbrainz_cache::MusicbrainzCacheLegacy;
 use crate::core::entity_traits::has_id::HasID;
 use crate::core::entity_traits::mb_cached::MBCached;
 use crate::core::entity_traits::mbid::HasMBID;
 
 use crate::models::data::musicbrainz::work::mbid::WorkMBID;
-use crate::models::data::musicbrainz_database::MUSICBRAINZ_DATABASE;
+use crate::models::data::musicbrainz_database_legacy::MUSICBRAINZ_DATABASE_LEGACY;
 
 use super::Work;
 
@@ -23,7 +23,7 @@ impl HasMBID<WorkMBID> for Work {
 }
 
 impl MBCached<WorkMBID> for Work {
-    fn get_cache() -> Arc<MusicbrainzCache<WorkMBID, Self>> {
-        MUSICBRAINZ_DATABASE.works().clone()
+    fn get_cache() -> Arc<MusicbrainzCacheLegacy<WorkMBID, Self>> {
+        MUSICBRAINZ_DATABASE_LEGACY.works().clone()
     }
 }
