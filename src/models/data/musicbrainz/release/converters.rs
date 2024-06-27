@@ -1,6 +1,9 @@
 use itertools::Itertools;
 use musicbrainz_rs::entity::release::Release as ReleaseMS;
 
+use crate::models::data::musicbrainz::musicbrainz_entity::MusicBrainzEntity;
+use crate::models::error::Error;
+
 use super::Release;
 
 impl From<ReleaseMS> for Release {
@@ -34,5 +37,26 @@ impl From<ReleaseMS> for Release {
                 .map(|relations| relations.into_iter().map_into().collect_vec()),
             tags: value.tags,
         }
+    }
+}
+
+impl Release {
+    pub fn try_from_entity(value: MusicBrainzEntity) -> Result<Self, Error> {
+        Self::try_from(value)
+    }
+}
+
+impl TryFrom<MusicBrainzEntity> for Release {
+    type Error = Error;
+
+    fn try_from(value: MusicBrainzEntity) -> Result<Self, Self::Error> {
+        if let MusicBrainzEntity::Release(val) = value {
+            return Ok(val);
+        }
+
+        Err(Error::InvalidTypeConvertion(
+            "MusicBrainzEntity".to_string(),
+            "Release".to_string(),
+        ))
     }
 }

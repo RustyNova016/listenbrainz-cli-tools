@@ -1,3 +1,4 @@
+use crate::core::caching::serde_cacache;
 use crate::models::data::musicbrainz::mbid::MBID;
 use std::io;
 use thiserror::Error;
@@ -24,6 +25,18 @@ pub enum Error {
 
     #[error("Couldn't write the configuration file.")]
     ConfigFileWriteError(serde_json::Error),
+
+    // --- Caching --- //
+    #[error("Error while getting the cache")]
+    CacheError(#[from] serde_cacache::error::Error),
+
+    // --- Fetching --- //
+    #[error("Cannot find entity in Musicbrainz. It may have been deleted, or simply may not exist at all")]
+    MBNotFound(String),
+
+    // --- Type errors --- //
+    #[error("Couldn't convert {0} into {1}")]
+    InvalidTypeConvertion(String, String),
 }
 
 impl Error {}

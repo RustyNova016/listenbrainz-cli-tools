@@ -68,6 +68,10 @@ impl IsMusicbrainzEntity for ReleaseGroup {
             relations: newer.relations.or(self.relations),
         }
     }
+
+    fn into_any(self) -> super::entity::any_musicbrainz_entity::AnyMusicBrainzEntity {
+        self.into()
+    }
 }
 
 impl HasArtistCredits<ReleaseGroupMBID> for ReleaseGroup {

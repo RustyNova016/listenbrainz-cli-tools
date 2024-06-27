@@ -2,9 +2,12 @@ use std::fmt::{Display, Formatter};
 use std::marker::PhantomData;
 use std::ops::Deref;
 
+use serde::Deserialize;
+use serde::Serialize;
+
 use crate::models::data::musicbrainz::entity::is_musicbrainz_entity::IsMusicbrainzEntity;
 
-#[derive(Debug, PartialEq, Eq)]
+#[derive(Debug, PartialEq, Eq, Deserialize, Serialize, Hash, Clone)]
 pub struct MBIDSpe<T, S>
 where
     T: IsMusicbrainzEntity,
@@ -17,12 +20,17 @@ where
 }
 
 // Id state
+#[derive(Debug, PartialEq, Eq, Deserialize, Serialize, Hash, Clone)]
 pub struct NaiveID;
+#[derive(Debug, PartialEq, Eq, Deserialize, Serialize, Hash, Clone)]
 pub struct PrimaryID;
 
 pub trait IdAliasState: Sync + Send {}
 impl IdAliasState for NaiveID {}
 impl IdAliasState for PrimaryID {}
+
+pub type NaiveMBID<T> = MBIDSpe<T, NaiveID>;
+pub type PrimaryMBID<T> = MBIDSpe<T, PrimaryID>;
 
 impl<T: IsMusicbrainzEntity, S: IdAliasState> Deref for MBIDSpe<T, S> {
     type Target = String;
@@ -49,5 +57,15 @@ where
 {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.id)
+    }
+}
+
+impl<T, S> MBIDSpe<T, S>
+where
+    T: IsMusicbrainzEntity,
+    S: IdAliasState,
+{
+    pub fn id(&self) -> &str {
+        &self.id
     }
 }
