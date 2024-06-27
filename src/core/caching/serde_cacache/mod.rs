@@ -1,13 +1,14 @@
-pub mod error;
-pub mod tidy;
 use std::fmt::Display;
 use std::marker::PhantomData;
 use std::path::PathBuf;
 
-use crate::core::caching::serde_cacache::error::Error;
+pub use crate::core::caching::serde_cacache::error::Error;
 use cacache::Integrity;
 use serde::de::DeserializeOwned;
 use serde::Serialize;
+
+pub mod error;
+pub mod tidy;
 
 #[derive(Debug, Clone)]
 pub struct SerdeCacache<K, V> {

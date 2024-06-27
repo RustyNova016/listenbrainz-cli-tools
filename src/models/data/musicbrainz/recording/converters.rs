@@ -1,6 +1,8 @@
 use itertools::Itertools;
 
+use crate::models::data::musicbrainz::musicbrainz_entity::MusicBrainzEntity;
 use crate::models::data::musicbrainz::recording::Recording;
+use crate::models::error::Error;
 
 impl From<musicbrainz_rs::entity::recording::Recording> for Recording {
     fn from(recording: musicbrainz_rs::entity::recording::Recording) -> Self {
@@ -26,5 +28,26 @@ impl From<musicbrainz_rs::entity::recording::Recording> for Recording {
                 .relations
                 .map(|relations| relations.into_iter().map_into().collect_vec()),
         }
+    }
+}
+
+impl Recording {
+    pub fn try_from_entity(value: MusicBrainzEntity) -> Result<Self, Error> {
+        Self::try_from(value)
+    }
+}
+
+impl TryFrom<MusicBrainzEntity> for Recording {
+    type Error = Error;
+
+    fn try_from(value: MusicBrainzEntity) -> Result<Self, Self::Error> {
+        if let MusicBrainzEntity::Recording(val) = value {
+            return Ok(val);
+        }
+
+        Err(Error::InvalidTypeConvertion(
+            "MusicBrainzEntity".to_string(),
+            "Recording".to_string(),
+        ))
     }
 }

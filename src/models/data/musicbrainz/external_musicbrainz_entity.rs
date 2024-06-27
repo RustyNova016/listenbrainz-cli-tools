@@ -1,7 +1,7 @@
 use extend::ext;
 use musicbrainz_rs::entity::relations::RelationContent;
 
-use crate::core::entity_traits::mbid::{HasMBID, IsMbid};
+use crate::core::entity_traits::mbid::HasMBID;
 use crate::models::data::musicbrainz::mbid::MBID;
 use crate::models::data::musicbrainz::musicbrainz_entity::MusicBrainzEntity;
 use crate::models::data::musicbrainz_database::MUSICBRAINZ_DATABASE;
@@ -30,7 +30,7 @@ pub impl FlattenedMBEntity {
         self.0.save_to_cache().await?;
 
         MUSICBRAINZ_DATABASE
-            .add_alias(&mbid.clone().into_mbid(), &self.0.get_mbid())
+            .add_alias(&mbid.clone(), &self.0.get_mbid())
             .await?;
 
         for extra in self.1 {

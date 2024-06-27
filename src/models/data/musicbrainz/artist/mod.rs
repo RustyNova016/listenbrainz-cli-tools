@@ -1,3 +1,4 @@
+pub mod convertion;
 use derive_getters::Getters;
 use itertools::Itertools;
 use musicbrainz_rs::entity::alias::Alias;
@@ -11,6 +12,7 @@ use crate::models::data::musicbrainz::mbid::generic_mbid::{MBIDSpe, PrimaryID};
 use crate::models::data::musicbrainz::relation::Relation;
 use crate::models::data::musicbrainz::work::mbid::WorkMBID;
 
+use super::entity::any_musicbrainz_entity::AnyMusicBrainzEntity;
 use super::entity::entity_kind::MusicbrainzEntityKind;
 use super::entity::is_musicbrainz_entity::IsMusicbrainzEntity;
 use super::recording::mbid::RecordingMBID;
@@ -104,5 +106,9 @@ impl IsMusicbrainzEntity for Artist {
             works: newer.works.or(self.works),
             relations: newer.relations.or(self.relations),
         }
+    }
+
+    fn into_any(self) -> AnyMusicBrainzEntity {
+        AnyMusicBrainzEntity::Artist(self)
     }
 }

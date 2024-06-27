@@ -1,3 +1,4 @@
+pub mod primary;
 use derive_more::{Display, From, IsVariant, Unwrap};
 use serde::{Deserialize, Serialize};
 
@@ -9,6 +10,8 @@ use crate::models::data::musicbrainz::recording::mbid::RecordingMBID;
 use crate::models::data::musicbrainz::release::mbid::ReleaseMBID;
 use crate::models::data::musicbrainz::release_group::mbid::ReleaseGroupMBID;
 use crate::models::data::musicbrainz::work::mbid::WorkMBID;
+
+use super::entity::any_musicbrainz_entity::AnyMusicBrainzEntity;
 
 pub mod converters;
 pub mod extensions;
@@ -26,6 +29,32 @@ pub enum MBID {
 
 impl IsMbid<MusicBrainzEntity> for MBID {
     async fn get_or_fetch_entity(&self) -> color_eyre::Result<MusicBrainzEntity> {
+        Ok(match self {
+            Self::Artist(val) => val.get_or_fetch_entity().await?.into(),
+            Self::Release(val) => val.get_or_fetch_entity().await?.into(),
+            Self::Work(val) => val.get_or_fetch_entity().await?.into(),
+            Self::ReleaseGroup(val) => val.get_or_fetch_entity().await?.into(),
+            Self::Recording(val) => val.get_or_fetch_entity().await?.into(),
+        })
+    }
+
+    async fn fetch(&self) -> color_eyre::Result<ExternalMusicBrainzEntity> {
+        match self {
+            Self::Artist(val) => val.fetch().await,
+            Self::Release(val) => val.fetch().await,
+            Self::Work(val) => val.fetch().await,
+            Self::ReleaseGroup(val) => val.fetch().await,
+            Self::Recording(val) => val.fetch().await,
+        }
+    }
+
+    fn into_mbid(self) -> MBID {
+        self
+    }
+}
+
+impl IsMbid<AnyMusicBrainzEntity> for MBID {
+    async fn get_or_fetch_entity(&self) -> color_eyre::Result<AnyMusicBrainzEntity> {
         Ok(match self {
             Self::Artist(val) => val.get_or_fetch_entity().await?.into(),
             Self::Release(val) => val.get_or_fetch_entity().await?.into(),

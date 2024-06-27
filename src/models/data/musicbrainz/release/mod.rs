@@ -84,6 +84,10 @@ impl IsMusicbrainzEntity for Release {
             tags: newer.tags.or(self.tags),
         }
     }
+
+    fn into_any(self) -> super::entity::any_musicbrainz_entity::AnyMusicBrainzEntity {
+        self.into()
+    }
 }
 
 impl HasArtistCredits<ReleaseMBID> for Release {
