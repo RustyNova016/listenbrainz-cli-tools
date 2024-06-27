@@ -29,16 +29,8 @@ impl From<WorkMS> for Work {
     }
 }
 
-impl Work {
-    pub fn try_from_entity(value: MusicBrainzEntity) -> Result<Self, Error> {
-        Self::try_from(value)
-    }
-}
-
-impl TryFrom<MusicBrainzEntity> for Work {
-    type Error = Error;
-
-    fn try_from(value: MusicBrainzEntity) -> Result<Self, Self::Error> {
+impl From<MusicBrainzEntity> for Result<Work, Error> {
+    fn from(value: MusicBrainzEntity) -> Self {
         if let MusicBrainzEntity::Work(val) = value {
             return Ok(val);
         }

@@ -40,16 +40,8 @@ impl From<ReleaseMS> for Release {
     }
 }
 
-impl Release {
-    pub fn try_from_entity(value: MusicBrainzEntity) -> Result<Self, Error> {
-        Self::try_from(value)
-    }
-}
-
-impl TryFrom<MusicBrainzEntity> for Release {
-    type Error = Error;
-
-    fn try_from(value: MusicBrainzEntity) -> Result<Self, Self::Error> {
+impl From<MusicBrainzEntity> for Result<Release, Error> {
+    fn from(value: MusicBrainzEntity) -> Self {
         if let MusicBrainzEntity::Release(val) = value {
             return Ok(val);
         }

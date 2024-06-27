@@ -36,16 +36,8 @@ impl From<ReleaseGroupMS> for ReleaseGroup {
     }
 }
 
-impl ReleaseGroup {
-    pub fn try_from_entity(value: MusicBrainzEntity) -> Result<Self, Error> {
-        Self::try_from(value)
-    }
-}
-
-impl TryFrom<MusicBrainzEntity> for ReleaseGroup {
-    type Error = Error;
-
-    fn try_from(value: MusicBrainzEntity) -> Result<Self, Self::Error> {
+impl From<MusicBrainzEntity> for Result<ReleaseGroup, Error> {
+    fn from(value: MusicBrainzEntity) -> Self {
         if let MusicBrainzEntity::ReleaseGroup(val) = value {
             return Ok(val);
         }

@@ -31,16 +31,8 @@ impl From<musicbrainz_rs::entity::recording::Recording> for Recording {
     }
 }
 
-impl Recording {
-    pub fn try_from_entity(value: MusicBrainzEntity) -> Result<Self, Error> {
-        Self::try_from(value)
-    }
-}
-
-impl TryFrom<MusicBrainzEntity> for Recording {
-    type Error = Error;
-
-    fn try_from(value: MusicBrainzEntity) -> Result<Self, Self::Error> {
+impl From<MusicBrainzEntity> for Result<Recording, Error> {
+    fn from(value: MusicBrainzEntity) -> Self {
         if let MusicBrainzEntity::Recording(val) = value {
             return Ok(val);
         }
