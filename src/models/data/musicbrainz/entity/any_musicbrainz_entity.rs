@@ -1,4 +1,6 @@
 use std::mem::discriminant;
+use std::ops::Deref;
+use std::sync::Arc;
 
 use derive_more::{From, IsVariant, Unwrap};
 use serde::{Deserialize, Serialize};
@@ -20,11 +22,11 @@ use super::is_musicbrainz_entity::IsMusicbrainzEntity;
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, IsVariant, Unwrap, From)]
 pub enum AnyMusicBrainzEntity {
-    Artist(Artist),
-    ReleaseGroup(ReleaseGroup),
-    Release(Release),
-    Recording(Recording),
-    Work(Work),
+    Artist(Arc<Artist>),
+    ReleaseGroup(Arc<ReleaseGroup>),
+    Release(Arc<Release>),
+    Recording(Arc<Recording>),
+    Work(Arc<Work>),
 }
 
 impl AnyMusicBrainzEntity {
@@ -64,11 +66,31 @@ impl IsMusicbrainzEntity for AnyMusicBrainzEntity {
         }
 
         match self {
-            Self::Artist(val) => val.update(newer.unwrap_artist()).into(),
-            Self::Recording(val) => val.update(newer.unwrap_recording()).into(),
-            Self::Release(val) => val.update(newer.unwrap_release()).into(),
-            Self::ReleaseGroup(val) => val.update(newer.unwrap_release_group()).into(),
-            Self::Work(val) => val.update(newer.unwrap_work()).into(),
+            Self::Artist(val) => val
+                .as_ref()
+                .clone()
+                .update(newer.unwrap_artist().as_ref().clone())
+                .into_arc_and_any(),
+            Self::Recording(val) => val
+                .as_ref()
+                .clone()
+                .update(newer.unwrap_recording().as_ref().clone())
+                .into_arc_and_any(),
+            Self::Release(val) => val
+                .as_ref()
+                .clone()
+                .update(newer.unwrap_release().as_ref().clone())
+                .into_arc_and_any(),
+            Self::ReleaseGroup(val) => val
+                .as_ref()
+                .clone()
+                .update(newer.unwrap_release_group().as_ref().clone())
+                .into_arc_and_any(),
+            Self::Work(val) => val
+                .as_ref()
+                .clone()
+                .update(newer.unwrap_work().as_ref().clone())
+                .into_arc_and_any(),
         }
     }
 
@@ -94,7 +116,13 @@ impl IsMusicbrainzEntity for AnyMusicBrainzEntity {
         MBIDSpe::from(id)
     }
 
-    fn into_any(self) -> AnyMusicBrainzEntity {
-        self
+    fn into_any(self: Arc<Self>) -> AnyMusicBrainzEntity {
+        match self.deref().clone() {
+            Self::Artist(val) => val.into_any(),
+            Self::Recording(val) => val.into_any(),
+            Self::Release(val) => val.into_any(),
+            Self::ReleaseGroup(val) => val.into_any(),
+            Self::Work(val) => val.into_any(),
+        }
     }
 }

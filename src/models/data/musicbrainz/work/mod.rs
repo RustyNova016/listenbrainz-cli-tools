@@ -1,3 +1,5 @@
+use std::sync::Arc;
+
 use derive_getters::Getters;
 use musicbrainz_rs::entity::alias::Alias;
 use musicbrainz_rs::entity::genre::Genre;
@@ -67,7 +69,7 @@ impl IsMusicbrainzEntity for Work {
         }
     }
 
-    fn into_any(self) -> super::entity::any_musicbrainz_entity::AnyMusicBrainzEntity {
+    fn into_any(self: Arc<Self>) -> super::entity::any_musicbrainz_entity::AnyMusicBrainzEntity {
         self.into()
     }
 }

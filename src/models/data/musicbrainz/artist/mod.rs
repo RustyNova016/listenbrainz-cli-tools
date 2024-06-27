@@ -1,4 +1,6 @@
 pub mod convertion;
+use std::sync::Arc;
+
 use derive_getters::Getters;
 use itertools::Itertools;
 use musicbrainz_rs::entity::alias::Alias;
@@ -108,7 +110,7 @@ impl IsMusicbrainzEntity for Artist {
         }
     }
 
-    fn into_any(self) -> AnyMusicBrainzEntity {
+    fn into_any(self: Arc<Self>) -> AnyMusicBrainzEntity {
         AnyMusicBrainzEntity::Artist(self)
     }
 }

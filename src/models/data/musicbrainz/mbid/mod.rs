@@ -1,4 +1,5 @@
-pub mod primary;
+use std::sync::Arc;
+
 use derive_more::{Display, From, IsVariant, Unwrap};
 use serde::{Deserialize, Serialize};
 
@@ -17,6 +18,7 @@ pub mod converters;
 pub mod extensions;
 pub mod generic_mbid;
 pub mod is_musicbrainz_id;
+pub mod primary;
 
 #[derive(Debug, Clone, PartialEq, Eq, From, Serialize, Deserialize, Display, IsVariant, Unwrap)]
 pub enum MBID {
@@ -56,11 +58,11 @@ impl IsMbid<MusicBrainzEntity> for MBID {
 impl IsMbid<AnyMusicBrainzEntity> for MBID {
     async fn get_or_fetch_entity(&self) -> color_eyre::Result<AnyMusicBrainzEntity> {
         Ok(match self {
-            Self::Artist(val) => val.get_or_fetch_entity().await?.into(),
-            Self::Release(val) => val.get_or_fetch_entity().await?.into(),
-            Self::Work(val) => val.get_or_fetch_entity().await?.into(),
-            Self::ReleaseGroup(val) => val.get_or_fetch_entity().await?.into(),
-            Self::Recording(val) => val.get_or_fetch_entity().await?.into(),
+            Self::Artist(val) => Arc::new(val.get_or_fetch_entity().await?).into(),
+            Self::Release(val) => Arc::new(val.get_or_fetch_entity().await?).into(),
+            Self::Work(val) => Arc::new(val.get_or_fetch_entity().await?).into(),
+            Self::ReleaseGroup(val) => Arc::new(val.get_or_fetch_entity().await?).into(),
+            Self::Recording(val) => Arc::new(val.get_or_fetch_entity().await?).into(),
         })
     }
 

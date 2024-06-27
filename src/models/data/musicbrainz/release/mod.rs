@@ -1,3 +1,5 @@
+use std::sync::Arc;
+
 use chrono::NaiveDate;
 use derive_getters::Getters;
 use musicbrainz_rs::entity::alias::Alias;
@@ -85,7 +87,7 @@ impl IsMusicbrainzEntity for Release {
         }
     }
 
-    fn into_any(self) -> super::entity::any_musicbrainz_entity::AnyMusicBrainzEntity {
+    fn into_any(self: Arc<Self>) -> super::entity::any_musicbrainz_entity::AnyMusicBrainzEntity {
         self.into()
     }
 }

@@ -1,3 +1,5 @@
+use std::sync::Arc;
+
 use serde::de::DeserializeOwned;
 use serde::Serialize;
 
@@ -16,5 +18,9 @@ where
 
     fn update(self, other: Self) -> Self;
 
-    fn into_any(self) -> AnyMusicBrainzEntity;
+    fn into_arc_and_any(self) -> AnyMusicBrainzEntity {
+        Arc::new(self).into_any()
+    }
+
+    fn into_any(self: Arc<Self>) -> AnyMusicBrainzEntity;
 }
