@@ -7,7 +7,7 @@ use serde::{Deserialize, Serialize};
 
 use crate::core::entity_traits::mbid::HasMBID;
 use crate::models::data::musicbrainz::artist::Artist;
-use crate::models::data::musicbrainz::mbid::generic_mbid::MBIDSpe;
+use crate::models::data::musicbrainz::mbid::any_mbid::AnyMBIDType;
 use crate::models::data::musicbrainz::mbid::generic_mbid::PrimaryID;
 use crate::models::data::musicbrainz::mbid::MBID;
 use crate::models::data::musicbrainz::recording::Recording;
@@ -41,22 +41,8 @@ impl AnyMusicBrainzEntity {
 
         Ok(())
     }
-}
 
-impl HasMBID<MBID> for AnyMusicBrainzEntity {
-    fn get_mbid(&self) -> MBID {
-        match self {
-            Self::Artist(val) => val.get_mbid().into(),
-            Self::ReleaseGroup(val) => val.get_mbid().into(),
-            Self::Release(val) => val.get_mbid().into(),
-            Self::Recording(val) => val.get_mbid().into(),
-            Self::Work(val) => val.get_mbid().into(),
-        }
-    }
-}
-
-impl IsMusicbrainzEntity for AnyMusicBrainzEntity {
-    fn update(self, newer: Self) -> Self {
+    pub fn update(self, newer: Self) -> Self {
         // Check if both are the same variant
         if discriminant(&self) != discriminant(&newer) {
             // No big deal. But worth mentioning
@@ -94,7 +80,7 @@ impl IsMusicbrainzEntity for AnyMusicBrainzEntity {
         }
     }
 
-    fn as_kind(&self) -> MusicbrainzEntityKind {
+    pub fn as_kind(&self) -> MusicbrainzEntityKind {
         match self {
             Self::Artist(val) => val.as_kind(),
             Self::Recording(val) => val.as_kind(),
@@ -104,25 +90,33 @@ impl IsMusicbrainzEntity for AnyMusicBrainzEntity {
         }
     }
 
-    fn get_mbidspe(&self) -> MBIDSpe<Self, PrimaryID> {
-        let id: String = match self {
-            Self::Artist(val) => val.get_mbidspe().to_string(),
-            Self::Recording(val) => val.get_mbidspe().to_string(),
-            Self::Release(val) => val.get_mbidspe().to_string(),
-            Self::ReleaseGroup(val) => val.get_mbidspe().to_string(),
-            Self::Work(val) => val.get_mbidspe().to_string(),
-        };
-
-        MBIDSpe::from(id)
+    pub fn get_mbidspe(&self) -> AnyMBIDType<PrimaryID> {
+        match self {
+            Self::Artist(val) => val.get_mbidspe().into(),
+            Self::Recording(val) => val.get_mbidspe().into(),
+            Self::Release(val) => val.get_mbidspe().into(),
+            Self::ReleaseGroup(val) => val.get_mbidspe().into(),
+            Self::Work(val) => val.get_mbidspe().into(),
+        }
     }
 
-    fn into_any(self: Arc<Self>) -> AnyMusicBrainzEntity {
+    pub fn into_any(self: Arc<Self>) -> Self {
         match self.deref().clone() {
             Self::Artist(val) => val.into_any(),
             Self::Recording(val) => val.into_any(),
             Self::Release(val) => val.into_any(),
             Self::ReleaseGroup(val) => val.into_any(),
             Self::Work(val) => val.into_any(),
+        }
+    }
+
+    pub fn get_mbid(&self) -> MBID {
+        match self {
+            Self::Artist(val) => val.get_mbid().into(),
+            Self::ReleaseGroup(val) => val.get_mbid().into(),
+            Self::Release(val) => val.get_mbid().into(),
+            Self::Recording(val) => val.get_mbid().into(),
+            Self::Work(val) => val.get_mbid().into(),
         }
     }
 }
