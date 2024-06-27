@@ -11,5 +11,7 @@ where
 {
     fn as_kind(&self) -> MusicbrainzEntityKind;
 
-    fn get_mbid(&self) -> MBIDSpe<Self, PrimaryID>;
+    fn get_mbidspe(&self) -> MBIDSpe<Self, PrimaryID>;
+
+    fn update(self, other: Self) -> Self;
 }
