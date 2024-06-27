@@ -13,7 +13,7 @@ use crate::core::caching::serde_cacache::error::Error;
 use crate::core::caching::serde_cacache::tidy::SerdeCacacheTidy;
 use crate::core::caching::CACHE_LOCATION;
 use crate::core::entity_traits::mbid::{HasMBID, IsMbid};
-use crate::core::entity_traits::updatable::Updatable;
+use crate::models::data::musicbrainz::entity::is_musicbrainz_entity::IsMusicbrainzEntity;
 use crate::models::data::musicbrainz::external_musicbrainz_entity::FlattenedMBEntityExt;
 use crate::models::data::musicbrainz::relation::external::RelationContentExt;
 use crate::utils::{println_cli, println_cli_warn};
@@ -22,7 +22,7 @@ use crate::utils::{println_cli, println_cli_warn};
 pub struct MusicbrainzCache<K, V>
 where
     K: IsMbid<V> + Serialize + DeserializeOwned,
-    V: Serialize + DeserializeOwned + HasMBID<K> + Updatable + Clone,
+    V: Serialize + DeserializeOwned + HasMBID<K> + IsMusicbrainzEntity + Clone,
 {
     disk_cache: SerdeCacacheTidy<K, V>,
     alias_cache: SerdeCacacheTidy<K, K>,
@@ -36,7 +36,7 @@ where
 impl<K: IsMbid<V>, V> MusicbrainzCache<K, V>
 where
     K: IsMbid<V> + Serialize + DeserializeOwned,
-    V: Serialize + DeserializeOwned + HasMBID<K> + Updatable + Clone,
+    V: Serialize + DeserializeOwned + HasMBID<K> + IsMusicbrainzEntity + Clone,
 {
     pub fn new(name: &str) -> Self {
         let mut location = CACHE_LOCATION.clone();

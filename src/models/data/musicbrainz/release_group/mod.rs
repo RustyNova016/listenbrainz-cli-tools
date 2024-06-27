@@ -45,8 +45,28 @@ impl IsMusicbrainzEntity for ReleaseGroup {
         MusicbrainzEntityKind::ReleaseGroup
     }
 
-    fn get_mbid(&self) -> MBIDSpe<Self, PrimaryID> {
+    fn get_mbidspe(&self) -> MBIDSpe<Self, PrimaryID> {
         MBIDSpe::from(self.id.to_string())
+    }
+
+    fn update(self, newer: Self) -> Self {
+        Self {
+            id: newer.id,
+            secondary_types: newer.secondary_types,
+            secondary_type_ids: newer.secondary_type_ids,
+            disambiguation: newer.disambiguation,
+            title: newer.title,
+            primary_type_id: newer.primary_type_id.or(self.primary_type_id),
+            first_release_date: newer.first_release_date.or(self.first_release_date),
+            primary_type: newer.primary_type.or(self.primary_type),
+            tags: newer.tags.or(self.tags),
+            aliases: newer.aliases.or(self.aliases),
+            genres: newer.genres.or(self.genres),
+            releases: newer.releases.or(self.releases),
+            annotation: newer.annotation.or(self.annotation),
+            artist_credit: newer.artist_credit.or(self.artist_credit),
+            relations: newer.relations.or(self.relations),
+        }
     }
 }
 

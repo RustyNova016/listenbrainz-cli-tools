@@ -57,8 +57,32 @@ impl IsMusicbrainzEntity for Release {
         MusicbrainzEntityKind::Release
     }
 
-    fn get_mbid(&self) -> MBIDSpe<Self, PrimaryID> {
+    fn get_mbidspe(&self) -> MBIDSpe<Self, PrimaryID> {
         MBIDSpe::from(self.id.to_string())
+    }
+
+    fn update(self, newer: Self) -> Self {
+        Self {
+            annotation: newer.annotation.or(self.annotation),
+            barcode: newer.barcode.or(self.barcode),
+            country: newer.country.or(self.country),
+            disambiguation: newer.disambiguation.or(self.disambiguation),
+            media: newer.media.or(self.media),
+            packaging_id: newer.packaging_id.or(self.packaging_id),
+            status_id: newer.status_id.or(self.status_id),
+            title: newer.title,
+            id: newer.id,
+            artist_credit: newer.artist_credit.or(self.artist_credit),
+            release_group: newer.release_group.or(self.release_group),
+            relations: newer.relations.or(self.relations),
+            aliases: newer.aliases.or(self.aliases),
+            date: newer.date.or(self.date),
+            genres: newer.genres.or(self.genres),
+            packaging: newer.packaging.or(self.packaging),
+            //quality: newer.quality.or(self.quality),
+            status: newer.status.or(self.status),
+            tags: newer.tags.or(self.tags),
+        }
     }
 }
 

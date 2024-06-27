@@ -4,7 +4,6 @@ use derive_more::{From, IsVariant, Unwrap};
 use serde::{Deserialize, Serialize};
 
 use crate::core::entity_traits::mbid::HasMBID;
-use crate::core::entity_traits::updatable::Updatable;
 use crate::models::data::musicbrainz::artist::Artist;
 use crate::models::data::musicbrainz::mbid::MBID;
 use crate::models::data::musicbrainz::recording::Recording;
@@ -13,6 +12,11 @@ use crate::models::data::musicbrainz::release_group::ReleaseGroup;
 use crate::models::data::musicbrainz::work::Work;
 use crate::models::data::musicbrainz_database::MUSICBRAINZ_DATABASE;
 use crate::utils::println_cli_warn;
+
+use super::entity::entity_kind::MusicbrainzEntityKind;
+use super::entity::is_musicbrainz_entity::IsMusicbrainzEntity;
+use super::mbid::generic_mbid::MBIDSpe;
+use super::mbid::generic_mbid::PrimaryID;
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, IsVariant, Unwrap, From)]
 pub enum MusicBrainzEntity {
@@ -49,7 +53,7 @@ impl HasMBID<MBID> for MusicBrainzEntity {
     }
 }
 
-impl Updatable for MusicBrainzEntity {
+impl IsMusicbrainzEntity for MusicBrainzEntity {
     fn update(self, newer: Self) -> Self {
         // Check if both are the same variant
         if discriminant(&self) != discriminant(&newer) {
@@ -66,5 +70,27 @@ impl Updatable for MusicBrainzEntity {
             Self::ReleaseGroup(val) => val.update(newer.unwrap_release_group()).into(),
             Self::Work(val) => val.update(newer.unwrap_work()).into(),
         }
+    }
+
+    fn as_kind(&self) -> MusicbrainzEntityKind {
+        match self {
+            Self::Artist(val) => val.as_kind(),
+            Self::Recording(val) => val.as_kind(),
+            Self::Release(val) => val.as_kind(),
+            Self::ReleaseGroup(val) => val.as_kind(),
+            Self::Work(val) => val.as_kind(),
+        }
+    }
+
+    fn get_mbidspe(&self) -> MBIDSpe<Self, PrimaryID> {
+        let id: String = match self {
+            Self::Artist(val) => val.get_mbidspe().to_string(),
+            Self::Recording(val) => val.get_mbidspe().to_string(),
+            Self::Release(val) => val.get_mbidspe().to_string(),
+            Self::ReleaseGroup(val) => val.get_mbidspe().to_string(),
+            Self::Work(val) => val.get_mbidspe().to_string(),
+        };
+
+        MBIDSpe::from(id)
     }
 }

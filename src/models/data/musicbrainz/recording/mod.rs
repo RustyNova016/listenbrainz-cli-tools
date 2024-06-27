@@ -45,8 +45,26 @@ impl IsMusicbrainzEntity for Recording {
         MusicbrainzEntityKind::Recording
     }
 
-    fn get_mbid(&self) -> MBIDSpe<Self, PrimaryID> {
+    fn get_mbidspe(&self) -> MBIDSpe<Self, PrimaryID> {
         MBIDSpe::from(self.id.to_string())
+    }
+
+    fn update(self, newer: Self) -> Self {
+        Self {
+            id: newer.id,
+            title: newer.title,
+            artist_credit: newer.artist_credit.or(self.artist_credit),
+            releases: newer.releases.or(self.releases),
+            isrcs: newer.isrcs.or(self.isrcs),
+            disambiguation: newer.disambiguation.or(self.disambiguation),
+            tags: newer.tags.or(self.tags),
+            video: newer.video.or(self.video),
+            length: newer.length.or(self.length),
+            annotation: newer.annotation.or(self.annotation),
+            genres: newer.genres.or(self.genres),
+            aliases: self.aliases,
+            relations: newer.relations.or(self.relations),
+        }
     }
 }
 
