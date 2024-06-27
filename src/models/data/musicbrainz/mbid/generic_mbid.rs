@@ -1,13 +1,14 @@
 use std::fmt::{Display, Formatter};
 use std::marker::PhantomData;
 use std::ops::Deref;
+use std::hash::Hash;
 
 use serde::Deserialize;
 use serde::Serialize;
 
 use crate::models::data::musicbrainz::entity::is_musicbrainz_entity::IsMusicbrainzEntity;
 
-#[derive(Debug, PartialEq, Eq, Deserialize, Serialize, Hash, Clone)]
+#[derive(Debug, PartialEq, Eq, Deserialize, Serialize, Clone)]
 pub struct MBIDSpe<T, S>
 where
     T: IsMusicbrainzEntity,
@@ -69,3 +70,12 @@ where
         &self.id
     }
 }
+
+impl<T, S> Hash for MBIDSpe<T, S>
+where
+    T: IsMusicbrainzEntity,
+    S: IdAliasState, {
+        fn hash<H: std::hash::Hasher>(&self, state: &mut H) {
+            self.id.hash(state)
+        }
+    }
