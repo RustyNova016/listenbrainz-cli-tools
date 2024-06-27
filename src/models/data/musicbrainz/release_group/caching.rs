@@ -1,13 +1,13 @@
 use std::sync::Arc;
 
-use crate::core::caching::musicbrainz_cache::MusicbrainzCache;
+use crate::core::caching::musicbrainz_cache::MusicbrainzCacheLegacy;
 use crate::core::entity_traits::has_id::HasID;
 use crate::core::entity_traits::mb_cached::MBCached;
 use crate::core::entity_traits::mbid::HasMBID;
 
 use crate::models::data::musicbrainz::release_group::mbid::ReleaseGroupMBID;
 use crate::models::data::musicbrainz::release_group::ReleaseGroup;
-use crate::models::data::musicbrainz_database::MUSICBRAINZ_DATABASE;
+use crate::models::data::musicbrainz_database_legacy::MUSICBRAINZ_DATABASE_LEGACY;
 
 impl HasID for ReleaseGroup {
     fn get_id(&self) -> String {
@@ -22,7 +22,7 @@ impl HasMBID<ReleaseGroupMBID> for ReleaseGroup {
 }
 
 impl MBCached<ReleaseGroupMBID> for ReleaseGroup {
-    fn get_cache() -> Arc<MusicbrainzCache<ReleaseGroupMBID, Self>> {
-        MUSICBRAINZ_DATABASE.release_groups().clone()
+    fn get_cache() -> Arc<MusicbrainzCacheLegacy<ReleaseGroupMBID, Self>> {
+        MUSICBRAINZ_DATABASE_LEGACY.release_groups().clone()
     }
 }

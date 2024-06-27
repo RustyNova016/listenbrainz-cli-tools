@@ -6,7 +6,7 @@ use derive_getters::Getters;
 use once_cell::sync::Lazy;
 use tokio::try_join;
 
-use crate::core::caching::musicbrainz_cache::MusicbrainzCache;
+use crate::core::caching::musicbrainz_cache::MusicbrainzCacheLegacy;
 use crate::models::cli::cache::ClearTarget;
 use crate::models::data::musicbrainz::artist::mbid::ArtistMBID;
 use crate::models::data::musicbrainz::mbid::MBID;
@@ -22,19 +22,19 @@ use super::musicbrainz::recording::Recording;
 use super::musicbrainz::release::Release;
 use super::musicbrainz::work::Work;
 
-pub(crate) static MUSICBRAINZ_DATABASE: Lazy<Arc<MusicBrainzDatabase>> =
-    Lazy::new(|| Arc::new(MusicBrainzDatabase::default()));
+pub(crate) static MUSICBRAINZ_DATABASE_LEGACY: Lazy<Arc<MusicBrainzDatabaseLegacy>> =
+    Lazy::new(|| Arc::new(MusicBrainzDatabaseLegacy::default()));
 
 #[derive(Debug, Getters)]
-pub struct MusicBrainzDatabase {
-    artists: Arc<MusicbrainzCache<ArtistMBID, Artist>>,
-    releases: Arc<MusicbrainzCache<ReleaseMBID, Release>>,
-    recordings: Arc<MusicbrainzCache<RecordingMBID, Recording>>,
-    release_groups: Arc<MusicbrainzCache<ReleaseGroupMBID, ReleaseGroup>>,
-    works: Arc<MusicbrainzCache<WorkMBID, Work>>,
+pub struct MusicBrainzDatabaseLegacy {
+    artists: Arc<MusicbrainzCacheLegacy<ArtistMBID, Artist>>,
+    releases: Arc<MusicbrainzCacheLegacy<ReleaseMBID, Release>>,
+    recordings: Arc<MusicbrainzCacheLegacy<RecordingMBID, Recording>>,
+    release_groups: Arc<MusicbrainzCacheLegacy<ReleaseGroupMBID, ReleaseGroup>>,
+    works: Arc<MusicbrainzCacheLegacy<WorkMBID, Work>>,
 }
 
-impl MusicBrainzDatabase {
+impl MusicBrainzDatabaseLegacy {
     pub async fn remove(&self, id: &MBID) -> color_eyre::Result<()> {
         match id {
             MBID::Artist(id) => self.artists.remove(id).await?,
@@ -118,14 +118,14 @@ impl MusicBrainzDatabase {
     }
 }
 
-impl Default for MusicBrainzDatabase {
+impl Default for MusicBrainzDatabaseLegacy {
     fn default() -> Self {
         Self {
-            artists: Arc::new(MusicbrainzCache::new("artists")),
-            releases: Arc::new(MusicbrainzCache::new("releases")),
-            recordings: Arc::new(MusicbrainzCache::new("recordings")),
-            release_groups: Arc::new(MusicbrainzCache::new("release_groups")),
-            works: Arc::new(MusicbrainzCache::new("works")),
+            artists: Arc::new(MusicbrainzCacheLegacy::new("artists")),
+            releases: Arc::new(MusicbrainzCacheLegacy::new("releases")),
+            recordings: Arc::new(MusicbrainzCacheLegacy::new("recordings")),
+            release_groups: Arc::new(MusicbrainzCacheLegacy::new("release_groups")),
+            works: Arc::new(MusicbrainzCacheLegacy::new("works")),
         }
     }
 }

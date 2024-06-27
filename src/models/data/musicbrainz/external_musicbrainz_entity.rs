@@ -4,7 +4,7 @@ use musicbrainz_rs::entity::relations::RelationContent;
 use crate::core::entity_traits::mbid::HasMBID;
 use crate::models::data::musicbrainz::mbid::MBID;
 use crate::models::data::musicbrainz::musicbrainz_entity::MusicBrainzEntity;
-use crate::models::data::musicbrainz_database::MUSICBRAINZ_DATABASE;
+use crate::models::data::musicbrainz_database_legacy::MUSICBRAINZ_DATABASE_LEGACY;
 
 pub type ExternalMusicBrainzEntity = RelationContent;
 pub type FlattenedMBEntity = (MusicBrainzEntity, Vec<MusicBrainzEntity>);
@@ -15,7 +15,7 @@ pub impl ExternalMusicBrainzEntity {}
 #[ext]
 pub impl FlattenedMBEntity {
     async fn insert_into_cache_with_alias(self, mbid: &MBID) -> color_eyre::Result<()> {
-        MUSICBRAINZ_DATABASE
+        MUSICBRAINZ_DATABASE_LEGACY
             .add_alias(mbid, &self.0.get_mbid())
             .await?;
 
@@ -29,7 +29,7 @@ pub impl FlattenedMBEntity {
 
         self.0.save_to_cache().await?;
 
-        MUSICBRAINZ_DATABASE
+        MUSICBRAINZ_DATABASE_LEGACY
             .add_alias(&mbid.clone(), &self.0.get_mbid())
             .await?;
 
