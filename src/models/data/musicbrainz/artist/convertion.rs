@@ -3,16 +3,8 @@ use crate::models::error::Error;
 
 use super::Artist;
 
-impl Artist {
-    pub fn try_from_entity(value: MusicBrainzEntity) -> Result<Self, Error> {
-        Self::try_from(value)
-    }
-}
-
-impl TryFrom<MusicBrainzEntity> for Artist {
-    type Error = Error;
-
-    fn try_from(value: MusicBrainzEntity) -> Result<Self, Self::Error> {
+impl From<MusicBrainzEntity> for Result<Artist, Error> {
+    fn from(value: MusicBrainzEntity) -> Self {
         if let MusicBrainzEntity::Artist(val) = value {
             return Ok(val);
         }
