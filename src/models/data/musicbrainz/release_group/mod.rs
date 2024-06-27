@@ -1,4 +1,3 @@
-use crate::core::entity_traits::relations::has_artist_credits::HasArtistCredits;
 use chrono::NaiveDate;
 use derive_getters::Getters;
 use musicbrainz_rs::entity::alias::Alias;
@@ -7,7 +6,11 @@ use musicbrainz_rs::entity::release_group::{ReleaseGroupPrimaryType, ReleaseGrou
 use musicbrainz_rs::entity::tag::Tag;
 use serde::{Deserialize, Serialize};
 
+use crate::core::entity_traits::relations::has_artist_credits::HasArtistCredits;
 use crate::models::data::musicbrainz::artist_credit::collection::ArtistCredits;
+use crate::models::data::musicbrainz::entity::entity_kind::MusicbrainzEntityKind;
+use crate::models::data::musicbrainz::entity::is_musicbrainz_entity::IsMusicbrainzEntity;
+use crate::models::data::musicbrainz::mbid::generic_mbid::{MBIDSpe, PrimaryID};
 use crate::models::data::musicbrainz::relation::Relation;
 use crate::models::data::musicbrainz::release::mbid::ReleaseMBID;
 use crate::models::data::musicbrainz::release_group::mbid::ReleaseGroupMBID;
@@ -35,6 +38,16 @@ pub struct ReleaseGroup {
     aliases: Option<Vec<Alias>>,
     genres: Option<Vec<Genre>>,
     annotation: Option<String>,
+}
+
+impl IsMusicbrainzEntity for ReleaseGroup {
+    fn as_kind(&self) -> MusicbrainzEntityKind {
+        MusicbrainzEntityKind::ReleaseGroup
+    }
+
+    fn get_mbid(&self) -> MBIDSpe<Self, PrimaryID> {
+        MBIDSpe::from(self.id.to_string())
+    }
 }
 
 impl HasArtistCredits<ReleaseGroupMBID> for ReleaseGroup {

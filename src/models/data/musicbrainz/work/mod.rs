@@ -3,9 +3,12 @@ use musicbrainz_rs::entity::alias::Alias;
 use musicbrainz_rs::entity::genre::Genre;
 use musicbrainz_rs::entity::tag::Tag;
 use musicbrainz_rs::entity::work::WorkAttribute;
-
 use serde::Deserialize;
 use serde::Serialize;
+
+use crate::models::data::musicbrainz::entity::entity_kind::MusicbrainzEntityKind;
+use crate::models::data::musicbrainz::entity::is_musicbrainz_entity::IsMusicbrainzEntity;
+use crate::models::data::musicbrainz::mbid::generic_mbid::{MBIDSpe, PrimaryID};
 
 use super::relation::Relation;
 
@@ -34,6 +37,16 @@ pub struct Work {
     aliases: Option<Vec<Alias>>,
     genres: Option<Vec<Genre>>,
     annotation: Option<String>,
+}
+
+impl IsMusicbrainzEntity for Work {
+    fn as_kind(&self) -> MusicbrainzEntityKind {
+        MusicbrainzEntityKind::Work
+    }
+
+    fn get_mbid(&self) -> MBIDSpe<Self, PrimaryID> {
+        MBIDSpe::from(self.id.to_string())
+    }
 }
 
 impl Work {

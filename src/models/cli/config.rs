@@ -1,7 +1,7 @@
 use crate::core::entity_traits::config_file::ConfigFile;
 use crate::models::config::recording_timeout::RecordingTimeoutConfig;
 use crate::models::config::Config;
-use crate::models::data::musicbrainz::mbid::mbid_kind::MBIDKind;
+use crate::models::data::musicbrainz::entity::entity_kind::MusicbrainzEntityKind;
 use crate::models::data::musicbrainz::mbid::MBID;
 use crate::utils::extensions::chrono_ext::DurationExt;
 use chrono::Duration;
@@ -59,7 +59,8 @@ impl ConfigCommands {
                 duration,
             } => {
                 RecordingTimeoutConfig::set_timeout(
-                    MBID::from_string(recording, MBIDKind::Recording)?.unwrap_recording(),
+                    MBID::from_string(recording, MusicbrainzEntityKind::Recording)?
+                        .unwrap_recording(),
                     Duration::from_human_string(duration)?,
                 )?;
             }

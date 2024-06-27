@@ -1,4 +1,3 @@
-pub mod getters;
 use derive_getters::Getters;
 use musicbrainz_rs::entity::alias::Alias;
 use musicbrainz_rs::entity::genre::Genre;
@@ -6,6 +5,9 @@ use musicbrainz_rs::entity::tag::Tag;
 use serde::{Deserialize, Serialize};
 
 use crate::core::entity_traits::relations::has_artist_credits::HasArtistCredits;
+use crate::models::data::musicbrainz::entity::entity_kind::MusicbrainzEntityKind;
+use crate::models::data::musicbrainz::entity::is_musicbrainz_entity::IsMusicbrainzEntity;
+use crate::models::data::musicbrainz::mbid::generic_mbid::{MBIDSpe, PrimaryID};
 use crate::models::data::musicbrainz::release::mbid::ReleaseMBID;
 
 use super::artist_credit::collection::ArtistCredits;
@@ -17,6 +19,7 @@ pub mod caching;
 pub mod converters;
 pub mod external;
 pub mod get_or_fetch;
+pub mod getters;
 pub mod mbid;
 
 #[derive(Debug, Clone, Eq, PartialEq, Deserialize, Serialize, Getters)]
@@ -35,6 +38,16 @@ pub struct Recording {
     //rating: Option<Rating>,
     genres: Option<Vec<Genre>>,
     annotation: Option<String>,
+}
+
+impl IsMusicbrainzEntity for Recording {
+    fn as_kind(&self) -> MusicbrainzEntityKind {
+        MusicbrainzEntityKind::Recording
+    }
+
+    fn get_mbid(&self) -> MBIDSpe<Self, PrimaryID> {
+        MBIDSpe::from(self.id.to_string())
+    }
 }
 
 impl Recording {

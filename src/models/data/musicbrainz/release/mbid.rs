@@ -7,6 +7,8 @@ use serde::{Deserialize, Serialize};
 use crate::core::entity_traits::mb_cached::MBCached;
 use crate::core::entity_traits::mbid::IsMbid;
 use crate::models::data::musicbrainz::external_musicbrainz_entity::ExternalMusicBrainzEntity;
+use crate::models::data::musicbrainz::mbid::generic_mbid::{IdAliasState, MBIDSpe};
+use crate::models::data::musicbrainz::mbid::is_musicbrainz_id::IsMusicbrainzID;
 use crate::models::data::musicbrainz::mbid::MBID;
 use crate::models::data::musicbrainz::release::external::ReleaseExt;
 use crate::models::data::musicbrainz::release::Release;
@@ -46,5 +48,32 @@ impl IsMbid<Release> for ReleaseMBID {
 
     fn into_mbid(self) -> MBID {
         MBID::Release(self)
+    }
+}
+
+impl<S> IsMusicbrainzID<Release> for MBIDSpe<Release, S>
+where
+    S: IdAliasState,
+{
+    async fn fetch(&self) -> color_eyre::Result<ExternalMusicBrainzEntity> {
+        println_mus(format!("Getting data for release MBID: {}", &self));
+
+        Ok(ReleaseMS::fetch()
+            .id(self)
+            .with_artists()
+            .with_artist_credits()
+            .with_release_groups()
+            .with_artist_credits()
+            .with_aliases()
+            .with_annotations()
+            .with_artist_relations()
+            .with_recordings()
+            .with_recording_level_relations()
+            .with_work_level_relations()
+            .with_work_relations()
+            .execute()
+            .await
+            .context("Failed to fetch release from MusicBrainz")?
+            .into_entity())
     }
 }
