@@ -5,6 +5,7 @@ use std::sync::Arc;
 use derive_more::{From, IsVariant, Unwrap};
 use serde::{Deserialize, Serialize};
 
+use crate::core::caching::musicbrainz::musicbrainz_cache::MusicbrainzCache;
 use crate::core::entity_traits::mbid::HasMBID;
 use crate::models::data::musicbrainz::artist::Artist;
 use crate::models::data::musicbrainz::mbid::any_mbid::AnyMBIDType;

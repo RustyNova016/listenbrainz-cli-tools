@@ -1,10 +1,12 @@
+use serde::de::DeserializeOwned;
+use serde::Deserialize;
+use serde::Serialize;
 use std::fmt::{Display, Formatter};
+use std::hash::Hash;
+use std::hash::Hasher;
 use std::marker::PhantomData;
 use std::ops::Deref;
 use std::hash::Hash;
-
-use serde::Deserialize;
-use serde::Serialize;
 
 use crate::models::data::musicbrainz::entity::is_musicbrainz_entity::IsMusicbrainzEntity;
 
@@ -26,7 +28,7 @@ pub struct NaiveID;
 #[derive(Debug, PartialEq, Eq, Deserialize, Serialize, Hash, Clone)]
 pub struct PrimaryID;
 
-pub trait IdAliasState: Sync + Send {}
+pub trait IdAliasState: Sync + Send + Eq + Hash + Serialize + DeserializeOwned + Clone {}
 impl IdAliasState for NaiveID {}
 impl IdAliasState for PrimaryID {}
 
@@ -74,8 +76,9 @@ where
 impl<T, S> Hash for MBIDSpe<T, S>
 where
     T: IsMusicbrainzEntity,
-    S: IdAliasState, {
-        fn hash<H: std::hash::Hasher>(&self, state: &mut H) {
-            self.id.hash(state)
-        }
+    S: IdAliasState,
+{
+    fn hash<H: Hasher>(&self, state: &mut H) {
+        self.id.hash(state);
     }
+}

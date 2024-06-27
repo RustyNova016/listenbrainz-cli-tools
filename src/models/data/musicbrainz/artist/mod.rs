@@ -113,4 +113,8 @@ impl IsMusicbrainzEntity for Artist {
     fn into_any(self: Arc<Self>) -> AnyMusicBrainzEntity {
         AnyMusicBrainzEntity::Artist(self)
     }
+
+    fn get_mb_cache(
+    ) -> Arc<crate::core::caching::musicbrainz::musicbrainz_cache::MusicbrainzCache<Self>> {
+    }
 }

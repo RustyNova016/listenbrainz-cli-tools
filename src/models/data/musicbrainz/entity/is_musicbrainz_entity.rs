@@ -3,6 +3,7 @@ use std::sync::Arc;
 use serde::de::DeserializeOwned;
 use serde::Serialize;
 
+use crate::core::caching::musicbrainz::musicbrainz_cache::MusicbrainzCache;
 use crate::models::data::musicbrainz::mbid::generic_mbid::{MBIDSpe, PrimaryID};
 
 use super::any_musicbrainz_entity::AnyMusicBrainzEntity;
@@ -10,7 +11,7 @@ use super::entity_kind::MusicbrainzEntityKind;
 
 pub trait IsMusicbrainzEntity
 where
-    Self: Clone + Serialize + DeserializeOwned,
+    Self: Clone + Serialize + DeserializeOwned + Eq,
 {
     fn as_kind(&self) -> MusicbrainzEntityKind;
 
@@ -23,4 +24,6 @@ where
     }
 
     fn into_any(self: Arc<Self>) -> AnyMusicBrainzEntity;
+
+    fn get_mb_cache() -> Arc<MusicbrainzCache<Self>>;
 }
