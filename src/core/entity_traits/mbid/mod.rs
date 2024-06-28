@@ -7,6 +7,8 @@ use serde::Serialize;
 use std::fmt::{Debug, Display};
 use std::future::Future;
 
+use super::update::Updatable;
+
 pub mod is_cached_mbid;
 
 pub trait IsMbid<T>
@@ -41,7 +43,7 @@ where
 
 pub trait HasMBID<K>
 where
-    Self: Serialize + DeserializeOwned + IsMusicbrainzEntity + Sized + Debug + Clone,
+    Self: Serialize + DeserializeOwned + Updatable + Sized + Debug + Clone,
     K: IsMbid<Self>,
 {
     fn get_mbid(&self) -> K;

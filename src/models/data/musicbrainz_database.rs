@@ -32,9 +32,9 @@ pub(crate) static MUSICBRAINZ_DATABASE: Lazy<Arc<MusicBrainzDatabase>> =
 pub struct MusicBrainzDatabase {
     artists: Arc<MusicbrainzCache<Artist>>,
     releases: Arc<MusicbrainzCache<Release>>,
-    recordings: Arc<MusicbrainzCache< Recording>>,
-    release_groups: Arc<MusicbrainzCache< ReleaseGroup>>,
-    works: Arc<MusicbrainzCache< Work>>,
+    recordings: Arc<MusicbrainzCache<Recording>>,
+    release_groups: Arc<MusicbrainzCache<ReleaseGroup>>,
+    works: Arc<MusicbrainzCache<Work>>,
 }
 
 impl MusicBrainzDatabase {
