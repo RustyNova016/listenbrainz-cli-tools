@@ -57,7 +57,7 @@ impl HasMBID<MBID> for MusicBrainzEntity {
 }
 
 impl IsMusicbrainzEntity for MusicBrainzEntity {
-    fn update(self, newer: Self) -> Self {
+    fn partial_update(self, newer: Self) -> Self {
         // Check if both are the same variant
         if discriminant(&self) != discriminant(&newer) {
             // No big deal. But worth mentioning
@@ -67,11 +67,11 @@ impl IsMusicbrainzEntity for MusicBrainzEntity {
         }
 
         match self {
-            Self::Artist(val) => val.update(newer.unwrap_artist()).into(),
-            Self::Recording(val) => val.update(newer.unwrap_recording()).into(),
-            Self::Release(val) => val.update(newer.unwrap_release()).into(),
-            Self::ReleaseGroup(val) => val.update(newer.unwrap_release_group()).into(),
-            Self::Work(val) => val.update(newer.unwrap_work()).into(),
+            Self::Artist(val) => val.partial_update(newer.unwrap_artist()).into(),
+            Self::Recording(val) => val.partial_update(newer.unwrap_recording()).into(),
+            Self::Release(val) => val.partial_update(newer.unwrap_release()).into(),
+            Self::ReleaseGroup(val) => val.partial_update(newer.unwrap_release_group()).into(),
+            Self::Work(val) => val.partial_update(newer.unwrap_work()).into(),
         }
     }
 

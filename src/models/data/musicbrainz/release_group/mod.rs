@@ -51,7 +51,7 @@ impl IsMusicbrainzEntity for ReleaseGroup {
         MBIDSpe::from(self.id.to_string())
     }
 
-    fn update(self, newer: Self) -> Self {
+    fn partial_update(self, newer: Self) -> Self {
         Self {
             id: newer.id,
             secondary_types: newer.secondary_types,

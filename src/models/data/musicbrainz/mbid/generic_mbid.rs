@@ -76,6 +76,6 @@ where
     T: IsMusicbrainzEntity,
     S: IdAliasState, {
         fn hash<H: std::hash::Hasher>(&self, state: &mut H) {
-            self.id.hash(state)
+            self.id.hash(state);
         }
     }

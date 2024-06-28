@@ -7,10 +7,12 @@ use crate::core::caching::musicbrainz_cache::MusicbrainzCacheLegacy;
 use crate::core::entity_traits::mbid::{HasMBID, IsMbid};
 use crate::models::data::musicbrainz::entity::is_musicbrainz_entity::IsMusicbrainzEntity;
 
+use super::update::Updatable;
+
 pub trait MBCached<K>
 where
     K: IsMbid<Self> + Serialize + DeserializeOwned,
-    Self: Serialize + DeserializeOwned + HasMBID<K> + IsMusicbrainzEntity + Clone,
+    Self: Serialize + DeserializeOwned + HasMBID<K> + Updatable + Clone,
 {
     fn get_cache() -> Arc<MusicbrainzCacheLegacy<K, Self>>;
 

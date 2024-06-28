@@ -5,6 +5,7 @@ use crate::core::entity_traits::has_id::HasID;
 use crate::core::entity_traits::mb_cached::MBCached;
 use crate::core::entity_traits::mbid::HasMBID;
 
+use crate::core::entity_traits::update::Updatable;
 use crate::models::data::musicbrainz::release_group::mbid::ReleaseGroupMBID;
 use crate::models::data::musicbrainz::release_group::ReleaseGroup;
 use crate::models::data::musicbrainz_database_legacy::MUSICBRAINZ_DATABASE_LEGACY;
@@ -26,3 +27,5 @@ impl MBCached<ReleaseGroupMBID> for ReleaseGroup {
         MUSICBRAINZ_DATABASE_LEGACY.release_groups().clone()
     }
 }
+
+impl Updatable for ReleaseGroup {}
