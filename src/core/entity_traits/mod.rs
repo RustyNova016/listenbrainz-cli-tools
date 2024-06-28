@@ -1,4 +1,3 @@
-pub mod update;
 pub mod cached;
 pub mod cached_trait;
 pub mod config_file;
@@ -10,3 +9,4 @@ pub mod insertable_children;
 pub mod mb_cached;
 pub mod mbid;
 pub mod relations;
+pub mod update;

@@ -186,7 +186,12 @@ where
         let older_version = self.get_or_load().await?;
 
         let new_data = match older_version {
-            Some(older) => Arc::new(older.as_ref().clone().partial_update(value.as_ref().clone())),
+            Some(older) => Arc::new(
+                older
+                    .as_ref()
+                    .clone()
+                    .partial_update(value.as_ref().clone()),
+            ),
             None => value,
         };
 
@@ -201,7 +206,12 @@ where
         let older_version = self.get_or_load_with_lock(write_lock).await?;
 
         let new_data = match older_version {
-            Some(older) => Arc::new(older.as_ref().clone().partial_update(value.as_ref().clone())),
+            Some(older) => Arc::new(
+                older
+                    .as_ref()
+                    .clone()
+                    .partial_update(value.as_ref().clone()),
+            ),
             None => value,
         };
 

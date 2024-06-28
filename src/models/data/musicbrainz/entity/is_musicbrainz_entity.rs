@@ -15,7 +15,7 @@ use super::entity_kind::MusicbrainzEntityKind;
 pub trait IsMusicbrainzEntity
 where
     Self: Clone + Serialize + DeserializeOwned + Eq,
-    //NaiveMBID<Self>: IsMusicbrainzID<Self>
+    NaiveMBID<Self>: IsMusicbrainzID<Self>,
 {
     fn as_kind(&self) -> MusicbrainzEntityKind;
 
