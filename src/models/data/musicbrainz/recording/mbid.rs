@@ -21,6 +21,7 @@ use super::Recording;
 #[derive(
     Debug, Clone, PartialEq, Eq, Deref, DerefMut, Into, From, Serialize, Deserialize, Hash, Display,
 )]
+#[deprecated]
 pub struct RecordingMBID(String);
 
 impl RecordingMBID {
