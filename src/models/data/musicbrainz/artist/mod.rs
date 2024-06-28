@@ -88,7 +88,7 @@ impl IsMusicbrainzEntity for Artist {
         MBIDSpe::from(self.id.to_string())
     }
 
-    fn update(self, newer: Self) -> Self {
+    fn partial_update(self, newer: Self) -> Self {
         Self {
             id: newer.id,
             name: newer.name,

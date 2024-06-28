@@ -55,27 +55,27 @@ impl AnyMusicBrainzEntity {
             Self::Artist(val) => val
                 .as_ref()
                 .clone()
-                .update(newer.unwrap_artist().as_ref().clone())
+                .partial_update(newer.unwrap_artist().as_ref().clone())
                 .into_arc_and_any(),
             Self::Recording(val) => val
                 .as_ref()
                 .clone()
-                .update(newer.unwrap_recording().as_ref().clone())
+                .partial_update(newer.unwrap_recording().as_ref().clone())
                 .into_arc_and_any(),
             Self::Release(val) => val
                 .as_ref()
                 .clone()
-                .update(newer.unwrap_release().as_ref().clone())
+                .partial_update(newer.unwrap_release().as_ref().clone())
                 .into_arc_and_any(),
             Self::ReleaseGroup(val) => val
                 .as_ref()
                 .clone()
-                .update(newer.unwrap_release_group().as_ref().clone())
+                .partial_update(newer.unwrap_release_group().as_ref().clone())
                 .into_arc_and_any(),
             Self::Work(val) => val
                 .as_ref()
                 .clone()
-                .update(newer.unwrap_work().as_ref().clone())
+                .partial_update(newer.unwrap_work().as_ref().clone())
                 .into_arc_and_any(),
         }
     }

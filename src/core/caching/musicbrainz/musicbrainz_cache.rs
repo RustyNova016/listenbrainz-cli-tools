@@ -1,5 +1,4 @@
 use std::collections::HashMap;
-use std::hash::Hash;
 use std::sync::Arc;
 
 use futures::try_join;
@@ -20,7 +19,7 @@ use super::cached_entity::CachedEntity;
 #[derive(Debug)]
 pub struct MusicbrainzCache<V>
 where
-    V: IsMusicbrainzEntity + Eq + Hash,
+    V: IsMusicbrainzEntity + Eq,
     MusicBrainzEntity: Into<Result<V, Error>>,
     NaiveMBID<V>: IsMusicbrainzID<V>,
 {
@@ -32,7 +31,7 @@ where
 
 impl<V> MusicbrainzCache<V>
 where
-    V: IsMusicbrainzEntity + Eq + Hash,
+    V: IsMusicbrainzEntity + Eq,
     MusicBrainzEntity: Into<Result<V, Error>>,
     NaiveMBID<V>: IsMusicbrainzID<V>,
 {

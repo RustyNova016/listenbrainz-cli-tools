@@ -19,6 +19,8 @@ use crate::models::data::musicbrainz::work::mbid::WorkMBID;
 use crate::models::error::Error;
 
 use super::musicbrainz::artist::Artist;
+use super::musicbrainz::mbid::any_mbid::AnyMBIDType;
+use super::musicbrainz::mbid::generic_mbid::NaiveID;
 use super::musicbrainz::recording::Recording;
 use super::musicbrainz::release::Release;
 use super::musicbrainz::work::Work;
@@ -36,13 +38,13 @@ pub struct MusicBrainzDatabase {
 }
 
 impl MusicBrainzDatabase {
-    pub async fn remove(&self, id: &MBID) -> color_eyre::Result<()> {
+    pub async fn remove(&self, id: &AnyMBIDType<NaiveID>) -> color_eyre::Result<()> {
         match id {
-            MBID::Artist(id) => self.artists.remove(id).await?,
-            MBID::Release(id) => self.releases.remove(id).await?,
-            MBID::Recording(id) => self.recordings.remove(id).await?,
-            MBID::ReleaseGroup(id) => self.release_groups.remove(id).await?,
-            MBID::Work(id) => self.works.remove(id).await?,
+            AnyMBIDType::Artist(id) => self.artists.remove(id).await?,
+            AnyMBIDType::Release(id) => self.releases.remove(id).await?,
+            AnyMBIDType::Recording(id) => self.recordings.remove(id).await?,
+            AnyMBIDType::ReleaseGroup(id) => self.release_groups.remove(id).await?,
+            AnyMBIDType::Work(id) => self.works.remove(id).await?,
         }
 
         Ok(())
@@ -64,43 +66,43 @@ impl MusicBrainzDatabase {
         Ok(())
     }
 
-    pub async fn add_alias(&self, alias: &MBID, main: &MBID) -> color_eyre::Result<()> {
-        // Check if both are the same variant
-        if discriminant(alias) != discriminant(main) {
-            return Err(Report::from(Error::MBIDAliasError(
-                alias.clone(),
-                main.clone(),
-            )));
-        }
+    // pub async fn add_alias(&self, alias: &MBID, main: &MBID) -> color_eyre::Result<()> {
+    //     // Check if both are the same variant
+    //     if discriminant(alias) != discriminant(main) {
+    //         return Err(Report::from(Error::MBIDAliasError(
+    //             alias.clone(),
+    //             main.clone(),
+    //         )));
+    //     }
 
-        let main = main.clone();
+    //     let main = main.clone();
 
-        match alias {
-            MBID::Artist(alias) => {
-                self.artists
-                    .insert_alias(alias, &main.unwrap_artist())
-                    .await?;
-            }
-            MBID::Release(alias) => {
-                self.releases
-                    .insert_alias(alias, &main.unwrap_release())
-                    .await?;
-            }
-            MBID::Work(alias) => self.works.insert_alias(alias, &main.unwrap_work()).await?,
-            MBID::ReleaseGroup(alias) => {
-                self.release_groups
-                    .insert_alias(alias, &main.unwrap_release_group())
-                    .await?;
-            }
-            MBID::Recording(alias) => {
-                self.recordings
-                    .insert_alias(alias, &main.unwrap_recording())
-                    .await?;
-            }
-        }
+    //     match alias {
+    //         MBID::Artist(alias) => {
+    //             self.artists
+    //                 .insert_alias(alias, &main.unwrap_artist())
+    //                 .await?;
+    //         }
+    //         MBID::Release(alias) => {
+    //             self.releases
+    //                 .insert_alias(alias, &main.unwrap_release())
+    //                 .await?;
+    //         }
+    //         MBID::Work(alias) => self.works.insert_alias(alias, &main.unwrap_work()).await?,
+    //         MBID::ReleaseGroup(alias) => {
+    //             self.release_groups
+    //                 .insert_alias(alias, &main.unwrap_release_group())
+    //                 .await?;
+    //         }
+    //         MBID::Recording(alias) => {
+    //             self.recordings
+    //                 .insert_alias(alias, &main.unwrap_recording())
+    //                 .await?;
+    //         }
+    //     }
 
-        Ok(())
-    }
+    //     Ok(())
+    // }
 
     pub async fn clear(&self, target: &ClearTarget) -> cacache::Result<()> {
         match target {
@@ -122,11 +124,11 @@ impl MusicBrainzDatabase {
 impl Default for MusicBrainzDatabase {
     fn default() -> Self {
         Self {
-            artists: Arc::new(MusicbrainzCacheLegacy::new("artists")),
-            releases: Arc::new(MusicbrainzCacheLegacy::new("releases")),
-            recordings: Arc::new(MusicbrainzCacheLegacy::new("recordings")),
-            release_groups: Arc::new(MusicbrainzCacheLegacy::new("release_groups")),
-            works: Arc::new(MusicbrainzCacheLegacy::new("works")),
+            artists: Arc::new(MusicbrainzCache::new("artists")),
+            releases: Arc::new(MusicbrainzCache::new("releases")),
+            recordings: Arc::new(MusicbrainzCache::new("recordings")),
+            release_groups: Arc::new(MusicbrainzCache::new("release_groups")),
+            works: Arc::new(MusicbrainzCache::new("works")),
         }
     }
 }

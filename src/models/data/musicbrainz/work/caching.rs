@@ -5,6 +5,7 @@ use crate::core::entity_traits::has_id::HasID;
 use crate::core::entity_traits::mb_cached::MBCached;
 use crate::core::entity_traits::mbid::HasMBID;
 
+use crate::core::entity_traits::update::Updatable;
 use crate::models::data::musicbrainz::work::mbid::WorkMBID;
 use crate::models::data::musicbrainz_database_legacy::MUSICBRAINZ_DATABASE_LEGACY;
 
@@ -27,3 +28,5 @@ impl MBCached<WorkMBID> for Work {
         MUSICBRAINZ_DATABASE_LEGACY.works().clone()
     }
 }
+
+impl Updatable for Work {}

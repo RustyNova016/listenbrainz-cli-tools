@@ -63,7 +63,7 @@ impl IsMusicbrainzEntity for Release {
         MBIDSpe::from(self.id.to_string())
     }
 
-    fn update(self, newer: Self) -> Self {
+    fn partial_update(self, newer: Self) -> Self {
         Self {
             annotation: newer.annotation.or(self.annotation),
             barcode: newer.barcode.or(self.barcode),

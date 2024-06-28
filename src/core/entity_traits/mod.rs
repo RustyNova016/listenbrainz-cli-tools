@@ -1,3 +1,4 @@
+pub mod update;
 pub mod cached;
 pub mod cached_trait;
 pub mod config_file;

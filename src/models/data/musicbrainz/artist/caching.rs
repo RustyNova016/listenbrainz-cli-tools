@@ -4,6 +4,7 @@ use crate::core::caching::musicbrainz_cache::MusicbrainzCacheLegacy;
 use crate::core::entity_traits::has_id::HasID;
 use crate::core::entity_traits::mb_cached::MBCached;
 use crate::core::entity_traits::mbid::HasMBID;
+use crate::core::entity_traits::update::Updatable;
 use crate::models::data::musicbrainz::artist::mbid::ArtistMBID;
 use crate::models::data::musicbrainz::artist::Artist;
 use crate::models::data::musicbrainz_database_legacy::MUSICBRAINZ_DATABASE_LEGACY;
@@ -25,3 +26,5 @@ impl MBCached<ArtistMBID> for Artist {
         MUSICBRAINZ_DATABASE_LEGACY.artists().clone()
     }
 }
+
+impl Updatable for Artist {}
