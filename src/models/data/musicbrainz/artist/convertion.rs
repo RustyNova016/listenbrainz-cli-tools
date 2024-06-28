@@ -1,7 +1,6 @@
 use std::sync::Arc;
 
 use crate::models::data::musicbrainz::entity::any_musicbrainz_entity::AnyMusicBrainzEntity;
-use crate::models::data::musicbrainz::musicbrainz_entity::MusicBrainzEntity;
 use crate::models::error::Error;
 
 use super::Artist;

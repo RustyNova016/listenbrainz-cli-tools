@@ -17,7 +17,7 @@ where
 impl<T> From<PrimaryMBID<T>> for NaiveMBID<T>
 where
     T: IsMusicbrainzEntity,
-    NaiveMBID<T>: IsMusicbrainzID<T>,
+    Self: IsMusicbrainzID<T>,
 {
     fn from(value: PrimaryMBID<T>) -> Self {
         Self::from(value.id().to_string())

@@ -1,22 +1,12 @@
-use std::mem::discriminant;
 use std::sync::Arc;
 
-use color_eyre::Report;
 use derive_getters::Getters;
 use once_cell::sync::Lazy;
 use tokio::try_join;
 
 use crate::core::caching::musicbrainz::musicbrainz_cache::MusicbrainzCache;
-use crate::core::caching::musicbrainz_cache::MusicbrainzCacheLegacy;
 use crate::models::cli::cache::ClearTarget;
-use crate::models::data::musicbrainz::artist::mbid::ArtistMBID;
-use crate::models::data::musicbrainz::mbid::MBID;
-use crate::models::data::musicbrainz::recording::mbid::RecordingMBID;
-use crate::models::data::musicbrainz::release::mbid::ReleaseMBID;
-use crate::models::data::musicbrainz::release_group::mbid::ReleaseGroupMBID;
 use crate::models::data::musicbrainz::release_group::ReleaseGroup;
-use crate::models::data::musicbrainz::work::mbid::WorkMBID;
-use crate::models::error::Error;
 
 use super::musicbrainz::artist::Artist;
 use super::musicbrainz::mbid::any_mbid::AnyMBIDType;

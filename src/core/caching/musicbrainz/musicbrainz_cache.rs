@@ -11,7 +11,6 @@ use crate::models::data::musicbrainz::entity::any_musicbrainz_entity::AnyMusicBr
 use crate::models::data::musicbrainz::entity::is_musicbrainz_entity::IsMusicbrainzEntity;
 use crate::models::data::musicbrainz::mbid::generic_mbid::NaiveMBID;
 use crate::models::data::musicbrainz::mbid::is_musicbrainz_id::IsMusicbrainzID;
-use crate::models::data::musicbrainz::musicbrainz_entity::MusicBrainzEntity;
 use crate::models::error::Error;
 use crate::utils::println_cli_warn;
 

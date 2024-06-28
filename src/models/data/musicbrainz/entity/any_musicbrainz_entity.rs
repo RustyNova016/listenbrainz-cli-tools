@@ -36,7 +36,7 @@ impl AnyMusicBrainzEntity {
                 MUSICBRAINZ_DATABASE_LEGACY
                     .release_groups()
                     .update(val)
-                    .await?
+                    .await?;
             }
             Self::Release(val) => MUSICBRAINZ_DATABASE_LEGACY.releases().update(val).await?,
             Self::Recording(val) => MUSICBRAINZ_DATABASE_LEGACY.recordings().update(val).await?,

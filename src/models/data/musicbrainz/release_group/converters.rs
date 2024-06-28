@@ -4,7 +4,6 @@ use itertools::Itertools;
 use musicbrainz_rs::entity::release_group::ReleaseGroup as ReleaseGroupMS;
 
 use crate::models::data::musicbrainz::entity::any_musicbrainz_entity::AnyMusicBrainzEntity;
-use crate::models::data::musicbrainz::musicbrainz_entity::MusicBrainzEntity;
 use crate::models::data::musicbrainz::release_group::ReleaseGroup;
 use crate::models::error::Error;
 
