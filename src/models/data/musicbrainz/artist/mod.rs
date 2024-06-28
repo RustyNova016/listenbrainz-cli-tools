@@ -13,6 +13,7 @@ use serde::{Deserialize, Serialize};
 use crate::models::data::musicbrainz::mbid::generic_mbid::{MBIDSpe, PrimaryID};
 use crate::models::data::musicbrainz::relation::Relation;
 use crate::models::data::musicbrainz::work::mbid::WorkMBID;
+use crate::models::error::Error;
 
 use super::entity::any_musicbrainz_entity::AnyMusicBrainzEntity;
 use super::entity::entity_kind::MusicbrainzEntityKind;
@@ -112,6 +113,17 @@ impl IsMusicbrainzEntity for Artist {
             works: newer.works.or(self.works),
             relations: newer.relations.or(self.relations),
         }
+    }
+
+    fn try_from_any(value: &AnyMusicBrainzEntity) -> Result<Arc<Self>, Error> {
+        if let AnyMusicBrainzEntity::Artist(val) = value {
+            return Ok(val.clone());
+        }
+
+        Err(Error::InvalidTypeConvertion(
+            "MusicBrainzEntity".to_string(),
+            "Artist".to_string(),
+        ))
     }
 
     fn into_any(self: Arc<Self>) -> AnyMusicBrainzEntity {

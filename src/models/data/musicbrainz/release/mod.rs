@@ -20,6 +20,8 @@ use crate::models::data::musicbrainz::release_group::mbid::ReleaseGroupMBID;
 use self::mbid::ReleaseMBID;
 use self::media::Media;
 
+use super::entity::any_musicbrainz_entity::AnyMusicBrainzEntity;
+
 pub mod external;
 
 pub mod caching;
@@ -60,6 +62,17 @@ impl IsMusicbrainzEntity for Release {
     // }
     fn as_kind(&self) -> MusicbrainzEntityKind {
         MusicbrainzEntityKind::Release
+    }
+
+    fn try_from_any(value: &AnyMusicBrainzEntity) -> Result<Arc<Self>, crate::models::error::Error> {
+        if let AnyMusicBrainzEntity::Release(val) = value {
+            return Ok(val.clone());
+        }
+
+        Err(crate::models::error::Error::InvalidTypeConvertion(
+            "MusicBrainzEntity".to_string(),
+            "Release".to_string(),
+        ))
     }
 
     fn get_mbidspe(&self) -> MBIDSpe<Self, PrimaryID> {

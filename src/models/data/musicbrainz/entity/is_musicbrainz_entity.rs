@@ -6,6 +6,7 @@ use serde::Serialize;
 use crate::models::data::musicbrainz::mbid::generic_mbid::NaiveMBID;
 use crate::models::data::musicbrainz::mbid::generic_mbid::{MBIDSpe, PrimaryID};
 use crate::models::data::musicbrainz::mbid::is_musicbrainz_id::IsMusicbrainzID;
+use crate::models::error::Error;
 
 use super::any_musicbrainz_entity::AnyMusicBrainzEntity;
 use super::entity_kind::MusicbrainzEntityKind;
@@ -27,6 +28,8 @@ where
     }
 
     fn into_any(self: Arc<Self>) -> AnyMusicBrainzEntity;
+
+    fn try_from_any(value: &AnyMusicBrainzEntity) -> Result<Arc<Self>, Error>;
 
     //fn get_mb_cache() -> Arc<MusicbrainzCache<Self>>;
 }
