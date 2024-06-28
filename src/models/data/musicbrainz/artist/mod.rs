@@ -10,9 +10,11 @@ use musicbrainz_rs::entity::lifespan::LifeSpan;
 use musicbrainz_rs::entity::tag::Tag;
 use serde::{Deserialize, Serialize};
 
+use crate::core::caching::musicbrainz::musicbrainz_cache::MusicbrainzCache;
 use crate::models::data::musicbrainz::mbid::generic_mbid::{MBIDSpe, PrimaryID};
 use crate::models::data::musicbrainz::relation::Relation;
 use crate::models::data::musicbrainz::work::mbid::WorkMBID;
+use crate::models::data::musicbrainz_database::MUSICBRAINZ_DATABASE;
 
 use super::entity::any_musicbrainz_entity::AnyMusicBrainzEntity;
 use super::entity::entity_kind::MusicbrainzEntityKind;
@@ -80,6 +82,10 @@ impl From<musicbrainz_rs::entity::artist::Artist> for Artist {
 }
 
 impl IsMusicbrainzEntity for Artist {
+    // fn get_mb_cache() -> Arc<MusicbrainzCache<Self>> {
+    //     MUSICBRAINZ_DATABASE.artists().clone()
+    // }
+
     fn as_kind(&self) -> MusicbrainzEntityKind {
         MusicbrainzEntityKind::Artist
     }

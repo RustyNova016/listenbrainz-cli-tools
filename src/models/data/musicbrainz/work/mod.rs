@@ -8,9 +8,11 @@ use musicbrainz_rs::entity::work::WorkAttribute;
 use serde::Deserialize;
 use serde::Serialize;
 
+use crate::core::caching::musicbrainz::musicbrainz_cache::MusicbrainzCache;
 use crate::models::data::musicbrainz::entity::entity_kind::MusicbrainzEntityKind;
 use crate::models::data::musicbrainz::entity::is_musicbrainz_entity::IsMusicbrainzEntity;
 use crate::models::data::musicbrainz::mbid::generic_mbid::{MBIDSpe, PrimaryID};
+use crate::models::data::musicbrainz_database::MUSICBRAINZ_DATABASE;
 
 use super::relation::Relation;
 
@@ -42,6 +44,10 @@ pub struct Work {
 }
 
 impl IsMusicbrainzEntity for Work {
+    // fn get_mb_cache() -> Arc<MusicbrainzCache<Self>> {
+    //     MUSICBRAINZ_DATABASE.works().clone()
+    // }
+
     fn as_kind(&self) -> MusicbrainzEntityKind {
         MusicbrainzEntityKind::Work
     }
