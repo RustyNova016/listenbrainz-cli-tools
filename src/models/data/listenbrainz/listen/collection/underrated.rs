@@ -16,7 +16,7 @@ impl ListenCollection {
     pub async fn get_underrated_recordings(
         &self,
     ) -> color_eyre::Result<Vec<(Decimal, RecordingMBID)>> {
-        let unique_recordings = self.get_listened_recordings_mbids_naive();
+        let unique_recordings = self.get_listened_recordings_mbids().await?;
         let recording_stats = self
             .get_statistics_of(GroupByTarget::Recording)
             .await
