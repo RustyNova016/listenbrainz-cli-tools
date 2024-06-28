@@ -3,6 +3,7 @@ use crate::core::entity_traits::mb_cached::MBCached;
 use super::HasMBID;
 use super::IsMbid;
 
+#[deprecated]
 pub trait IsCachedMBID<T>
 where
     Self: IsMbid<T>,

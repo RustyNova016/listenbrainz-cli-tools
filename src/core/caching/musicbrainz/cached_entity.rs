@@ -132,7 +132,7 @@ where
         let main_entity = V::try_from_any(&converted_fetch.0)?;
 
         self.alias_cache
-            .set(&self.key, &main_entity.get_mbidspe().into_naive())
+            .set(&self.key, &main_entity.get_mbidspe().as_naive())
             .await?;
         self.update_with_lock(main_entity.clone(), write_lock)
             .await?;
@@ -152,7 +152,7 @@ where
     ///
     /// This automatically picks a write lock
     pub async fn set(&self, value: Arc<V>) -> Result<(), serde_cacache::Error> {
-        let mbid = value.get_mbidspe().into_naive();
+        let mbid = value.get_mbidspe().as_naive();
 
         // TODO: Add try_join! for speedup.
         self.loaded.write().await.replace(value.clone());
@@ -169,7 +169,7 @@ where
         value: Arc<V>,
         write_lock: &mut RwLockWriteGuard<'a, Option<Arc<V>>>,
     ) -> Result<(), serde_cacache::Error> {
-        let mbid = value.get_mbidspe().into_naive();
+        let mbid = value.get_mbidspe().as_naive();
 
         // TODO: Add try_join! for speedup.
         write_lock.replace(value.clone());

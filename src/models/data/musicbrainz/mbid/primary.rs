@@ -9,17 +9,14 @@ where
     T: IsMusicbrainzEntity,
     NaiveMBID<T>: IsMusicbrainzID<T>,
 {
-    pub fn into_naive(self) -> NaiveMBID<T> {
-        self.into()
-    }
 }
 
-impl<T> From<PrimaryMBID<T>> for NaiveMBID<T>
-where
-    T: IsMusicbrainzEntity,
-    Self: IsMusicbrainzID<T>,
-{
-    fn from(value: PrimaryMBID<T>) -> Self {
-        Self::from(value.id().to_string())
-    }
-}
+// impl<T> From<PrimaryMBID<T>> for NaiveMBID<T>
+// where
+//     T: IsMusicbrainzEntity,
+//     Self: IsMusicbrainzID<T>,
+// {
+//     fn from(value: PrimaryMBID<T>) -> Self {
+//         Self::from(value.id().to_string())
+//     }
+// }

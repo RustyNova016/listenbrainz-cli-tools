@@ -8,6 +8,7 @@ use crate::core::entity_traits::mbid::{HasMBID, IsMbid};
 
 use super::update::Updatable;
 
+#[deprecated]
 pub trait MBCached<K>
 where
     K: IsMbid<Self> + Serialize + DeserializeOwned,

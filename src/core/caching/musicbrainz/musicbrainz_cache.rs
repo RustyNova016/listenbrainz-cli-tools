@@ -81,14 +81,14 @@ where
     }
 
     pub async fn set(&self, value: Arc<V>) -> Result<(), SerdeCacacheError> {
-        self.get_entity(&value.get_mbidspe().into_naive())
+        self.get_entity(&value.get_mbidspe().as_naive())
             .await
             .set(value)
             .await
     }
 
     pub async fn update(&self, value: Arc<V>) -> color_eyre::Result<()> {
-        self.get_entity(&value.get_mbidspe().into_naive())
+        self.get_entity(&value.get_mbidspe().as_naive())
             .await
             .update(value)
             .await
@@ -146,7 +146,7 @@ where
                 .force_fetch_entity(mbid)
                 .await?
                 .get_mbidspe()
-                .into_naive()),
+                .as_naive()),
             Err(val) => Err(val.into()),
         }
     }

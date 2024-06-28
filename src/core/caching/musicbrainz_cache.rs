@@ -19,6 +19,7 @@ use crate::models::data::musicbrainz::relation::external::RelationContentExt;
 use crate::utils::{println_cli, println_cli_warn};
 
 #[derive(Debug)]
+#[deprecated]
 pub struct MusicbrainzCacheLegacy<K, V>
 where
     K: IsMbid<V> + Serialize + DeserializeOwned,
