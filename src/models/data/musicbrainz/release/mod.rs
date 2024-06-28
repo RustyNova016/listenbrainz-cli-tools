@@ -21,7 +21,7 @@ use crate::models::data::musicbrainz::relation::Relation;
 use crate::models::data::musicbrainz::release_group::mbid::ReleaseGroupMBID;
 use crate::models::data::musicbrainz_database::MUSICBRAINZ_DATABASE;
 
-use super::entity::any_musicbrainz_entity::AnyMusicBrainzEntity;
+use super::entity::any::any_musicbrainz_entity::AnyMusicBrainzEntity;
 
 pub mod external;
 
@@ -106,7 +106,7 @@ impl IsMusicbrainzEntity for Release {
         }
     }
 
-    fn into_any(self: Arc<Self>) -> super::entity::any_musicbrainz_entity::AnyMusicBrainzEntity {
+    fn into_any(self: Arc<Self>) -> AnyMusicBrainzEntity {
         self.into()
     }
 }

@@ -1,3 +1,3 @@
-pub mod any_musicbrainz_entity;
+pub mod any;
 pub mod entity_kind;
 pub mod is_musicbrainz_entity;

@@ -1,4 +1,3 @@
-pub mod convertion;
 use std::sync::Arc;
 
 use derive_getters::Getters;
@@ -17,7 +16,7 @@ use crate::models::data::musicbrainz::work::mbid::WorkMBID;
 use crate::models::data::musicbrainz_database::MUSICBRAINZ_DATABASE;
 use crate::models::error::Error;
 
-use super::entity::any_musicbrainz_entity::AnyMusicBrainzEntity;
+use super::entity::any::any_musicbrainz_entity::AnyMusicBrainzEntity;
 use super::entity::entity_kind::MusicbrainzEntityKind;
 use super::entity::is_musicbrainz_entity::IsMusicbrainzEntity;
 use super::recording::mbid::RecordingMBID;

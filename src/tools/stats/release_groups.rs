@@ -2,6 +2,7 @@ use crate::core::entity_traits::mb_cached::MBCached;
 use crate::core::entity_traits::relations::has_artist_credits::HasArtistCredits;
 use crate::core::statistics::statistic_sorter::StatisticSorter;
 use crate::models::cli::common::SortSorterBy;
+use crate::models::data::musicbrainz::entity::is_musicbrainz_entity::IsMusicbrainzEntity;
 use crate::models::data::musicbrainz::release_group::ReleaseGroup;
 use crate::utils::cli_paging::CLIPager;
 
@@ -9,7 +10,7 @@ pub async fn stats_release_groups(stats: StatisticSorter, sort_by: SortSorterBy)
     let mut pager = CLIPager::new(5);
 
     for (key, data) in stats.into_sorted_vec(sort_by) {
-        let release_group = ReleaseGroup::get_cached_or_fetch(&key.clone().into())
+        let release_group = ReleaseGroup::get_load_or_fetch(&key.clone().into())
             .await
             .unwrap(); // TODO: Use MBIDs
 

@@ -13,9 +13,11 @@ where
     K: IsMbid<Self> + Serialize + DeserializeOwned,
     Self: Serialize + DeserializeOwned + HasMBID<K> + Updatable + Clone,
 {
+    #[deprecated]
     fn get_cache() -> Arc<MusicbrainzCacheLegacy<K, Self>>;
 
     /// Get the data from the cache, or call the API. Any request is deduplicated
+    #[deprecated]
     fn get_cached_or_fetch(key: &K) -> impl std::future::Future<Output = color_eyre::Result<Self>> {
         async move {
             match Self::get_cache().get(key).await? {
@@ -25,10 +27,12 @@ where
         }
     }
 
+    #[deprecated]
     async fn save(&self) -> color_eyre::Result<()> {
         Self::get_cache().update(self).await
     }
 
+    #[deprecated]
     async fn refresh(&self) -> color_eyre::Result<Self> {
         Self::get_cache()
             .force_fetch_and_save(&self.get_mbid())

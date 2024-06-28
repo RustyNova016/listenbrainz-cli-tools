@@ -13,7 +13,7 @@ use crate::models::data::musicbrainz::release_group::ReleaseGroup;
 use crate::models::data::musicbrainz::work::Work;
 use crate::models::data::musicbrainz_database_legacy::MUSICBRAINZ_DATABASE_LEGACY;
 
-use super::entity::any_musicbrainz_entity::AnyMusicBrainzEntity;
+use super::entity::any::any_musicbrainz_entity::AnyMusicBrainzEntity;
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, IsVariant, Unwrap, From)]
 pub enum MusicBrainzEntity {

@@ -3,7 +3,7 @@ use std::sync::Arc;
 use itertools::Itertools;
 use musicbrainz_rs::entity::release::Release as ReleaseMS;
 
-use crate::models::data::musicbrainz::entity::any_musicbrainz_entity::AnyMusicBrainzEntity;
+use crate::models::data::musicbrainz::entity::any::any_musicbrainz_entity::AnyMusicBrainzEntity;
 use crate::models::error::Error;
 
 use super::Release;

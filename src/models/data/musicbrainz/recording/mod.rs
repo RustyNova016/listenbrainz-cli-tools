@@ -13,7 +13,8 @@ use crate::models::data::musicbrainz::mbid::generic_mbid::{MBIDSpe, PrimaryID};
 use crate::models::data::musicbrainz::release::mbid::ReleaseMBID;
 
 use super::artist_credit::collection::ArtistCredits;
-use super::entity::any_musicbrainz_entity::AnyMusicBrainzEntity;
+
+use super::entity::any::any_musicbrainz_entity::AnyMusicBrainzEntity;
 use super::relation::Relation;
 use crate::core::caching::musicbrainz::musicbrainz_cache::MusicbrainzCache;
 use crate::models::data::musicbrainz_database::MUSICBRAINZ_DATABASE;
@@ -89,7 +90,7 @@ impl IsMusicbrainzEntity for Recording {
         }
     }
 
-    fn into_any(self: Arc<Self>) -> super::entity::any_musicbrainz_entity::AnyMusicBrainzEntity {
+    fn into_any(self: Arc<Self>) -> AnyMusicBrainzEntity {
         self.into()
     }
 }
