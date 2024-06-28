@@ -1,6 +1,7 @@
 use super::cached::Cached;
 use super::insertable::Insertable;
 
+#[deprecated]
 /// Trait for all the entities that can be fetched
 pub trait Fetchable {
     /// Fetch the entity
@@ -12,6 +13,7 @@ pub trait Fetchable {
 }
 
 // --------
+#[deprecated]
 pub trait FetchableAndCachable: Fetchable + Cached {
     /// Get the data from the cache, or call the API. Any request is deduplicated
     fn get_cached_or_fetch(

@@ -2,8 +2,8 @@ use clap::Parser;
 use color_eyre::eyre::Ok;
 
 use models::cli::Cli;
+use models::data::musicbrainz_database::MUSICBRAINZ_DATABASE;
 
-use crate::models::data::musicbrainz_database_legacy::MUSICBRAINZ_DATABASE_LEGACY;
 use crate::utils::println_cli;
 
 pub mod core;
@@ -24,7 +24,7 @@ async fn main() -> color_eyre::Result<()> {
     if post_run {
         println_cli("Optional cleanup - This is fine to cancel");
         println_cli("Cleaning some old entries...");
-        MUSICBRAINZ_DATABASE_LEGACY
+        MUSICBRAINZ_DATABASE
             .invalidate_last_entries(10, 10)
             .await?;
         println_cli("Done!");
