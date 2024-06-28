@@ -30,5 +30,5 @@ where
 
     fn into_any(self: Arc<Self>) -> AnyMusicBrainzEntity;
 
-    //fn get_mb_cache() -> MusicbrainzCache<Self>;
+    //fn get_mb_cache() -> Arc<MusicbrainzCache<Self>>;
 }
