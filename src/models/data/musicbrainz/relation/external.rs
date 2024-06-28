@@ -4,7 +4,7 @@ use itertools::Itertools;
 use musicbrainz_rs::entity::relations::RelationContent;
 
 use crate::models::data::musicbrainz::artist::external::ArtistExt;
-use crate::models::data::musicbrainz::entity::any_musicbrainz_entity::AnyMusicBrainzEntity;
+use crate::models::data::musicbrainz::entity::any::any_musicbrainz_entity::AnyMusicBrainzEntity;
 use crate::models::data::musicbrainz::external_musicbrainz_entity::FlattenedMBEntity;
 use crate::models::data::musicbrainz::musicbrainz_entity::MusicBrainzEntity;
 use crate::models::data::musicbrainz::recording::external::RecordingExt;

@@ -7,6 +7,8 @@ use serde::{Deserialize, Serialize};
 
 use crate::core::entity_traits::mbid::HasMBID;
 use crate::models::data::musicbrainz::artist::Artist;
+use crate::models::data::musicbrainz::entity::entity_kind::MusicbrainzEntityKind;
+use crate::models::data::musicbrainz::entity::is_musicbrainz_entity::IsMusicbrainzEntity;
 use crate::models::data::musicbrainz::mbid::any_mbid::AnyMBIDType;
 use crate::models::data::musicbrainz::mbid::generic_mbid::PrimaryID;
 use crate::models::data::musicbrainz::mbid::MBID;
@@ -16,9 +18,6 @@ use crate::models::data::musicbrainz::release_group::ReleaseGroup;
 use crate::models::data::musicbrainz::work::Work;
 use crate::models::data::musicbrainz_database_legacy::MUSICBRAINZ_DATABASE_LEGACY;
 use crate::utils::println_cli_warn;
-
-use super::entity_kind::MusicbrainzEntityKind;
-use super::is_musicbrainz_entity::IsMusicbrainzEntity;
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, IsVariant, Unwrap, From)]
 pub enum AnyMusicBrainzEntity {

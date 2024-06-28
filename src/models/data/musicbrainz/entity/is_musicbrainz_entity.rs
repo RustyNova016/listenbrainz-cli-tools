@@ -9,7 +9,7 @@ use crate::models::data::musicbrainz::mbid::generic_mbid::{MBIDSpe, PrimaryID};
 use crate::models::data::musicbrainz::mbid::is_musicbrainz_id::IsMusicbrainzID;
 use crate::models::error::Error;
 
-use super::any_musicbrainz_entity::AnyMusicBrainzEntity;
+use super::any::any_musicbrainz_entity::AnyMusicBrainzEntity;
 use super::entity_kind::MusicbrainzEntityKind;
 
 pub trait IsMusicbrainzEntity
@@ -35,17 +35,17 @@ where
     fn get_mb_cache() -> Arc<MusicbrainzCache<Self>>;
 
     /// Get the data from the cache, or call the API. Any request is deduplicated
-    fn get_cached_or_fetch(
+    fn get_load_or_fetch(
         mbid: &NaiveMBID<Self>,
     ) -> impl std::future::Future<Output = color_eyre::Result<Arc<Self>>> {
         async move { Self::get_mb_cache().get_load_or_fetch(mbid).await }
     }
 
-    async fn save(self: Arc<Self>) -> color_eyre::Result<()> {
+    async fn update_and_save(self: Arc<Self>) -> color_eyre::Result<()> {
         Self::get_mb_cache().update(self).await
     }
 
-    async fn refresh(&self) -> color_eyre::Result<Arc<Self>> {
+    async fn get_refreshed(&self) -> color_eyre::Result<Arc<Self>> {
         Self::get_mb_cache()
             .force_fetch_entity(&self.get_mbidspe().into_naive())
             .await

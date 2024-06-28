@@ -8,7 +8,7 @@ use musicbrainz_rs::entity::work::WorkAttribute;
 use serde::Deserialize;
 use serde::Serialize;
 
-use super::entity::any_musicbrainz_entity::AnyMusicBrainzEntity;
+use super::entity::any::any_musicbrainz_entity::AnyMusicBrainzEntity;
 use super::relation::Relation;
 use crate::core::caching::musicbrainz::musicbrainz_cache::MusicbrainzCache;
 use crate::models::data::musicbrainz::entity::entity_kind::MusicbrainzEntityKind;
@@ -88,7 +88,7 @@ impl IsMusicbrainzEntity for Work {
         }
     }
 
-    fn into_any(self: Arc<Self>) -> super::entity::any_musicbrainz_entity::AnyMusicBrainzEntity {
+    fn into_any(self: Arc<Self>) -> AnyMusicBrainzEntity {
         self.into()
     }
 }

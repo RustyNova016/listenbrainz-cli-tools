@@ -10,6 +10,7 @@ use crate::models::data::musicbrainz::external_musicbrainz_entity::ExternalMusic
 use crate::models::data::musicbrainz::mbid::any_mbid::AnyMBIDType;
 use crate::models::data::musicbrainz::mbid::generic_mbid::IdAliasState;
 use crate::models::data::musicbrainz::mbid::generic_mbid::MBIDSpe;
+use crate::models::data::musicbrainz::mbid::generic_mbid::NaiveMBID;
 use crate::models::data::musicbrainz::mbid::is_musicbrainz_id::IsMusicbrainzID;
 use crate::models::data::musicbrainz::mbid::MBID;
 use crate::models::data::musicbrainz::recording::external::RecordingExt;
@@ -21,6 +22,12 @@ use super::Recording;
     Debug, Clone, PartialEq, Eq, Deref, DerefMut, Into, From, Serialize, Deserialize, Hash, Display,
 )]
 pub struct RecordingMBID(String);
+
+impl RecordingMBID {
+    pub fn into_spe_naive(&self) -> NaiveMBID<Recording> {
+        MBIDSpe::from(self.to_string())
+    }
+}
 
 impl IsMbid<Recording> for RecordingMBID {
     async fn get_or_fetch_entity(&self) -> color_eyre::Result<Recording> {

@@ -8,7 +8,6 @@ use musicbrainz_rs::entity::release_group::{ReleaseGroupPrimaryType, ReleaseGrou
 use musicbrainz_rs::entity::tag::Tag;
 use serde::{Deserialize, Serialize};
 
-use super::entity::any_musicbrainz_entity::AnyMusicBrainzEntity;
 use crate::core::caching::musicbrainz::musicbrainz_cache::MusicbrainzCache;
 use crate::core::entity_traits::relations::has_artist_credits::HasArtistCredits;
 use crate::models::data::musicbrainz::artist_credit::collection::ArtistCredits;
@@ -19,6 +18,8 @@ use crate::models::data::musicbrainz::relation::Relation;
 use crate::models::data::musicbrainz::release::mbid::ReleaseMBID;
 use crate::models::data::musicbrainz::release_group::mbid::ReleaseGroupMBID;
 use crate::models::data::musicbrainz_database::MUSICBRAINZ_DATABASE;
+
+use super::entity::any::any_musicbrainz_entity::AnyMusicBrainzEntity;
 
 mod caching;
 mod converters;
@@ -91,11 +92,11 @@ impl IsMusicbrainzEntity for ReleaseGroup {
         }
     }
 
-    fn into_any(self: Arc<Self>) -> super::entity::any_musicbrainz_entity::AnyMusicBrainzEntity {
+    fn into_any(self: Arc<Self>) -> AnyMusicBrainzEntity {
         self.into()
     }
 
-    fn into_arc_and_any(self) -> super::entity::any_musicbrainz_entity::AnyMusicBrainzEntity {
+    fn into_arc_and_any(self) -> AnyMusicBrainzEntity {
         Arc::new(self).into_any()
     }
 }
