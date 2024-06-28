@@ -1,7 +1,9 @@
+use std::sync::Arc;
+
 use itertools::Itertools;
 use musicbrainz_rs::entity::release_group::ReleaseGroup as ReleaseGroupMS;
 
-use crate::models::data::musicbrainz::musicbrainz_entity::MusicBrainzEntity;
+use crate::models::data::musicbrainz::entity::any_musicbrainz_entity::AnyMusicBrainzEntity;
 use crate::models::data::musicbrainz::release_group::ReleaseGroup;
 use crate::models::error::Error;
 
@@ -36,9 +38,9 @@ impl From<ReleaseGroupMS> for ReleaseGroup {
     }
 }
 
-impl From<MusicBrainzEntity> for Result<ReleaseGroup, Error> {
-    fn from(value: MusicBrainzEntity) -> Self {
-        if let MusicBrainzEntity::ReleaseGroup(val) = value {
+impl From<AnyMusicBrainzEntity> for Result<Arc<ReleaseGroup>, Error> {
+    fn from(value: AnyMusicBrainzEntity) -> Self {
+        if let AnyMusicBrainzEntity::ReleaseGroup(val) = value {
             return Ok(val);
         }
 

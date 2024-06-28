@@ -1,9 +1,9 @@
 use crate::core::caching::serde_cacache;
 use crate::core::caching::serde_cacache::tidy::SerdeCacacheTidy;
+use crate::models::data::musicbrainz::entity::any_musicbrainz_entity::AnyMusicBrainzEntity;
 use crate::models::data::musicbrainz::entity::is_musicbrainz_entity::IsMusicbrainzEntity;
 use crate::models::data::musicbrainz::mbid::generic_mbid::NaiveMBID;
 use crate::models::data::musicbrainz::mbid::is_musicbrainz_id::IsMusicbrainzID;
-use crate::models::data::musicbrainz::musicbrainz_entity::MusicBrainzEntity;
 use crate::models::data::musicbrainz::relation::external::RelationContentExt;
 use crate::models::error::Error;
 use std::sync::Arc;
@@ -14,7 +14,7 @@ use tokio::sync::RwLockWriteGuard;
 pub struct CachedEntity<V>
 where
     V: IsMusicbrainzEntity,
-    MusicBrainzEntity: Into<Result<V, Error>>,
+    AnyMusicBrainzEntity: Into<Result<Arc<V>, Error>>,
     NaiveMBID<V>: IsMusicbrainzID<V>,
 {
     key: NaiveMBID<V>,
@@ -27,7 +27,7 @@ where
 impl<V> CachedEntity<V>
 where
     V: IsMusicbrainzEntity,
-    MusicBrainzEntity: Into<Result<V, Error>>,
+    AnyMusicBrainzEntity: Into<Result<Arc<V>, Error>>,
     NaiveMBID<V>: IsMusicbrainzID<V>,
 {
     pub fn new(
@@ -127,11 +127,11 @@ where
         write_lock: &mut RwLockWriteGuard<'a, Option<Arc<V>>>,
     ) -> color_eyre::Result<Arc<V>> {
         let fetch_result = self.key.fetch().await?;
-        let converted_fetch = fetch_result.flattened();
+        let converted_fetch = fetch_result.flattened_any();
 
         // First, process the main entity
-        let maybe_value: Result<V, Error> = converted_fetch.0.into();
-        let main_entity: Arc<V> = Arc::new(maybe_value?);
+        let maybe_value: Result<Arc<V>, Error> = converted_fetch.0.into();
+        let main_entity = maybe_value?;
 
         self.alias_cache
             .set(&self.key, &main_entity.get_mbidspe().into_naive())
@@ -220,10 +220,10 @@ where
 
     pub async fn update_from_generic_entity(
         &self,
-        value: MusicBrainzEntity,
+        value: AnyMusicBrainzEntity,
     ) -> color_eyre::Result<()> {
-        let maybe_value: Result<V, Error> = value.into();
-        let converted: Arc<V> = Arc::new(maybe_value?);
+        let maybe_value: Result<Arc<V>, Error> = value.into();
+        let converted: Arc<V> = maybe_value?;
         self.update(converted).await
     }
 }

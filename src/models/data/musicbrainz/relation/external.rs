@@ -1,8 +1,10 @@
 use color_eyre::eyre::eyre;
 use extend::ext;
+use itertools::Itertools;
 use musicbrainz_rs::entity::relations::RelationContent;
 
 use crate::models::data::musicbrainz::artist::external::ArtistExt;
+use crate::models::data::musicbrainz::entity::any_musicbrainz_entity::AnyMusicBrainzEntity;
 use crate::models::data::musicbrainz::external_musicbrainz_entity::FlattenedMBEntity;
 use crate::models::data::musicbrainz::musicbrainz_entity::MusicBrainzEntity;
 use crate::models::data::musicbrainz::recording::external::RecordingExt;
@@ -17,6 +19,11 @@ pub impl RelationContent {
             self.flatten_main().expect("Missing implementation"),
             self.flatten_children().expect("Missing implementation"),
         )
+    }
+
+    fn flattened_any(&self) -> (AnyMusicBrainzEntity, Vec<AnyMusicBrainzEntity>) {
+        let data = self.flattened();
+        (data.0.into(), data.1.into_iter().map_into().collect_vec())
     }
 
     fn flattened_result(&self) -> color_eyre::Result<FlattenedMBEntity> {

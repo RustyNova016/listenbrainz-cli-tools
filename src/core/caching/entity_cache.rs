@@ -9,7 +9,6 @@ use tokio::sync::{Semaphore, SemaphorePermit};
 use crate::core::caching::CACHE_LOCATION;
 use crate::core::entity_traits::fetchable::Fetchable;
 use crate::core::entity_traits::insertable::Insertable;
-use crate::models::data::musicbrainz::entity::is_musicbrainz_entity::IsMusicbrainzEntity;
 
 use super::serde_cacache::tidy::SerdeCacacheTidy;
 

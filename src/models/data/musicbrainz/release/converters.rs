@@ -1,7 +1,9 @@
+use std::sync::Arc;
+
 use itertools::Itertools;
 use musicbrainz_rs::entity::release::Release as ReleaseMS;
 
-use crate::models::data::musicbrainz::musicbrainz_entity::MusicBrainzEntity;
+use crate::models::data::musicbrainz::entity::any_musicbrainz_entity::AnyMusicBrainzEntity;
 use crate::models::error::Error;
 
 use super::Release;
@@ -40,9 +42,9 @@ impl From<ReleaseMS> for Release {
     }
 }
 
-impl From<MusicBrainzEntity> for Result<Release, Error> {
-    fn from(value: MusicBrainzEntity) -> Self {
-        if let MusicBrainzEntity::Release(val) = value {
+impl From<AnyMusicBrainzEntity> for Result<Arc<Release>, Error> {
+    fn from(value: AnyMusicBrainzEntity) -> Self {
+        if let AnyMusicBrainzEntity::Release(val) = value {
             return Ok(val);
         }
 

@@ -1,5 +1,3 @@
-use std::mem::discriminant;
-use std::ops::Deref;
 use std::sync::Arc;
 
 use derive_more::{From, IsVariant, Unwrap};
@@ -14,15 +12,8 @@ use crate::models::data::musicbrainz::release::Release;
 use crate::models::data::musicbrainz::release_group::ReleaseGroup;
 use crate::models::data::musicbrainz::work::Work;
 use crate::models::data::musicbrainz_database_legacy::MUSICBRAINZ_DATABASE_LEGACY;
-use crate::utils::println_cli_warn;
 
 use super::entity::any_musicbrainz_entity::AnyMusicBrainzEntity;
-use super::entity::entity_kind::MusicbrainzEntityKind;
-use super::entity::is_musicbrainz_entity::IsMusicbrainzEntity;
-use super::mbid::generic_mbid::MBIDSpe;
-use super::mbid::generic_mbid::NaiveMBID;
-use super::mbid::generic_mbid::PrimaryID;
-use super::mbid::is_musicbrainz_id::IsMusicbrainzID;
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, IsVariant, Unwrap, From)]
 pub enum MusicBrainzEntity {
@@ -40,7 +31,7 @@ impl MusicBrainzEntity {
                 MUSICBRAINZ_DATABASE_LEGACY
                     .release_groups()
                     .update(val)
-                    .await?
+                    .await?;
             }
             Self::Release(val) => MUSICBRAINZ_DATABASE_LEGACY.releases().update(val).await?,
             Self::Recording(val) => MUSICBRAINZ_DATABASE_LEGACY.recordings().update(val).await?,
@@ -65,3 +56,15 @@ impl HasMBID<MBID> for MusicBrainzEntity {
 }
 
 impl Updatable for MusicBrainzEntity {}
+
+impl From<MusicBrainzEntity> for AnyMusicBrainzEntity {
+    fn from(value: MusicBrainzEntity) -> Self {
+        match value {
+            MusicBrainzEntity::Artist(val) => Self::Artist(Arc::new(val)),
+            MusicBrainzEntity::ReleaseGroup(val) => Self::ReleaseGroup(Arc::new(val)),
+            MusicBrainzEntity::Release(val) => Self::Release(Arc::new(val)),
+            MusicBrainzEntity::Recording(val) => Self::Recording(Arc::new(val)),
+            MusicBrainzEntity::Work(val) => Self::Work(Arc::new(val)),
+        }
+    }
+}

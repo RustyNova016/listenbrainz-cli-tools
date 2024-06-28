@@ -5,7 +5,6 @@ use serde::Serialize;
 
 use crate::core::caching::musicbrainz_cache::MusicbrainzCacheLegacy;
 use crate::core::entity_traits::mbid::{HasMBID, IsMbid};
-use crate::models::data::musicbrainz::entity::is_musicbrainz_entity::IsMusicbrainzEntity;
 
 use super::update::Updatable;
 
