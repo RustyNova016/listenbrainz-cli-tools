@@ -13,6 +13,7 @@ use crate::models::data::musicbrainz::mbid::generic_mbid::{MBIDSpe, PrimaryID};
 use crate::models::data::musicbrainz::release::mbid::ReleaseMBID;
 
 use super::artist_credit::collection::ArtistCredits;
+use super::entity::any_musicbrainz_entity::AnyMusicBrainzEntity;
 use super::relation::Relation;
 
 use self::mbid::RecordingMBID;
@@ -46,6 +47,17 @@ impl IsMusicbrainzEntity for Recording {
     // fn get_mb_cache() -> Arc<MusicbrainzCache<Self>> {
     //     MUSICBRAINZ_DATABASE.recordings().clone()
     // }
+
+    fn try_from_any(value: &AnyMusicBrainzEntity) -> Result<Arc<Self>, crate::models::error::Error> {
+        if let AnyMusicBrainzEntity::Recording(val) = value {
+            return Ok(val.clone());
+        }
+
+        Err(crate::models::error::Error::InvalidTypeConvertion(
+            "MusicBrainzEntity".to_string(),
+            "Recording".to_string(),
+        ))
+    }
 
     fn as_kind(&self) -> MusicbrainzEntityKind {
         MusicbrainzEntityKind::Recording

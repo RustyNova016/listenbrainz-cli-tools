@@ -14,7 +14,6 @@ use tokio::sync::RwLockWriteGuard;
 pub struct CachedEntity<V>
 where
     V: IsMusicbrainzEntity,
-    AnyMusicBrainzEntity: Into<Result<Arc<V>, Error>>,
     NaiveMBID<V>: IsMusicbrainzID<V>,
 {
     key: NaiveMBID<V>,
@@ -27,7 +26,6 @@ where
 impl<V> CachedEntity<V>
 where
     V: IsMusicbrainzEntity,
-    AnyMusicBrainzEntity: Into<Result<Arc<V>, Error>>,
     NaiveMBID<V>: IsMusicbrainzID<V>,
 {
     pub fn new(
@@ -130,8 +128,7 @@ where
         let converted_fetch = fetch_result.flattened_any();
 
         // First, process the main entity
-        let maybe_value: Result<Arc<V>, Error> = converted_fetch.0.into();
-        let main_entity = maybe_value?;
+        let main_entity = V::try_from_any(&converted_fetch.0)?;
 
         self.alias_cache
             .set(&self.key, &main_entity.get_mbidspe().into_naive())
@@ -220,10 +217,9 @@ where
 
     pub async fn update_from_generic_entity(
         &self,
-        value: AnyMusicBrainzEntity,
+        value: &AnyMusicBrainzEntity,
     ) -> color_eyre::Result<()> {
-        let maybe_value: Result<Arc<V>, Error> = value.into();
-        let converted: Arc<V> = maybe_value?;
+        let converted = V::try_from_any(value)?;
         self.update(converted).await
     }
 }

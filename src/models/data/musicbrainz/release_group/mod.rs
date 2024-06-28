@@ -17,6 +17,8 @@ use crate::models::data::musicbrainz::relation::Relation;
 use crate::models::data::musicbrainz::release::mbid::ReleaseMBID;
 use crate::models::data::musicbrainz::release_group::mbid::ReleaseGroupMBID;
 
+use super::entity::any_musicbrainz_entity::AnyMusicBrainzEntity;
+
 mod caching;
 mod converters;
 pub(crate) mod external;
@@ -49,6 +51,18 @@ impl IsMusicbrainzEntity for ReleaseGroup {
 
     fn as_kind(&self) -> MusicbrainzEntityKind {
         MusicbrainzEntityKind::ReleaseGroup
+    }
+
+    
+    fn try_from_any(value: &AnyMusicBrainzEntity) -> Result<Arc<Self>, crate::models::error::Error> {
+        if let AnyMusicBrainzEntity::ReleaseGroup(val) = value {
+            return Ok(val.clone());
+        }
+
+        Err(crate::models::error::Error::InvalidTypeConvertion(
+            "MusicBrainzEntity".to_string(),
+            "ReleaseGroup".to_string(),
+        ))
     }
 
     fn get_mbidspe(&self) -> MBIDSpe<Self, PrimaryID> {

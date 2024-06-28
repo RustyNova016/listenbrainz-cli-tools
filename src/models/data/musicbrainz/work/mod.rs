@@ -12,6 +12,7 @@ use crate::models::data::musicbrainz::entity::entity_kind::MusicbrainzEntityKind
 use crate::models::data::musicbrainz::entity::is_musicbrainz_entity::IsMusicbrainzEntity;
 use crate::models::data::musicbrainz::mbid::generic_mbid::{MBIDSpe, PrimaryID};
 
+use super::entity::any_musicbrainz_entity::AnyMusicBrainzEntity;
 use super::relation::Relation;
 
 use self::mbid::WorkMBID;
@@ -48,6 +49,17 @@ impl IsMusicbrainzEntity for Work {
 
     fn as_kind(&self) -> MusicbrainzEntityKind {
         MusicbrainzEntityKind::Work
+    }
+
+    fn try_from_any(value: &AnyMusicBrainzEntity) -> Result<Arc<Self>, crate::models::error::Error> {
+        if let AnyMusicBrainzEntity::Work(val) = value {
+            return Ok(val.clone());
+        }
+
+        Err(crate::models::error::Error::InvalidTypeConvertion(
+            "MusicBrainzEntity".to_string(),
+            "Work".to_string(),
+        ))
     }
 
     fn get_mbidspe(&self) -> MBIDSpe<Self, PrimaryID> {

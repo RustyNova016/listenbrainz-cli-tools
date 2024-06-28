@@ -20,7 +20,6 @@ use super::cached_entity::CachedEntity;
 pub struct MusicbrainzCache<V>
 where
     V: IsMusicbrainzEntity + Eq,
-    AnyMusicBrainzEntity: Into<Result<Arc<V>, Error>>,
     NaiveMBID<V>: IsMusicbrainzID<V>,
 {
     cache_entities: RwLock<HashMap<NaiveMBID<V>, Arc<CachedEntity<V>>>>,
@@ -32,7 +31,6 @@ where
 impl<V> MusicbrainzCache<V>
 where
     V: IsMusicbrainzEntity + Eq,
-    AnyMusicBrainzEntity: Into<Result<Arc<V>, Error>>,
     NaiveMBID<V>: IsMusicbrainzID<V>,
 {
     pub fn new(name: &str) -> Self {
