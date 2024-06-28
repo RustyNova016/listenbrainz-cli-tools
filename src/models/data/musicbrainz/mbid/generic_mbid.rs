@@ -17,7 +17,7 @@ where
     S: IdAliasState,
     NaiveMBID<T>: IsMusicbrainzID<T>,
 {
-    id: String,
+    pub(super) id: String,
 
     _entity_type: PhantomData<T>,
     _state: PhantomData<S>,

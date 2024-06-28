@@ -10,6 +10,7 @@ use super::update::Updatable;
 
 pub mod is_cached_mbid;
 
+#[deprecated]
 pub trait IsMbid<T>
 where
     Self: Display + Clone + Serialize + DeserializeOwned,

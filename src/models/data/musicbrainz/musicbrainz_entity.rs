@@ -16,6 +16,7 @@ use crate::models::data::musicbrainz_database_legacy::MUSICBRAINZ_DATABASE_LEGAC
 use super::entity::any::any_musicbrainz_entity::AnyMusicBrainzEntity;
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, IsVariant, Unwrap, From)]
+#[deprecated]
 pub enum MusicBrainzEntity {
     Artist(Artist),
     ReleaseGroup(ReleaseGroup),

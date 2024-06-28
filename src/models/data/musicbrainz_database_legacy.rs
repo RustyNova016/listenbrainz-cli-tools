@@ -22,10 +22,12 @@ use super::musicbrainz::recording::Recording;
 use super::musicbrainz::release::Release;
 use super::musicbrainz::work::Work;
 
+#[deprecated]
 pub(crate) static MUSICBRAINZ_DATABASE_LEGACY: Lazy<Arc<MusicBrainzDatabaseLegacy>> =
     Lazy::new(|| Arc::new(MusicBrainzDatabaseLegacy::default()));
 
 #[derive(Debug, Getters)]
+#[deprecated]
 pub struct MusicBrainzDatabaseLegacy {
     artists: Arc<MusicbrainzCacheLegacy<ArtistMBID, Artist>>,
     releases: Arc<MusicbrainzCacheLegacy<ReleaseMBID, Release>>,

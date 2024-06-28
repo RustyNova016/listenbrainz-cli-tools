@@ -47,7 +47,7 @@ where
 
     async fn get_refreshed(&self) -> color_eyre::Result<Arc<Self>> {
         Self::get_mb_cache()
-            .force_fetch_entity(&self.get_mbidspe().into_naive())
+            .force_fetch_entity(&self.get_mbidspe().as_naive())
             .await
     }
 }
