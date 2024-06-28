@@ -5,6 +5,8 @@ use chrono::DateTime;
 use chrono::Duration;
 use chrono::Utc;
 use derive_getters::Getters;
+use itertools::Itertools;
+use prettytable::color;
 use rust_decimal::prelude::FromPrimitive;
 use rust_decimal::Decimal;
 
@@ -26,6 +28,21 @@ impl RecordingIDWithListens {
             recording_id,
             listens,
         }
+    }
+
+    pub fn new_from_unfiltered(recording_id: RecordingMBID, listens: &ListenCollection) -> Self {
+        let filtered = listens.get_listens_of_recording(&recording_id);
+
+        Self {
+            recording_id,
+            listens: filtered,
+        }
+    }
+
+    pub async fn all_from_unfiltered(listens: &ListenCollection) -> color_eyre::Result<Vec<Self>> {
+        let recordings = listens.get_listened_recordings_mbids().await?;
+
+        Ok(recordings.into_iter().map(|rec| Self::new_from_unfiltered(rec, listens)).collect_vec())
     }
 
     pub fn first_listen_date(&self) -> Option<DateTime<Utc>> {
