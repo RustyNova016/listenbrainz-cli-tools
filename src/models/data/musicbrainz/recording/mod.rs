@@ -15,6 +15,8 @@ use crate::models::data::musicbrainz::release::mbid::ReleaseMBID;
 use super::artist_credit::collection::ArtistCredits;
 use super::entity::any_musicbrainz_entity::AnyMusicBrainzEntity;
 use super::relation::Relation;
+use crate::core::caching::musicbrainz::musicbrainz_cache::MusicbrainzCache;
+use crate::models::data::musicbrainz_database::MUSICBRAINZ_DATABASE;
 
 use self::mbid::RecordingMBID;
 
@@ -44,11 +46,13 @@ pub struct Recording {
 }
 
 impl IsMusicbrainzEntity for Recording {
-    // fn get_mb_cache() -> Arc<MusicbrainzCache<Self>> {
-    //     MUSICBRAINZ_DATABASE.recordings().clone()
-    // }
+    fn get_mb_cache() -> Arc<MusicbrainzCache<Self>> {
+        MUSICBRAINZ_DATABASE.recordings().clone()
+    }
 
-    fn try_from_any(value: &AnyMusicBrainzEntity) -> Result<Arc<Self>, crate::models::error::Error> {
+    fn try_from_any(
+        value: &AnyMusicBrainzEntity,
+    ) -> Result<Arc<Self>, crate::models::error::Error> {
         if let AnyMusicBrainzEntity::Recording(val) = value {
             return Ok(val.clone());
         }

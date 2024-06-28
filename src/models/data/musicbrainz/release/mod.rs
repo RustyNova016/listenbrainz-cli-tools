@@ -8,6 +8,9 @@ use musicbrainz_rs::entity::release::{ReleasePackaging, ReleaseStatus};
 use musicbrainz_rs::entity::tag::Tag;
 use serde::{Deserialize, Serialize};
 
+use self::mbid::ReleaseMBID;
+use self::media::Media;
+use crate::core::caching::musicbrainz::musicbrainz_cache::MusicbrainzCache;
 use crate::core::entity_traits::relations::has_artist_credits::HasArtistCredits;
 use crate::core::entity_traits::relations::has_release_group::HasReleaseGroup;
 use crate::models::data::musicbrainz::artist_credit::collection::ArtistCredits;
@@ -16,9 +19,7 @@ use crate::models::data::musicbrainz::entity::is_musicbrainz_entity::IsMusicbrai
 use crate::models::data::musicbrainz::mbid::generic_mbid::{MBIDSpe, PrimaryID};
 use crate::models::data::musicbrainz::relation::Relation;
 use crate::models::data::musicbrainz::release_group::mbid::ReleaseGroupMBID;
-
-use self::mbid::ReleaseMBID;
-use self::media::Media;
+use crate::models::data::musicbrainz_database::MUSICBRAINZ_DATABASE;
 
 use super::entity::any_musicbrainz_entity::AnyMusicBrainzEntity;
 
@@ -57,14 +58,16 @@ pub struct Release {
 }
 
 impl IsMusicbrainzEntity for Release {
-    // fn get_mb_cache() -> Arc<MusicbrainzCache<Self>> {
-    //     MUSICBRAINZ_DATABASE.releases().clone()
-    // }
+    fn get_mb_cache() -> Arc<MusicbrainzCache<Self>> {
+        MUSICBRAINZ_DATABASE.releases().clone()
+    }
     fn as_kind(&self) -> MusicbrainzEntityKind {
         MusicbrainzEntityKind::Release
     }
 
-    fn try_from_any(value: &AnyMusicBrainzEntity) -> Result<Arc<Self>, crate::models::error::Error> {
+    fn try_from_any(
+        value: &AnyMusicBrainzEntity,
+    ) -> Result<Arc<Self>, crate::models::error::Error> {
         if let AnyMusicBrainzEntity::Release(val) = value {
             return Ok(val.clone());
         }
