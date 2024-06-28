@@ -2,6 +2,7 @@ use clap::Parser;
 use color_eyre::eyre::Ok;
 
 use models::cli::Cli;
+use tools::compatibility::compatibility_command;
 
 use crate::models::data::musicbrainz_database::MUSICBRAINZ_DATABASE;
 use crate::utils::println_cli;
@@ -15,14 +16,17 @@ pub mod utils;
 #[tokio::main]
 async fn main() -> color_eyre::Result<()> {
     color_eyre::install()?;
-    let cli = Cli::parse();
+    // let cli = Cli::parse();
 
     println!("Hello!");
 
-    cli.command
-        .run()
-        .await
-        .expect("An error occured in the app");
+    compatibility_command("RustyNova", "Volumetrique").await.unwrap();
+    panic!("at the disco");
+
+    // cli.command
+    //     .run()
+    //     .await
+    //     .expect("An error occured in the app");
 
     println_cli("Optional cleanup - This is fine to cancel");
     println_cli("Cleaning some old entries...");

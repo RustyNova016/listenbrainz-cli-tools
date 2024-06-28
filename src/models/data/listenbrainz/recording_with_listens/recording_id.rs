@@ -6,7 +6,6 @@ use chrono::Duration;
 use chrono::Utc;
 use derive_getters::Getters;
 use itertools::Itertools;
-use prettytable::color;
 use rust_decimal::prelude::FromPrimitive;
 use rust_decimal::Decimal;
 
@@ -103,4 +102,6 @@ impl RecordingIDWithListens {
         Decimal::from_i64(self.overdue_by().num_seconds()).unwrap()
             / Decimal::from_i64(self.average_duration_between_listens().num_seconds()).unwrap()
     }
+
+    
 }
