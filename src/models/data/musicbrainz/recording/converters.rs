@@ -1,5 +1,8 @@
+use std::sync::Arc;
+
 use itertools::Itertools;
 
+use crate::models::data::musicbrainz::entity::any_musicbrainz_entity::AnyMusicBrainzEntity;
 use crate::models::data::musicbrainz::musicbrainz_entity::MusicBrainzEntity;
 use crate::models::data::musicbrainz::recording::Recording;
 use crate::models::error::Error;
@@ -31,9 +34,9 @@ impl From<musicbrainz_rs::entity::recording::Recording> for Recording {
     }
 }
 
-impl From<MusicBrainzEntity> for Result<Recording, Error> {
-    fn from(value: MusicBrainzEntity) -> Self {
-        if let MusicBrainzEntity::Recording(val) = value {
+impl From<AnyMusicBrainzEntity> for Result<Arc<Recording>, Error> {
+    fn from(value: AnyMusicBrainzEntity) -> Self {
+        if let AnyMusicBrainzEntity::Recording(val) = value {
             return Ok(val);
         }
 

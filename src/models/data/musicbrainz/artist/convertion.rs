@@ -1,11 +1,14 @@
+use std::sync::Arc;
+
+use crate::models::data::musicbrainz::entity::any_musicbrainz_entity::AnyMusicBrainzEntity;
 use crate::models::data::musicbrainz::musicbrainz_entity::MusicBrainzEntity;
 use crate::models::error::Error;
 
 use super::Artist;
 
-impl From<MusicBrainzEntity> for Result<Artist, Error> {
-    fn from(value: MusicBrainzEntity) -> Self {
-        if let MusicBrainzEntity::Artist(val) = value {
+impl From<AnyMusicBrainzEntity> for Result<Arc<Artist>, Error> {
+    fn from(value: AnyMusicBrainzEntity) -> Self {
+        if let AnyMusicBrainzEntity::Artist(val) = value {
             return Ok(val);
         }
 

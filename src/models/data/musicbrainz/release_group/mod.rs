@@ -80,7 +80,7 @@ impl IsMusicbrainzEntity for ReleaseGroup {
     fn into_any(self: Arc<Self>) -> super::entity::any_musicbrainz_entity::AnyMusicBrainzEntity {
         self.into()
     }
-    
+
     fn into_arc_and_any(self) -> super::entity::any_musicbrainz_entity::AnyMusicBrainzEntity {
         Arc::new(self).into_any()
     }

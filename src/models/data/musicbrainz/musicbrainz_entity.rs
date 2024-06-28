@@ -65,3 +65,17 @@ impl HasMBID<MBID> for MusicBrainzEntity {
 }
 
 impl Updatable for MusicBrainzEntity {}
+
+impl From<MusicBrainzEntity> for AnyMusicBrainzEntity {
+    fn from(value: MusicBrainzEntity) -> Self {
+        match value {
+            MusicBrainzEntity::Artist(val) => AnyMusicBrainzEntity::Artist(Arc::new(val)),
+            MusicBrainzEntity::ReleaseGroup(val) => {
+                AnyMusicBrainzEntity::ReleaseGroup(Arc::new(val))
+            }
+            MusicBrainzEntity::Release(val) => AnyMusicBrainzEntity::Release(Arc::new(val)),
+            MusicBrainzEntity::Recording(val) => AnyMusicBrainzEntity::Recording(Arc::new(val)),
+            MusicBrainzEntity::Work(val) => AnyMusicBrainzEntity::Work(Arc::new(val)),
+        }
+    }
+}
