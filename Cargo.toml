@@ -31,7 +31,7 @@ itertools = "0.13.0"
 prettytable-rs = { version = "0.10.0" }
 color-eyre = "0.6.3"
 rust_decimal = "1.35.0"
-clap = { version = "4.5.7", features = ["unicode", "wrap_help", "derive"] }
+clap = { version = "4.5.8", features = ["unicode", "wrap_help", "derive"] }
 clap_complete = "4.5.7"
 chrono = "0.4.38"
 cached = { version = "0.51.4", features = ["disk_store"] }
