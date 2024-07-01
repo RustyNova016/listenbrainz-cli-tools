@@ -17,6 +17,16 @@ pub struct ConfigCli {
 
 #[derive(Subcommand, Debug, Clone)]
 pub enum ConfigCommands {
+    /// Prevent an MSID to appear in the mbid mapper.
+    BlacklistMapperMSID {
+        /// The msid to blacklist
+        msid: String,
+
+        /// Remove it from the blacklist
+        #[arg(long, action)]
+        remove: bool,
+    },
+
     /// Associate an user token to an username. This makes `--token` arguments optional, and prevent always having to insert it
     SetToken {
         /// Name of the user to add the token
@@ -33,15 +43,6 @@ pub enum ConfigCommands {
 
         /// A duration to timeout for
         duration: String,
-    },
-
-    BlacklistMapperMSID {
-        /// The msid to blacklist
-        msid: String,
-
-        /// Remove it from the blacklist
-        #[arg(long, action)]
-        remove: bool,
     },
 }
 

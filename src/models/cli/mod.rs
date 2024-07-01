@@ -1,17 +1,15 @@
 pub mod cache;
 pub mod lookup;
+pub mod mapping;
 use cache::CacheCommand;
 use clap::{Parser, Subcommand};
 use config::ConfigCli;
 use lookup::LookupCommand;
+use mapping::MappingCommand;
 
-use crate::models::cli::common::{GroupByTarget, SortListensBy, SortSorterBy};
+use crate::models::cli::common::{GroupByTarget, SortSorterBy};
 use crate::models::cli::radio::RadioCommand;
-use crate::tools::interactive_mapper::interactive_mapper;
 use crate::tools::stats::stats_command;
-use crate::tools::unlinked::unmapped_command;
-
-use super::config::Config;
 
 pub mod common;
 pub mod config;
@@ -21,24 +19,55 @@ pub mod radio;
 #[derive(Parser, Debug, Clone)]
 #[command(version, about, long_about = None)]
 pub struct Cli {
+    #[arg(long, hide = true)]
+    pub markdown_help: bool,
+
     #[command(subcommand)]
     pub command: Commands,
 }
 
+impl Cli {
+    pub async fn run(&self) -> color_eyre::Result<()> {
+        // Invoked as: `$ my-app --markdown-help`
+        if self.markdown_help {
+            clap_markdown::print_help_markdown::<Self>();
+            return Ok(());
+        }
+
+        self.command.run().await
+    }
+}
+
 #[derive(Subcommand, Debug, Clone)]
 pub enum Commands {
-    /// Tools with the unlinked listens
-    Unmapped {
-        /// Name of the user to fetch unlinked listen from
-        #[arg(short, long)]
-        username: String,
+    /// Commands to deal with the local cache
+    Cache(CacheCommand),
 
-        /// Sort the listens by type
-        #[arg(short, long)]
-        sort: Option<SortSorterBy>,
-    },
+    /// Commands to deal with the app's configuration
+    Config(ConfigCli),
 
-    /// Live and accurate statistics
+    /// Get detailled information about an entity
+    Lookup(LookupCommand),
+
+    /// Commands for interacting with listen mappings
+    Mapping(MappingCommand),
+
+    /// Generate radio playlists for you
+    Radio(RadioCommand),
+
+    /// Shows top statistics for a specific target
+    ///
+    /// Target is the entity type to group the stats by. Currently, those entities stats are implemented:
+    ///
+    /// - Recordings (`recording`)
+    ///
+    /// - Artists (`artist`)
+    ///
+    /// - Releases (`release`)
+    ///
+    /// - Release Groups (`release_group`)
+    ///
+    /// - Works (`work`)
     Stats {
         //#[command(subcommand)]
         //command: StatsCommand,
@@ -47,63 +76,23 @@ pub enum Commands {
         target: GroupByTarget,
 
         /// Name of the user to fetch stats listen from
-        #[arg(short, long)]
         username: String,
 
         /// Sort by:
         #[arg(short, long, default_value_t = SortSorterBy::Count)]
         sort: SortSorterBy,
     },
-
-    /// Map unmapped recordings easily
-    Mapping {
-        /// Name of the user to fetch unlinked listen from
-        #[arg(short, long)]
-        username: String,
-
-        /// User token
-        #[arg(short, long)]
-        token: Option<String>,
-
-        /// Sort the listens by type
-        #[arg(short, long)]
-        sort: Option<SortListensBy>,
-    },
-
-    /// Generate playlists
-    Radio(RadioCommand),
-
-    Cache(CacheCommand),
-
-    Config(ConfigCli),
-    //Search {},
-    Lookup(LookupCommand),
 }
 
 impl Commands {
     pub async fn run(&self) -> color_eyre::Result<()> {
         match self {
-            Self::Unmapped { username, sort } => {
-                unmapped_command(&username.to_lowercase(), *sort).await;
-            }
             Self::Stats {
                 username,
                 target,
                 sort,
             } => {
                 stats_command(&username.to_lowercase(), *target, *sort).await;
-            }
-            Self::Mapping {
-                username,
-                token,
-                sort,
-            } => {
-                interactive_mapper(
-                    username,
-                    Config::get_token_or_argument(username, token),
-                    *sort,
-                )
-                .await?;
             }
 
             Self::Radio(val) => val.run().await?,
@@ -113,6 +102,8 @@ impl Commands {
             Self::Config(val) => val.command.run().await?,
 
             Self::Lookup(val) => val.run().await?,
+
+            Self::Mapping(val) => val.run().await?,
         }
         Ok(())
     }

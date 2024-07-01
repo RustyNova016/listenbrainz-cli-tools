@@ -1,5 +1,9 @@
 # Listenbrainz CLI Tools
 
+[![Crate](https://img.shields.io/crates/v/listenbrainz-cli-tools)](https://crates.io/crates/listenbrainz-cli-tools)
+[![CI builder](https://github.com/RustyNova016/listenbrainz-cli-tools/actions/workflows/rust.yml/badge.svg)](https://github.com/RustyNova016/listenbrainz-cli-tools/actions/workflows/rust.yml)
+[![License](https://img.shields.io/crates/l/listenbrainz-cli-tools)](https://github.com/RustyNova016/listenbrainz-cli-tools/blob/master/LICENSE)
+
 A collection of CLI based tools for Listenbrainz.
 
 # Installing
@@ -13,12 +17,14 @@ cd ./listenbrainz-cli-tools
 cargo build --release
 ```
 
+# Usage
+
+Full markdown help can be found under [docs/CommandLineHelp.md](https://github.com/RustyNova016/listenbrainz-cli-tools/blob/feature/markdown_help.rs/docs/CommandLineHelp.md), but full `--help` support exists too. 
+
 # Tools
 ## Unmapped listens 
-To search for your unmapped listens, use:
-```shell
-listenbrainz-cli-tools unmapped -u <username>
-```
+
+[Usage > Command Line documentation](https://github.com/RustyNova016/listenbrainz-cli-tools/blob/feature/markdown_help.rs/docs/CommandLineHelp.md#listenbrainz-cli-tools-mapping-list-unmapped)
 
 This will list all your unmapped listens, grouped by similarity. 
 It also gives a link to quickly look up the listen in listenbrainz, and go link it
@@ -39,33 +45,25 @@ Total: 8 unlinked recordings
 
 ## Interactive mass mapper
 
-This tools allow for easy and faster mapping of recordings. It goes through each unmapped recordings, 
-and give a few suggested recordings for the mapping. This is the exact same as mapping recording in the web UI.
+[Usage > Command Line documentation](https://github.com/RustyNova016/listenbrainz-cli-tools/blob/feature/markdown_help.rs/docs/CommandLineHelp.md#listenbrainz-cli-tools-mapping-mapper)
 
-```shell
-listenbrainz-cli-tools mapping -u <username> -t <user token>
-```
+This tool allows for easy and faster mapping of recordings. It goes through each unmapped recordings, and give a few suggested recordings for the mapping. This is the exact same as mapping recording in the web UI.
 
-## Live statistics
+## Statistics
 
-While ListenBrainz have its own statistic page, it only refreshes daily, and is limited to only some entities.
-With those commands, you'll be able to see your statistics in no time!
+[Usage > Command Line documentation](https://github.com/RustyNova016/listenbrainz-cli-tools/blob/feature/markdown_help.rs/docs/CommandLineHelp.md#listenbrainz-cli-tools-stats)
 
-```shell
-listenbrainz-cli-tools stats -u <username> -t <target>
-```
+While ListenBrainz have its own statistic page, it only refreshes daily, and is limited to only some entities. Furthermore, bugs in ListenBrainz statitics lead to misleading result.
 
-Target is the entity type to group the stats by. Currently, those entities stats are implemented:
-
-- Recordings (`recording`)
-- Artists (`artist`)
-- Releases (`release`)
-- Release Groups (`release_group`)
-- Works (`work`)
+This calculator aims to be most accurate possible, and will display your top listens for you.
 
 ## Radio
 
+A few radio algorithms have been made to generate playlists for you
+
 ### Artist Circles
+
+[Usage > Command Line documentation](https://github.com/RustyNova016/listenbrainz-cli-tools/blob/feature/markdown_help.rs/docs/CommandLineHelp.md#listenbrainz-cli-tools-radio-circles)
 
 This algorithm keep your playlist close to the artists you are listening to. The way it generate is as follow:
 
@@ -75,26 +73,11 @@ This algorithm keep your playlist close to the artists you are listening to. The
 
 There is the option to only get unlistened recordings, making an alternative to ListenBrainz's own discovery playlists.
 
-Usage:
-
-```shell
-listenbrainz-cli-tools radio circles -u <username> -t <token>
-```
-
-Only unlistened:
-
-```shell
-listenbrainz-cli-tools radio circles -u <username> -t <token> --unlistened
-```
-
 ### Underrated tracks
 
-This radio will create a playlist containing all the tracks that you listen to, but seemingly no one else does. 
+[Usage > Command Line documentation](https://github.com/RustyNova016/listenbrainz-cli-tools/blob/feature/markdown_help.rs/docs/CommandLineHelp.md#listenbrainz-cli-tools-radio-underrated)
 
-Usage:
-```shell
-listenbrainz-cli-tools radio underrated -u <username> -t <token>
-```
+This radio will create a playlist containing all the tracks that you listen to, but seemingly no one else does. 
 
 > The mix is made by calculating a score for each listen. This score is composed of two values:
 >
@@ -102,36 +85,29 @@ listenbrainz-cli-tools radio underrated -u <username> -t <token>
 >
 > - The percentage of the recording's listens being from the user (Made with this formula: (user listens / worldwide listens) *100)
 
+> [!IMPORTANT]  
+> As of the 2nd of july 2024, a bug in ListenBrainz made all global listen counts frozen. This radio will most likely be extremely inaccurrate by now. See the official status on [LB-1590](https://tickets.metabrainz.org/projects/LB/issues/LB-1590) 
+
 ### Listen rate
 
-This algorythm bases itself on your listen rate of recording to get more forgotten tracks. It takes the recordings with the lowest listen rates, and put them into a playlist
+[Usage > Command Line documentation](https://github.com/RustyNova016/listenbrainz-cli-tools/blob/feature/markdown_help.rs/docs/CommandLineHelp.md#listenbrainz-cli-tools-radio-rate)
 
-Usage:
-```shell
-listenbrainz-cli-tools radio rate -u <username> -t <token> --min-rate=<Number of listens...> --min-per=<... Per range> --min=<Minimum listens (Default: 3)>
-```
+This algorithm bases itself on your listen rate of recording to get more forgotten tracks. It takes the recordings with the lowest listen rates, and put them into a playlist
 
-Exemple usage:
-```shell
-listenbrainz-cli-tools radio rate -u <username> -t <token> --min-rate=3 --min-per=year --min=10
-```
 
 ### Overdue listens
+
+[Usage > Command Line documentation](https://github.com/RustyNova016/listenbrainz-cli-tools/blob/feature/markdown_help.rs/docs/CommandLineHelp.md#listenbrainz-cli-tools-radio-rate)
+
 Similar to listen rates, this algorithm calculate the average time between listens, and estimate when the next listen will happen. 
 It thens put together a playlist made out of recordings you should have listened by now.
 
-Usage:
-```shell
-listenbrainz-cli-tools radio overdue -u <username> -t <token> --min=<Minimum listens (Default: 3)>
-```
-
 Another mode is the "Overdue factor". Instead of sorting by date, the listens are sorted by how many estimated listens should have happened by now (Time elapsed since last listen / Average time per listens)
-
-Usage:
-```shell
-listenbrainz-cli-tools radio overdue -u <username> -t <token> --min=<Minimum listens (Default: 3)> -o
-```
 
 # Other infos
 
-This project is in beta. There's a lot of features I like to add, and need a lot of testing before 1.0. If you find a bug, or have a feature request, feel free to create a new issue.
+This project is in beta. There's a lot of features I'd like to add, and need a lot of testing before 1.0. If you find a bug, or have a feature request, feel free to create (and spam) a new issue.
+
+# See also
+- [musicbrainz_rs_nova](https://github.com/RustyNova016/musicbrainz_rs_nova): A fork of musicbrainz-rs as the original project seems to have staled
+- [listenbrainz-rs](https://github.com/InputUsername/listenbrainz-rs): API bindings for listenbrainz

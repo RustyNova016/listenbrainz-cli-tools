@@ -19,10 +19,7 @@ async fn main() -> color_eyre::Result<()> {
 
     println!("Hello!");
 
-    cli.command
-        .run()
-        .await
-        .expect("An error occured in the app");
+    cli.run().await.expect("An error occured in the app");
 
     println_cli("Optional cleanup - This is fine to cancel");
     println_cli("Cleaning some old entries...");
