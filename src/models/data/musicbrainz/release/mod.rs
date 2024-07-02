@@ -9,6 +9,9 @@ use serde::{Deserialize, Serialize};
 use crate::core::entity_traits::relations::has_artist_credits::HasArtistCredits;
 use crate::core::entity_traits::relations::has_release_group::HasReleaseGroup;
 use crate::models::data::musicbrainz::artist_credit::collection::ArtistCredits;
+use crate::models::data::musicbrainz::entity::entity_kind::MusicbrainzEntityKind;
+use crate::models::data::musicbrainz::entity::is_musicbrainz_entity::IsMusicbrainzEntity;
+use crate::models::data::musicbrainz::mbid::generic_mbid::{MBIDSpe, PrimaryID};
 use crate::models::data::musicbrainz::relation::Relation;
 use crate::models::data::musicbrainz::release_group::mbid::ReleaseGroupMBID;
 
@@ -47,6 +50,16 @@ pub struct Release {
     aliases: Option<Vec<Alias>>,
     genres: Option<Vec<Genre>>,
     annotation: Option<String>,
+}
+
+impl IsMusicbrainzEntity for Release {
+    fn as_kind(&self) -> MusicbrainzEntityKind {
+        MusicbrainzEntityKind::Release
+    }
+
+    fn get_mbid(&self) -> MBIDSpe<Self, PrimaryID> {
+        MBIDSpe::from(self.id.to_string())
+    }
 }
 
 impl HasArtistCredits<ReleaseMBID> for Release {

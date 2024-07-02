@@ -4,6 +4,7 @@ use std::ops::Deref;
 use std::path::PathBuf;
 use std::sync::Arc;
 
+use cacache::RemoveOpts;
 use cacache::{Integrity, Metadata};
 use chashmap::CHashMap;
 use futures::future::try_join_all;
@@ -13,6 +14,8 @@ use serde::Serialize;
 use tokio::sync::RwLock;
 
 use crate::core::caching::serde_cacache::error::Error;
+
+use super::error::is_error_io_not_found;
 
 #[derive(Debug, Clone)]
 pub struct SerdeCacacheTidy<K, V> {
@@ -128,18 +131,25 @@ where
         let _activate_lock = self.cache_lock.write().await;
         let _write_lock = lock.write().await;
 
-        let Some(metadata_of_entry) = cacache::metadata(&self.name, key.to_string()).await? else {
-            return Ok(());
-        };
-
         // All entries have been entered with their key, making all the duplicates uniques.
         // So it's safe* to just delete the hash
         //
         // Hash collisions may still occure, but if we worry about those, we should worry about using cacache in the first place
-        cacache::remove(&self.name, key.to_string()).await?;
-        cacache::remove_hash(&self.name, &metadata_of_entry.integrity).await?;
+        let deletion_res = RemoveOpts::new()
+            .remove_fully(true)
+            .remove(&self.name, key.to_string())
+            .await;
 
-        Ok(())
+        match deletion_res {
+            Ok(_) => Ok(()),
+            Err(cacache::Error::IoError(err, stri)) => {
+                match err.kind() {
+                    std::io::ErrorKind::NotFound => Ok(()), // This is fine. We wanted it deleted.
+                    _ => Err(cacache::Error::IoError(err, stri)),
+                }
+            }
+            Err(err) => Err(err),
+        }
     }
 
     pub async fn delete_last_entries(
@@ -177,13 +187,13 @@ where
             .into_iter()
             .k_smallest_by_key(k, |entry| entry.time)
             .map(|entry_to_delete| async move {
-                #[cfg(debug)]
+                #[cfg(debug_assertions)]
                 println!("Deleting: {}", entry_to_delete.key);
                 let data = self.inner_delete_entry(&entry_to_delete.key).await;
-                #[cfg(debug)]
+                #[cfg(debug_assertions)]
                 println!("Deleted: {}", entry_to_delete.key);
                 #[allow(clippy::let_and_return)]
-                // This fixes clippy complaining for non debug builds
+                // This fixes clippy complaining about non debug builds
                 data
             })
             .collect_vec();
@@ -191,5 +201,20 @@ where
         try_join_all(entries_to_delete).await?;
 
         Ok(())
+    }
+
+    pub async fn clear(&self) -> cacache::Result<()> {
+        let result = cacache::clear(&self.name).await;
+
+        match result {
+            Ok(val) => Ok(val),
+            Err(err) => {
+                if is_error_io_not_found(&err) {
+                    Ok(())
+                } else {
+                    Err(err)
+                }
+            }
+        }
     }
 }

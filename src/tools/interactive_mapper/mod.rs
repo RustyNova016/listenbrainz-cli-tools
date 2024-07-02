@@ -1,8 +1,11 @@
+use crate::core::entity_traits::config_file::ConfigFile;
 use crate::models::cli::common::SortListensBy;
+use crate::models::config::Config;
 use crate::models::data::listenbrainz::listen::collection::ListenCollection;
 use crate::models::data::listenbrainz::listen::Listen;
 use crate::models::data::listenbrainz::user_listens::UserListens;
 use crate::utils::println_cli;
+use color_eyre::eyre::Ok;
 use core::fmt;
 use inquire::Select;
 use itertools::Itertools;
@@ -11,13 +14,24 @@ use std::collections::HashMap;
 use std::fmt::{Display, Formatter};
 use std::sync::Arc;
 
-pub async fn interactive_mapper(username: &str, token: String, sort: Option<SortListensBy>) {
+pub async fn interactive_mapper(
+    username: &str,
+    token: String,
+    sort: Option<SortListensBy>,
+) -> color_eyre::Result<()> {
+    let blacklisted = Config::load()?
+        .mapper()
+        .as_ref()
+        .map(|conf| conf.backlisted().clone())
+        .unwrap_or_default();
+
     println_cli(format!("Fetching unmapped for user {username}"));
     let mut unmappeds: ListenCollection = UserListens::get_user_with_refresh(username)
         .await
         .expect("Couldn't fetch the new listens")
         .get_unmapped_listens()
         .into_iter()
+        .filter(|listen| !blacklisted.contains(&listen.messybrainz_data.msid))
         .unique_by(|listen| listen.get_messybrain_data().msid.clone())
         .collect();
 
@@ -38,6 +52,8 @@ pub async fn interactive_mapper(username: &str, token: String, sort: Option<Sort
             ReturnOption::Previous => i -= 1,
         }
     }
+
+    Ok(())
 }
 
 #[derive(Deserialize, Serialize)]
@@ -108,6 +124,7 @@ async fn process_listen(
         username,
         listen.listened_at.timestamp() + 1
     );
+    println!("  - MSID: {}", listen.get_messybrain_data().msid);
     println!();
     println!();
     let ans = Select::new("Select a recording", options)

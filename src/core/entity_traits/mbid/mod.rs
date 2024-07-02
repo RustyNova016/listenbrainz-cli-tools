@@ -1,4 +1,3 @@
-pub mod is_cached_mbid;
 use crate::models::data::musicbrainz::external_musicbrainz_entity::ExternalMusicBrainzEntity;
 use crate::models::data::musicbrainz::mbid::MBID;
 use extend::ext;
@@ -8,6 +7,8 @@ use std::fmt::{Debug, Display};
 use std::future::Future;
 
 use super::updatable::Updatable;
+
+pub mod is_cached_mbid;
 
 pub trait IsMbid<T>
 where

@@ -1,10 +1,12 @@
-use crate::core::entity_traits::mb_cached::MBCached;
 use color_eyre::eyre::{eyre, Context, OptionExt};
 use itertools::Itertools;
 
+use crate::core::entity_traits::mb_cached::MBCached;
 use crate::core::entity_traits::mbid::IsMbid;
 use crate::core::entity_traits::relations::has_artist_credits::HasArtistCredits;
 use crate::models::data::musicbrainz::artist_credit::collection::ArtistCredits;
+use crate::models::data::musicbrainz::mbid::generic_mbid::MBIDSpe;
+use crate::models::data::musicbrainz::mbid::generic_mbid::PrimaryID;
 use crate::models::data::musicbrainz::recording::mbid::RecordingMBID;
 use crate::models::data::musicbrainz::release::mbid::ReleaseMBID;
 use crate::models::data::musicbrainz::work::mbid::WorkMBID;
@@ -12,6 +14,10 @@ use crate::models::data::musicbrainz::work::mbid::WorkMBID;
 use super::Recording;
 
 impl Recording {
+    pub fn recording_mbid(&self) -> MBIDSpe<Self, PrimaryID> {
+        self.id.to_string().into()
+    }
+
     pub async fn get_or_fetch_releases_ids(&self) -> color_eyre::Result<Vec<ReleaseMBID>> {
         Ok(match &self.releases {
             Some(releases) => releases.clone(),

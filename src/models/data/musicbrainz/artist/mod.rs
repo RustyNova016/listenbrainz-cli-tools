@@ -1,3 +1,4 @@
+use derive_getters::Getters;
 use itertools::Itertools;
 use musicbrainz_rs::entity::alias::Alias;
 use musicbrainz_rs::entity::artist::{ArtistType, Gender};
@@ -6,9 +7,12 @@ use musicbrainz_rs::entity::lifespan::LifeSpan;
 use musicbrainz_rs::entity::tag::Tag;
 use serde::{Deserialize, Serialize};
 
+use crate::models::data::musicbrainz::mbid::generic_mbid::{MBIDSpe, PrimaryID};
 use crate::models::data::musicbrainz::relation::Relation;
 use crate::models::data::musicbrainz::work::mbid::WorkMBID;
 
+use super::entity::entity_kind::MusicbrainzEntityKind;
+use super::entity::is_musicbrainz_entity::IsMusicbrainzEntity;
 use super::recording::mbid::RecordingMBID;
 use super::release::mbid::ReleaseMBID;
 use super::release_group::mbid::ReleaseGroupMBID;
@@ -20,15 +24,15 @@ pub mod external;
 pub mod getters;
 pub mod mbid;
 
-#[derive(Debug, Clone, Eq, PartialEq, Deserialize, Serialize)]
+#[derive(Debug, Clone, Eq, PartialEq, Deserialize, Serialize, Getters)]
 #[serde(rename_all = "kebab-case")]
 pub struct Artist {
-    pub id: ArtistMBID,
-    pub name: String,
-    pub sort_name: String,
-    pub disambiguation: String,
-    pub artist_type: Option<ArtistType>,
-    pub gender: Option<Gender>,
+    id: ArtistMBID,
+    name: String,
+    sort_name: String,
+    disambiguation: String,
+    artist_type: Option<ArtistType>,
+    gender: Option<Gender>,
     //pub area: Option<Area>,
     //pub begin_area: Option<Area>,
     relations: Option<Vec<Relation>>,
@@ -36,13 +40,13 @@ pub struct Artist {
     works: Option<Vec<WorkMBID>>,
     release_groups: Option<Vec<ReleaseGroupMBID>>,
     recordings: Option<Vec<RecordingMBID>>,
-    pub aliases: Option<Vec<Alias>>,
-    pub tags: Option<Vec<Tag>>,
-    pub genres: Option<Vec<Genre>>,
+    aliases: Option<Vec<Alias>>,
+    tags: Option<Vec<Tag>>,
+    genres: Option<Vec<Genre>>,
     //pub rating: Option<Rating>,
-    pub country: Option<String>,
-    pub annotation: Option<String>,
-    pub life_span: Option<LifeSpan>,
+    country: Option<String>,
+    annotation: Option<String>,
+    life_span: Option<LifeSpan>,
 }
 
 impl From<musicbrainz_rs::entity::artist::Artist> for Artist {
@@ -68,5 +72,15 @@ impl From<musicbrainz_rs::entity::artist::Artist> for Artist {
                 .relations
                 .map(|relations| relations.into_iter().map_into().collect_vec()),
         }
+    }
+}
+
+impl IsMusicbrainzEntity for Artist {
+    fn as_kind(&self) -> MusicbrainzEntityKind {
+        MusicbrainzEntityKind::Artist
+    }
+
+    fn get_mbid(&self) -> MBIDSpe<Self, PrimaryID> {
+        MBIDSpe::from(self.id.to_string())
     }
 }

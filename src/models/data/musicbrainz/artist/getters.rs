@@ -6,7 +6,7 @@ use crate::core::entity_traits::mbid::HasMBID;
 use crate::models::data::musicbrainz::external_musicbrainz_entity::FlattenedMBEntityExt;
 use crate::models::data::musicbrainz::recording::external::RecordingExt;
 use crate::models::data::musicbrainz::recording::Recording;
-use crate::utils::extensions::musicbrainz::BrowseQueryTExt;
+use crate::utils::extensions::musicbrainz_ext::BrowseQueryTExt;
 use crate::utils::println_mus;
 
 use super::Artist;

@@ -1,5 +1,6 @@
 pub mod artist;
 pub mod artist_credit;
+pub mod entity;
 pub mod external_musicbrainz_entity;
 pub mod mbid;
 pub mod musicbrainz_entity;

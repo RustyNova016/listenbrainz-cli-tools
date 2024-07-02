@@ -7,6 +7,9 @@ use serde::{Deserialize, Serialize};
 use crate::core::entity_traits::mb_cached::MBCached;
 use crate::core::entity_traits::mbid::IsMbid;
 use crate::models::data::musicbrainz::external_musicbrainz_entity::ExternalMusicBrainzEntity;
+use crate::models::data::musicbrainz::mbid::generic_mbid::IdAliasState;
+use crate::models::data::musicbrainz::mbid::generic_mbid::MBIDSpe;
+use crate::models::data::musicbrainz::mbid::is_musicbrainz_id::IsMusicbrainzID;
 use crate::models::data::musicbrainz::mbid::MBID;
 use crate::models::data::musicbrainz::recording::external::RecordingExt;
 use crate::utils::println_mus;
@@ -43,5 +46,28 @@ impl IsMbid<Recording> for RecordingMBID {
 
     fn into_mbid(self) -> MBID {
         MBID::Recording(self)
+    }
+}
+
+impl<S> IsMusicbrainzID<Recording> for MBIDSpe<Recording, S>
+where
+    S: IdAliasState,
+{
+    async fn fetch(&self) -> color_eyre::Result<ExternalMusicBrainzEntity> {
+        println_mus(format!("Getting data for recording MBID: {}", &self));
+
+        color_eyre::eyre::Ok(
+            RecordingMS::fetch()
+                .id(self)
+                .with_artists()
+                .with_releases()
+                .with_work_relations()
+                .with_aliases()
+                .with_work_level_relations()
+                .execute()
+                .await
+                .context("Failed to fetch recording from MusicBrainz")?
+                .into_entity(),
+        )
     }
 }

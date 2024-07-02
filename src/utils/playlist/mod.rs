@@ -1,9 +1,12 @@
 use crate::models::data::musicbrainz::recording::mbid::RecordingMBID;
+use color_eyre::eyre::Context;
 use derive_builder::Builder;
 use listenbrainz::raw::request::{
     PlaylistCreate, PlaylistCreatePlaylist, PlaylistCreatePlaylistExtension,
     PlaylistCreatePlaylistExtensionInner, PlaylistCreatePlaylistTrack,
 };
+use listenbrainz::raw::response::PlaylistCreateResponse;
+use listenbrainz::raw::Client;
 
 #[derive(Clone, Builder)]
 pub struct PlaylistStub {
@@ -58,5 +61,11 @@ impl PlaylistStub {
                 annotation: self.description,
             },
         }
+    }
+
+    pub async fn send(self, token: &str) -> color_eyre::Result<PlaylistCreateResponse> {
+        Client::new()
+            .playlist_create(token, self.into_jspf())
+            .context("Couldn't send the playlist")
     }
 }

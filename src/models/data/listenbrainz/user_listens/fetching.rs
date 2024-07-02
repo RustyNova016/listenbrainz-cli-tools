@@ -22,7 +22,7 @@ impl UserListens {
         Self::fetch_latest(username).await?;
 
         println_cli("Updating unmapped listens...");
-        Self::update_unlinked_of_user(username).await?; //TODO: Put back on
+        //Self::update_unlinked_of_user(username).await?; //TODO: Put back on
 
         Ok(Self::get_from_cache(username)
             .await

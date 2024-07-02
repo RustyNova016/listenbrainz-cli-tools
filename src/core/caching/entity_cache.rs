@@ -74,6 +74,12 @@ where
         self.cache.delete_last_entries(k, keep_min).await?;
         Ok(())
     }
+
+    pub async fn clear(&self) -> cacache::Result<()> {
+        self.cache.clear().await?;
+
+        Ok(())
+    }
 }
 
 impl<V> EntityCache<V>

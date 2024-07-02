@@ -19,3 +19,11 @@ pub enum Error {
 }
 
 impl Error {}
+
+pub(super) fn is_error_io_not_found(err: &cacache::Error) -> bool {
+    let cacache::Error::IoError(err, _) = err else {
+        return false;
+    };
+
+    err.kind() == std::io::ErrorKind::NotFound
+}
