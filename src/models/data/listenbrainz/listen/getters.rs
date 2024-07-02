@@ -21,4 +21,11 @@ impl Listen {
                 .await?,
         ))
     }
+
+    pub fn get_naive_recording_mbid(&self) -> Option<RecordingMBID> {
+        match self.mapping_data.as_ref() {
+            Some(val) => Some(val.get_recording_mbid()),
+            None => None,
+        }
+    }
 }
