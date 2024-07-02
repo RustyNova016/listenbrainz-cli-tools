@@ -19,6 +19,11 @@ pub struct CacheCommand {
 #[derive(Subcommand, Debug, Clone)]
 pub enum CacheSubcommands {
     /// Load a listen dump from the website
+    ///
+    /// Allows to load an exported dump of you listens. This is often faster than using the app.
+    /// This also prevent stumbling into LB-1584
+    ///
+    /// You can get a listen dump [here](https://listenbrainz.org/settings/export/)
     LoadDump {
         /// Name of the user to import those listens for
         username: String,
@@ -28,6 +33,8 @@ pub enum CacheSubcommands {
     },
 
     /// Wipe the cache's data
+    ///
+    /// This is useful if you need disk space, or need to manually rebuild in case of corruption
     Clear { target: ClearTarget },
 }
 

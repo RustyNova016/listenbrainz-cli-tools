@@ -19,9 +19,11 @@ pub struct RadioCommand {
     #[command(subcommand)]
     pub command: RadioSubcommands,
 
+    /// The minimum count of tracks the radio should add to the playlist. (Default: 50, gets overidden by `--min-duration`)
     #[arg(long)]
     min_count: Option<u64>,
 
+    /// The minimum duration the playlist should last for. This accept natural language (Ex: "1 hour 36 mins")
     #[arg(long)]
     min_duration: Option<String>,
 }
@@ -56,42 +58,53 @@ impl RadioCommand {
 
 #[derive(Subcommand, Debug, Clone)]
 pub enum RadioSubcommands {
-    /// Radio based on artist that already got listened to
+    /// Randomly adds recordings from artists you already listened to
     Circles {
-        /// Name of the user to fetch unlinked listen from
-        #[arg(short, long)]
+        /// Name of the user to fetch listens from
         username: String,
 
-        /// User token
-        #[arg(short, long)]
+        /// Your user token.
+        ///
+        /// You can find it at <https://listenbrainz.org/settings/>.
+        /// If it's set in the config file, you can ignore this argument
         token: Option<String>,
 
-        /// Use this flag to only get unlistened recordings
+        /// Use this flag to only get unlistened recordings. This is great for exploration playlists
         #[clap(long, action=ArgAction::SetTrue)]
         unlistened: bool,
-        ///// The amount of hours needed to wait after a recording have been given before it is resuggested
-        //#[arg(short, long, default_value_t = 0)]
-        //cooldown: u64
     },
 
     /// Generate a playlist containing your underrated listens
+    ///
+    /// This radio will create a playlist containing all the tracks that you listen to, but seemingly no one else does.
+    ///
+    ///> The mix is made by calculating a score for each listen. This score is composed of two values:
+    ///> - The rank in the user's top 1000 recording of all time (First place get 100 points, second get 999.9, etc...)
+    ///> - The percentage of the recording's listens being from the user (Made with this formula: (user listens / worldwide listens) *100)
     Underrated {
-        /// Name of the user to fetch unlinked listen from
-        #[arg(short, long)]
+        /// Name of the user to fetch listens from
         username: String,
 
-        /// User token
+        /// Your user token.
+        ///
+        /// You can find it at <https://listenbrainz.org/settings/>.
+        /// If it's set in the config file, you can ignore this argument
         #[arg(short, long)]
         token: Option<String>,
     },
 
     /// Generate playlists depending on the listen rate of recordings
+    ///
+    /// This algorythm bases itself on your listen rate of recording to get more forgotten tracks.
+    /// It takes the recordings with the lowest listen rates, and put them into a playlist
     Rate {
-        /// Name of the user to fetch unlinked listen from
-        #[arg(short, long)]
+        /// Name of the user to fetch listens from
         username: String,
 
-        /// User token
+        /// Your user token.
+        ///
+        /// You can find it at <https://listenbrainz.org/settings/>.
+        /// If it's set in the config file, you can ignore this argument
         #[arg(short, long)]
         token: Option<String>,
 
@@ -112,13 +125,18 @@ pub enum RadioSubcommands {
         cooldown: u64,
     },
 
-    /// Generate playlists based on recording that the user should have listened to by now according to the user's listen rate
+    /// Generate playlists based on recording that the user should have listened to by now
+    ///
+    /// Similar to listen rates, this algorithm calculate the average time between listens, and estimate when the next listen will happen.
+    /// It then put together a playlist made out of recordings you should have listened by now.
     Overdue {
-        /// Name of the user to fetch unlinked listen from
-        #[arg(short, long)]
+        /// Name of the user to fetch listens from
         username: String,
 
-        /// User token
+        /// Your user token.
+        ///
+        /// You can find it at <https://listenbrainz.org/settings/>.
+        /// If it's set in the config file, you can ignore this argument
         #[arg(short, long)]
         token: Option<String>,
 
@@ -131,6 +149,9 @@ pub enum RadioSubcommands {
         cooldown: u64,
 
         /// Sort the recordings by the time overdue / the average time between listens
+        ///
+        /// Instead of sorting by date, the listens are sorted by how many estimated listens should have happened by now (Time elapsed since last listen / Average time per listens)
+
         #[arg(short, long, default_value_t = false)]
         overdue_factor: bool,
     },
