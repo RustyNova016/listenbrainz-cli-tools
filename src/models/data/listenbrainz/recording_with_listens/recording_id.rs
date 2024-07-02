@@ -41,7 +41,10 @@ impl RecordingIDWithListens {
     pub async fn all_from_unfiltered(listens: &ListenCollection) -> color_eyre::Result<Vec<Self>> {
         let recordings = listens.get_listened_recordings_mbids().await?;
 
-        Ok(recordings.into_iter().map(|rec| Self::new_from_unfiltered(rec, listens)).collect_vec())
+        Ok(recordings
+            .into_iter()
+            .map(|rec| Self::new_from_unfiltered(rec, listens))
+            .collect_vec())
     }
 
     pub fn first_listen_date(&self) -> Option<DateTime<Utc>> {
@@ -102,6 +105,4 @@ impl RecordingIDWithListens {
         Decimal::from_i64(self.overdue_by().num_seconds()).unwrap()
             / Decimal::from_i64(self.average_duration_between_listens().num_seconds()).unwrap()
     }
-
-    
 }

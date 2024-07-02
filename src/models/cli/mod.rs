@@ -7,6 +7,7 @@ use lookup::LookupCommand;
 
 use crate::models::cli::common::{GroupByTarget, SortListensBy, SortSorterBy};
 use crate::models::cli::radio::RadioCommand;
+use crate::tools::compatibility::compatibility_command;
 use crate::tools::interactive_mapper::interactive_mapper;
 use crate::tools::stats::stats_command;
 use crate::tools::unlinked::unmapped_command;
@@ -70,6 +71,14 @@ pub enum Commands {
         sort: Option<SortListensBy>,
     },
 
+    Compatibility {
+        /// The name of the first user
+        user_a: String,
+
+        /// The name of the second user
+        user_b: String,
+    },
+
     /// Generate playlists
     Radio(RadioCommand),
 
@@ -105,6 +114,8 @@ impl Commands {
                 )
                 .await?;
             }
+
+            Self::Compatibility { user_a, user_b } => compatibility_command(user_a, user_b).await?,
 
             Self::Radio(val) => val.run().await?,
 
