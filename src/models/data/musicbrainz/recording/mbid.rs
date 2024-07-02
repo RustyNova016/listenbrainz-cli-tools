@@ -7,8 +7,10 @@ use serde::{Deserialize, Serialize};
 use crate::core::entity_traits::mb_cached::MBCached;
 use crate::core::entity_traits::mbid::IsMbid;
 use crate::models::data::musicbrainz::external_musicbrainz_entity::ExternalMusicBrainzEntity;
+use crate::models::data::musicbrainz::mbid::any_mbid::AnyMBIDType;
 use crate::models::data::musicbrainz::mbid::generic_mbid::IdAliasState;
 use crate::models::data::musicbrainz::mbid::generic_mbid::MBIDSpe;
+use crate::models::data::musicbrainz::mbid::generic_mbid::NaiveMBID;
 use crate::models::data::musicbrainz::mbid::is_musicbrainz_id::IsMusicbrainzID;
 use crate::models::data::musicbrainz::mbid::MBID;
 use crate::models::data::musicbrainz::recording::external::RecordingExt;
@@ -19,7 +21,14 @@ use super::Recording;
 #[derive(
     Debug, Clone, PartialEq, Eq, Deref, DerefMut, Into, From, Serialize, Deserialize, Hash, Display,
 )]
+#[deprecated]
 pub struct RecordingMBID(String);
+
+impl RecordingMBID {
+    pub fn into_spe_naive(&self) -> NaiveMBID<Recording> {
+        MBIDSpe::from(self.to_string())
+    }
+}
 
 impl IsMbid<Recording> for RecordingMBID {
     async fn get_or_fetch_entity(&self) -> color_eyre::Result<Recording> {
@@ -69,5 +78,14 @@ where
                 .context("Failed to fetch recording from MusicBrainz")?
                 .into_entity(),
         )
+    }
+}
+
+impl<S> From<MBIDSpe<Recording, S>> for AnyMBIDType<S>
+where
+    S: IdAliasState,
+{
+    fn from(value: MBIDSpe<Recording, S>) -> Self {
+        Self::Recording(value)
     }
 }

@@ -1,3 +1,5 @@
+use std::sync::Arc;
+
 use chrono::NaiveDate;
 use derive_getters::Getters;
 use musicbrainz_rs::entity::alias::Alias;
@@ -6,6 +8,7 @@ use musicbrainz_rs::entity::release_group::{ReleaseGroupPrimaryType, ReleaseGrou
 use musicbrainz_rs::entity::tag::Tag;
 use serde::{Deserialize, Serialize};
 
+use crate::core::caching::musicbrainz::musicbrainz_cache::MusicbrainzCache;
 use crate::core::entity_traits::relations::has_artist_credits::HasArtistCredits;
 use crate::models::data::musicbrainz::artist_credit::collection::ArtistCredits;
 use crate::models::data::musicbrainz::entity::entity_kind::MusicbrainzEntityKind;
@@ -14,6 +17,9 @@ use crate::models::data::musicbrainz::mbid::generic_mbid::{MBIDSpe, PrimaryID};
 use crate::models::data::musicbrainz::relation::Relation;
 use crate::models::data::musicbrainz::release::mbid::ReleaseMBID;
 use crate::models::data::musicbrainz::release_group::mbid::ReleaseGroupMBID;
+use crate::models::data::musicbrainz_database::MUSICBRAINZ_DATABASE;
+
+use super::entity::any::any_musicbrainz_entity::AnyMusicBrainzEntity;
 
 mod caching;
 mod converters;
@@ -41,12 +47,57 @@ pub struct ReleaseGroup {
 }
 
 impl IsMusicbrainzEntity for ReleaseGroup {
+    fn get_mb_cache() -> Arc<MusicbrainzCache<Self>> {
+        MUSICBRAINZ_DATABASE.release_groups().clone()
+    }
+
     fn as_kind(&self) -> MusicbrainzEntityKind {
         MusicbrainzEntityKind::ReleaseGroup
     }
 
-    fn get_mbid(&self) -> MBIDSpe<Self, PrimaryID> {
+    fn try_from_any(
+        value: &AnyMusicBrainzEntity,
+    ) -> Result<Arc<Self>, crate::models::error::Error> {
+        if let AnyMusicBrainzEntity::ReleaseGroup(val) = value {
+            return Ok(val.clone());
+        }
+
+        Err(crate::models::error::Error::InvalidTypeConvertion(
+            "MusicBrainzEntity".to_string(),
+            "ReleaseGroup".to_string(),
+        ))
+    }
+
+    fn get_mbidspe(&self) -> MBIDSpe<Self, PrimaryID> {
         MBIDSpe::from(self.id.to_string())
+    }
+
+    fn partial_update(self, newer: Self) -> Self {
+        Self {
+            id: newer.id,
+            secondary_types: newer.secondary_types,
+            secondary_type_ids: newer.secondary_type_ids,
+            disambiguation: newer.disambiguation,
+            title: newer.title,
+            primary_type_id: newer.primary_type_id.or(self.primary_type_id),
+            first_release_date: newer.first_release_date.or(self.first_release_date),
+            primary_type: newer.primary_type.or(self.primary_type),
+            tags: newer.tags.or(self.tags),
+            aliases: newer.aliases.or(self.aliases),
+            genres: newer.genres.or(self.genres),
+            releases: newer.releases.or(self.releases),
+            annotation: newer.annotation.or(self.annotation),
+            artist_credit: newer.artist_credit.or(self.artist_credit),
+            relations: newer.relations.or(self.relations),
+        }
+    }
+
+    fn into_any(self: Arc<Self>) -> AnyMusicBrainzEntity {
+        self.into()
+    }
+
+    fn into_arc_and_any(self) -> AnyMusicBrainzEntity {
+        Arc::new(self).into_any()
     }
 }
 

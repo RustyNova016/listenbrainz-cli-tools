@@ -1,5 +1,10 @@
+use std::sync::Arc;
+
 use itertools::Itertools;
 use musicbrainz_rs::entity::release::Release as ReleaseMS;
+
+use crate::models::data::musicbrainz::entity::any::any_musicbrainz_entity::AnyMusicBrainzEntity;
+use crate::models::error::Error;
 
 use super::Release;
 
@@ -34,5 +39,18 @@ impl From<ReleaseMS> for Release {
                 .map(|relations| relations.into_iter().map_into().collect_vec()),
             tags: value.tags,
         }
+    }
+}
+
+impl From<AnyMusicBrainzEntity> for Result<Arc<Release>, Error> {
+    fn from(value: AnyMusicBrainzEntity) -> Self {
+        if let AnyMusicBrainzEntity::Release(val) = value {
+            return Ok(val);
+        }
+
+        Err(Error::InvalidTypeConvertion(
+            "MusicBrainzEntity".to_string(),
+            "Release".to_string(),
+        ))
     }
 }

@@ -2,7 +2,7 @@ use std::path::PathBuf;
 
 use crate::models::cli::cache::load_listen_dump::load_listen_dump;
 use crate::models::data::entity_database::ENTITY_DATABASE;
-use crate::models::data::musicbrainz_database::MUSICBRAINZ_DATABASE;
+use crate::models::data::musicbrainz_database_legacy::MUSICBRAINZ_DATABASE_LEGACY;
 use clap::ValueEnum;
 use clap::{Parser, Subcommand};
 use futures::try_join;
@@ -39,7 +39,7 @@ impl CacheCommand {
             }
             CacheSubcommands::Clear { target } => {
                 let _ = try_join!(
-                    MUSICBRAINZ_DATABASE.clear(target),
+                    MUSICBRAINZ_DATABASE_LEGACY.clear(target),
                     ENTITY_DATABASE.clear(*target)
                 )?;
             }

@@ -1,3 +1,5 @@
+use std::sync::Arc;
+
 use derive_getters::Getters;
 use itertools::Itertools;
 use musicbrainz_rs::entity::alias::Alias;
@@ -7,10 +9,14 @@ use musicbrainz_rs::entity::lifespan::LifeSpan;
 use musicbrainz_rs::entity::tag::Tag;
 use serde::{Deserialize, Serialize};
 
+use crate::core::caching::musicbrainz::musicbrainz_cache::MusicbrainzCache;
 use crate::models::data::musicbrainz::mbid::generic_mbid::{MBIDSpe, PrimaryID};
 use crate::models::data::musicbrainz::relation::Relation;
 use crate::models::data::musicbrainz::work::mbid::WorkMBID;
+use crate::models::data::musicbrainz_database::MUSICBRAINZ_DATABASE;
+use crate::models::error::Error;
 
+use super::entity::any::any_musicbrainz_entity::AnyMusicBrainzEntity;
 use super::entity::entity_kind::MusicbrainzEntityKind;
 use super::entity::is_musicbrainz_entity::IsMusicbrainzEntity;
 use super::recording::mbid::RecordingMBID;
@@ -76,11 +82,56 @@ impl From<musicbrainz_rs::entity::artist::Artist> for Artist {
 }
 
 impl IsMusicbrainzEntity for Artist {
+    fn get_mb_cache() -> Arc<MusicbrainzCache<Self>> {
+        MUSICBRAINZ_DATABASE.artists().clone()
+    }
+
     fn as_kind(&self) -> MusicbrainzEntityKind {
         MusicbrainzEntityKind::Artist
     }
 
-    fn get_mbid(&self) -> MBIDSpe<Self, PrimaryID> {
+    fn get_mbidspe(&self) -> MBIDSpe<Self, PrimaryID> {
         MBIDSpe::from(self.id.to_string())
+    }
+
+    fn partial_update(self, newer: Self) -> Self {
+        Self {
+            id: newer.id,
+            name: newer.name,
+            annotation: newer.annotation.or(self.annotation),
+            tags: newer.tags.or(self.tags),
+            aliases: newer.aliases.or(self.aliases),
+            artist_type: newer.artist_type.or(self.artist_type),
+            country: newer.country.or(self.country),
+            gender: newer.gender.or(self.gender),
+            genres: newer.genres.or(self.genres),
+            life_span: newer.life_span.or(self.life_span),
+            disambiguation: newer.disambiguation,
+            recordings: newer.recordings.or(self.recordings),
+            release_groups: newer.release_groups.or(self.release_groups),
+            releases: newer.releases.or(self.releases),
+            sort_name: newer.sort_name,
+            works: newer.works.or(self.works),
+            relations: newer.relations.or(self.relations),
+        }
+    }
+
+    fn try_from_any(value: &AnyMusicBrainzEntity) -> Result<Arc<Self>, Error> {
+        if let AnyMusicBrainzEntity::Artist(val) = value {
+            return Ok(val.clone());
+        }
+
+        Err(Error::InvalidTypeConvertion(
+            "MusicBrainzEntity".to_string(),
+            "Artist".to_string(),
+        ))
+    }
+
+    fn into_any(self: Arc<Self>) -> AnyMusicBrainzEntity {
+        AnyMusicBrainzEntity::Artist(self)
+    }
+
+    fn into_arc_and_any(self) -> AnyMusicBrainzEntity {
+        Arc::new(self).into_any()
     }
 }

@@ -13,13 +13,14 @@ use crate::core::caching::serde_cacache::error::Error;
 use crate::core::caching::serde_cacache::tidy::SerdeCacacheTidy;
 use crate::core::caching::CACHE_LOCATION;
 use crate::core::entity_traits::mbid::{HasMBID, IsMbid};
-use crate::core::entity_traits::updatable::Updatable;
+use crate::core::entity_traits::update::Updatable;
 use crate::models::data::musicbrainz::external_musicbrainz_entity::FlattenedMBEntityExt;
 use crate::models::data::musicbrainz::relation::external::RelationContentExt;
 use crate::utils::{println_cli, println_cli_warn};
 
 #[derive(Debug)]
-pub struct MusicbrainzCache<K, V>
+#[deprecated]
+pub struct MusicbrainzCacheLegacy<K, V>
 where
     K: IsMbid<V> + Serialize + DeserializeOwned,
     V: Serialize + DeserializeOwned + HasMBID<K> + Updatable + Clone,
@@ -33,7 +34,7 @@ where
     fetch_locks: CHashMap<String, Arc<Semaphore>>,
 }
 
-impl<K: IsMbid<V>, V> MusicbrainzCache<K, V>
+impl<K: IsMbid<V>, V> MusicbrainzCacheLegacy<K, V>
 where
     K: IsMbid<V> + Serialize + DeserializeOwned,
     V: Serialize + DeserializeOwned + HasMBID<K> + Updatable + Clone,
