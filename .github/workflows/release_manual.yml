@@ -1,7 +1,5 @@
-name: release
-on:
-  release:
-    types: [published]     
+name: release_manual
+on: workflow_dispatch
       
 jobs:
       get-tag:
