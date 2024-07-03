@@ -19,12 +19,12 @@ cargo build --release
 
 # Usage
 
-Full markdown help can be found under [docs/CommandLineHelp.md](https://github.com/RustyNova016/listenbrainz-cli-tools/blob/feature/markdown_help.rs/docs/CommandLineHelp.md), but full `--help` support exists too. 
+Full markdown help can be found under [docs/CommandLineHelp.md](https://github.com/RustyNova016/listenbrainz-cli-tools/blob/master/docs/CommandLineHelp.md), but full `--help` support exists too. 
 
 # Tools
 ## Unmapped listens 
 
-[Usage > Command Line documentation](https://github.com/RustyNova016/listenbrainz-cli-tools/blob/feature/markdown_help.rs/docs/CommandLineHelp.md#listenbrainz-cli-tools-mapping-list-unmapped)
+[Usage > Command Line documentation](https://github.com/RustyNova016/listenbrainz-cli-tools/blob/master/docs/CommandLineHelp.md#listenbrainz-cli-tools-mapping-list-unmapped)
 
 This will list all your unmapped listens, grouped by similarity. 
 It also gives a link to quickly look up the listen in listenbrainz, and go link it
@@ -45,13 +45,13 @@ Total: 8 unlinked recordings
 
 ## Interactive mass mapper
 
-[Usage > Command Line documentation](https://github.com/RustyNova016/listenbrainz-cli-tools/blob/feature/markdown_help.rs/docs/CommandLineHelp.md#listenbrainz-cli-tools-mapping-mapper)
+[Usage > Command Line documentation](https://github.com/RustyNova016/listenbrainz-cli-tools/blob/master/docs/CommandLineHelp.md#listenbrainz-cli-tools-mapping-mapper)
 
 This tool allows for easy and faster mapping of recordings. It goes through each unmapped recordings, and give a few suggested recordings for the mapping. This is the exact same as mapping recording in the web UI.
 
 ## Statistics
 
-[Usage > Command Line documentation](https://github.com/RustyNova016/listenbrainz-cli-tools/blob/feature/markdown_help.rs/docs/CommandLineHelp.md#listenbrainz-cli-tools-stats)
+[Usage > Command Line documentation](https://github.com/RustyNova016/listenbrainz-cli-tools/blob/master/docs/CommandLineHelp.md#listenbrainz-cli-tools-stats)
 
 While ListenBrainz have its own statistic page, it only refreshes daily, and is limited to only some entities. Furthermore, bugs in ListenBrainz statitics lead to misleading result.
 
@@ -63,7 +63,7 @@ A few radio algorithms have been made to generate playlists for you
 
 ### Artist Circles
 
-[Usage > Command Line documentation](https://github.com/RustyNova016/listenbrainz-cli-tools/blob/feature/markdown_help.rs/docs/CommandLineHelp.md#listenbrainz-cli-tools-radio-circles)
+[Usage > Command Line documentation](https://github.com/RustyNova016/listenbrainz-cli-tools/blob/master/docs/CommandLineHelp.md#listenbrainz-cli-tools-radio-circles)
 
 This algorithm keep your playlist close to the artists you are listening to. The way it generate is as follow:
 
@@ -75,7 +75,7 @@ There is the option to only get unlistened recordings, making an alternative to 
 
 ### Underrated tracks
 
-[Usage > Command Line documentation](https://github.com/RustyNova016/listenbrainz-cli-tools/blob/feature/markdown_help.rs/docs/CommandLineHelp.md#listenbrainz-cli-tools-radio-underrated)
+[Usage > Command Line documentation](https://github.com/RustyNova016/listenbrainz-cli-tools/blob/master/docs/CommandLineHelp.md#listenbrainz-cli-tools-radio-underrated)
 
 This radio will create a playlist containing all the tracks that you listen to, but seemingly no one else does. 
 
@@ -90,14 +90,14 @@ This radio will create a playlist containing all the tracks that you listen to, 
 
 ### Listen rate
 
-[Usage > Command Line documentation](https://github.com/RustyNova016/listenbrainz-cli-tools/blob/feature/markdown_help.rs/docs/CommandLineHelp.md#listenbrainz-cli-tools-radio-rate)
+[Usage > Command Line documentation](https://github.com/RustyNova016/listenbrainz-cli-tools/blob/master/docs/CommandLineHelp.md#listenbrainz-cli-tools-radio-rate)
 
 This algorithm bases itself on your listen rate of recording to get more forgotten tracks. It takes the recordings with the lowest listen rates, and put them into a playlist
 
 
 ### Overdue listens
 
-[Usage > Command Line documentation](https://github.com/RustyNova016/listenbrainz-cli-tools/blob/feature/markdown_help.rs/docs/CommandLineHelp.md#listenbrainz-cli-tools-radio-rate)
+[Usage > Command Line documentation](https://github.com/RustyNova016/listenbrainz-cli-tools/blob/master/docs/CommandLineHelp.md#listenbrainz-cli-tools-radio-rate)
 
 Similar to listen rates, this algorithm calculate the average time between listens, and estimate when the next listen will happen. 
 It thens put together a playlist made out of recordings you should have listened by now.
