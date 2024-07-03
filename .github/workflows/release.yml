@@ -1,9 +1,7 @@
 name: release
 on:
-  push:
-    # Pattern matched against refs/tags
-    tags:        
-      - 'v*'          
+  release:
+    types: [published]     
       
 jobs:
       get-tag:
