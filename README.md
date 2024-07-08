@@ -104,6 +104,26 @@ It thens put together a playlist made out of recordings you should have listened
 
 Another mode is the "Overdue factor". Instead of sorting by date, the listens are sorted by how many estimated listens should have happened by now (Time elapsed since last listen / Average time per listens)
 
+# User Compatibility
+
+[Usage > Command Line documentation](https://github.com/RustyNova016/listenbrainz-cli-tools/blob/master/docs/CommandLineHelp.md#listenbrainz-cli-tools-compatibility)
+
+Similarly to Listenbrainz, a compatibility calculator is available, using a new algorithm that may provide more accurate results.
+
+ The score is calculated as follow:
+ - For each user and listened recording, the percentage of total listens being of this recording is calculated (total recording listens / total number of listens of user)
+ - The lowest percent between the two user's is then added to the total score
+
+ ### Exemple
+
+ As an exemple, let's have two users: UserA and UserB. They both only share one listened track in common, being "Exemple Track".
+ UserA has 5 listens on "Exemple Track", and 28 total listens. UserB has 12 listens on "Exemple Track", and 45 total listens.
+ - This means that "Exemple Track" makes 17% of UserA's total listens, and 26% of UserB's listens.
+ - We take the lowest percent between the two, meaning that we add 17% to the final score. 
+ 
+ Since "Exemple Track" is the only shared track, this means that the final score is 17% compatibility
+
+
 # Other infos
 
 This project is in beta. There's a lot of features I'd like to add, and need a lot of testing before 1.0. If you find a bug, or have a feature request, feel free to create (and spam) a new issue.
