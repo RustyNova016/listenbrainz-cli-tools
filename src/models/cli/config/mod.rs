@@ -7,6 +7,9 @@ use crate::utils::extensions::chrono_ext::DurationExt;
 use chrono::Duration;
 use clap::Parser;
 use clap::Subcommand;
+use listen_config::ListenConfigCli;
+
+pub mod listen_config;
 
 #[derive(Parser, Debug, Clone)]
 #[command(version, about, long_about = None)]
@@ -44,6 +47,9 @@ pub enum ConfigCommands {
         /// A duration to timeout for
         duration: String,
     },
+
+    /// Configuration targeting listen data
+    Listens(ListenConfigCli),
 }
 
 impl ConfigCommands {
@@ -73,6 +79,7 @@ impl ConfigCommands {
                     Config::remove_blacklisted_msid(msid)?;
                 }
             }
+            Self::Listens(val) => val.run().await?,
         }
 
         Ok(())

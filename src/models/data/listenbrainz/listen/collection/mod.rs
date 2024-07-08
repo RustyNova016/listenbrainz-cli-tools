@@ -120,6 +120,7 @@ impl ListenCollection {
     }
 
     /// Return the list of unique recordings ids that have been listened to.
+    #[deprecated]
     pub fn get_listened_recordings_mbids_naive(&self) -> Vec<RecordingMBID> {
         self.get_mapped_listens()
             .into_iter()

@@ -1,13 +1,13 @@
 use chrono::Duration;
 use chrono::Local;
 use humantime::format_duration;
-use std::io;
 use std::sync::Arc;
 
 use crate::core::entity_traits::mbid::IsMbid;
 use crate::models::data::listenbrainz::recording_with_listens::recording::RecordingWithListens;
 use crate::models::data::listenbrainz::user_listens::UserListens;
 use crate::models::data::musicbrainz::recording::mbid::RecordingMBID;
+use crate::utils::cli::await_next;
 use crate::utils::extensions::chrono_ext::DateTimeUtcExt;
 use crate::utils::extensions::chrono_ext::DurationExt;
 use crate::utils::println_cli;
@@ -29,8 +29,7 @@ pub async fn lookup_recording(username: &str, id: RecordingMBID) -> color_eyre::
         lookup_recording_unlistened(recording_info).await?;
     }
 
-    let buf = &mut String::new();
-    let _ = io::stdin().read_line(buf);
+    await_next();
 
     Ok(())
 }

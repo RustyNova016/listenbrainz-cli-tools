@@ -1,6 +1,3 @@
-pub mod cache;
-pub mod lookup;
-pub mod mapping;
 use cache::CacheCommand;
 use clap::{Parser, Subcommand};
 use config::ConfigCli;
@@ -9,10 +6,14 @@ use mapping::MappingCommand;
 
 use crate::models::cli::common::{GroupByTarget, SortSorterBy};
 use crate::models::cli::radio::RadioCommand;
+use crate::tools::compatibility::compatibility_command;
 use crate::tools::stats::stats_command;
 
+pub mod cache;
 pub mod common;
 pub mod config;
+pub mod lookup;
+pub mod mapping;
 pub mod radio;
 
 /// Tools for Listenbrainz
@@ -42,6 +43,14 @@ impl Cli {
 pub enum Commands {
     /// Commands to deal with the local cache
     Cache(CacheCommand),
+
+    Compatibility {
+        /// The name of the first user
+        user_a: String,
+
+        /// The name of the second user
+        user_b: String,
+    },
 
     /// Commands to deal with the app's configuration
     Config(ConfigCli),
@@ -94,6 +103,8 @@ impl Commands {
             } => {
                 stats_command(&username.to_lowercase(), *target, *sort).await;
             }
+
+            Self::Compatibility { user_a, user_b } => compatibility_command(user_a, user_b).await?,
 
             Self::Radio(val) => val.run().await?,
 
