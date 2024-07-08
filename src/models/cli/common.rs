@@ -54,3 +54,11 @@ impl GroupByTarget {
         }
     }
 }
+
+#[derive(ValueEnum, Clone, Debug, Copy, Default, IsVariant)]
+pub enum ConfigBool {
+    #[default]
+    Toggle,
+    True,
+    False,
+}

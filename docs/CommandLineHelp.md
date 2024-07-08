@@ -1,3 +1,4 @@
+Hello!
 # Command-Line Help for `listenbrainz-cli-tools`
 
 This document contains the help content for the `listenbrainz-cli-tools` command-line program.
@@ -8,10 +9,13 @@ This document contains the help content for the `listenbrainz-cli-tools` command
 * [`listenbrainz-cli-tools cache`↴](#listenbrainz-cli-tools-cache)
 * [`listenbrainz-cli-tools cache load-dump`↴](#listenbrainz-cli-tools-cache-load-dump)
 * [`listenbrainz-cli-tools cache clear`↴](#listenbrainz-cli-tools-cache-clear)
+* [`listenbrainz-cli-tools compatibility`↴](#listenbrainz-cli-tools-compatibility)
 * [`listenbrainz-cli-tools config`↴](#listenbrainz-cli-tools-config)
 * [`listenbrainz-cli-tools config blacklist-mapper-msid`↴](#listenbrainz-cli-tools-config-blacklist-mapper-msid)
 * [`listenbrainz-cli-tools config set-token`↴](#listenbrainz-cli-tools-config-set-token)
 * [`listenbrainz-cli-tools config timeout`↴](#listenbrainz-cli-tools-config-timeout)
+* [`listenbrainz-cli-tools config listens`↴](#listenbrainz-cli-tools-config-listens)
+* [`listenbrainz-cli-tools config listens refresh-unmapped-listens`↴](#listenbrainz-cli-tools-config-listens-refresh-unmapped-listens)
 * [`listenbrainz-cli-tools lookup`↴](#listenbrainz-cli-tools-lookup)
 * [`listenbrainz-cli-tools mapping`↴](#listenbrainz-cli-tools-mapping)
 * [`listenbrainz-cli-tools mapping list-unmapped`↴](#listenbrainz-cli-tools-mapping-list-unmapped)
@@ -32,6 +36,7 @@ A CLI app containing a set of useful tools for Listenbrainz
 ###### **Subcommands:**
 
 * `cache` — Commands to deal with the local cache
+* `compatibility` — 
 * `config` — Commands to deal with the app's configuration
 * `lookup` — Get detailled information about an entity
 * `mapping` — Commands for interacting with listen mappings
@@ -87,6 +92,17 @@ This is useful if you need disk space, or need to manually rebuild in case of co
 
 
 
+## `listenbrainz-cli-tools compatibility`
+
+**Usage:** `listenbrainz-cli-tools compatibility <USER_A> <USER_B>`
+
+###### **Arguments:**
+
+* `<USER_A>` — The name of the first user
+* `<USER_B>` — The name of the second user
+
+
+
 ## `listenbrainz-cli-tools config`
 
 Commands to deal with the app's configuration
@@ -98,6 +114,7 @@ Commands to deal with the app's configuration
 * `blacklist-mapper-msid` — Prevent an MSID to appear in the mbid mapper
 * `set-token` — Associate an user token to an username. This makes `--token` arguments optional, and prevent always having to insert it
 * `timeout` — Prevent the recording to appear on radios for a while. If you're burn out of a track and need it gone, use this
+* `listens` — Configuration targeting listen data
 
 
 
@@ -140,6 +157,33 @@ Prevent the recording to appear on radios for a while. If you're burn out of a t
 
 * `<RECORDING>` — A string containing a MBID of a recording
 * `<DURATION>` — A duration to timeout for
+
+
+
+## `listenbrainz-cli-tools config listens`
+
+Configuration targeting listen data
+
+**Usage:** `listenbrainz-cli-tools config listens <COMMAND>`
+
+###### **Subcommands:**
+
+* `refresh-unmapped-listens` — Toggle / Set whether the unmapped listens should be automatically updated when fetching listens
+
+
+
+## `listenbrainz-cli-tools config listens refresh-unmapped-listens`
+
+Toggle / Set whether the unmapped listens should be automatically updated when fetching listens
+
+**Usage:** `listenbrainz-cli-tools config listens refresh-unmapped-listens <STATE>`
+
+###### **Arguments:**
+
+* `<STATE>` — What do you want it set to?
+
+  Possible values: `toggle`, `true`, `false`
+
 
 
 
