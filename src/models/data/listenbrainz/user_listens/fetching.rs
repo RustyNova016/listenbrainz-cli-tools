@@ -9,6 +9,7 @@ use tokio::sync::RwLock;
 use crate::core::display::progress_bar::ProgressBarCli;
 use crate::core::entity_traits::cached::Cached;
 use crate::core::entity_traits::insertable::Insertable;
+use crate::models::config::global_config::CONFIG;
 use crate::utils::extensions::UserListensPayloadExt;
 use crate::utils::{println_cli, println_lis};
 
@@ -21,8 +22,10 @@ impl UserListens {
         println_cli("Getting new user listens...");
         Self::fetch_latest(username).await?;
 
-        println_cli("Updating unmapped listens...");
-        //Self::update_unlinked_of_user(username).await?; //TODO: Put back on
+        if CONFIG.read().await.listens.refresh_unmapped_listens {
+            println_cli("Updating unmapped listens...");
+            Self::update_unlinked_of_user(username).await?;
+        }
 
         Ok(Self::get_from_cache(username)
             .await

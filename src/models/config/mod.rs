@@ -1,11 +1,15 @@
-pub mod mapper;
-pub mod recording_timeout;
 use crate::core::entity_traits::config_file::ConfigFile;
 use derive_getters::Getters;
+use listen_config::ListenConfig;
 use mapper::MapperConfig;
 use serde::Deserialize;
 use serde::Serialize;
 use std::collections::HashMap;
+
+pub mod global_config;
+pub mod listen_config;
+pub mod mapper;
+pub mod recording_timeout;
 
 #[derive(Debug, Serialize, Deserialize, Getters, Default)]
 pub struct Config {
@@ -13,6 +17,9 @@ pub struct Config {
     tokens: HashMap<String, String>,
 
     pub(super) mapper: Option<MapperConfig>,
+
+    #[serde(default)]
+    pub listens: ListenConfig,
 }
 
 impl Config {

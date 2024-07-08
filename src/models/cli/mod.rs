@@ -1,6 +1,3 @@
-pub mod cache;
-pub mod lookup;
-pub mod mapping;
 use cache::CacheCommand;
 use clap::{Parser, Subcommand};
 use config::ConfigCli;
@@ -12,8 +9,11 @@ use crate::models::cli::radio::RadioCommand;
 use crate::tools::compatibility::compatibility_command;
 use crate::tools::stats::stats_command;
 
+pub mod cache;
 pub mod common;
 pub mod config;
+pub mod lookup;
+pub mod mapping;
 pub mod radio;
 
 /// Tools for Listenbrainz
