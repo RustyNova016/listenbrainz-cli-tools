@@ -24,9 +24,7 @@ async fn main() -> color_eyre::Result<()> {
     if post_run {
         println_cli("Optional cleanup - This is fine to cancel");
         println_cli("Cleaning some old entries...");
-        MUSICBRAINZ_DATABASE
-            .invalidate_last_entries(10, 10)
-            .await?;
+        MUSICBRAINZ_DATABASE.invalidate_last_entries(10, 10).await?;
         println_cli("Done!");
     }
 

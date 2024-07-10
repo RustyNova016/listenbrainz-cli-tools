@@ -1,6 +1,7 @@
 pub mod any_mbid;
 pub mod common_impl;
 pub mod naive;
+pub mod state_id;
 
 use derive_more::{Display, From, IsVariant, Unwrap};
 use serde::{Deserialize, Serialize};
