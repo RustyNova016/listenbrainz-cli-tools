@@ -2,20 +2,24 @@ use crate::core::caching::serde_cacache;
 use crate::core::caching::serde_cacache::tidy::SerdeCacacheTidy;
 
 use crate::models::data::musicbrainz::entity::any::any_musicbrainz_entity::AnyMusicBrainzEntity;
-use crate::models::data::musicbrainz::entity::is_musicbrainz_entity::IsMusicbrainzEntity;
-use crate::models::data::musicbrainz::mbid::generic_mbid::NaiveMBID;
+
+use crate::models::data::musicbrainz::entity::traits::fetch_entity::FetchEntity;
 use crate::models::data::musicbrainz::mbid::is_musicbrainz_id::IsMusicbrainzID;
+use crate::models::data::musicbrainz::mbid::state_id::state::NaiveMBID;
 use crate::models::data::musicbrainz::relation::external::RelationContentExt;
+use crate::models::data::musicbrainz::mbid::state_id::MusicBrainzEntity;
+
 use crate::models::error::Error;
 use std::sync::Arc;
+use serde::de::DeserializeOwned;
+use serde::Serialize;
 use tokio::sync::RwLock;
 use tokio::sync::RwLockWriteGuard;
 
 #[derive(Debug)]
 pub struct CachedEntity<V>
 where
-    V: IsMusicbrainzEntity,
-    NaiveMBID<V>: IsMusicbrainzID<V>,
+    V: MusicBrainzEntity + FetchEntity + Serialize + DeserializeOwned,
 {
     key: NaiveMBID<V>,
     loaded: RwLock<Option<Arc<V>>>,
@@ -26,8 +30,7 @@ where
 
 impl<V> CachedEntity<V>
 where
-    V: IsMusicbrainzEntity,
-    NaiveMBID<V>: IsMusicbrainzID<V>,
+    V: MusicBrainzEntity + FetchEntity + Serialize + DeserializeOwned,
 {
     pub fn new(
         id: NaiveMBID<V>,
@@ -125,7 +128,7 @@ where
         &self,
         write_lock: &mut RwLockWriteGuard<'a, Option<Arc<V>>>,
     ) -> color_eyre::Result<Arc<V>> {
-        let fetch_result = self.key.fetch().await?;
+        let fetch_result = self.key.fetch_entity().await?;
         let converted_fetch = fetch_result.flattened_any();
 
         // First, process the main entity

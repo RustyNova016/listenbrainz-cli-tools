@@ -3,8 +3,12 @@ pub mod traits;
 
 use std::marker::PhantomData;
 
+use serde::Deserialize;
+use serde::Serialize;
+
 pub mod impls;
 
+#[derive(Debug, PartialEq, Eq, Deserialize, Serialize, Clone)]
 pub struct MBIDWithState<T, S>
 where
     T: MusicBrainzEntity + ?Sized,

@@ -7,6 +7,7 @@ use std::ops::Deref;
 use super::MBIDState;
 use super::MBIDWithState;
 use super::MusicBrainzEntity;
+pub mod entity_cachable;
 
 pub mod any_state;
 pub mod entity_fetchable;
