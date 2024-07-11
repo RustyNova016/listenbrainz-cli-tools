@@ -1,3 +1,4 @@
+pub mod vec_from_vec;
 pub mod cached;
 pub mod cached_trait;
 pub mod config_file;

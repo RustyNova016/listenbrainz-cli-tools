@@ -1,3 +1,4 @@
+pub mod collection;
 pub mod any;
 pub mod converters;
 pub mod state;
