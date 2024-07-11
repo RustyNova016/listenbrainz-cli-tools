@@ -14,7 +14,7 @@ use crate::models::error::Error;
 use super::any::any_musicbrainz_entity::AnyMusicBrainzEntity;
 use super::entity_kind::MusicbrainzEntityKind;
 
-/// Marker trait for an MusicBrainz entity
+/// Marker trait for an `MusicBrainz` entity
 pub trait MusicBrainzEntity: Serialize + DeserializeOwned + Eq + Clone {
     async fn fetch<S: MBIDState>(
         id: &MBIDWithState<Self, S>,

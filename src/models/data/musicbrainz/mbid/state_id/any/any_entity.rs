@@ -1,5 +1,4 @@
 use crate::models::data::musicbrainz::artist::Artist;
-use crate::models::data::musicbrainz::entity::entity_kind::MusicbrainzEntityKind;
 use crate::models::data::musicbrainz::mbid::state_id::MBIDState;
 use crate::models::data::musicbrainz::mbid::state_id::MBIDWithState;
 use crate::models::data::musicbrainz::recording::Recording;

@@ -1,11 +1,7 @@
-use std::marker::PhantomData;
-use std::sync::Arc;
-
 use crate::models::data::musicbrainz::entity::is_musicbrainz_entity::IsMusicbrainzEntity;
 
 use super::generic_mbid::IdAliasState;
 use super::generic_mbid::MBIDSpe;
-use super::generic_mbid::NaiveID;
 use super::generic_mbid::NaiveMBID;
 use super::is_musicbrainz_id::IsMusicbrainzID;
 

@@ -13,15 +13,13 @@ where
         let kind = T::get_kind();
 
         match kind {
-            MusicbrainzEntityKind::Artist => AnyEntityMBID::Artist(MBIDWithState::from(value.id)),
-            MusicbrainzEntityKind::Recording => {
-                AnyEntityMBID::Recording(MBIDWithState::from(value.id))
-            }
-            MusicbrainzEntityKind::Release => AnyEntityMBID::Release(MBIDWithState::from(value.id)),
+            MusicbrainzEntityKind::Artist => Self::Artist(MBIDWithState::from(value.id)),
+            MusicbrainzEntityKind::Recording => Self::Recording(MBIDWithState::from(value.id)),
+            MusicbrainzEntityKind::Release => Self::Release(MBIDWithState::from(value.id)),
             MusicbrainzEntityKind::ReleaseGroup => {
-                AnyEntityMBID::ReleaseGroup(MBIDWithState::from(value.id))
+                Self::ReleaseGroup(MBIDWithState::from(value.id))
             }
-            MusicbrainzEntityKind::Work => AnyEntityMBID::Work(MBIDWithState::from(value.id)),
+            MusicbrainzEntityKind::Work => Self::Work(MBIDWithState::from(value.id)),
             _ => todo!(),
         }
     }

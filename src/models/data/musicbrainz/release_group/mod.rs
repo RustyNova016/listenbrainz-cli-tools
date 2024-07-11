@@ -9,7 +9,6 @@ use musicbrainz_rs::entity::release_group::{ReleaseGroupPrimaryType, ReleaseGrou
 use musicbrainz_rs::entity::tag::Tag;
 use serde::{Deserialize, Serialize};
 
-use crate::core::caching::musicbrainz::musicbrainz_cache::MusicbrainzCache;
 use crate::core::entity_traits::relations::has_artist_credits::HasArtistCredits;
 use crate::models::data::musicbrainz::artist_credit::collection::ArtistCredits;
 use crate::models::data::musicbrainz::entity::entity_kind::MusicbrainzEntityKind;
@@ -18,7 +17,6 @@ use crate::models::data::musicbrainz::mbid::generic_mbid::{MBIDSpe, PrimaryID};
 use crate::models::data::musicbrainz::relation::Relation;
 use crate::models::data::musicbrainz::release::mbid::ReleaseMBID;
 use crate::models::data::musicbrainz::release_group::mbid::ReleaseGroupMBID;
-use crate::models::data::musicbrainz_database::MUSICBRAINZ_DATABASE;
 
 use super::entity::any::any_musicbrainz_entity::AnyMusicBrainzEntity;
 
