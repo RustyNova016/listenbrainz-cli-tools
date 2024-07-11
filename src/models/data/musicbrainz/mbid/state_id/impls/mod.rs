@@ -1,3 +1,4 @@
+pub mod naive;
 use std::fmt::Display;
 use std::fmt::Formatter;
 use std::hash::Hash;
@@ -7,10 +8,8 @@ use std::ops::Deref;
 use super::MBIDState;
 use super::MBIDWithState;
 use super::MusicBrainzEntity;
-pub mod entity_cachable;
 
 pub mod any_state;
-pub mod entity_fetchable;
 
 impl<T, S> Deref for MBIDWithState<T, S>
 where
@@ -48,16 +47,6 @@ where
     }
 }
 
-impl<T, S> MBIDWithState<T, S>
-where
-    T: MusicBrainzEntity,
-    S: MBIDState,
-{
-    pub fn id(&self) -> &str {
-        &self.id
-    }
-}
-
 impl<T, S> Hash for MBIDWithState<T, S>
 where
     T: MusicBrainzEntity,
@@ -65,5 +54,15 @@ where
 {
     fn hash<H: std::hash::Hasher>(&self, state: &mut H) {
         self.id.hash(state);
+    }
+}
+
+impl<T, S> Clone for MBIDWithState<T, S>
+where
+    T: MusicBrainzEntity,
+    S: MBIDState,
+{
+    fn clone(&self) -> Self {
+        Self::from(self.id.clone())
     }
 }

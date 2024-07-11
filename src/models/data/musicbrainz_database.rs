@@ -9,8 +9,8 @@ use crate::models::cli::cache::ClearTarget;
 use crate::models::data::musicbrainz::release_group::ReleaseGroup;
 
 use super::musicbrainz::artist::Artist;
-use super::musicbrainz::mbid::any_mbid::AnyMBIDType;
-use super::musicbrainz::mbid::generic_mbid::NaiveID;
+use super::musicbrainz::mbid::state_id::any::any_entity::AnyEntityMBID;
+use super::musicbrainz::mbid::state_id::state::NaiveIDState;
 use super::musicbrainz::recording::Recording;
 use super::musicbrainz::release::Release;
 use super::musicbrainz::work::Work;
@@ -28,13 +28,13 @@ pub struct MusicBrainzDatabase {
 }
 
 impl MusicBrainzDatabase {
-    pub async fn remove(&self, id: &AnyMBIDType<NaiveID>) -> color_eyre::Result<()> {
+    pub async fn remove(&self, id: &AnyEntityMBID<NaiveIDState>) -> color_eyre::Result<()> {
         match id {
-            AnyMBIDType::Artist(id) => self.artists.remove(id).await?,
-            AnyMBIDType::Release(id) => self.releases.remove(id).await?,
-            AnyMBIDType::Recording(id) => self.recordings.remove(id).await?,
-            AnyMBIDType::ReleaseGroup(id) => self.release_groups.remove(id).await?,
-            AnyMBIDType::Work(id) => self.works.remove(id).await?,
+            AnyEntityMBID::Artist(id) => self.artists.remove(id).await?,
+            AnyEntityMBID::Release(id) => self.releases.remove(id).await?,
+            AnyEntityMBID::Recording(id) => self.recordings.remove(id).await?,
+            AnyEntityMBID::ReleaseGroup(id) => self.release_groups.remove(id).await?,
+            AnyEntityMBID::Work(id) => self.works.remove(id).await?,
         }
 
         Ok(())

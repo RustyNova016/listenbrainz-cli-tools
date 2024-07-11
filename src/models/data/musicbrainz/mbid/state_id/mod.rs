@@ -1,18 +1,23 @@
+pub mod any;
+pub mod converters;
 pub mod state;
 pub mod traits;
 
 use std::marker::PhantomData;
 
+use derive_getters::Getters;
 use serde::Deserialize;
 use serde::Serialize;
 
+use crate::models::data::musicbrainz::entity::traits::MusicBrainzEntity;
+
 pub mod impls;
 
-#[derive(Debug, PartialEq, Eq, Deserialize, Serialize, Clone)]
+#[derive(Debug, PartialEq, Eq, Deserialize, Serialize, Getters)]
 pub struct MBIDWithState<T, S>
 where
-    T: MusicBrainzEntity + ?Sized,
-    S: MBIDState + ?Sized,
+    T: MusicBrainzEntity,
+    S: MBIDState,
 {
     pub(super) id: String,
 
@@ -21,8 +26,5 @@ where
 }
 
 // Typestate markers
-
-/// Marker trait for an MusicBrainz entity
-pub trait MusicBrainzEntity {}
 
 pub trait MBIDState {}

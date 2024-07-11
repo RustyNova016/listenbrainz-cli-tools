@@ -5,12 +5,12 @@ use std::sync::Arc;
 use derive_more::{From, IsVariant, Unwrap};
 use serde::{Deserialize, Serialize};
 
-use crate::core::entity_traits::mbid::HasMBID;
 use crate::models::data::musicbrainz::artist::Artist;
 use crate::models::data::musicbrainz::entity::entity_kind::MusicbrainzEntityKind;
-use crate::models::data::musicbrainz::entity::is_musicbrainz_entity::IsMusicbrainzEntity;
-use crate::models::data::musicbrainz::mbid::any_mbid::AnyMBIDType;
+use crate::models::data::musicbrainz::entity::traits::MusicBrainzEntity;
 use crate::models::data::musicbrainz::mbid::generic_mbid::PrimaryID;
+use crate::models::data::musicbrainz::mbid::state_id::any::any_entity::AnyEntityMBID;
+use crate::models::data::musicbrainz::mbid::state_id::state::PrimaryIDState;
 use crate::models::data::musicbrainz::mbid::MBID;
 use crate::models::data::musicbrainz::recording::Recording;
 use crate::models::data::musicbrainz::release::Release;
@@ -59,48 +59,48 @@ impl AnyMusicBrainzEntity {
             Self::Artist(val) => val
                 .as_ref()
                 .clone()
-                .partial_update(newer.unwrap_artist().as_ref().clone())
+                .incremental_update(newer.unwrap_artist().as_ref().clone())
                 .into_arc_and_any(),
             Self::Recording(val) => val
                 .as_ref()
                 .clone()
-                .partial_update(newer.unwrap_recording().as_ref().clone())
+                .incremental_update(newer.unwrap_recording().as_ref().clone())
                 .into_arc_and_any(),
             Self::Release(val) => val
                 .as_ref()
                 .clone()
-                .partial_update(newer.unwrap_release().as_ref().clone())
+                .incremental_update(newer.unwrap_release().as_ref().clone())
                 .into_arc_and_any(),
             Self::ReleaseGroup(val) => val
                 .as_ref()
                 .clone()
-                .partial_update(newer.unwrap_release_group().as_ref().clone())
+                .incremental_update(newer.unwrap_release_group().as_ref().clone())
                 .into_arc_and_any(),
             Self::Work(val) => val
                 .as_ref()
                 .clone()
-                .partial_update(newer.unwrap_work().as_ref().clone())
+                .incremental_update(newer.unwrap_work().as_ref().clone())
                 .into_arc_and_any(),
         }
     }
 
-    pub fn as_kind(&self) -> MusicbrainzEntityKind {
+    pub fn get_kind(&self) -> MusicbrainzEntityKind {
         match self {
-            Self::Artist(val) => val.as_kind(),
-            Self::Recording(val) => val.as_kind(),
-            Self::Release(val) => val.as_kind(),
-            Self::ReleaseGroup(val) => val.as_kind(),
-            Self::Work(val) => val.as_kind(),
+            Self::Artist(_) => MusicbrainzEntityKind::Artist,
+            Self::Recording(_) => MusicbrainzEntityKind::Recording,
+            Self::Release(_) => MusicbrainzEntityKind::Release,
+            Self::ReleaseGroup(_) => MusicbrainzEntityKind::ReleaseGroup,
+            Self::Work(_) => MusicbrainzEntityKind::Work,
         }
     }
 
-    pub fn get_mbidspe(&self) -> AnyMBIDType<PrimaryID> {
+    pub fn get_mbidspe(&self) -> AnyEntityMBID<PrimaryIDState> {
         match self {
-            Self::Artist(val) => val.get_mbidspe().into(),
-            Self::Recording(val) => val.get_mbidspe().into(),
-            Self::Release(val) => val.get_mbidspe().into(),
-            Self::ReleaseGroup(val) => val.get_mbidspe().into(),
-            Self::Work(val) => val.get_mbidspe().into(),
+            Self::Artist(val) => val.get_mbid().into(),
+            Self::Recording(val) => val.get_mbid().into(),
+            Self::Release(val) => val.get_mbid().into(),
+            Self::ReleaseGroup(val) => val.get_mbid().into(),
+            Self::Work(val) => val.get_mbid().into(),
         }
     }
 
@@ -111,16 +111,6 @@ impl AnyMusicBrainzEntity {
             Self::Release(val) => val.into_any(),
             Self::ReleaseGroup(val) => val.into_any(),
             Self::Work(val) => val.into_any(),
-        }
-    }
-
-    pub fn get_mbid(&self) -> MBID {
-        match self {
-            Self::Artist(val) => val.get_mbid().into(),
-            Self::ReleaseGroup(val) => val.get_mbid().into(),
-            Self::Release(val) => val.get_mbid().into(),
-            Self::Recording(val) => val.get_mbid().into(),
-            Self::Work(val) => val.get_mbid().into(),
         }
     }
 }

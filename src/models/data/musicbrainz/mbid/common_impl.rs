@@ -22,8 +22,4 @@ where
     pub fn as_naive(&self) -> NaiveMBID<T> {
         NaiveMBID::from(self.id().to_string())
     }
-
-    async fn get_entity(&self) -> color_eyre::Result<Arc<T>> {
-        T::get_load_or_fetch(&self.clone().as_naive()).await
-    }
 }

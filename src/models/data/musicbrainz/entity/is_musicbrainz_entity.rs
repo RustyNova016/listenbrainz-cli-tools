@@ -12,6 +12,7 @@ use crate::models::error::Error;
 use super::any::any_musicbrainz_entity::AnyMusicBrainzEntity;
 use super::entity_kind::MusicbrainzEntityKind;
 
+#[deprecated]
 pub trait IsMusicbrainzEntity
 where
     Self: Clone + Serialize + DeserializeOwned + Eq,
@@ -31,23 +32,4 @@ where
     fn into_any(self: Arc<Self>) -> AnyMusicBrainzEntity;
 
     fn try_from_any(value: &AnyMusicBrainzEntity) -> Result<Arc<Self>, Error>;
-
-    fn get_mb_cache() -> Arc<MusicbrainzCache<Self>>;
-
-    /// Get the data from the cache, or call the API. Any request is deduplicated
-    fn get_load_or_fetch(
-        mbid: &NaiveMBID<Self>,
-    ) -> impl std::future::Future<Output = color_eyre::Result<Arc<Self>>> {
-        async move { Self::get_mb_cache().get_load_or_fetch(mbid).await }
-    }
-
-    async fn update_and_save(self: Arc<Self>) -> color_eyre::Result<()> {
-        Self::get_mb_cache().update(self).await
-    }
-
-    async fn get_refreshed(&self) -> color_eyre::Result<Arc<Self>> {
-        Self::get_mb_cache()
-            .force_fetch_entity(&self.get_mbidspe().as_naive())
-            .await
-    }
 }

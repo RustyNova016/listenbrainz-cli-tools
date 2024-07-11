@@ -1,25 +1,18 @@
 use crate::core::caching::serde_cacache;
 use crate::core::caching::serde_cacache::tidy::SerdeCacacheTidy;
-
 use crate::models::data::musicbrainz::entity::any::any_musicbrainz_entity::AnyMusicBrainzEntity;
-
-use crate::models::data::musicbrainz::entity::traits::fetch_entity::FetchEntity;
-use crate::models::data::musicbrainz::mbid::is_musicbrainz_id::IsMusicbrainzID;
+use crate::models::data::musicbrainz::entity::traits::MusicBrainzEntity;
 use crate::models::data::musicbrainz::mbid::state_id::state::NaiveMBID;
 use crate::models::data::musicbrainz::relation::external::RelationContentExt;
-use crate::models::data::musicbrainz::mbid::state_id::MusicBrainzEntity;
 
-use crate::models::error::Error;
 use std::sync::Arc;
-use serde::de::DeserializeOwned;
-use serde::Serialize;
 use tokio::sync::RwLock;
 use tokio::sync::RwLockWriteGuard;
 
 #[derive(Debug)]
 pub struct CachedEntity<V>
 where
-    V: MusicBrainzEntity + FetchEntity + Serialize + DeserializeOwned,
+    V: MusicBrainzEntity,
 {
     key: NaiveMBID<V>,
     loaded: RwLock<Option<Arc<V>>>,
@@ -30,7 +23,7 @@ where
 
 impl<V> CachedEntity<V>
 where
-    V: MusicBrainzEntity + FetchEntity + Serialize + DeserializeOwned,
+    V: MusicBrainzEntity,
 {
     pub fn new(
         id: NaiveMBID<V>,
@@ -135,7 +128,7 @@ where
         let main_entity = V::try_from_any(&converted_fetch.0)?;
 
         self.alias_cache
-            .set(&self.key, &main_entity.get_mbidspe().as_naive())
+            .set(&self.key, &main_entity.get_mbid().into_naive())
             .await?;
         self.update_with_lock(main_entity.clone(), write_lock)
             .await?;
@@ -155,7 +148,7 @@ where
     ///
     /// This automatically picks a write lock
     pub async fn set(&self, value: Arc<V>) -> Result<(), serde_cacache::Error> {
-        let mbid = value.get_mbidspe().as_naive();
+        let mbid = value.get_mbid().into_naive();
 
         // TODO: Add try_join! for speedup.
         self.loaded.write().await.replace(value.clone());
@@ -172,7 +165,7 @@ where
         value: Arc<V>,
         write_lock: &mut RwLockWriteGuard<'a, Option<Arc<V>>>,
     ) -> Result<(), serde_cacache::Error> {
-        let mbid = value.get_mbidspe().as_naive();
+        let mbid = value.get_mbid().into_naive();
 
         // TODO: Add try_join! for speedup.
         write_lock.replace(value.clone());
@@ -191,7 +184,7 @@ where
                 older
                     .as_ref()
                     .clone()
-                    .partial_update(value.as_ref().clone()),
+                    .incremental_update(value.as_ref().clone()),
             ),
             None => value,
         };
@@ -211,7 +204,7 @@ where
                 older
                     .as_ref()
                     .clone()
-                    .partial_update(value.as_ref().clone()),
+                    .incremental_update(value.as_ref().clone()),
             ),
             None => value,
         };

@@ -2,19 +2,13 @@ use std::collections::HashMap;
 use std::sync::Arc;
 
 use futures::try_join;
-use serde::de::DeserializeOwned;
-use serde::Serialize;
 use tokio::sync::RwLock;
 
 use crate::core::caching::serde_cacache::error::Error as SerdeCacacheError;
 use crate::core::caching::serde_cacache::tidy::SerdeCacacheTidy;
 use crate::core::caching::CACHE_LOCATION;
-
-use crate::models::data::musicbrainz::entity::is_musicbrainz_entity::IsMusicbrainzEntity;
-use crate::models::data::musicbrainz::entity::traits::fetch_entity::FetchEntity;
-use crate::models::data::musicbrainz::mbid::generic_mbid::NaiveMBID;
-use crate::models::data::musicbrainz::mbid::is_musicbrainz_id::IsMusicbrainzID;
-use crate::models::data::musicbrainz::mbid::state_id::MusicBrainzEntity;
+use crate::models::data::musicbrainz::entity::traits::MusicBrainzEntity;
+use crate::models::data::musicbrainz::mbid::state_id::state::NaiveMBID;
 use crate::models::error::Error;
 use crate::utils::println_cli_warn;
 
@@ -23,7 +17,7 @@ use super::cached_entity::CachedEntity;
 #[derive(Debug)]
 pub struct MusicbrainzCache<V>
 where
-    V: MusicBrainzEntity + FetchEntity + Serialize + DeserializeOwned + Eq,
+    V: MusicBrainzEntity,
 {
     cache_entities: RwLock<HashMap<NaiveMBID<V>, Arc<CachedEntity<V>>>>,
 
@@ -33,7 +27,7 @@ where
 
 impl<V> MusicbrainzCache<V>
 where
-    V: MusicBrainzEntity + FetchEntity + Serialize + DeserializeOwned + Eq,
+    V: MusicBrainzEntity + Eq,
 {
     pub fn new(name: &str) -> Self {
         let mut location = CACHE_LOCATION.clone();
@@ -83,14 +77,14 @@ where
     }
 
     pub async fn set(&self, value: Arc<V>) -> Result<(), SerdeCacacheError> {
-        self.get_entity(&value.get_mbidspe().as_naive())
+        self.get_entity(&value.get_mbid().into_naive())
             .await
             .set(value)
             .await
     }
 
     pub async fn update(&self, value: Arc<V>) -> color_eyre::Result<()> {
-        self.get_entity(&value.get_mbidspe().as_naive())
+        self.get_entity(&value.get_mbid().into_naive())
             .await
             .update(value)
             .await
@@ -144,11 +138,9 @@ where
     ) -> color_eyre::Result<NaiveMBID<V>> {
         match self.alias_cache.get_or_option(mbid).await {
             Ok(Some(val)) => Ok(val),
-            Ok(None) | Err(SerdeCacacheError::CacheDeserializationError(_)) => Ok(self
-                .force_fetch_entity(mbid)
-                .await?
-                .get_mbidspe()
-                .as_naive()),
+            Ok(None) | Err(SerdeCacacheError::CacheDeserializationError(_)) => {
+                Ok(self.force_fetch_entity(mbid).await?.get_mbid().into_naive())
+            }
             Err(val) => Err(val.into()),
         }
     }

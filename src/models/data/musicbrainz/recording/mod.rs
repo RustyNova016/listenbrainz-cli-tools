@@ -1,3 +1,4 @@
+pub mod entity;
 use std::sync::Arc;
 
 use derive_getters::Getters;
@@ -47,10 +48,6 @@ pub struct Recording {
 }
 
 impl IsMusicbrainzEntity for Recording {
-    fn get_mb_cache() -> Arc<MusicbrainzCache<Self>> {
-        MUSICBRAINZ_DATABASE.recordings().clone()
-    }
-
     fn try_from_any(
         value: &AnyMusicBrainzEntity,
     ) -> Result<Arc<Self>, crate::models::error::Error> {

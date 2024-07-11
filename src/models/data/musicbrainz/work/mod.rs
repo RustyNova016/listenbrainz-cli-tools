@@ -1,3 +1,4 @@
+pub mod entity;
 use std::sync::Arc;
 
 use derive_getters::Getters;
@@ -44,10 +45,6 @@ pub struct Work {
 }
 
 impl IsMusicbrainzEntity for Work {
-    fn get_mb_cache() -> Arc<MusicbrainzCache<Self>> {
-        MUSICBRAINZ_DATABASE.works().clone()
-    }
-
     fn as_kind(&self) -> MusicbrainzEntityKind {
         MusicbrainzEntityKind::Work
     }

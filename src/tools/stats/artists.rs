@@ -1,7 +1,7 @@
 use crate::core::statistics::statistic_sorter::StatisticSorter;
 use crate::models::cli::common::SortSorterBy;
 use crate::models::data::musicbrainz::artist::Artist;
-use crate::models::data::musicbrainz::entity::is_musicbrainz_entity::IsMusicbrainzEntity;
+use crate::models::data::musicbrainz::entity::traits::MusicBrainzEntity;
 use crate::utils::cli_paging::CLIPager;
 
 pub async fn stats_artist(stats: StatisticSorter, sort_by: SortSorterBy) {

@@ -1,3 +1,4 @@
+pub mod entity;
 use std::sync::Arc;
 
 use chrono::NaiveDate;
@@ -58,9 +59,6 @@ pub struct Release {
 }
 
 impl IsMusicbrainzEntity for Release {
-    fn get_mb_cache() -> Arc<MusicbrainzCache<Self>> {
-        MUSICBRAINZ_DATABASE.releases().clone()
-    }
     fn as_kind(&self) -> MusicbrainzEntityKind {
         MusicbrainzEntityKind::Release
     }

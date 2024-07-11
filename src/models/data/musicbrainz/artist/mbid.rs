@@ -9,9 +9,6 @@ use crate::core::entity_traits::mbid::IsMbid;
 use crate::models::data::musicbrainz::artist::external::ArtistExt;
 use crate::models::data::musicbrainz::artist::Artist;
 use crate::models::data::musicbrainz::external_musicbrainz_entity::ExternalMusicBrainzEntity;
-use crate::models::data::musicbrainz::mbid::any_mbid::AnyMBIDType;
-use crate::models::data::musicbrainz::mbid::generic_mbid::{IdAliasState, MBIDSpe};
-use crate::models::data::musicbrainz::mbid::is_musicbrainz_id::IsMusicbrainzID;
 use crate::models::data::musicbrainz::mbid::MBID;
 use crate::utils::println_mus;
 
@@ -39,33 +36,5 @@ impl IsMbid<Artist> for ArtistMBID {
 
     fn into_mbid(self) -> MBID {
         MBID::Artist(self)
-    }
-}
-
-impl<S> IsMusicbrainzID<Artist> for MBIDSpe<Artist, S>
-where
-    S: IdAliasState,
-{
-    async fn fetch(&self) -> color_eyre::Result<ExternalMusicBrainzEntity> {
-        println_mus(format!("Getting data for artist MBID: {}", &self));
-
-        Ok(ArtistMS::fetch()
-            .id(self)
-            .with_aliases()
-            .with_artist_relations()
-            .with_recording_relations()
-            .execute()
-            .await
-            .context("Failed to fetch artist from MusicBrainz")?
-            .into_entity())
-    }
-}
-
-impl<S> From<MBIDSpe<Artist, S>> for AnyMBIDType<S>
-where
-    S: IdAliasState,
-{
-    fn from(value: MBIDSpe<Artist, S>) -> Self {
-        Self::Artist(value)
     }
 }
