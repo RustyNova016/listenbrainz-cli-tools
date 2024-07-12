@@ -1,4 +1,5 @@
 use crate::core::entity_traits::mbid::IsMbid;
+use crate::core::entity_traits::vec_from_vec::InnerFrom;
 use crate::models::data::listenbrainz::user_listens::UserListens;
 use crate::models::data::musicbrainz::mbid::extensions::VecTExt;
 use crate::models::radio::RadioConfig;
@@ -29,7 +30,7 @@ pub async fn underrated_mix(
         format!("{username}'s underrated mix"),
         Some(username.clone()),
         true,
-        playlist.into_mbids(),
+        playlist.into_mbids().inner_from(),
         Some(format!("A playlist containing all the tracks that {username} listen to, 
             but seemingly no one else does. Come take a listen if you want to find hidden gems!<br>
             <br>

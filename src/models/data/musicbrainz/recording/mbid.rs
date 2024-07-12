@@ -7,6 +7,7 @@ use serde::{Deserialize, Serialize};
 use crate::core::entity_traits::mb_cached::MBCached;
 use crate::core::entity_traits::mbid::IsMbid;
 use crate::models::data::musicbrainz::external_musicbrainz_entity::ExternalMusicBrainzEntity;
+use crate::models::data::musicbrainz::mbid;
 use crate::models::data::musicbrainz::mbid::generic_mbid::IdAliasState;
 use crate::models::data::musicbrainz::mbid::generic_mbid::MBIDSpe;
 use crate::models::data::musicbrainz::mbid::generic_mbid::NaiveMBID;
@@ -77,5 +78,11 @@ where
                 .context("Failed to fetch recording from MusicBrainz")?
                 .into_entity(),
         )
+    }
+}
+
+impl From<RecordingMBID> for mbid::state_id::state::NaiveMBID<Recording> {
+    fn from(value: RecordingMBID) -> Self {
+        Self::from(value.0)
     }
 }
