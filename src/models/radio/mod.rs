@@ -1,3 +1,5 @@
+use std::sync::Arc;
+
 use crate::utils::println_cli_info;
 
 use super::config::recording_timeout::RecordingTimeoutConfig;
@@ -22,7 +24,7 @@ pub struct RadioConfig {
 }
 
 impl RadioConfig {
-    pub fn check_min_lenght(&self, playlist: &[Recording]) -> bool {
+    pub fn check_min_lenght(&self, playlist: &[Arc<Recording>]) -> bool {
         let has_min_count = playlist.len() as u64 >= self.min_count;
         let has_min_duration = Lazy::new(|| {
             playlist
@@ -38,9 +40,9 @@ impl RadioConfig {
         }
     }
 
-    pub async fn finalize_radio_playlist<I, E>(&self, mut generator: I) -> Result<Vec<Recording>, E>
+    pub async fn finalize_radio_playlist<I, E>(&self, mut generator: I) -> Result<Vec<Arc<Recording>>, E>
     where
-        I: Stream<Item = Result<Recording, E>> + Unpin,
+        I: Stream<Item = Result<Arc<Recording>, E>> + Unpin,
         E: Sync + Send,
     {
         let mut results = Vec::new();

@@ -1,3 +1,5 @@
+pub mod conversions;
+pub mod collection;
 pub mod any;
 pub mod entity_kind;
 pub mod is_musicbrainz_entity;
