@@ -3,6 +3,7 @@ use std::sync::Arc;
 use crate::core::caching::musicbrainz::musicbrainz_cache::MusicbrainzCache;
 use crate::models::data::musicbrainz::external_musicbrainz_entity::ExternalMusicBrainzEntity;
 use crate::models::data::musicbrainz::mbid::state_id::state::NaiveMBID;
+use crate::models::data::musicbrainz::mbid::state_id::state::PrimaryMBID;
 use crate::models::data::musicbrainz::mbid::state_id::MBIDState;
 use crate::models::data::musicbrainz::mbid::state_id::MBIDWithState;
 use crate::models::data::musicbrainz::mbid::state_id::MusicBrainzEntity;
@@ -28,5 +29,9 @@ where
     /// Get the matching entity from the cache, or fetch it
     pub async fn get_load_or_fetch(&self) -> color_eyre::Result<Arc<T>> {
         T::get_load_or_fetch(&self.clone().into_naive()).await // TODO: Remove into naive
+    }
+
+    pub async fn to_primary(&self) -> color_eyre::Result<PrimaryMBID<T>> {
+        Ok(self.get_load_or_fetch().await?.get_mbid())
     }
 }

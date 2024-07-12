@@ -6,6 +6,8 @@ use serde::{Deserialize, Serialize};
 
 use crate::core::entity_traits::mb_cached::MBCached;
 use crate::models::data::listenbrainz::mapping_data::MappingData;
+use crate::models::data::musicbrainz::mbid::state_id::state::NaiveMBID;
+use crate::models::data::musicbrainz::mbid::state_id::state::PrimaryMBID;
 use crate::models::data::musicbrainz::recording::mbid::RecordingMBID;
 use crate::models::data::musicbrainz::recording::Recording;
 
@@ -93,5 +95,20 @@ impl Listen {
             .context("Listenbrainz returned an error")?;
 
         Ok(())
+    }
+
+    pub fn get_mapped_naive_mbid(&self) -> Option<NaiveMBID<Recording>> {
+        self.mapping_data
+            .as_ref()
+            .map(|val| NaiveMBID::from(val.recording_mbid.clone()))
+    }
+
+    pub async fn get_mapped_primary_mbid(
+        &self,
+    ) -> Option<color_eyre::Result<PrimaryMBID<Recording>>> {
+        match self.get_mapped_naive_mbid() {
+            Some(val) => Some(val.to_primary().await),
+            None => None,
+        }
     }
 }

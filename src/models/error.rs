@@ -37,6 +37,9 @@ pub enum Error {
     // --- Type errors --- //
     #[error("Couldn't convert {0} into {1}")]
     InvalidTypeConvertion(String, String),
+
+    #[error("Tried to convert from entity kind {0} into {1}")]
+    InvalidKindConvertion(String, String),
 }
 
 impl Error {}

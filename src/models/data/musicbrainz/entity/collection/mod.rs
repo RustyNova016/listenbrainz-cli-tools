@@ -18,9 +18,10 @@ where
     }
 
     fn get_mbids_as_naive(self) -> Vec<NaiveMBID<T>> {
-        self.iter().map(|val| val.get_mbid().into_naive()).collect_vec()
+        self.iter()
+            .map(|val| val.get_mbid().into_naive())
+            .collect_vec()
     }
 }
-
 
 impl<T> CollectionOfEntity<T> for Vec<Arc<T>> where T: MusicBrainzEntity {}

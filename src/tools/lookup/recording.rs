@@ -6,17 +6,21 @@ use std::sync::Arc;
 use crate::core::entity_traits::mbid::IsMbid;
 use crate::models::data::listenbrainz::recording_with_listens::recording::RecordingWithListens;
 use crate::models::data::listenbrainz::user_listens::UserListens;
+use crate::models::data::musicbrainz::mbid::state_id::state::NaiveMBID;
 use crate::models::data::musicbrainz::recording::mbid::RecordingMBID;
+use crate::models::data::musicbrainz::recording::Recording;
 use crate::utils::cli::await_next;
 use crate::utils::extensions::chrono_ext::DateTimeUtcExt;
 use crate::utils::extensions::chrono_ext::DurationExt;
 use crate::utils::println_cli;
 
-pub async fn lookup_recording(username: &str, id: RecordingMBID) -> color_eyre::Result<()> {
+pub async fn lookup_recording(username: &str, id: NaiveMBID<Recording>) -> color_eyre::Result<()> {
     let listens = UserListens::get_user_with_refresh(username)
         .await
         .expect("Couldn't fetch the new listens")
         .get_mapped_listens();
+
+    let id = RecordingMBID::from(id.to_string()); // TODO: Replace
 
     let recording_listens = listens.get_listens_of_recording(&id);
 

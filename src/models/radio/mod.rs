@@ -40,7 +40,10 @@ impl RadioConfig {
         }
     }
 
-    pub async fn finalize_radio_playlist<I, E>(&self, mut generator: I) -> Result<Vec<Arc<Recording>>, E>
+    pub async fn finalize_radio_playlist<I, E>(
+        &self,
+        mut generator: I,
+    ) -> Result<Vec<Arc<Recording>>, E>
     where
         I: Stream<Item = Result<Arc<Recording>, E>> + Unpin,
         E: Sync + Send,
