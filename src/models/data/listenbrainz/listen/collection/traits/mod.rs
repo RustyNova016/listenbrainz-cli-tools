@@ -2,6 +2,8 @@ use std::sync::Arc;
 
 use crate::models::data::listenbrainz::listen::Listen;
 
+pub mod listen_iterator;
+
 pub trait CollectionOfListens {
     fn iter_listens(&self) -> impl Iterator<Item = &Arc<Listen>>;
 

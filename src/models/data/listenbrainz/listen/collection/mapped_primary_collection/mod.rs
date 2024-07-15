@@ -18,7 +18,7 @@ pub impl PrimaryListenCollection {
     // --- Querry methods ---
 
     /// Return only the listens of a specific recording
-    fn get_listens_of_recording(&self, id: &PrimaryMBID<Recording>) -> Self {
+    fn where_mapped_recording_eq(&self, id: &PrimaryMBID<Recording>) -> Self {
         self.iter()
             .filter_map(|val| {
                 if &val.0 == id {

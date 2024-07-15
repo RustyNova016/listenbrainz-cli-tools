@@ -2,8 +2,9 @@ use chrono::Duration;
 use chrono::Local;
 use humantime::format_duration;
 
-use crate::models::data::listenbrainz::recording_with_listens::recording::RecordingWithListens;
+use crate::models::data::listenbrainz::listens_with_entity::ListensWithEntity;
 use crate::models::data::listenbrainz::user_listens::UserListens;
+use crate::models::data::musicbrainz::entity::traits::MusicBrainzEntity;
 use crate::models::data::musicbrainz::mbid::state_id::state::NaiveMBID;
 use crate::models::data::musicbrainz::recording::Recording;
 use crate::utils::cli::await_next;
@@ -19,7 +20,7 @@ pub async fn lookup_recording(username: &str, id: NaiveMBID<Recording>) -> color
         .await?;
 
     let recording_info =
-        RecordingWithListens::new_from_unfiltered(id.get_load_or_fetch().await?, &listens);
+        ListensWithEntity::<Recording>::from_unfiltered(id.get_load_or_fetch().await?, &listens);
 
     if recording_info.is_listened() {
         lookup_recording_listened(recording_info).await?;
@@ -33,21 +34,23 @@ pub async fn lookup_recording(username: &str, id: NaiveMBID<Recording>) -> color
 }
 
 async fn lookup_recording_unlistened(
-    recording_info: RecordingWithListens,
+    recording_info: ListensWithEntity<Recording>,
 ) -> color_eyre::Result<()> {
     let data_string = format!(
         "\nHere are the statistics of {} ({})
         
         The recording hasn't been listened to yet",
-        recording_info.recording().get_title_with_credits().await?,
-        recording_info.recording_id()
+        recording_info.entity().get_title_with_credits().await?,
+        recording_info.entity().get_mbid()
     );
 
     println_cli(data_string);
     Ok(())
 }
 
-async fn lookup_recording_listened(recording_info: RecordingWithListens) -> color_eyre::Result<()> {
+async fn lookup_recording_listened(
+    recording_info: ListensWithEntity<Recording>,
+) -> color_eyre::Result<()> {
     let data_string = format!(
         " ---
         \nHere are the statistics of {} ({})\
@@ -66,8 +69,8 @@ async fn lookup_recording_listened(recording_info: RecordingWithListens) -> colo
         \n    - Underated score: {}\
         \n    - Overdue score: {}\
         \n",
-        recording_info.recording().get_title_with_credits().await?,
-        recording_info.recording_id(),
+        recording_info.entity().get_title_with_credits().await?,
+        recording_info.entity().get_mbid(),
         recording_info.listen_count(),
         recording_info
             .first_listen_date()
@@ -103,7 +106,7 @@ async fn lookup_recording_listened(recording_info: RecordingWithListens) -> colo
     Ok(())
 }
 
-fn get_overdue_line(recording_info: &RecordingWithListens) -> String {
+fn get_overdue_line(recording_info: &ListensWithEntity<Recording>) -> String {
     let time = recording_info.overdue_by();
 
     if time <= Duration::zero() {

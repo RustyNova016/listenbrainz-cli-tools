@@ -7,8 +7,9 @@ use rust_decimal::Decimal;
 use tokio::sync::OnceCell;
 
 use crate::models::data::listenbrainz::listen::collection::ListenCollection;
-use crate::models::data::listenbrainz::recording_with_listens::recording_id::RecordingIDWithListens;
+use crate::models::data::listenbrainz::listens_with_entity::ListensWithEntity;
 use crate::models::data::musicbrainz::recording::mbid::RecordingMBID;
+use crate::models::data::musicbrainz::recording::Recording;
 
 use super::display::progress_bar::ProgressBarCli;
 
@@ -77,8 +78,12 @@ impl UserCompatibility {
         let mut ratios = Vec::new();
 
         for shared_rec in shared_recordings {
-            let rec_and_listens = RecordingIDWithListens::new_from_unfiltered(
-                shared_rec.into_stateful().await?,
+            let rec_and_listens = ListensWithEntity::<Recording>::from_unfiltered(
+                shared_rec
+                    .into_stateful()
+                    .await?
+                    .get_load_or_fetch()
+                    .await?,
                 &user_listens,
             );
 
