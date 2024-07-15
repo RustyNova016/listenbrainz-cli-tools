@@ -20,6 +20,7 @@ impl ListenCollection {
     }
 
     /// Filter listens depending on their mapped recordings. Recording ids are assumed to be primary
+    #[deprecated]
     pub async fn filter_recordings(
         &self,
         list: &[RecordingMBID],
@@ -27,7 +28,7 @@ impl ListenCollection {
         keep_unmapped: bool,
     ) -> color_eyre::Result<Self> {
         //TODO: Multithread it
-        let mut result = Self::new();
+        let mut result = Self::default();
 
         for listen in self.iter() {
             let Some(listen_id) = listen.get_primary_recording_id().await? else {

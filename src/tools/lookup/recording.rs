@@ -1,13 +1,10 @@
 use chrono::Duration;
 use chrono::Local;
 use humantime::format_duration;
-use std::sync::Arc;
 
-use crate::core::entity_traits::mbid::IsMbid;
 use crate::models::data::listenbrainz::recording_with_listens::recording::RecordingWithListens;
 use crate::models::data::listenbrainz::user_listens::UserListens;
 use crate::models::data::musicbrainz::mbid::state_id::state::NaiveMBID;
-use crate::models::data::musicbrainz::recording::mbid::RecordingMBID;
 use crate::models::data::musicbrainz::recording::Recording;
 use crate::utils::cli::await_next;
 use crate::utils::extensions::chrono_ext::DateTimeUtcExt;
@@ -18,14 +15,11 @@ pub async fn lookup_recording(username: &str, id: NaiveMBID<Recording>) -> color
     let listens = UserListens::get_user_with_refresh(username)
         .await
         .expect("Couldn't fetch the new listens")
-        .get_mapped_listens();
-
-    let id = RecordingMBID::from(id.to_string()); // TODO: Replace
-
-    let recording_listens = listens.get_listens_of_recording(&id);
+        .get_primary_listens()
+        .await?;
 
     let recording_info =
-        RecordingWithListens::new(Arc::new(id.get_or_fetch_entity().await?), recording_listens);
+        RecordingWithListens::new_from_unfiltered(id.get_load_or_fetch().await?, &listens);
 
     if recording_info.is_listened() {
         lookup_recording_listened(recording_info).await?;

@@ -2,12 +2,16 @@ pub mod checks;
 mod converters;
 pub mod filters;
 pub mod listen_rate;
+pub mod mapped_primary_collection;
+pub mod queries;
 pub mod recording;
+pub mod traits;
 use std::sync::Arc;
 
 use chrono::{DateTime, Utc};
 use itertools::Itertools;
 use serde::{Deserialize, Serialize};
+use traits::CollectionOfListens;
 
 use crate::models::cli::common::SortListensBy;
 use crate::models::data::musicbrainz::recording::mbid::RecordingMBID;
@@ -20,7 +24,9 @@ mod underrated;
 use derive_more::*;
 
 /// Wrapper for a vector of listens
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, Deref, DerefMut, IntoIterator)]
+#[derive(
+    Debug, Clone, PartialEq, Eq, Serialize, Deserialize, Deref, DerefMut, IntoIterator, Default,
+)]
 pub struct ListenCollection {
     #[deref]
     #[deref_mut]
@@ -28,8 +34,8 @@ pub struct ListenCollection {
 }
 
 impl ListenCollection {
-    pub fn new() -> Self {
-        Self { data: Vec::new() }
+    pub fn new(data: Vec<Arc<Listen>>) -> Self {
+        Self { data }
     }
 
     pub fn get_mapped_listens(&self) -> Self {
@@ -146,8 +152,8 @@ impl FromIterator<Arc<Listen>> for ListenCollection {
     }
 }
 
-impl Default for ListenCollection {
-    fn default() -> Self {
-        Self::new()
+impl CollectionOfListens for Vec<Arc<Listen>> {
+    fn iter_listens(&self) -> impl Iterator<Item = &Arc<Listen>> {
+        self.iter()
     }
 }

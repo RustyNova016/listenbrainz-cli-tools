@@ -6,6 +6,7 @@ use serde::{Deserialize, Serialize};
 
 use crate::core::entity_traits::mb_cached::MBCached;
 use crate::core::entity_traits::mbid::IsMbid;
+use crate::models::data::musicbrainz::entity::traits::MusicBrainzEntity;
 use crate::models::data::musicbrainz::external_musicbrainz_entity::ExternalMusicBrainzEntity;
 use crate::models::data::musicbrainz::mbid;
 use crate::models::data::musicbrainz::mbid::generic_mbid::IdAliasState;
@@ -14,6 +15,7 @@ use crate::models::data::musicbrainz::mbid::generic_mbid::NaiveMBID;
 use crate::models::data::musicbrainz::mbid::is_musicbrainz_id::IsMusicbrainzID;
 use crate::models::data::musicbrainz::mbid::state_id::any::any_entity::AnyEntityMBID;
 use crate::models::data::musicbrainz::mbid::state_id::any::any_id_to_kind::AnyIdToKind;
+use crate::models::data::musicbrainz::mbid::state_id::state::PrimaryMBID;
 use crate::models::data::musicbrainz::mbid::state_id::MBIDState;
 use crate::models::data::musicbrainz::mbid::state_id::MBIDWithState;
 use crate::models::data::musicbrainz::mbid::MBID;
@@ -32,6 +34,10 @@ pub struct RecordingMBID(String);
 impl RecordingMBID {
     pub fn into_spe_naive(&self) -> NaiveMBID<Recording> {
         MBIDSpe::from(self.to_string())
+    }
+
+    pub async fn into_stateful(&self) -> color_eyre::Result<PrimaryMBID<Recording>> {
+        Ok(self.get_or_fetch_entity().await?.get_mbid())
     }
 }
 

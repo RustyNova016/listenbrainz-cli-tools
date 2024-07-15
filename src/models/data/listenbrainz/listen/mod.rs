@@ -2,6 +2,7 @@ use std::collections::HashMap;
 
 use chrono::{DateTime, Utc};
 use color_eyre::eyre::Context;
+use derive_getters::Getters;
 use serde::{Deserialize, Serialize};
 
 use crate::core::entity_traits::mb_cached::MBCached;
@@ -18,7 +19,7 @@ pub mod convertion;
 pub mod getters;
 pub mod mapped_listen;
 
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, Getters)]
 pub struct Listen {
     /// The username of the user who listened to it
     pub user: String,

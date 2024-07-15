@@ -1,5 +1,8 @@
-use crate::models::data::listenbrainz::listen::collection::ListenCollection;
-use crate::models::data::musicbrainz::recording::mbid::RecordingMBID;
+use crate::models::data::listenbrainz::listen::collection::mapped_primary_collection::MappedPrimaryListenCollectionExt;
+use crate::models::data::listenbrainz::listen::collection::mapped_primary_collection::PrimaryListenCollection;
+use crate::models::data::listenbrainz::listen::collection::traits::CollectionOfListens;
+use crate::models::data::musicbrainz::mbid::state_id::state::PrimaryMBID;
+use crate::models::data::musicbrainz::recording::Recording;
 
 use chrono::DateTime;
 use chrono::Duration;
@@ -11,25 +14,29 @@ use rust_decimal::Decimal;
 
 #[derive(Debug, Clone, PartialEq, Eq, Getters)]
 pub struct RecordingIDWithListens {
-    recording_id: RecordingMBID,
-    listens: ListenCollection,
+    recording_id: PrimaryMBID<Recording>,
+    listens: PrimaryListenCollection,
 }
 
 impl RecordingIDWithListens {
-    pub fn new(recording_id: RecordingMBID, listens: ListenCollection) -> Self {
-        //TODO: Perf Testing
-        assert!(
-            listens.has_only_recording(&recording_id),
-            "Tried to insert a listen list that contain a listen from another recording"
-        );
+    // pub fn new(recording_id: PrimaryMBID<Recording>, listens: PrimaryListenCollection) -> Self {
+    //     //TODO: Perf Testing
+    //     assert!(
+    //         listens.has_only_recording(&recording_id),
+    //         "Tried to insert a listen list that contain a listen from another recording"
+    //     );
 
-        Self {
-            recording_id,
-            listens,
-        }
-    }
+    //     Self {
+    //         recording_id,
+    //         listens,
+    //     }
+    // }
 
-    pub fn new_from_unfiltered(recording_id: RecordingMBID, listens: &ListenCollection) -> Self {
+    /// Create a new [`RecordingIDWithListens`] from an id and a list of unfiltered listens
+    pub fn new_from_unfiltered(
+        recording_id: PrimaryMBID<Recording>,
+        listens: &PrimaryListenCollection,
+    ) -> Self {
         let filtered = listens.get_listens_of_recording(&recording_id);
 
         Self {
@@ -38,8 +45,8 @@ impl RecordingIDWithListens {
         }
     }
 
-    pub async fn all_from_unfiltered(listens: &ListenCollection) -> color_eyre::Result<Vec<Self>> {
-        let recordings = listens.get_listened_recordings_mbids().await?;
+    pub fn all_from_unfiltered(listens: &PrimaryListenCollection) -> color_eyre::Result<Vec<Self>> {
+        let recordings = listens.clone().into_mbids();
 
         Ok(recordings
             .into_iter()
@@ -49,13 +56,13 @@ impl RecordingIDWithListens {
 
     pub fn first_listen_date(&self) -> Option<DateTime<Utc>> {
         self.listens
-            .get_oldest_listen()
+            .find_oldest_listen()
             .map(|listen| *listen.get_listened_at())
     }
 
     pub fn last_listen_date(&self) -> Option<DateTime<Utc>> {
         self.listens
-            .get_latest_listen()
+            .find_latest_listen()
             .map(|listen| *listen.get_listened_at())
     }
 
@@ -93,7 +100,9 @@ impl RecordingIDWithListens {
 
     pub async fn underated_score_single(&self) -> color_eyre::Result<Decimal> {
         Ok(self
-            .listens()
+            .listens
+            .clone()
+            .into_legacy()
             .get_underrated_recordings()
             .await?
             .first()
