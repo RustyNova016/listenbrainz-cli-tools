@@ -78,7 +78,7 @@ impl UserCompatibility {
         let mut ratios = Vec::new();
 
         for shared_rec in shared_recordings {
-            let rec_and_listens = ListensWithEntity::<Recording>::from_unfiltered(
+            let rec_and_listens = ListensWithEntity::<Recording>::from_mapping(
                 shared_rec
                     .into_stateful()
                     .await?

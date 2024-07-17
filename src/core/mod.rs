@@ -1,6 +1,8 @@
 pub mod caching;
+pub mod data_structures;
 pub mod display;
 pub mod entity_traits;
+pub mod extension_traits;
 pub mod fetching;
 pub mod macros;
 pub mod statistics;

@@ -10,8 +10,8 @@ use crate::models::data::musicbrainz::recording::Recording;
 use super::ListensWithEntity;
 
 impl ListensWithEntity<Recording> {
-    /// Create a new [`ListenWithEntity`] from a vector of listens. It keep only direct listens
-    pub fn from_unfiltered(entity: Arc<Recording>, listens: &PrimaryListenCollection) -> Self {
+    /// Create a new [`ListenWithEntity`] from a vector of listens. It keep only directly mapped listens
+    pub fn from_mapping(entity: Arc<Recording>, listens: &PrimaryListenCollection) -> Self {
         let filtered = listens.where_mapped_recording_eq(&entity.get_mbid());
 
         Self {

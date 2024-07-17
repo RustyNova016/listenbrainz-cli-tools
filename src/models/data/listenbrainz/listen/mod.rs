@@ -1,4 +1,5 @@
 use std::collections::HashMap;
+use std::sync::Arc;
 
 use chrono::{DateTime, Utc};
 use color_eyre::eyre::Context;
@@ -18,6 +19,7 @@ pub mod collection;
 pub mod convertion;
 pub mod getters;
 pub mod mapped_listen;
+pub mod primary_listen;
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, Getters)]
 pub struct Listen {
@@ -75,6 +77,11 @@ impl Listen {
             )),
             None => Ok(None),
         }
+    }
+
+    pub async fn get_load_or_fetch_recording(&self) -> Option<color_eyre::Result<Arc<Recording>>> {
+        let mapped_mbid = self.get_mapped_naive_mbid()?;
+        Some(mapped_mbid.get_load_or_fetch().await)
     }
 
     /// Send a mapping request to Listenbrainz

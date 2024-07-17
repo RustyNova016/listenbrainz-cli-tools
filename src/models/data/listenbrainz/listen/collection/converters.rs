@@ -8,6 +8,7 @@ use itertools::Itertools;
 
 use crate::core::display::progress_bar::ProgressBarCli;
 use crate::core::entity_traits::mbid::is_cached_mbid::IsCachedMBID;
+use crate::models::data::listenbrainz::listen::primary_listen::PrimaryListen;
 use crate::models::data::musicbrainz::recording::mbid::RecordingMBID;
 
 use super::mapped_primary_collection::PrimaryListenCollection;
@@ -46,15 +47,9 @@ impl ListenCollection {
         ));
 
         stream::iter(self.into_iter())
-            .filter_map(|listen| async {
-                let id_result = listen
-                    .get_mapped_primary_mbid()
-                    .await
-                    .inspect(|_| pg.inc(1))?;
-
-                Some(id_result.map(|id| (id, listen)))
-            })
+            .filter_map(|listen| async { PrimaryListen::from_listen(listen).await })
             .map(future::ready)
+            .inspect(|_| pg.inc(1_u64))
             .buffer_unordered(20)
             .try_collect()
             .await

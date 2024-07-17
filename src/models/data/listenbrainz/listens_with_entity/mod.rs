@@ -1,3 +1,6 @@
+pub mod impl_trait;
+pub mod map;
+pub mod statistics;
 pub mod traits;
 use std::sync::Arc;
 
@@ -8,26 +11,30 @@ use derive_getters::Getters;
 use rust_decimal::prelude::FromPrimitive;
 use rust_decimal::Decimal;
 
-use crate::models::data::musicbrainz::entity::traits::MusicBrainzEntity;
-
 use super::listen::collection::mapped_primary_collection::PrimaryListenCollection;
 use super::listen::collection::traits::CollectionOfListens;
+use super::listen::primary_listen::PrimaryListen;
 
 pub mod listens_with_recording;
 
 #[derive(Debug, Clone, Getters)]
-pub struct ListensWithEntity<E>
-where
-    E: MusicBrainzEntity,
-{
+pub struct ListensWithEntity<E> {
     entity: Arc<E>,
     listens: PrimaryListenCollection,
 }
 
-impl<E> ListensWithEntity<E>
-where
-    E: MusicBrainzEntity,
-{
+impl<E> ListensWithEntity<E> {
+    pub fn new_empty(entity: Arc<E>) -> Self {
+        Self {
+            entity,
+            listens: Vec::new(),
+        }
+    }
+
+    pub fn push(&mut self, listen: PrimaryListen) {
+        self.listens.push(listen);
+    }
+
     pub fn first_listen_date(&self) -> Option<DateTime<Utc>> {
         self.listens
             .find_oldest_listen()

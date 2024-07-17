@@ -20,7 +20,7 @@ pub async fn lookup_recording(username: &str, id: NaiveMBID<Recording>) -> color
         .await?;
 
     let recording_info =
-        ListensWithEntity::<Recording>::from_unfiltered(id.get_load_or_fetch().await?, &listens);
+        ListensWithEntity::<Recording>::from_mapping(id.get_load_or_fetch().await?, &listens);
 
     if recording_info.is_listened() {
         lookup_recording_listened(recording_info).await?;
