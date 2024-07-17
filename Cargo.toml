@@ -40,7 +40,7 @@ extend = "1.2.0"
 directories = "5.0.1"
 chashmap = "2.2.2"
 indicatif = { version = "0.17.8", features = ["rayon", "improved_unicode", "futures"] }
-tokio = { version = "1.38.0", features = ["full"] }
+tokio = { version = "1.38.1", features = ["full"] }
 rayon = "1.10.0"
 reqwest = { version = "0.12.5", features = ["json"] }
 cacache = { version = "13.0.0", default-features = false, features = ["tokio-runtime", "mmap"] }
