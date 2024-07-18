@@ -51,6 +51,7 @@ impl ListenCollection {
             .map(future::ready)
             .inspect(|_| pg.inc(1_u64))
             .buffer_unordered(20)
+            .map_ok(Arc::new)
             .try_collect()
             .await
     }

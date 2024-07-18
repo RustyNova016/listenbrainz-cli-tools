@@ -1,8 +1,10 @@
+pub mod aliasing;
 use crate::core::caching::serde_cacache;
 use crate::core::caching::serde_cacache::tidy::SerdeCacacheTidy;
 use crate::models::data::musicbrainz::entity::any::any_musicbrainz_entity::AnyMusicBrainzEntity;
 use crate::models::data::musicbrainz::entity::traits::MusicBrainzEntity;
 use crate::models::data::musicbrainz::mbid::state_id::state::NaiveMBID;
+use crate::models::data::musicbrainz::mbid::state_id::state::PrimaryMBID;
 use crate::models::data::musicbrainz::relation::external::RelationContentExt;
 
 use std::sync::Arc;
@@ -15,10 +17,11 @@ where
     V: MusicBrainzEntity,
 {
     key: NaiveMBID<V>,
+    primary_id: Option<PrimaryMBID<V>>,
     loaded: RwLock<Option<Arc<V>>>,
 
-    disk_cache: Arc<SerdeCacacheTidy<NaiveMBID<V>, V>>,
-    alias_cache: Arc<SerdeCacacheTidy<NaiveMBID<V>, NaiveMBID<V>>>,
+    disk_cache: Arc<SerdeCacacheTidy<PrimaryMBID<V>, V>>,
+    alias_cache: Arc<SerdeCacacheTidy<NaiveMBID<V>, PrimaryMBID<V>>>,
 }
 
 impl<V> CachedEntity<V>
@@ -28,12 +31,13 @@ where
     pub fn new(
         id: NaiveMBID<V>,
         disk_cache: Arc<SerdeCacacheTidy<NaiveMBID<V>, V>>,
-        alias_cache: Arc<SerdeCacacheTidy<NaiveMBID<V>, NaiveMBID<V>>>,
+        alias_cache: Arc<SerdeCacacheTidy<NaiveMBID<V>, PrimaryMBID<V>>>,
     ) -> Self {
         Self {
             alias_cache,
             disk_cache,
             key: id,
+            primary_id: None,
             loaded: RwLock::new(None),
         }
     }
@@ -104,9 +108,11 @@ where
         &self,
         write_lock: &mut RwLockWriteGuard<'a, Option<Arc<V>>>,
     ) -> color_eyre::Result<Option<Arc<V>>> {
+        let id = &self.get_verified_id().await?;
+
         let cached = self
             .disk_cache
-            .get_or_option(&self.key)
+            .get_or_option(&id)
             .await?
             .map(|val| Arc::new(val));
 
@@ -117,6 +123,7 @@ where
         Ok(cached)
     }
 
+    /// This is the actual fetching of the entity.
     async fn inner_fetch<'a>(
         &self,
         write_lock: &mut RwLockWriteGuard<'a, Option<Arc<V>>>,

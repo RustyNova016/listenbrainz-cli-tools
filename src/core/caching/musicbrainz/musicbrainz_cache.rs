@@ -9,6 +9,7 @@ use crate::core::caching::serde_cacache::tidy::SerdeCacacheTidy;
 use crate::core::caching::CACHE_LOCATION;
 use crate::models::data::musicbrainz::entity::traits::MusicBrainzEntity;
 use crate::models::data::musicbrainz::mbid::state_id::state::NaiveMBID;
+use crate::models::data::musicbrainz::mbid::state_id::state::PrimaryMBID;
 use crate::models::error::Error;
 use crate::utils::println_cli_warn;
 
@@ -22,7 +23,7 @@ where
     cache_entities: RwLock<HashMap<NaiveMBID<V>, Arc<CachedEntity<V>>>>,
 
     disk_cache: Arc<SerdeCacacheTidy<NaiveMBID<V>, V>>,
-    alias_cache: Arc<SerdeCacacheTidy<NaiveMBID<V>, NaiveMBID<V>>>,
+    alias_cache: Arc<SerdeCacacheTidy<NaiveMBID<V>, PrimaryMBID<V>>>,
 }
 
 impl<V> MusicbrainzCache<V>
@@ -43,6 +44,7 @@ where
         }
     }
 
+    /// Get the cached entity corresponding to the MBID. If the entity doesn't exist, a new one will be created
     pub async fn get_entity(&self, id: &NaiveMBID<V>) -> Arc<CachedEntity<V>> {
         // Use a read to get the entity
         if let Some(entity) = self.cache_entities.read().await.get(id) {

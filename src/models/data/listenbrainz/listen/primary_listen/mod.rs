@@ -2,6 +2,7 @@ use std::sync::Arc;
 
 use color_eyre::eyre::Error;
 use derive_getters::Getters;
+use futures::StreamExt;
 use futures::TryStream;
 use futures::TryStreamExt;
 

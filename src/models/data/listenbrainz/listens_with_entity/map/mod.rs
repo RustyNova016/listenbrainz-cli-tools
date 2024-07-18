@@ -1,9 +1,9 @@
+pub mod artist;
 pub mod impl_trait;
 pub mod recording;
 use std::collections::HashMap;
 use std::hash::Hash;
 use std::sync::Arc;
-
 
 use crate::core::data_structures::table_map::table_index::TableItem;
 use crate::models::data::listenbrainz::listen::primary_listen::PrimaryListen;

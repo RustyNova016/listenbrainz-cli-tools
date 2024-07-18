@@ -3,6 +3,8 @@ use crate::models::data::musicbrainz::mbid::MBID;
 use std::io;
 use thiserror::Error;
 
+use super::data::musicbrainz::mbid::state_id::state::PrimaryMBID;
+
 #[derive(Error, Debug)]
 #[allow(clippy::enum_variant_names)]
 pub enum Error {
@@ -29,6 +31,10 @@ pub enum Error {
     // --- Caching --- //
     #[error("Error while getting the cache")]
     CacheError(#[from] serde_cacache::error::Error),
+
+    /// This error is made when trying to fetch an entity with a known redirection. The value contained is new MBID of the entity
+    #[error("Tried to fetch a redirected MBID. {0:?} should be fetched instead")]
+    MBIDRedirectError(String),
 
     // --- Fetching --- //
     #[error("Cannot find entity in Musicbrainz. It may have been deleted, or simply may not exist at all")]

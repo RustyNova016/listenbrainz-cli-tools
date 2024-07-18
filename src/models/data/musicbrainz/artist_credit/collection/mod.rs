@@ -45,7 +45,9 @@ impl ArtistCredits {
         credit_string
     }
 
-    pub fn into_artist_stream(self) -> impl TryStream<Ok = Arc<Artist>, Error = color_eyre::Report> {
+    pub fn into_artist_stream(
+        self,
+    ) -> impl TryStream<Ok = Arc<Artist>, Error = color_eyre::Report> {
         stream::iter(self.0)
             .map(|credit| async move { credit.artist.get_or_fetch_entity().await.map(Arc::new) })
             .buffered(1)

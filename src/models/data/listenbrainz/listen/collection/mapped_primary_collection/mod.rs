@@ -8,8 +8,10 @@ use crate::models::data::musicbrainz::recording::Recording;
 use extend::ext;
 use futures::stream;
 use futures::StreamExt;
+use futures::TryStreamExt;
 use itertools::Itertools;
 use std::sync::Arc;
+use tokio::sync::RwLock;
 
 use super::traits::CollectionOfListens;
 use super::ListenCollection;
@@ -53,18 +55,17 @@ pub impl PrimaryListenCollection {
         map
     }
 
-    fn map_mapped_artists(&self) -> ListensWithEntityMap<PrimaryMBID<Artist>, Artist> {
-        let mut map = ListensWithEntityMap::default();
+    async fn map_mapped_artists(
+        &self,
+    ) -> color_eyre::Result<ListensWithEntityMap<PrimaryMBID<Artist>, Artist>> {
+        let map = RwLock::new(ListensWithEntityMap::default());
 
-        let insert_stream = stream::iter(self).flat_map(|listen| listen.clone().associate_credited_artist());
-
-        
-
+        //TODO: Use Stream
         for listen in self {
-            map.add_listen(listen.mapped_recording().clone(), listen.clone());
+            ListensWithEntityMap::add_listen_artist_credits(&map, listen.clone()).await?;
         }
 
-        map
+        Ok(map.into_inner())
     }
 }
 

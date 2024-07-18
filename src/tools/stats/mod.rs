@@ -1,5 +1,6 @@
 pub mod work;
 use crate::models::cli::common::{GroupByTarget, SortSorterBy};
+use crate::models::data::listenbrainz::listen::collection::mapped_primary_collection::MappedPrimaryListenCollectionExt;
 use crate::models::data::listenbrainz::user_listens::UserListens;
 use crate::tools::stats::release_groups::stats_release_groups;
 use crate::utils::println_cli;
@@ -12,6 +13,12 @@ mod release_groups;
 mod releases;
 
 pub async fn stats_command(username: &str, target: GroupByTarget, sort_by: SortSorterBy) {
+    let mut listens = UserListens::get_user_with_refresh(username)
+        .await
+        .expect("Couldn't fetch the new listens")
+        .get_primary_listens().await.unwrap().map_mapped_recordings();
+
+    panic!();
     // Get the listens
     let user_listens = UserListens::get_user_with_refresh(username)
         .await
