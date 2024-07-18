@@ -2,16 +2,19 @@ pub mod group_by;
 use crate::models::data::listenbrainz::listen::primary_listen::PrimaryListen;
 use crate::models::data::listenbrainz::listen::Listen;
 use crate::models::data::listenbrainz::listens_with_entity::map::ListensWithEntityMap;
+use crate::models::data::musicbrainz::artist::Artist;
 use crate::models::data::musicbrainz::mbid::state_id::state::PrimaryMBID;
 use crate::models::data::musicbrainz::recording::Recording;
 use extend::ext;
+use futures::stream;
+use futures::StreamExt;
 use itertools::Itertools;
 use std::sync::Arc;
 
 use super::traits::CollectionOfListens;
 use super::ListenCollection;
 
-pub type PrimaryListenCollection = Vec<PrimaryListen>;
+pub type PrimaryListenCollection = Vec<Arc<PrimaryListen>>;
 
 #[ext(name = MappedPrimaryListenCollectionExt)]
 pub impl PrimaryListenCollection {
@@ -42,6 +45,20 @@ pub impl PrimaryListenCollection {
     // --- Stats ---
     fn map_mapped_recordings(&self) -> ListensWithEntityMap<PrimaryMBID<Recording>, Recording> {
         let mut map = ListensWithEntityMap::default();
+
+        for listen in self {
+            map.add_listen(listen.mapped_recording().clone(), listen.clone());
+        }
+
+        map
+    }
+
+    fn map_mapped_artists(&self) -> ListensWithEntityMap<PrimaryMBID<Artist>, Artist> {
+        let mut map = ListensWithEntityMap::default();
+
+        let insert_stream = stream::iter(self).flat_map(|listen| listen.clone().associate_credited_artist());
+
+        
 
         for listen in self {
             map.add_listen(listen.mapped_recording().clone(), listen.clone());

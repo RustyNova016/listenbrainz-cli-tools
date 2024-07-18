@@ -1,13 +1,18 @@
 use std::ops::Deref;
 use std::sync::Arc;
 
+use crate::core::entity_traits::mbid::IsMbid;
 use crate::models::data::musicbrainz::artist::mbid::ArtistMBID;
+use crate::models::data::musicbrainz::artist::Artist;
+use futures::stream;
+use futures::StreamExt;
+use futures::TryStream;
 use itertools::Itertools;
 use serde::{Deserialize, Serialize};
 
 use super::ArtistCredit;
 
-#[derive(Debug, Clone, Eq, PartialEq, Deserialize, Serialize)]
+#[derive(Debug, Clone, Eq, PartialEq, Deserialize, Serialize, Default)]
 pub struct ArtistCredits(Vec<Arc<ArtistCredit>>);
 
 impl Deref for ArtistCredits {
@@ -38,6 +43,12 @@ impl ArtistCredits {
         }
 
         credit_string
+    }
+
+    pub fn into_artist_stream(self) -> impl TryStream<Ok = Arc<Artist>, Error = color_eyre::Report> {
+        stream::iter(self.0)
+            .map(|credit| async move { credit.artist.get_or_fetch_entity().await.map(Arc::new) })
+            .buffered(1)
     }
 }
 

@@ -31,7 +31,7 @@ impl<E> ListensWithEntity<E> {
         }
     }
 
-    pub fn push(&mut self, listen: PrimaryListen) {
+    pub fn push(&mut self, listen: Arc<PrimaryListen>) {
         self.listens.push(listen);
     }
 

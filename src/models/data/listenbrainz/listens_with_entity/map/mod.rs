@@ -23,7 +23,7 @@ where
     K: Eq + Hash,
     E: TableItem<K>,
 {
-    pub fn add_listen(&mut self, entity: Arc<E>, listen: PrimaryListen) {
+    pub fn add_listen(&mut self, entity: Arc<E>, listen: Arc<PrimaryListen>) {
         self.data
             .entry(entity.get_key())
             .or_insert_with(|| ListensWithEntity::new_empty(entity.clone()))
