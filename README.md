@@ -123,6 +123,20 @@ Similarly to Listenbrainz, a compatibility calculator is available, using a new 
  
  Since "Exemple Track" is the only shared track, this means that the final score is 17% compatibility
 
+# Shell completions:
+
+How to use value hints and generate shell completions.
+
+Usage with zsh:
+```console
+$ listenbrainz-cli-tools --generate=zsh > /usr/local/share/zsh/site-functions/_listenbrainz-cli-tools
+$ compinit
+```
+fish:
+```console
+$ listenbrainz-cli-tools --generate=fish > listenbrainz-cli-tools.fish
+$ . ./listenbrainz-cli-tools.fish
+```
 
 # Other infos
 
