@@ -1,5 +1,12 @@
+use std::io;
+
 use cache::CacheCommand;
+use clap::Command;
+use clap::CommandFactory;
 use clap::{Parser, Subcommand};
+use clap_complete::generate;
+use clap_complete::Generator;
+use clap_complete::Shell;
 use config::ConfigCli;
 use lookup::LookupCommand;
 use mapping::MappingCommand;
@@ -23,19 +30,37 @@ pub struct Cli {
     #[arg(long, hide = true)]
     pub markdown_help: bool,
 
+    // If provided, outputs the completion file for given shell
+    #[arg(long = "generate", value_enum)]
+    generator: Option<Shell>,
+
     #[command(subcommand)]
-    pub command: Commands,
+    pub command: Option<Commands>,
 }
 
 impl Cli {
-    pub async fn run(&self) -> color_eyre::Result<()> {
+    pub async fn run(&self) -> color_eyre::Result<bool> {
         // Invoked as: `$ my-app --markdown-help`
         if self.markdown_help {
             clap_markdown::print_help_markdown::<Self>();
-            return Ok(());
+            return Ok(false);
         }
 
-        self.command.run().await
+        if let Some(generator) = self.generator {
+            let mut cmd = Self::command();
+            Self::print_completions(generator, &mut cmd);
+            return Ok(false);
+        }
+
+        if let Some(command) = &self.command {
+            command.run().await?;
+        }
+
+        Ok(true)
+    }
+
+    fn print_completions<G: Generator>(gen: G, cmd: &mut Command) {
+        generate(gen, cmd, cmd.get_name().to_string(), &mut io::stdout());
     }
 }
 
