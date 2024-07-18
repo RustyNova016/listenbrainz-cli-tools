@@ -1,74 +1,64 @@
-use crate::models::data::listenbrainz::listen::collection::ListenCollection;
-use crate::models::data::musicbrainz::recording::mbid::RecordingMBID;
+pub mod impl_trait;
+pub mod map;
+pub mod statistics;
+pub mod traits;
+use std::sync::Arc;
 
 use chrono::DateTime;
 use chrono::Duration;
 use chrono::Utc;
 use derive_getters::Getters;
-use itertools::Itertools;
 use rust_decimal::prelude::FromPrimitive;
 use rust_decimal::Decimal;
 
-#[derive(Debug, Clone, PartialEq, Eq, Getters)]
-pub struct RecordingIDWithListens {
-    recording_id: RecordingMBID,
-    listens: ListenCollection,
+use super::listen::collection::mapped_primary_collection::PrimaryListenCollection;
+use super::listen::collection::traits::CollectionOfListens;
+use super::listen::primary_listen::PrimaryListen;
+
+pub mod listens_with_recording;
+
+#[derive(Debug, Clone, Getters)]
+pub struct ListensWithEntity<E> {
+    entity: Arc<E>,
+    listens: PrimaryListenCollection,
 }
 
-impl RecordingIDWithListens {
-    pub fn new(recording_id: RecordingMBID, listens: ListenCollection) -> Self {
-        //TODO: Perf Testing
-        assert!(
-            listens.has_only_recording(&recording_id),
-            "Tried to insert a listen list that contain a listen from another recording"
-        );
-
+impl<E> ListensWithEntity<E> {
+    pub fn new_empty(entity: Arc<E>) -> Self {
         Self {
-            recording_id,
-            listens,
+            entity,
+            listens: Vec::new(),
         }
     }
 
-    pub fn new_from_unfiltered(recording_id: RecordingMBID, listens: &ListenCollection) -> Self {
-        let filtered = listens.get_listens_of_recording(&recording_id);
-
-        Self {
-            recording_id,
-            listens: filtered,
-        }
-    }
-
-    pub async fn all_from_unfiltered(listens: &ListenCollection) -> color_eyre::Result<Vec<Self>> {
-        let recordings = listens.get_listened_recordings_mbids().await?;
-
-        Ok(recordings
-            .into_iter()
-            .map(|rec| Self::new_from_unfiltered(rec, listens))
-            .collect_vec())
+    pub fn push(&mut self, listen: Arc<PrimaryListen>) {
+        self.listens.push(listen);
     }
 
     pub fn first_listen_date(&self) -> Option<DateTime<Utc>> {
         self.listens
-            .get_oldest_listen()
+            .find_oldest_listen()
             .map(|listen| *listen.get_listened_at())
     }
 
     pub fn last_listen_date(&self) -> Option<DateTime<Utc>> {
         self.listens
-            .get_latest_listen()
+            .find_latest_listen()
             .map(|listen| *listen.get_listened_at())
     }
 
+    /// The number of listens of the entity
     pub fn listen_count(&self) -> usize {
         self.listens.len()
     }
 
-    /// Return the amount of time this recording having known about
+    /// Return the amount of time this entity having been known about
     pub fn known_for(&self) -> Option<Duration> {
         self.first_listen_date()
             .map(|discovery| Utc::now() - discovery)
     }
 
+    /// The average time between two listens of the entity
     pub fn average_duration_between_listens(&self) -> Duration {
         self.known_for()
             .and_then(|dur| dur.checked_div(self.listen_count() as i32))
@@ -76,6 +66,7 @@ impl RecordingIDWithListens {
             .unwrap_or_else(Duration::zero)
     }
 
+    /// The date where the estimated next listen will be
     pub fn estimated_date_of_next_listen(&self) -> Option<DateTime<Utc>> {
         self.last_listen_date()
             .map(|listen_date| listen_date + self.average_duration_between_listens())
@@ -87,18 +78,9 @@ impl RecordingIDWithListens {
             .unwrap_or_else(Duration::zero)
     }
 
+    /// Return `true` is the recording have been listened to
     pub fn is_listened(&self) -> bool {
         !self.listens.is_empty()
-    }
-
-    pub async fn underated_score_single(&self) -> color_eyre::Result<Decimal> {
-        Ok(self
-            .listens()
-            .get_underrated_recordings()
-            .await?
-            .first()
-            .expect("Recording should have a score")
-            .0)
     }
 
     pub fn overdue_score(&self) -> Decimal {

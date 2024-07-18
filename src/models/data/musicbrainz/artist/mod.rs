@@ -1,3 +1,5 @@
+pub mod entity;
+
 use derive_getters::Getters;
 use itertools::Itertools;
 use musicbrainz_rs::entity::alias::Alias;
@@ -7,12 +9,9 @@ use musicbrainz_rs::entity::lifespan::LifeSpan;
 use musicbrainz_rs::entity::tag::Tag;
 use serde::{Deserialize, Serialize};
 
-use crate::models::data::musicbrainz::mbid::generic_mbid::{MBIDSpe, PrimaryID};
 use crate::models::data::musicbrainz::relation::Relation;
 use crate::models::data::musicbrainz::work::mbid::WorkMBID;
 
-use super::entity::entity_kind::MusicbrainzEntityKind;
-use super::entity::is_musicbrainz_entity::IsMusicbrainzEntity;
 use super::recording::mbid::RecordingMBID;
 use super::release::mbid::ReleaseMBID;
 use super::release_group::mbid::ReleaseGroupMBID;
@@ -72,15 +71,5 @@ impl From<musicbrainz_rs::entity::artist::Artist> for Artist {
                 .relations
                 .map(|relations| relations.into_iter().map_into().collect_vec()),
         }
-    }
-}
-
-impl IsMusicbrainzEntity for Artist {
-    fn as_kind(&self) -> MusicbrainzEntityKind {
-        MusicbrainzEntityKind::Artist
-    }
-
-    fn get_mbid(&self) -> MBIDSpe<Self, PrimaryID> {
-        MBIDSpe::from(self.id.to_string())
     }
 }

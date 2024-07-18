@@ -1,20 +1,22 @@
-use std::mem::discriminant;
+use std::sync::Arc;
 
 use derive_more::{From, IsVariant, Unwrap};
 use serde::{Deserialize, Serialize};
 
 use crate::core::entity_traits::mbid::HasMBID;
-use crate::core::entity_traits::updatable::Updatable;
+use crate::core::entity_traits::update::Updatable;
 use crate::models::data::musicbrainz::artist::Artist;
 use crate::models::data::musicbrainz::mbid::MBID;
 use crate::models::data::musicbrainz::recording::Recording;
 use crate::models::data::musicbrainz::release::Release;
 use crate::models::data::musicbrainz::release_group::ReleaseGroup;
 use crate::models::data::musicbrainz::work::Work;
-use crate::models::data::musicbrainz_database::MUSICBRAINZ_DATABASE;
-use crate::utils::println_cli_warn;
+use crate::models::data::musicbrainz_database_legacy::MUSICBRAINZ_DATABASE_LEGACY;
+
+use super::entity::any::any_musicbrainz_entity::AnyMusicBrainzEntity;
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, IsVariant, Unwrap, From)]
+#[deprecated]
 pub enum MusicBrainzEntity {
     Artist(Artist),
     ReleaseGroup(ReleaseGroup),
@@ -26,11 +28,16 @@ pub enum MusicBrainzEntity {
 impl MusicBrainzEntity {
     pub async fn save_to_cache(&self) -> color_eyre::Result<()> {
         match self {
-            Self::ReleaseGroup(val) => MUSICBRAINZ_DATABASE.release_groups().update(val).await?,
-            Self::Release(val) => MUSICBRAINZ_DATABASE.releases().update(val).await?,
-            Self::Recording(val) => MUSICBRAINZ_DATABASE.recordings().update(val).await?,
-            Self::Work(val) => MUSICBRAINZ_DATABASE.works().update(val).await?,
-            Self::Artist(val) => MUSICBRAINZ_DATABASE.artists().update(val).await?,
+            Self::ReleaseGroup(val) => {
+                MUSICBRAINZ_DATABASE_LEGACY
+                    .release_groups()
+                    .update(val)
+                    .await?;
+            }
+            Self::Release(val) => MUSICBRAINZ_DATABASE_LEGACY.releases().update(val).await?,
+            Self::Recording(val) => MUSICBRAINZ_DATABASE_LEGACY.recordings().update(val).await?,
+            Self::Work(val) => MUSICBRAINZ_DATABASE_LEGACY.works().update(val).await?,
+            Self::Artist(val) => MUSICBRAINZ_DATABASE_LEGACY.artists().update(val).await?,
         }
 
         Ok(())
@@ -49,22 +56,16 @@ impl HasMBID<MBID> for MusicBrainzEntity {
     }
 }
 
-impl Updatable for MusicBrainzEntity {
-    fn update(self, newer: Self) -> Self {
-        // Check if both are the same variant
-        if discriminant(&self) != discriminant(&newer) {
-            // No big deal. But worth mentioning
-            // TODO: Debug only warning
-            println_cli_warn("Tried to update entity type with mismatched entity type".to_string());
-            return self;
-        }
+impl Updatable for MusicBrainzEntity {}
 
-        match self {
-            Self::Artist(val) => val.update(newer.unwrap_artist()).into(),
-            Self::Recording(val) => val.update(newer.unwrap_recording()).into(),
-            Self::Release(val) => val.update(newer.unwrap_release()).into(),
-            Self::ReleaseGroup(val) => val.update(newer.unwrap_release_group()).into(),
-            Self::Work(val) => val.update(newer.unwrap_work()).into(),
+impl From<MusicBrainzEntity> for AnyMusicBrainzEntity {
+    fn from(value: MusicBrainzEntity) -> Self {
+        match value {
+            MusicBrainzEntity::Artist(val) => Self::Artist(Arc::new(val)),
+            MusicBrainzEntity::ReleaseGroup(val) => Self::ReleaseGroup(Arc::new(val)),
+            MusicBrainzEntity::Release(val) => Self::Release(Arc::new(val)),
+            MusicBrainzEntity::Recording(val) => Self::Recording(Arc::new(val)),
+            MusicBrainzEntity::Work(val) => Self::Work(Arc::new(val)),
         }
     }
 }

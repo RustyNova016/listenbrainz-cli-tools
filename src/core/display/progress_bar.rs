@@ -1,6 +1,7 @@
 use std::ops::Deref;
 use std::time::Duration;
 
+use futures::Stream;
 use indicatif::{ProgressBar, ProgressStyle};
 
 use crate::utils::logger::Logger;
@@ -30,6 +31,15 @@ impl ProgressBarCli {
         Logger::add_global_pg(progress_bar.clone());
 
         Self { pg: progress_bar }
+    }
+
+    pub fn wrap_stream<S: Stream + Unpin>(
+        stream: S,
+        name: Option<&str>,
+    ) -> indicatif::ProgressBarIter<S> {
+        let pg = Self::new(0_u64, name);
+
+        pg.wrap_stream(stream)
     }
 }
 

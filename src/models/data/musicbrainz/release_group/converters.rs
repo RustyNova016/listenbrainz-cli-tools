@@ -1,7 +1,11 @@
+use std::sync::Arc;
+
 use itertools::Itertools;
 use musicbrainz_rs::entity::release_group::ReleaseGroup as ReleaseGroupMS;
 
+use crate::models::data::musicbrainz::entity::any::any_musicbrainz_entity::AnyMusicBrainzEntity;
 use crate::models::data::musicbrainz::release_group::ReleaseGroup;
+use crate::models::error::Error;
 
 impl From<ReleaseGroupMS> for ReleaseGroup {
     fn from(value: ReleaseGroupMS) -> Self {
@@ -31,5 +35,18 @@ impl From<ReleaseGroupMS> for ReleaseGroup {
                 .relations
                 .map(|relations| relations.into_iter().map_into().collect_vec()),
         }
+    }
+}
+
+impl From<AnyMusicBrainzEntity> for Result<Arc<ReleaseGroup>, Error> {
+    fn from(value: AnyMusicBrainzEntity) -> Self {
+        if let AnyMusicBrainzEntity::ReleaseGroup(val) = value {
+            return Ok(val);
+        }
+
+        Err(Error::InvalidTypeConvertion(
+            "MusicBrainzEntity".to_string(),
+            "ReleaseGroup".to_string(),
+        ))
     }
 }

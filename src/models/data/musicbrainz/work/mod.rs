@@ -1,3 +1,6 @@
+pub mod entity;
+use std::sync::Arc;
+
 use derive_getters::Getters;
 use musicbrainz_rs::entity::alias::Alias;
 use musicbrainz_rs::entity::genre::Genre;
@@ -6,11 +9,11 @@ use musicbrainz_rs::entity::work::WorkAttribute;
 use serde::Deserialize;
 use serde::Serialize;
 
+use super::entity::any::any_musicbrainz_entity::AnyMusicBrainzEntity;
+use super::relation::Relation;
 use crate::models::data::musicbrainz::entity::entity_kind::MusicbrainzEntityKind;
 use crate::models::data::musicbrainz::entity::is_musicbrainz_entity::IsMusicbrainzEntity;
 use crate::models::data::musicbrainz::mbid::generic_mbid::{MBIDSpe, PrimaryID};
-
-use super::relation::Relation;
 
 use self::mbid::WorkMBID;
 
@@ -44,8 +47,44 @@ impl IsMusicbrainzEntity for Work {
         MusicbrainzEntityKind::Work
     }
 
-    fn get_mbid(&self) -> MBIDSpe<Self, PrimaryID> {
+    fn try_from_any(
+        value: &AnyMusicBrainzEntity,
+    ) -> Result<Arc<Self>, crate::models::error::Error> {
+        if let AnyMusicBrainzEntity::Work(val) = value {
+            return Ok(val.clone());
+        }
+
+        Err(crate::models::error::Error::InvalidTypeConvertion(
+            "MusicBrainzEntity".to_string(),
+            "Work".to_string(),
+        ))
+    }
+
+    fn get_mbidspe(&self) -> MBIDSpe<Self, PrimaryID> {
         MBIDSpe::from(self.id.to_string())
+    }
+
+    fn partial_update(self, newer: Self) -> Self {
+        Self {
+            id: newer.id,
+            disambiguation: newer.disambiguation,
+            title: newer.title,
+            tags: newer.tags.or(self.tags),
+            aliases: newer.aliases.or(self.aliases),
+            genres: newer.genres.or(self.genres),
+            annotation: newer.annotation.or(self.annotation),
+            attributes: newer.attributes.or(self.attributes),
+            iswcs: newer.iswcs.or(self.iswcs),
+            language: newer.language.or(self.language),
+            languages: newer.languages.or(self.languages),
+            type_id: newer.type_id.or(self.type_id),
+            //work_type: newer.work_type.or(self.work_type),
+            relations: newer.relations.or(self.relations),
+        }
+    }
+
+    fn into_any(self: Arc<Self>) -> AnyMusicBrainzEntity {
+        self.into()
     }
 }
 

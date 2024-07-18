@@ -1,4 +1,5 @@
-use crate::models::data::musicbrainz::recording::mbid::RecordingMBID;
+use crate::models::data::musicbrainz::mbid::state_id::state::NaiveMBID;
+use crate::models::data::musicbrainz::recording::Recording;
 use color_eyre::eyre::Context;
 use derive_builder::Builder;
 use listenbrainz::raw::request::{
@@ -15,7 +16,7 @@ pub struct PlaylistStub {
     description: Option<String>,
     username: Option<String>,
     public: bool,
-    tracks: Vec<RecordingMBID>,
+    tracks: Vec<NaiveMBID<Recording>>,
 }
 
 impl PlaylistStub {
@@ -23,7 +24,7 @@ impl PlaylistStub {
         title: String,
         username: Option<String>,
         public: bool,
-        tracks: Vec<RecordingMBID>,
+        tracks: Vec<NaiveMBID<Recording>>,
         description: Option<String>,
     ) -> Self {
         Self {

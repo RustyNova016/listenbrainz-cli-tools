@@ -7,8 +7,9 @@ use rust_decimal::Decimal;
 use tokio::sync::OnceCell;
 
 use crate::models::data::listenbrainz::listen::collection::ListenCollection;
-use crate::models::data::listenbrainz::recording_with_listens::recording_id::RecordingIDWithListens;
+use crate::models::data::listenbrainz::listens_with_entity::ListensWithEntity;
 use crate::models::data::musicbrainz::recording::mbid::RecordingMBID;
+use crate::models::data::musicbrainz::recording::Recording;
 
 use super::display::progress_bar::ProgressBarCli;
 
@@ -63,7 +64,11 @@ impl UserCompatibility {
         target: TargetUser,
     ) -> color_eyre::Result<Vec<(Decimal, RecordingMBID)>> {
         let shared_recordings = self.get_shared_recordings().await?;
-        let user_listens = self.get_user_listens(target);
+        let user_listens = self
+            .get_user_listens(target)
+            .clone()
+            .try_into_mapped_primary()
+            .await?;
 
         let progress = ProgressBarCli::new(
             shared_recordings.len() as u64,
@@ -73,8 +78,14 @@ impl UserCompatibility {
         let mut ratios = Vec::new();
 
         for shared_rec in shared_recordings {
-            let rec_and_listens =
-                RecordingIDWithListens::new_from_unfiltered(shared_rec.clone(), user_listens);
+            let rec_and_listens = ListensWithEntity::<Recording>::from_mapping(
+                shared_rec
+                    .into_stateful()
+                    .await?
+                    .get_load_or_fetch()
+                    .await?,
+                &user_listens,
+            );
 
             let ratio = Decimal::new(rec_and_listens.listen_count().try_into().unwrap(), 0)
                 / num_total_listens;

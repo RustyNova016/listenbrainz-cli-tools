@@ -1,16 +1,9 @@
 use extend::ext;
 use musicbrainz_rs::entity::work::Work;
 
-use crate::core::entity_traits::has_id::HasID;
 use crate::models::data::musicbrainz::external_musicbrainz_entity::ExternalMusicBrainzEntity;
 use crate::models::data::musicbrainz::musicbrainz_entity::MusicBrainzEntity;
 use crate::models::data::musicbrainz::relation::external::RelationContentExt;
-
-impl HasID for Work {
-    fn get_id(&self) -> String {
-        self.id.to_string()
-    }
-}
 
 #[ext]
 pub impl Work {

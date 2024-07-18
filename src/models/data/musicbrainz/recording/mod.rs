@@ -1,3 +1,6 @@
+pub mod entity;
+use std::sync::Arc;
+
 use derive_getters::Getters;
 use musicbrainz_rs::entity::alias::Alias;
 use musicbrainz_rs::entity::genre::Genre;
@@ -11,6 +14,8 @@ use crate::models::data::musicbrainz::mbid::generic_mbid::{MBIDSpe, PrimaryID};
 use crate::models::data::musicbrainz::release::mbid::ReleaseMBID;
 
 use super::artist_credit::collection::ArtistCredits;
+
+use super::entity::any::any_musicbrainz_entity::AnyMusicBrainzEntity;
 use super::relation::Relation;
 
 use self::mbid::RecordingMBID;
@@ -41,12 +46,47 @@ pub struct Recording {
 }
 
 impl IsMusicbrainzEntity for Recording {
+    fn try_from_any(
+        value: &AnyMusicBrainzEntity,
+    ) -> Result<Arc<Self>, crate::models::error::Error> {
+        if let AnyMusicBrainzEntity::Recording(val) = value {
+            return Ok(val.clone());
+        }
+
+        Err(crate::models::error::Error::InvalidTypeConvertion(
+            "MusicBrainzEntity".to_string(),
+            "Recording".to_string(),
+        ))
+    }
+
     fn as_kind(&self) -> MusicbrainzEntityKind {
         MusicbrainzEntityKind::Recording
     }
 
-    fn get_mbid(&self) -> MBIDSpe<Self, PrimaryID> {
+    fn get_mbidspe(&self) -> MBIDSpe<Self, PrimaryID> {
         MBIDSpe::from(self.id.to_string())
+    }
+
+    fn partial_update(self, newer: Self) -> Self {
+        Self {
+            id: newer.id,
+            title: newer.title,
+            artist_credit: newer.artist_credit.or(self.artist_credit),
+            releases: newer.releases.or(self.releases),
+            isrcs: newer.isrcs.or(self.isrcs),
+            disambiguation: newer.disambiguation.or(self.disambiguation),
+            tags: newer.tags.or(self.tags),
+            video: newer.video.or(self.video),
+            length: newer.length.or(self.length),
+            annotation: newer.annotation.or(self.annotation),
+            genres: newer.genres.or(self.genres),
+            aliases: self.aliases,
+            relations: newer.relations.or(self.relations),
+        }
+    }
+
+    fn into_any(self: Arc<Self>) -> AnyMusicBrainzEntity {
+        self.into()
     }
 }
 

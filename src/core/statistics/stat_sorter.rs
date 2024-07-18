@@ -16,7 +16,7 @@ pub trait StatSorter {
         if self.get_map_mut().get(key).is_none() {
             // No vec at this location. So we add one and return it
             self.get_map_mut()
-                .insert(key.clone(), ListenCollection::new());
+                .insert(key.clone(), ListenCollection::default());
         }
 
         return self

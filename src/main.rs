@@ -2,8 +2,8 @@ use clap::Parser;
 use color_eyre::eyre::Ok;
 
 use models::cli::Cli;
+use models::data::musicbrainz_database::MUSICBRAINZ_DATABASE;
 
-use crate::models::data::musicbrainz_database::MUSICBRAINZ_DATABASE;
 use crate::utils::println_cli;
 
 pub mod core;
@@ -15,6 +15,9 @@ pub mod utils;
 #[tokio::main]
 async fn main() -> color_eyre::Result<()> {
     color_eyre::install()?;
+
+    //If using tracing, uncomment
+    //console_subscriber::init();
     let cli = Cli::parse();
 
     println!("Hello!");

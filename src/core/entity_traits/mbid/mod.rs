@@ -6,19 +6,23 @@ use serde::Serialize;
 use std::fmt::{Debug, Display};
 use std::future::Future;
 
-use super::updatable::Updatable;
+use super::update::Updatable;
 
 pub mod is_cached_mbid;
 
+#[deprecated]
 pub trait IsMbid<T>
 where
     Self: Display + Clone + Serialize + DeserializeOwned,
     T: HasMBID<Self>,
 {
+    #[deprecated]
     fn get_or_fetch_entity(&self) -> impl Future<Output = color_eyre::Result<T>> + Send;
 
+    #[deprecated]
     fn fetch(&self) -> impl Future<Output = color_eyre::Result<ExternalMusicBrainzEntity>> + Send;
 
+    #[deprecated]
     fn into_mbid(self) -> MBID;
 }
 
@@ -40,6 +44,7 @@ where
     }
 }
 
+#[deprecated]
 pub trait HasMBID<K>
 where
     Self: Serialize + DeserializeOwned + Updatable + Sized + Debug + Clone,

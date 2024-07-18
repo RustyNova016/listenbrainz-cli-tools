@@ -13,6 +13,7 @@ use super::Artist;
 
 impl Artist {
     pub async fn get_all_recordings(&mut self) -> color_eyre::Result<Vec<Recording>> {
+        //TODO: Use Arc + No mut
         let recording_ids = match &self.recordings {
             Some(recordings) => recordings.clone(),
             None => {

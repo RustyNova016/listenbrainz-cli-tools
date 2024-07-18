@@ -1,3 +1,6 @@
+use std::sync::Arc;
+
+use futures::future;
 use futures::stream;
 use futures::StreamExt;
 use futures::TryStreamExt;
@@ -5,8 +8,10 @@ use itertools::Itertools;
 
 use crate::core::display::progress_bar::ProgressBarCli;
 use crate::core::entity_traits::mbid::is_cached_mbid::IsCachedMBID;
+use crate::models::data::listenbrainz::listen::primary_listen::PrimaryListen;
 use crate::models::data::musicbrainz::recording::mbid::RecordingMBID;
 
+use super::mapped_primary_collection::PrimaryListenCollection;
 use super::ListenCollection;
 
 impl ListenCollection {
@@ -33,5 +38,21 @@ impl ListenCollection {
             .filter_map(|listen| listen.get_naive_recording_mbid())
             .unique()
             .collect()
+    }
+
+    pub async fn try_into_mapped_primary(self) -> color_eyre::Result<PrimaryListenCollection> {
+        let pg = Arc::new(ProgressBarCli::new(
+            self.len() as u64,
+            Some("Loading listened recordings"),
+        ));
+
+        stream::iter(self.into_iter())
+            .filter_map(|listen| async { PrimaryListen::from_listen(listen).await })
+            .map(future::ready)
+            .inspect(|_| pg.inc(1_u64))
+            .buffer_unordered(20)
+            .map_ok(Arc::new)
+            .try_collect()
+            .await
     }
 }

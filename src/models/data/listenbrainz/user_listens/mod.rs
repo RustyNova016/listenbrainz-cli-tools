@@ -8,6 +8,7 @@ use serde::{Deserialize, Serialize};
 
 use crate::utils::extensions::UserListensPayloadExt;
 
+use super::listen::collection::mapped_primary_collection::PrimaryListenCollection;
 use super::listen::collection::ListenCollection;
 use super::listen::Listen;
 
@@ -25,7 +26,7 @@ impl UserListens {
     pub fn new(user: &str) -> Self {
         Self {
             username: user.to_lowercase(),
-            listens: ListenCollection::new(),
+            listens: ListenCollection::default(),
         }
     }
 
@@ -90,6 +91,10 @@ impl UserListens {
     /// Returns all the mapped listens
     pub fn get_mapped_listens(&self) -> ListenCollection {
         self.listens.get_mapped_listens()
+    }
+
+    pub async fn get_primary_listens(&self) -> color_eyre::Result<PrimaryListenCollection> {
+        self.listens.clone().try_into_mapped_primary().await
     }
 
     /// Returns the number of listens

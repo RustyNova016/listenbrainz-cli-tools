@@ -1,11 +1,15 @@
 use std::collections::HashMap;
+use std::sync::Arc;
 
 use chrono::{DateTime, Utc};
 use color_eyre::eyre::Context;
+use derive_getters::Getters;
 use serde::{Deserialize, Serialize};
 
 use crate::core::entity_traits::mb_cached::MBCached;
 use crate::models::data::listenbrainz::mapping_data::MappingData;
+use crate::models::data::musicbrainz::mbid::state_id::state::NaiveMBID;
+use crate::models::data::musicbrainz::mbid::state_id::state::PrimaryMBID;
 use crate::models::data::musicbrainz::recording::mbid::RecordingMBID;
 use crate::models::data::musicbrainz::recording::Recording;
 
@@ -15,8 +19,9 @@ pub mod collection;
 pub mod convertion;
 pub mod getters;
 pub mod mapped_listen;
+pub mod primary_listen;
 
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, Getters)]
 pub struct Listen {
     /// The username of the user who listened to it
     pub user: String,
@@ -74,6 +79,11 @@ impl Listen {
         }
     }
 
+    pub async fn get_load_or_fetch_recording(&self) -> Option<color_eyre::Result<Arc<Recording>>> {
+        let mapped_mbid = self.get_mapped_naive_mbid()?;
+        Some(mapped_mbid.get_load_or_fetch().await)
+    }
+
     /// Send a mapping request to Listenbrainz
     pub async fn submit_mapping(&self, mbid: &str, token: &str) -> color_eyre::Result<()> {
         let client = reqwest::Client::new();
@@ -93,5 +103,20 @@ impl Listen {
             .context("Listenbrainz returned an error")?;
 
         Ok(())
+    }
+
+    pub fn get_mapped_naive_mbid(&self) -> Option<NaiveMBID<Recording>> {
+        self.mapping_data
+            .as_ref()
+            .map(|val| NaiveMBID::from(val.recording_mbid.clone()))
+    }
+
+    pub async fn get_mapped_primary_mbid(
+        &self,
+    ) -> Option<color_eyre::Result<PrimaryMBID<Recording>>> {
+        match self.get_mapped_naive_mbid() {
+            Some(val) => Some(val.to_primary().await),
+            None => None,
+        }
     }
 }

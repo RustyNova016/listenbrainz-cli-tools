@@ -1,3 +1,4 @@
+pub mod hashmap_ext;
 use chrono::DateTime;
 use chrono::TimeZone;
 use chrono::Utc;

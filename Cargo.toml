@@ -6,7 +6,7 @@ repository = "https://github.com/RustyNova016/listenbrainz-cli-tools"
 publish = true
 license = "MIT"
 description = "A CLI app containing a set of useful tools for Listenbrainz"
-rust-version = "1.75"
+rust-version = "1.76"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
@@ -40,7 +40,7 @@ extend = "1.2.0"
 directories = "5.0.1"
 chashmap = "2.2.2"
 indicatif = { version = "0.17.8", features = ["rayon", "improved_unicode", "futures"] }
-tokio = { version = "1.38.1", features = ["full"] }
+tokio = { version = "1.38.1", features = ["full"] }  #["full", "tracing"] }
 rayon = "1.10.0"
 reqwest = { version = "0.12.5", features = ["json"] }
 cacache = { version = "13.0.0", default-features = false, features = ["tokio-runtime", "mmap"] }
@@ -56,6 +56,11 @@ humantime = "2.1.0"
 regex = "1.10.5"
 clap-markdown = "0.1.4"
 
+# Tracing fro debugging
+# tracing = "0.1"
+# tracing-subscriber = "0.3"
+# console-subscriber = "0.3.0"
+
 # The profile that 'cargo dist' will build with
 [profile.dist]
 inherits = "release"
@@ -64,6 +69,7 @@ lto = "thin"
 [lints.rust]
 unsafe_code = "forbid"
 async_fn_in_trait = { level = "allow", priority = 1 }
+deprecated = { level = "allow", priority = 1 }
 
 [lints.clippy]
 #pedantic = "deny"
@@ -86,6 +92,8 @@ explicit_iter_loop = { level = "warn", priority = 1 }
 # Won't apply
 must_use_candidate = { level = "allow", priority = 1 }
 map_unwrap_or = { level = "allow", priority = 1 }
+
+
 
 # Config for 'cargo dist'
 [workspace.metadata.dist]

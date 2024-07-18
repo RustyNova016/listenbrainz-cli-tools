@@ -23,7 +23,7 @@ impl StatisticSorter {
             return data;
         }
 
-        let new = Mutex::new(ListenCollection::new());
+        let new = Mutex::new(ListenCollection::default());
         self.listens.insert(key.to_string(), new);
         return self
             .listens

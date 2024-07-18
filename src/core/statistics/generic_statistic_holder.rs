@@ -27,7 +27,7 @@ impl<K> StatisticHolder<K> for GenericStatisticHolder<K> {
     fn create(id: K) -> Self {
         Self {
             _id: id,
-            listens: Mutex::new(ListenCollection::new()),
+            listens: Mutex::new(ListenCollection::default()),
         }
     }
 }
