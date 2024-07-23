@@ -257,7 +257,9 @@ async fn ask_for_mbid() -> RecordingMBID {
                         println!("Couldn't parse the string for any MBID. Please make sure there is one.");
                         continue;
                     }
-                    _ => Err(val).unwrap(),
+
+                    // User cancel. So we cancel the app
+                    _ => panic!("{val:?}"),
                 }
             }
         }

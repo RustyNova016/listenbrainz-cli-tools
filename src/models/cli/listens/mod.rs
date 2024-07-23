@@ -1,9 +1,8 @@
-pub mod remap;
 use clap::Parser;
 use clap::Subcommand;
-use remap::Remapper;
 
 use crate::models::config::Config;
+use crate::tools::listens::remap::Remapper;
 
 #[derive(Parser, Debug, Clone)]
 #[command(version, about, long_about = None)]
