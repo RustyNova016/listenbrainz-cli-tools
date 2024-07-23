@@ -2,6 +2,8 @@ use std::collections::HashMap;
 
 use chrono::{DateTime, Utc};
 use color_eyre::eyre::Context;
+use derive_getters::Getters;
+use listenbrainz::raw::response::UserListensListen;
 use serde::{Deserialize, Serialize};
 
 use crate::core::entity_traits::mb_cached::MBCached;
@@ -9,6 +11,7 @@ use crate::models::data::listenbrainz::mapping_data::MappingData;
 use crate::models::data::musicbrainz::recording::mbid::RecordingMBID;
 use crate::models::data::musicbrainz::recording::Recording;
 
+use super::messybrainz::msid::MSID;
 use super::messybrainz::MessyBrainzData;
 
 pub mod collection;
@@ -16,7 +19,7 @@ pub mod convertion;
 pub mod getters;
 pub mod mapped_listen;
 
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, Getters)]
 pub struct Listen {
     /// The username of the user who listened to it
     pub user: String,
@@ -29,6 +32,9 @@ pub struct Listen {
 
     /// Data of the mapping
     pub mapping_data: Option<MappingData>,
+
+    /// The original listen data before convertion
+    original_data: UserListensListen,
 }
 
 impl Listen {
@@ -93,5 +99,9 @@ impl Listen {
             .context("Listenbrainz returned an error")?;
 
         Ok(())
+    }
+
+    pub fn get_msid(&self) -> MSID {
+        self.messybrainz_data.msid.clone().into()
     }
 }

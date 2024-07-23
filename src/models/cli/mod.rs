@@ -8,6 +8,7 @@ use clap_complete::generate;
 use clap_complete::Generator;
 use clap_complete::Shell;
 use config::ConfigCli;
+use listens::ListenCommand;
 use lookup::LookupCommand;
 use mapping::MappingCommand;
 
@@ -19,6 +20,7 @@ use crate::tools::stats::stats_command;
 pub mod cache;
 pub mod common;
 pub mod config;
+pub mod listens;
 pub mod lookup;
 pub mod mapping;
 pub mod radio;
@@ -80,6 +82,9 @@ pub enum Commands {
     /// Commands to deal with the app's configuration
     Config(ConfigCli),
 
+    /// Commands for handling listen data
+    Listens(ListenCommand),
+
     /// Get detailled information about an entity
     Lookup(LookupCommand),
 
@@ -136,6 +141,8 @@ impl Commands {
             Self::Cache(val) => val.run().await?,
 
             Self::Config(val) => val.command.run().await?,
+
+            Self::Listens(val) => val.run().await?,
 
             Self::Lookup(val) => val.run().await?,
 

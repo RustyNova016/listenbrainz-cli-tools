@@ -1,4 +1,5 @@
 pub mod cli;
+pub mod crates;
 use std::fmt::Display;
 use std::sync::{Arc, Mutex};
 
@@ -107,12 +108,16 @@ pub fn println_cli<T: Display>(string: T) {
     logger.println_cli(string);
 }
 
+pub fn println_cli_err<T: Display>(string: T) {
+    println_cli(format!("[Error] {string}").red());
+}
+
 pub fn println_cli_warn<T: Display>(string: T) {
     println_cli(format!("[Warning] {string}").yellow());
 }
 
 pub fn println_cli_info<T: Display>(string: T) {
-    println_cli(format!("[Info] {string}").yellow());
+    println_cli(format!("[Info] {string}").bright_cyan());
 }
 
 pub fn println_lis<T: Display>(string: T) {
