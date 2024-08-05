@@ -53,7 +53,7 @@ derive-getters = "0.4.0"
 rust_decimal_macros = "1.35.0"
 futures = "0.3.30"
 humantime = "2.1.0"
-regex = "1.10.5"
+regex = "1.10.6"
 clap-markdown = "0.1.4"
 
 # The profile that 'cargo dist' will build with
