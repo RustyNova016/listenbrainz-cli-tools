@@ -30,7 +30,7 @@ inquire = "0.7.5"
 itertools = "0.13.0"
 color-eyre = "0.6.3"
 rust_decimal = "1.35.0"
-clap = { version = "4.5.9", features = ["unicode", "wrap_help", "derive", "color"] }
+clap = { version = "4.5.14", features = ["unicode", "wrap_help", "derive", "color"] }
 clap_complete = "4.5.8"
 chrono = "0.4.38"
 serde = { version = "1.0.204", features = ["rc"] }
