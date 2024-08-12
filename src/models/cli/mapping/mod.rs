@@ -40,10 +40,10 @@ pub enum MappingSubcommands {
     /// ```
     ///
     /// > Note: Listens are grouped by "Messybrainz ID" (MSID). This is the way Listenbrainz recognize similar listens
-    /// by attributing them the same MSID. Linking a listen will link the others as long as they have the same MSID.
+    /// > by attributing them the same MSID. Linking a listen will link the others as long as they have the same MSID.
     ///
     /// > This also means that the same recording can be shown twice in the list.
-    /// For example: "Panic - Dion Timer" won't have the same MSID as "Panic by Dion Timmer", even if they are the same recording.
+    /// > For example: "Panic - Dion Timer" won't have the same MSID as "Panic by Dion Timmer", even if they are the same recording.
     ListUnmapped {
         /// Name of the user to fetch unlinked listen from
         username: String,
