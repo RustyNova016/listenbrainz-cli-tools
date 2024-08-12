@@ -6,6 +6,7 @@ pub mod recording;
 use std::sync::Arc;
 
 use chrono::{DateTime, Utc};
+use derive_more::derive::{Deref, DerefMut, IntoIterator};
 use itertools::Itertools;
 use serde::{Deserialize, Serialize};
 
@@ -16,8 +17,6 @@ use super::Listen;
 
 pub mod stats;
 mod underrated;
-
-use derive_more::*;
 
 /// Wrapper for a vector of listens
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, Deref, DerefMut, IntoIterator)]
