@@ -29,7 +29,7 @@ derive_builder = "0.20.0"
 inquire = "0.7.5"
 itertools = "0.13.0"
 color-eyre = "0.6.3"
-rust_decimal = "1.35.0"
+rust_decimal = "1.36.0"
 clap = { version = "4.5.15", features = [
     "unicode",
     "wrap_help",
