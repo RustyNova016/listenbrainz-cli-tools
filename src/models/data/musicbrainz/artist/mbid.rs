@@ -22,7 +22,7 @@ impl IsMbid<Artist> for ArtistMBID {
         Artist::get_cached_or_fetch(self).await
     }
 
-    async fn fetch(&self) -> color_eyre::Result<ExternalMusicBrainzEntity> {
+    async fn fetch(&self) -> Result<ExternalMusicBrainzEntity, reqwest::Error> {
         println_mus(format!("Getting data for artist MBID: {}", &self));
 
         Ok(ArtistMS::fetch()
@@ -31,8 +31,7 @@ impl IsMbid<Artist> for ArtistMBID {
             .with_artist_relations()
             .with_recording_relations()
             .execute()
-            .await
-            .context("Failed to fetch artist from MusicBrainz")?
+            .await?
             .into_entity())
     }
 

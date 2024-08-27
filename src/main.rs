@@ -12,6 +12,8 @@ pub mod models;
 pub mod tools;
 pub mod utils;
 
+pub use crate::models::error::Error;
+
 #[tokio::main]
 async fn main() -> color_eyre::Result<()> {
     color_eyre::install()?;

@@ -26,22 +26,19 @@ impl IsMbid<Recording> for RecordingMBID {
         Recording::get_cached_or_fetch(self).await
     }
 
-    async fn fetch(&self) -> color_eyre::Result<ExternalMusicBrainzEntity> {
+    async fn fetch(&self) -> Result<ExternalMusicBrainzEntity, reqwest::Error> {
         println_mus(format!("Getting data for recording MBID: {}", &self));
 
-        color_eyre::eyre::Ok(
-            RecordingMS::fetch()
-                .id(self)
-                .with_artists()
-                .with_releases()
-                .with_work_relations()
-                .with_aliases()
-                .with_work_level_relations()
-                .execute()
-                .await
-                .context("Failed to fetch recording from MusicBrainz")?
-                .into_entity(),
-        )
+        Ok(RecordingMS::fetch()
+            .id(self)
+            .with_artists()
+            .with_releases()
+            .with_work_relations()
+            .with_aliases()
+            .with_work_level_relations()
+            .execute()
+            .await?
+            .into_entity())
     }
 
     fn into_mbid(self) -> MBID {

@@ -35,7 +35,7 @@ impl IsMbid<MusicBrainzEntity> for MBID {
         })
     }
 
-    async fn fetch(&self) -> color_eyre::Result<ExternalMusicBrainzEntity> {
+    async fn fetch(&self) -> Result<ExternalMusicBrainzEntity, reqwest::Error> {
         match self {
             Self::Artist(val) => val.fetch().await,
             Self::Release(val) => val.fetch().await,

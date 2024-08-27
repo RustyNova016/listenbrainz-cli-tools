@@ -1,4 +1,5 @@
 use crate::core::entity_traits::mb_cached::MBCached;
+use crate::Error;
 
 use super::HasMBID;
 use super::IsMbid;
@@ -12,7 +13,7 @@ where
         Ok(T::get_cache().get_primary_mbid_alias(self).await?)
     }
 
-    async fn get_or_fetch_primary_mbid_alias(&self) -> color_eyre::Result<Self> {
+    async fn get_or_fetch_primary_mbid_alias(&self) -> Result<Self, Error> {
         T::get_cache().get_or_fetch_primary_mbid_alias(self).await
     }
 }

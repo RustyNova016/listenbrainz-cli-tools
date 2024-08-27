@@ -4,8 +4,10 @@ use serde::de::DeserializeOwned;
 use serde::Serialize;
 
 use crate::core::caching::musicbrainz_cache::MusicbrainzCache;
+use crate::core::caching::serde_cacache;
 use crate::core::entity_traits::mbid::{HasMBID, IsMbid};
 use crate::core::entity_traits::updatable::Updatable;
+use crate::Error;
 
 pub trait MBCached<K>
 where
@@ -24,11 +26,11 @@ where
         }
     }
 
-    async fn save(&self) -> color_eyre::Result<()> {
+    async fn save(&self) -> Result<(), serde_cacache::Error> {
         Self::get_cache().update(self).await
     }
 
-    async fn refresh(&self) -> color_eyre::Result<Self> {
+    async fn refresh(&self) -> Result<Self, Error> {
         Self::get_cache()
             .force_fetch_and_save(&self.get_mbid())
             .await

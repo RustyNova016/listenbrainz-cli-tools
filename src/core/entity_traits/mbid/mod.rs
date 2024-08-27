@@ -17,7 +17,9 @@ where
 {
     fn get_or_fetch_entity(&self) -> impl Future<Output = color_eyre::Result<T>> + Send;
 
-    fn fetch(&self) -> impl Future<Output = color_eyre::Result<ExternalMusicBrainzEntity>> + Send;
+    fn fetch(
+        &self,
+    ) -> impl Future<Output = Result<ExternalMusicBrainzEntity, reqwest::Error>> + Send;
 
     fn into_mbid(self) -> MBID;
 }
