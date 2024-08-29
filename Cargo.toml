@@ -29,17 +29,17 @@ derive_builder = "0.20.0"
 inquire = "0.7.5"
 itertools = "0.13.0"
 color-eyre = "0.6.3"
-rust_decimal = "1.35.0"
-clap = { version = "4.5.15", features = [
+rust_decimal = "1.36.0"
+clap = { version = "4.5.16", features = [
     "unicode",
     "wrap_help",
     "derive",
     "color",
 ] }
-clap_complete = "4.5.14"
+clap_complete = "4.5.20"
 chrono = "0.4.38"
-serde = { version = "1.0.206", features = ["rc"] }
-serde_json = "1.0.124"
+serde = { version = "1.0.208", features = ["rc"] }
+serde_json = "1.0.125"
 once_cell = "1.19.0"
 extend = "1.2.0"
 directories = "5.0.1"
@@ -49,9 +49,9 @@ indicatif = { version = "0.17.8", features = [
     "improved_unicode",
     "futures",
 ] }
-tokio = { version = "1.39.2", features = ["full"] }
+tokio = { version = "1.39.3", features = ["full"] }
 rayon = "1.10.0"
-reqwest = { version = "0.12.5", features = ["json"] }
+reqwest = { version = "0.12.7", features = ["json"] }
 cacache = { version = "13.0.0", default-features = false, features = [
     "tokio-runtime",
     "mmap",
@@ -62,7 +62,7 @@ thiserror = "1.0.63"
 derive_more = { version = "1.0.0", features = ["full"] }
 derive-new = "0.6.0"
 derive-getters = "0.5.0"
-rust_decimal_macros = "1.35.0"
+rust_decimal_macros = "1.36.0"
 futures = "0.3.30"
 humantime = "2.1.0"
 regex = "1.10.6"
