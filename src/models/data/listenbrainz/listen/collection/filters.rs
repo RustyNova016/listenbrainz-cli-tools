@@ -30,18 +30,24 @@ impl ListenCollection {
         let mut result = Self::new();
 
         for listen in self.iter() {
-            let Some(listen_id) = listen.get_primary_recording_id().await? else {
-                if keep_unmapped {
-                    result.push(listen.clone());
+            match listen.get_primary_recording_id().await {
+                Ok(Some(listen_id)) => {
+                    let contains = list.contains(&listen_id);
+
+                    if (!contains && is_blacklist) || (contains && !is_blacklist) {
+                        result.push(listen.clone());
+                    }
                 }
+                Ok(None) => {
+                    if keep_unmapped {
+                        result.push(listen.clone());
+                    }
 
-                continue;
-            };
-
-            let contains = list.contains(&listen_id);
-
-            if (!contains && is_blacklist) || (contains && !is_blacklist) {
-                result.push(listen.clone());
+                    continue;
+                }
+                Err(err) => {
+                    print!("{err}");
+                }
             }
         }
 

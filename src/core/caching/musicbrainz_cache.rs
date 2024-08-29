@@ -9,14 +9,16 @@ use serde::de::DeserializeOwned;
 use serde::Serialize;
 use tokio::sync::{RwLock, RwLockWriteGuard, Semaphore};
 
-use crate::core::caching::serde_cacache::error::Error;
 use crate::core::caching::serde_cacache::tidy::SerdeCacacheTidy;
 use crate::core::caching::CACHE_LOCATION;
 use crate::core::entity_traits::mbid::{HasMBID, IsMbid};
 use crate::core::entity_traits::updatable::Updatable;
 use crate::models::data::musicbrainz::external_musicbrainz_entity::FlattenedMBEntityExt;
 use crate::models::data::musicbrainz::relation::external::RelationContentExt;
+use crate::models::error::Error;
 use crate::utils::{println_cli, println_cli_warn};
+
+use super::serde_cacache;
 
 #[derive(Debug)]
 pub struct MusicbrainzCache<K, V>
@@ -53,7 +55,7 @@ where
         }
     }
 
-    pub async fn get(&self, mbid: &K) -> Result<Option<V>, Error> {
+    pub async fn get(&self, mbid: &K) -> Result<Option<V>, serde_cacache::Error> {
         let new_mbid = self.get_primary_mbid_alias(mbid).await?;
 
         //if new_mbid.to_string() != mbid.to_string() {
@@ -80,7 +82,7 @@ where
 
             // Something went wrong while deserializing the struct
             // Schema probably changed. Which means we need make the cache hit fail
-            Err(Error::CacheDeserializationError(_err)) => {
+            Err(serde_cacache::Error::CacheDeserializationError(_err)) => {
                 //println_cli(
                 //    format!("Cache hit but with deserialization error for mbid {mbid}").yellow(),
                 //);
@@ -93,7 +95,7 @@ where
         }
     }
 
-    pub async fn set(&self, value: &V) -> Result<(), Error> {
+    pub async fn set(&self, value: &V) -> Result<(), serde_cacache::Error> {
         let mbid = value.get_mbid();
 
         let lock = self.get_lock(&mbid);
@@ -105,7 +107,7 @@ where
         Ok(())
     }
 
-    pub async fn update(&self, value: &V) -> color_eyre::Result<()> {
+    pub async fn update(&self, value: &V) -> Result<(), serde_cacache::Error> {
         let mbid = value.get_mbid();
         let older = self.get(&mbid).await?;
 
@@ -124,17 +126,17 @@ where
         &self,
         k: usize,
         keep_min: usize,
-    ) -> color_eyre::Result<()> {
+    ) -> Result<(), cacache::Error> {
         self.disk_cache.delete_last_entries(k, keep_min).await?;
         Ok(())
     }
 
-    pub async fn insert_alias(&self, alias: &K, main: &K) -> Result<(), Error> {
+    pub async fn insert_alias(&self, alias: &K, main: &K) -> Result<(), serde_cacache::Error> {
         self.alias_cache.set(alias, main).await?;
         Ok(())
     }
 
-    pub async fn remove(&self, id: &K) -> color_eyre::Result<()> {
+    pub async fn remove(&self, id: &K) -> Result<(), cacache::Error> {
         self.alias_cache.remove(id).await?;
         self.disk_cache.remove(id).await?;
         Ok(())
@@ -144,7 +146,7 @@ where
         &self,
         value: &V,
         _lock: RwLockWriteGuard<'a, String>,
-    ) -> Result<(), Error> {
+    ) -> Result<(), serde_cacache::Error> {
         let mbid = value.get_mbid();
 
         // TODO: Add tokio::join! for speedup.
@@ -153,10 +155,10 @@ where
         Ok(())
     }
 
-    pub async fn get_primary_mbid_alias(&self, mbid: &K) -> Result<K, Error> {
+    pub async fn get_primary_mbid_alias(&self, mbid: &K) -> Result<K, serde_cacache::Error> {
         match self.alias_cache.get_or_option(mbid).await {
             Ok(Some(val)) => Ok(val),
-            Ok(None) | Err(Error::CacheDeserializationError(_)) => {
+            Ok(None) | Err(serde_cacache::Error::CacheDeserializationError(_)) => {
                 #[cfg(debug_assertions)]
                 println_cli_warn("Trying to fetch the primary alias of MBID resulted in `None`. Returning input instead");
                 Ok(mbid.clone())
@@ -165,19 +167,35 @@ where
         }
     }
 
-    pub async fn get_or_fetch_primary_mbid_alias(&self, mbid: &K) -> color_eyre::Result<K> {
+    pub async fn get_or_fetch_primary_mbid_alias(&self, mbid: &K) -> Result<K, Error> {
         match self.alias_cache.get_or_option(mbid).await {
             Ok(Some(val)) => Ok(val),
-            Ok(None) | Err(Error::CacheDeserializationError(_)) => {
-                self.force_fetch_and_save(mbid).await?;
+            Ok(None) | Err(serde_cacache::Error::CacheDeserializationError(_)) => {
+                let fetch_res = self.force_fetch_and_save(mbid).await;
+
+                match fetch_res {
+                    Err(Error::RequestDecodeError(err)) => {
+                        // Server responded badly. There's an high chance of being a deleted MBID
+                        //TODO: Change musicbrainz_rs to actually handle errors instead of generic decode error
+
+                        println_cli_warn(format!("A decode error occured during the fetching of the primary alias of id: {mbid}"));
+                        println_cli_warn(err.to_string());
+                        println_cli_warn("This may be due to a deleted MBID. The naive mbid will be used instead.");
+
+                        return Ok(mbid.clone());
+                    }
+                    Err(err) => return Err(err),
+                    Ok(_) => {}
+                }
 
                 Ok(self
                     .alias_cache
                     .get_or_option(mbid)
-                    .await?
+                    .await
+                    .map_err(Error::CacheError)?
                     .expect("Couldn't retrieve the primary alias of MBID after fetching"))
             }
-            Err(val) => Err(val.into()),
+            Err(val) => Err(Error::CacheError(val)),
         }
     }
 
@@ -242,8 +260,11 @@ where
             .expect("Fetched data should be in the cache"))
     }
 
-    async fn fetch_and_save(mbid: &K) -> color_eyre::Result<()> {
-        let fetch_result = mbid.fetch().await?;
+    async fn fetch_and_save(mbid: &K) -> Result<(), Error> {
+        let fetch_result = mbid
+            .fetch()
+            .await
+            .map_err(Error::from_musicbrainz_rs_error)?;
         let converted_fetch = fetch_result.flattened();
 
         converted_fetch
@@ -257,9 +278,9 @@ where
     ///
     /// ⚠️ Waiting for a permit doesn't cancel the request. It only delays it.
     /// If the intention is to only fetch once, see [`Self::get_or_fetch`]
-    pub async fn force_fetch_and_save(&self, mbid: &K) -> color_eyre::Result<V> {
+    pub async fn force_fetch_and_save(&self, mbid: &K) -> Result<V, Error> {
         let lock = self.get_fetch_lock(mbid);
-        let _permit = lock.acquire().await.context("Couldn't get permit")?;
+        let _permit = lock.acquire().await.expect("Couldn't get permit");
 
         //println_cli(format!("Pre refresh: {:#?}", self.get(mbid).await?));
 
@@ -269,7 +290,8 @@ where
 
         Ok(self
             .get(mbid)
-            .await?
+            .await
+            .map_err(Error::CacheError)?
             .expect("Fetched data should be in the cache"))
     }
 

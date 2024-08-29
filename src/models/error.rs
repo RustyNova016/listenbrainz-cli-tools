@@ -1,4 +1,4 @@
-use crate::models::data::musicbrainz::mbid::MBID;
+use crate::{core::caching::serde_cacache, models::data::musicbrainz::mbid::MBID};
 use std::io;
 use thiserror::Error;
 
@@ -24,6 +24,25 @@ pub enum Error {
 
     #[error("Couldn't write the configuration file.")]
     ConfigFileWriteError(serde_json::Error),
+
+    // --- Cache Errors ---
+    #[error("Error with the cache.")]
+    CacheError(serde_cacache::error::Error),
+
+    // --- Fetching Errors ---
+    #[error("Error with the request.")]
+    RequestError(reqwest::Error),
+
+    #[error("Couldn't decode the server's responce")]
+    RequestDecodeError(reqwest::Error),
 }
 
-impl Error {}
+impl Error {
+    pub fn from_musicbrainz_rs_error(err: reqwest::Error) -> Self {
+        if err.is_decode() {
+            return Self::RequestDecodeError(err);
+        }
+
+        Self::RequestError(err)
+    }
+}
