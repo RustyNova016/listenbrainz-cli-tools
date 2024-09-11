@@ -93,9 +93,12 @@ manual_string_new = { level = "warn", priority = 1 }
 doc_markdown = { level = "warn", priority = 1 }
 uninlined_format_args = { level = "warn", priority = 1 }
 explicit_iter_loop = { level = "warn", priority = 1 }
+allow_attributes = { level = "warn", priority = 1 }
+suboptimal_flops= { level = "warn", priority = 1 }
+
 #unwrap_used = { level = "warn", priority = 1 } # Fix needed in separate PR
 
-# Won't apply
+# Won't apply... Yet
 must_use_candidate = { level = "allow", priority = 1 }
 map_unwrap_or = { level = "allow", priority = 1 }
 
