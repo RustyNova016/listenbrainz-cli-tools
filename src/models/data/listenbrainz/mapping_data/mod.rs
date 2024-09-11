@@ -60,7 +60,7 @@ impl From<UserListensMBIDMapping> for MappingData {
             recording_name: value
                 .recording_name
                 .clone()
-                .unwrap_or(format!("Unknown Track ({})", value.recording_mbid)),
+                .unwrap_or_else(|| format!("Unknown Track ({})", value.recording_mbid)),
             artist_mbid: value
                 .artist_mbids
                 .clone()
