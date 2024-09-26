@@ -54,3 +54,13 @@ fn display_results(
 
     await_next();
 }
+
+#[tokio::test]
+#[serial_test::serial]
+async fn compatibility() {
+    compatibility_command("RustyNova", "backhdlp")
+        .await
+        .unwrap();
+
+    assert!(true)
+}

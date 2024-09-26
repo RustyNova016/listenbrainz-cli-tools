@@ -1,15 +1,15 @@
-use crate::core::entity_traits::mbid::IsMbid;
-use crate::models::data::listenbrainz::user_listens::UserListens;
-use crate::models::data::musicbrainz::mbid::extensions::VecTExt;
-use crate::models::radio::RadioConfig;
-use crate::utils::playlist::PlaylistStub;
-use chrono::prelude::Utc;
-use chrono::Duration;
-use futures::stream;
-use futures::StreamExt;
+use chrono::{Duration, Utc};
 use itertools::Itertools;
-use rust_decimal::prelude::Decimal;
-use rust_decimal::prelude::FromPrimitive;
+use musicbrainz_db_lite::models::listenbrainz::listen::Listen;
+use rust_decimal::Decimal;
+
+use crate::database::get_db_client;
+use crate::database::listenbrainz::listens::fetch_latest_listens_of_user;
+use crate::datastructures::listen_collection::ListenCollection;
+use crate::datastructures::recording_with_listens::RecordingWithListens;
+use crate::models::data::musicbrainz::recording::mbid::RecordingMBID;
+use crate::models::radio::{RadioConfig, RadioConfigBuilder};
+use crate::utils::playlist::PlaylistStub;
 
 pub async fn overdue_radio(
     username: &str,
@@ -19,74 +19,69 @@ pub async fn overdue_radio(
     overdue_factor: bool,
     config: RadioConfig,
 ) -> color_eyre::Result<()> {
-    let mut listens = UserListens::get_user_with_refresh(username)
-        .await
-        .expect("Couldn't fetch the new listens")
-        .get_mapped_listens();
-
+    let db = get_db_client().await;
+    let conn = &mut *db.as_sqlx_pool().acquire().await?;
     let deadline = Utc::now() - Duration::hours(cooldown as i64);
-    let blacklisted_recordings = listens
-        .get_listened_after(&deadline)
-        .get_listened_recordings_mbids()
-        .await
-        .unwrap();
+    let time_stamp = deadline.timestamp();
 
-    // Filter out all the listens of blacklisted recordings
-    listens = listens
-        .filter_recordings(&blacklisted_recordings, true, false)
-        .await
-        .unwrap();
+    // Get the listens
+    fetch_latest_listens_of_user(get_db_client().await.as_welds_client(), username).await?;
+    println!("Getting...");
+    let listens: ListenCollection = sqlx::query_as!(
+        Listen,
+        "
+        SELECT 
+            listens.* 
+        FROM       
+            users 
+            INNER JOIN listens ON users.name = listens.user 
+            INNER JOIN msid_mapping ON listens.recording_msid = msid_mapping.recording_msid
+        WHERE
+            -- Only for this user
+            LOWER(listens.user) = LOWER(?)  
 
-    let mut rates = listens
-        .get_listen_rates()
-        .await
-        .expect("Couldn't calculate the listens rates");
+            -- Keep only mapped listens 
+            AND msid_mapping.user = users.id 
 
-    // Filter minimum
-    rates.retain(|rate| rate.1.listen_count() > &min_listens.unwrap_or(2_u64));
+            -- Give some recordings a cooldown period 
+            AND listened_at < ?",
+        username,
+        time_stamp
+    )
+    .fetch_all(&mut *conn)
+    .await?
+    .into();
 
-    // Get scores
+    // Now let's group them by Recording ID
+    println!("Grouping...");
+    let grouped = listens.group_by_recording(&mut *conn).await?;
+
+    let mut recordings = RecordingWithListens::from_group_by(&mut *conn, grouped).await?;
+
+    recordings.retain(|data| data.listen_count() as u64 > min_listens.unwrap_or(1_u64));
+
+    // Sort
     let scores = if !overdue_factor {
-        rates
-            .into_iter()
-            .map(|(listens, rate)| {
-                let time_elapsed_after_prediction =
-                    Utc::now() - rate.get_estimated_date_of_next_listen(&listens);
-
-                (
-                    Decimal::from(time_elapsed_after_prediction.num_seconds()),
-                    rate.recording().clone(),
-                )
-            })
-            .collect_vec()
+        recordings.into_iter().map(|r| (Decimal::from(r.overdue_by().num_seconds()), r.recording().clone())).collect_vec()
     } else {
-        rates
-            .into_iter()
-            .map(|(listens, rate)| {
-                let overdue_by =
-                    Decimal::from_i64(rate.get_overdue_by(&listens).num_seconds()).unwrap();
-                let time_for_listen =
-                    Decimal::from_i64(rate.get_average_time_between_listens().num_seconds())
-                        .unwrap();
-                let overdue_factor = overdue_by / time_for_listen;
-
-                (overdue_factor, rate.recording().clone())
-            })
-            .collect_vec()
+        recordings.into_iter().map(|r| (r.overdue_factor(), r.recording().clone())).collect_vec()
     };
 
-    let sorted_scores = RadioConfig::sort_scores(scores);
+    let sorted_scores = RadioConfig::sort_scores2(scores);
 
-    let scores_as_recording = stream::iter(sorted_scores)
-        .map(|recording_mbid| async move { recording_mbid.get_or_fetch_entity().await })
-        .buffered(1);
-    let playlist = config.finalize_radio_playlist(scores_as_recording).await?;
+    let playlist = config
+        .finalize_radio_playlist_from_vec::<()>(sorted_scores)
+        .await
+        .unwrap();
 
     PlaylistStub::new(
         "Radio: Overdue listens".to_string(),
         Some(username.to_string()),
         true,
-        playlist.into_mbids(),
+        playlist
+            .into_iter()
+            .map(|r| RecordingMBID::from(r.mbid))
+            .collect(),
         Some(
             "Automatically generated by: https://github.com/RustyNova016/listenbrainz-cli-tools"
                 .to_string(),
@@ -96,4 +91,15 @@ pub async fn overdue_radio(
     .await?;
 
     Ok(())
+}
+
+#[tokio::test]
+#[serial_test::serial]
+async fn overdue_by() {
+    let var_name = RadioConfigBuilder::default();
+    overdue_radio("RustyNova", "t", None, 0, false, var_name.build().unwrap())
+        .await
+        .unwrap();
+
+    assert!(true)
 }
