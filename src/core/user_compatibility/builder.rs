@@ -2,6 +2,8 @@ use color_eyre::eyre::Context;
 use derive_getters::Getters;
 use tokio::sync::OnceCell;
 
+use crate::database::get_db_client;
+use crate::database::listenbrainz::listens::fetch_latest_listens_of_user;
 use crate::models::data::listenbrainz::listen::collection::ListenCollection;
 use crate::models::data::listenbrainz::user_listens::UserListens;
 
@@ -41,20 +43,28 @@ impl UserCompatibilityBuilder {
 
     pub async fn build_user_a_listens(&self) -> color_eyre::Result<ListenCollection> {
         Ok(match &self.user_a_listens {
-            None => UserListens::get_user_with_refresh(&self.user_a)
-                .await
-                .context("Couldn't fetch the new listens")?
-                .get_mapped_listens(),
+            None => {
+                fetch_latest_listens_of_user(get_db_client().await.as_welds_client(), &self.user_a)
+                    .await?;
+                UserListens::get_user_with_refresh(&self.user_a)
+                    .await
+                    .context("Couldn't fetch the new listens")?
+                    .get_mapped_listens()
+            }
             Some(val) => val.clone(),
         })
     }
 
     pub async fn build_user_b_listens(&self) -> color_eyre::Result<ListenCollection> {
         Ok(match &self.user_b_listens {
-            None => UserListens::get_user_with_refresh(&self.user_b)
-                .await
-                .context("Couldn't fetch the new listens")?
-                .get_mapped_listens(),
+            None => {
+                fetch_latest_listens_of_user(get_db_client().await.as_welds_client(), &self.user_a)
+                    .await?;
+                UserListens::get_user_with_refresh(&self.user_b)
+                    .await
+                    .context("Couldn't fetch the new listens")?
+                    .get_mapped_listens()
+            }
             Some(val) => val.clone(),
         })
     }

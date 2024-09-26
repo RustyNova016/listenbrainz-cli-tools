@@ -29,6 +29,12 @@ pub enum Error {
     #[error("Error with the cache.")]
     CacheError(serde_cacache::error::Error),
 
+    #[error("Tried to get row id {0} but couldn't be found")]
+    MissingRowInDB(i64),
+
+    #[error(transparent)]
+    SQLxError(#[from] sqlx::Error),
+
     // --- Fetching Errors ---
     #[error("Error with the request.")]
     RequestError(reqwest::Error),

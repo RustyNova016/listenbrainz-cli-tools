@@ -1,3 +1,5 @@
+pub mod radio;
+pub mod tracing;
 pub mod cli;
 use std::fmt::Display;
 use std::sync::{Arc, Mutex};

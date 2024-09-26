@@ -7,6 +7,8 @@ use crate::models::data::musicbrainz_database::MUSICBRAINZ_DATABASE;
 use crate::utils::println_cli;
 
 pub mod core;
+pub mod database;
+pub mod datastructures;
 pub mod models;
 /// This is the module containing all the different tools of this app
 pub mod tools;
@@ -17,6 +19,10 @@ pub use crate::models::error::Error;
 #[tokio::main]
 async fn main() -> color_eyre::Result<()> {
     color_eyre::install()?;
+    //let mut clog = colog::default_builder();
+    //clog.filter(None, log::LevelFilter::Trace);
+    //clog.init();
+
     let cli = Cli::parse();
 
     println!("Hello!");

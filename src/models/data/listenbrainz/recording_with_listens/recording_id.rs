@@ -5,7 +5,7 @@ use chrono::DateTime;
 use chrono::Duration;
 use chrono::Utc;
 use derive_getters::Getters;
-use itertools::Itertools;
+use itertools::Itertools; 
 use rust_decimal::prelude::FromPrimitive;
 use rust_decimal::Decimal;
 
