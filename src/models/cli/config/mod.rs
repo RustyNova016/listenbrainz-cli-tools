@@ -50,6 +50,9 @@ pub enum ConfigCommands {
 
     /// Configuration targeting listen data
     Listens(ListenConfigCli),
+
+    /// Set the default username
+    DefaultUser { username: String },
 }
 
 impl ConfigCommands {
@@ -80,6 +83,12 @@ impl ConfigCommands {
                 }
             }
             Self::Listens(val) => val.run().await?,
+
+            Self::DefaultUser { username } => {
+                let mut conf = Config::load()?;
+                conf.default_user = Some(username.clone());
+                conf.save()?;
+            }
         }
 
         Ok(())

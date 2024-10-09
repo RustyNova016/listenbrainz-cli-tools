@@ -1,6 +1,7 @@
 use std::path::PathBuf;
 
 use crate::models::cli::cache::load_listen_dump::load_listen_dump;
+use crate::models::config::Config;
 use crate::models::data::entity_database::ENTITY_DATABASE;
 use crate::models::data::musicbrainz_database::MUSICBRAINZ_DATABASE;
 use clap::ValueEnum;
@@ -25,11 +26,11 @@ pub enum CacheSubcommands {
     ///
     /// You can get a listen dump [here](https://listenbrainz.org/settings/export/)
     LoadDump {
-        /// Name of the user to import those listens for
-        username: String,
-
         /// Path to the dump file
         path: PathBuf,
+
+        /// Name of the user to import those listens for
+        username: Option<String>,
     },
 
     /// Wipe the cache's data
@@ -42,7 +43,7 @@ impl CacheCommand {
     pub async fn run(&self) -> color_eyre::Result<()> {
         match &self.command {
             CacheSubcommands::LoadDump { username, path } => {
-                load_listen_dump(path, username).await?;
+                load_listen_dump(path, &Config::check_username(username)).await?;
             }
             CacheSubcommands::Clear { target } => {
                 let _ = try_join!(

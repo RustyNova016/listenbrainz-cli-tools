@@ -46,7 +46,7 @@ pub enum MappingSubcommands {
     /// > For example: "Panic - Dion Timer" won't have the same MSID as "Panic by Dion Timmer", even if they are the same recording.
     ListUnmapped {
         /// Name of the user to fetch unlinked listen from
-        username: String,
+        username: Option<String>,
 
         /// Sort the listens by type
         #[arg(short, long)]
@@ -58,7 +58,7 @@ pub enum MappingSubcommands {
     /// It goes through each unmapped recordings, and give a few suggested recordings for the mapping. This is the exact same as mapping recording in the web UI.
     Mapper {
         /// Name of the user to fetch listens from
-        username: String,
+        username: Option<String>,
 
         /// Your user token.
         ///
@@ -77,7 +77,7 @@ impl MappingSubcommands {
     pub async fn run(&self) -> color_eyre::Result<()> {
         match self {
             Self::ListUnmapped { username, sort } => {
-                unmapped_command(&username.to_lowercase(), *sort).await;
+                unmapped_command(&Config::check_username(username).to_lowercase(), *sort).await;
             }
 
             Self::Mapper {
@@ -86,8 +86,8 @@ impl MappingSubcommands {
                 sort,
             } => {
                 interactive_mapper(
-                    username,
-                    Config::get_token_or_argument(username, token),
+                    &Config::check_username(username),
+                    Config::check_token(&Config::check_username(username), token),
                     *sort,
                 )
                 .await?;

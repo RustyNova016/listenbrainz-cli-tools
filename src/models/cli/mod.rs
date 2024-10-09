@@ -16,6 +16,8 @@ use crate::models::cli::radio::RadioCommand;
 use crate::tools::compatibility::compatibility_command;
 use crate::tools::stats::stats_command;
 
+use super::config::Config;
+
 pub mod cache;
 pub mod common;
 pub mod config;
@@ -110,7 +112,7 @@ pub enum Commands {
         target: GroupByTarget,
 
         /// Name of the user to fetch stats listen from
-        username: String,
+        username: Option<String>,
 
         /// Sort by:
         #[arg(short, long, default_value_t = SortSorterBy::Count)]
@@ -126,7 +128,12 @@ impl Commands {
                 target,
                 sort,
             } => {
-                stats_command(&username.to_lowercase(), *target, *sort).await;
+                stats_command(
+                    &Config::check_username(username).to_lowercase(),
+                    *target,
+                    *sort,
+                )
+                .await;
             }
 
             Self::Compatibility { user_a, user_b } => compatibility_command(user_a, user_b).await?,
