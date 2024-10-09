@@ -1,6 +1,5 @@
-use std::{collections::{hash_map::IntoIter, HashMap}, hash::Hash};
+use std::collections::{hash_map::IntoIter, HashMap};
 
-use derive_more::derive::Neg;
 use musicbrainz_db_lite::models::{
     listenbrainz::listen::Listen,
     musicbrainz::{label::Label, recording::Recording, release::Release},
@@ -99,11 +98,10 @@ impl<T, Col> Default for GroupBy<T, Col> {
     }
 }
 
-
 impl<T, Col> IntoIterator for GroupBy<T, Col> {
     type Item = (i64, (T, Col));
     type IntoIter = IntoIter<i64, (T, Col)>;
-    
+
     fn into_iter(self) -> Self::IntoIter {
         self.data.into_iter()
     }

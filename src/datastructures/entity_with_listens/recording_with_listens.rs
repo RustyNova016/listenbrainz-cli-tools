@@ -4,8 +4,9 @@ use musicbrainz_db_lite::models::musicbrainz::recording::Recording;
 use rust_decimal::{prelude::FromPrimitive, Decimal};
 
 
-use super::listen_collection::ListenCollection;
-use crate::datastructures::listen_collection::group_by::GroupByRecordingID;
+use crate::datastructures::listen_collection::{group_by::GroupByRecordingID, ListenCollection};
+
+use super::impl_entity_with_listens;
 
 #[derive(Debug, Clone, PartialEq, Eq, Getters)]
 pub struct RecordingWithListens {
@@ -18,14 +19,14 @@ impl RecordingWithListens {
         Self { listens, recording }
     }
 
-    pub async fn from_group_by(group_by: GroupByRecordingID) -> Result<Vec<Self>, crate::Error> {
+    pub fn from_group_by(group_by: GroupByRecordingID) -> Vec<Self> {
         let mut res = Vec::new();
 
         for (_, (recording, listens)) in group_by {
             res.push(Self { listens, recording })
         }
 
-        Ok(res)
+        res
     }
 
     pub fn first_listen_date(&self) -> Option<DateTime<Utc>> {
@@ -40,10 +41,6 @@ impl RecordingWithListens {
             .map(|listen| listen.listened_at_as_datetime())
     }
 
-    pub fn listen_count(&self) -> usize {
-        self.listens.data.len()
-    }
-
     /// Return the amount of time this recording having known about
     pub fn known_for(&self) -> Option<Duration> {
         self.first_listen_date()
@@ -52,7 +49,7 @@ impl RecordingWithListens {
 
     pub fn average_duration_between_listens(&self) -> Duration {
         // If the recording haven't been listened to, then the average time is zero
-        if self.listen_count() < 2 {
+        if self.len() < 2 {
             return Duration::zero();
         }
 
@@ -64,7 +61,7 @@ impl RecordingWithListens {
                 .expect("There's at least two listens");
 
         duration_between_first_and_last
-            .checked_div(self.listen_count() as i32)
+            .checked_div(self.len() as i32)
             .unwrap_or_else(Duration::zero)
     }
 
@@ -98,3 +95,5 @@ impl RecordingWithListens {
             .0)
     } */
 }
+
+impl_entity_with_listens!(RecordingWithListens);
