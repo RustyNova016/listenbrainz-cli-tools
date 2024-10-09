@@ -37,13 +37,13 @@ impl Config {
             return arg.clone();
         }
 
-        match Config::load_or_panic().tokens.get(&username.to_lowercase()) {
+        match Self::load_or_panic().tokens.get(&username.to_lowercase()) {
             Some(val) => val.clone(),
             None => {
                 Cli::command()
                     .error(
                         clap::error::ErrorKind::MissingRequiredArgument,
-                        format!("No token was provided, and no tokens have been associated to {}. Try adding your token to the command, or set the user's token with `config set-token <USERNAME> <TOKEN>`", username),
+                        format!("No token was provided, and no tokens have been associated to {username}. Try adding your token to the command, or set the user's token with `config set-token <USERNAME> <TOKEN>`"),
                     )
                     .exit()
             }
@@ -54,7 +54,7 @@ impl Config {
         Self::load_or_panic().default_user
     }
 
-    fn load_or_panic() -> Config {
+    fn load_or_panic() -> Self {
         Self::load().expect("Cannot load the configuration file. Aborting.")
     }
 
@@ -63,7 +63,7 @@ impl Config {
             return s.clone();
         }
 
-        match Config::get_default_user() {
+        match Self::get_default_user() {
             Some(val) => val,
             None => {
                 Cli::command()
