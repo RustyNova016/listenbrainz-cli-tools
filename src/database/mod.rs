@@ -15,11 +15,15 @@ pub static DB_LOCATION: Lazy<PathBuf> = Lazy::new(|| {
         .to_path_buf();
     path.push("listenbrainz_cli_tools");
     #[cfg(debug_assertions)]
-    path.push("debug/debug.db");
+    path.push("debug/debug_db.db");
 
     #[cfg(not(debug_assertions))]
     path.push("data.db");
-    fs::create_dir_all(&path).expect("Couldn't create cache directory");
+
+    println!("{}", path.to_str().unwrap());
+    if !fs::exists(&path).unwrap() {
+        fs::create_dir_all(&path).expect("Couldn't create cache directory");
+    }
     path
 });
 
@@ -33,18 +37,29 @@ pub async fn get_db_client() -> &'static DBClient {
     MUSICBRAINZ_LITE.get_or_init(|| client)
 }
 
-async fn setup_database() -> Result<DBClient, musicbrainz_db_lite::Error> {
-    File::create_new("./debug_db.db").unwrap();
+pub async fn get_conn() -> sqlx::pool::PoolConnection<sqlx::Sqlite> {
+    get_db_client()
+        .await
+        .as_sqlx_pool()
+        .acquire()
+        .await
+        .expect("Couldn't get connection to the SQLite database")
+}
 
-    let client = DBClient::connect("./debug_db.db").await?;
+async fn setup_database() -> Result<DBClient, musicbrainz_db_lite::Error> {
+    File::create_new(DB_LOCATION.to_str().unwrap()).unwrap();
+
+    let client = DBClient::connect(DB_LOCATION.to_str().unwrap()).await?;
     client.create_database().await?;
 
     Ok(client)
 }
 
 async fn connect_to_db() -> Result<Option<DBClient>, musicbrainz_db_lite::Error> {
-    if std::fs::exists("./debug_db.db").unwrap() {
-        return Ok(Some(DBClient::connect("./debug_db.db").await?));
+    if std::fs::exists(DB_LOCATION.to_str().unwrap()).unwrap() {
+        return Ok(Some(
+            DBClient::connect(DB_LOCATION.to_str().unwrap()).await?,
+        ));
     }
 
     Ok(None)

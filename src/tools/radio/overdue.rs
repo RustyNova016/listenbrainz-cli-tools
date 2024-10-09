@@ -31,7 +31,7 @@ pub async fn overdue_radio(
         Listen,
         "
         SELECT 
-            listens.* 
+            listens.*
         FROM       
             users 
             INNER JOIN listens ON users.name = listens.user 

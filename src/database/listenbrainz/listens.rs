@@ -10,7 +10,8 @@ use sqlx::SqliteConnection;
 
 use crate::{
     core::entity_traits::mb_cached::MBCached,
-    utils::{cli::global_progress_bar::PG_FETCHING, println_lis},
+    datastructures::listen_collection::ListenCollection,
+    utils::{cli::global_progress_bar::PG_FETCHING, println_cli, println_cli_info, println_cli_warn, println_lis},
     Error,
 };
 
@@ -36,7 +37,7 @@ pub async fn fetch_latest_listens_of_user(
     while (latest_listen_ts.is_none() && pull_ts.is_some())
         || (latest_listen_ts.is_some_and(|a| pull_ts.is_some_and(|b| a <= b)))
     {
-        println_lis(format!(
+        println_cli(format!(
             "Getting listens from before: {} ({})",
             DateTime::from_timestamp(pull_ts.unwrap(), 0).unwrap(),
             pull_ts.unwrap(),
@@ -46,6 +47,8 @@ pub async fn fetch_latest_listens_of_user(
 
     Ok(())
 }
+
+
 
 #[derive(Builder)]
 pub struct ListenFetchQuery {
@@ -58,7 +61,7 @@ pub struct ListenFetchQuery {
 }
 
 impl ListenFetchQuery {
-    pub async fn fetch(self, client: &DBClient) -> Result<Vec<Listen>, crate::Error> {
+    pub async fn fetch(self, client: &DBClient) -> Result<ListenCollection, crate::Error> {
         fetch_latest_listens_of_user(client.as_welds_client(), &self.user).await?;
         let conn = &mut *client.as_sqlx_pool().acquire().await?;
 
@@ -67,10 +70,10 @@ impl ListenFetchQuery {
         }
 
         match self.returns {
-            ListenFetchQueryReturn::Mapped => {
-                Ok(Listen::get_mapped_listen_of_user(conn, &self.user).await?)
-            }
-            ListenFetchQueryReturn::None => Ok(Vec::new()),
+            ListenFetchQueryReturn::Mapped => Ok(ListenCollection::new(
+                Listen::get_mapped_listen_of_user(conn, &self.user).await?,
+            )),
+            ListenFetchQueryReturn::None => Ok(ListenCollection::default()),
         }
     }
 
@@ -80,7 +83,7 @@ impl ListenFetchQuery {
     ) -> Result<(), crate::Error> {
         let unfetched = Listen::get_unfetched_recordings_of_user(conn, &user).await?;
         let subm = PG_FETCHING.get_submitter(unfetched.len() as u64);
-
+        
         for id in unfetched {
             Recording::get_or_fetch(conn, &id).await?;
             subm.inc(1);
