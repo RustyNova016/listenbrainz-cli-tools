@@ -61,7 +61,7 @@ pub enum RadioSubcommands {
     /// Randomly adds recordings from artists you already listened to
     Circles {
         /// Name of the user to fetch listens from
-        username: String,
+        username: Option<String>,
 
         /// Your user token.
         ///
@@ -83,7 +83,7 @@ pub enum RadioSubcommands {
     ///> - The percentage of the recording's listens being from the user (Made with this formula: (user listens / worldwide listens) *100)
     Underrated {
         /// Name of the user to fetch listens from
-        username: String,
+        username: Option<String>,
 
         /// Your user token.
         ///
@@ -99,7 +99,7 @@ pub enum RadioSubcommands {
     /// It takes the recordings with the lowest listen rates, and put them into a playlist
     Rate {
         /// Name of the user to fetch listens from
-        username: String,
+        username: Option<String>,
 
         /// Your user token.
         ///
@@ -131,7 +131,7 @@ pub enum RadioSubcommands {
     /// It then put together a playlist made out of recordings you should have listened by now.
     Overdue {
         /// Name of the user to fetch listens from
-        username: String,
+        username: Option<String>,
 
         /// Your user token.
         ///
@@ -167,8 +167,8 @@ impl RadioSubcommands {
                 //cooldown
             } => {
                 create_radio_mix(
-                    username,
-                    Config::get_token_or_argument(username, token),
+                    &Config::check_username(username),
+                    Config::check_token(&Config::check_username(username), token),
                     *unlistened,
                     config,
                 )
@@ -177,8 +177,8 @@ impl RadioSubcommands {
 
             Self::Underrated { username, token } => {
                 underrated_mix(
-                    username.clone(),
-                    Config::get_token_or_argument(username, token),
+                    Config::check_username(username),
+                    Config::check_token(&Config::check_username(username), token),
                     config,
                 )
                 .await?;
@@ -205,8 +205,8 @@ impl RadioSubcommands {
                 }
 
                 listen_rate_radio(
-                    username,
-                    &Config::get_token_or_argument(username, token),
+                    &Config::check_username(username),
+                    &Config::check_token(&Config::check_username(username), token),
                     rate,
                     *min,
                     *cooldown,
@@ -223,8 +223,8 @@ impl RadioSubcommands {
                 overdue_factor: delay_factor,
             } => {
                 overdue_radio(
-                    username,
-                    &Config::get_token_or_argument(username, token),
+                    &Config::check_username(username),
+                    &Config::check_token(&Config::check_username(username), token),
                     *min,
                     *cooldown,
                     *delay_factor,

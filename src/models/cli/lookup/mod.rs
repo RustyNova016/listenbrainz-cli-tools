@@ -1,3 +1,4 @@
+use crate::models::config::Config;
 use crate::models::data::musicbrainz::entity::entity_kind::MusicbrainzEntityKind;
 use crate::models::data::musicbrainz::mbid::MBID;
 use crate::tools::lookup::lookup_command;
@@ -7,14 +8,14 @@ use clap::ValueEnum;
 #[derive(Parser, Debug, Clone)]
 #[command(version, about, long_about = None)]
 pub struct LookupCommand {
-    /// Name of the user to look up stats from
-    username: String,
-
     /// The type of entity to look for
     entity_type: LookupTarget,
 
     /// The id of the entity (Accept URLs)
     id: String,
+
+    /// Name of the user to look up stats from
+    username: Option<String>,
 }
 
 impl LookupCommand {
@@ -25,7 +26,7 @@ impl LookupCommand {
             }
         };
 
-        lookup_command(&self.username, id).await?;
+        lookup_command(&Config::check_username(&self.username), id).await?;
         Ok(())
     }
 }
