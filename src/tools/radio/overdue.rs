@@ -5,8 +5,8 @@ use rust_decimal::Decimal;
 
 use crate::database::get_db_client;
 use crate::database::listenbrainz::listens::fetch_latest_listens_of_user;
+use crate::datastructures::entity_with_listens::recording_with_listens::RecordingWithListens;
 use crate::datastructures::listen_collection::ListenCollection;
-use crate::datastructures::recording_with_listens::RecordingWithListens;
 use crate::models::data::musicbrainz::recording::mbid::RecordingMBID;
 use crate::models::radio::RadioConfig;
 use crate::utils::playlist::PlaylistStub;
@@ -56,9 +56,9 @@ pub async fn overdue_radio(
     println!("Grouping...");
     let grouped = listens.group_by_recording(&mut *conn).await?;
 
-    let mut recordings = RecordingWithListens::from_group_by(grouped).await?;
+    let mut recordings = RecordingWithListens::from_group_by(grouped);
 
-    recordings.retain(|data| data.listen_count() as u64 > min_listens.unwrap_or(1_u64));
+    recordings.retain(|data| data.len() as u64 > min_listens.unwrap_or(1_u64));
 
     // Sort
     let scores = if !overdue_factor {

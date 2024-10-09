@@ -7,8 +7,8 @@ use musicbrainz_db_lite::models::musicbrainz::recording::Recording;
 use crate::database::get_db_client;
 use crate::database::listenbrainz::listens::ListenFetchQuery;
 use crate::database::listenbrainz::listens::ListenFetchQueryReturn;
+use crate::datastructures::entity_with_listens::recording_with_listens::RecordingWithListens;
 use crate::datastructures::listen_collection::ListenCollection;
-use crate::datastructures::recording_with_listens::RecordingWithListens;
 use crate::models::config::Config;
 use crate::models::data::musicbrainz::recording::mbid::RecordingMBID;
 use crate::utils::cli::await_next;
@@ -39,7 +39,6 @@ pub async fn lookup_recording(username: &str, id: RecordingMBID) -> color_eyre::
         .group_by_recording(conn)
         .await?;
     let coupled = RecordingWithListens::from_group_by(grouped)
-        .await?
         .pop()
         .unwrap(); //TODO: Handle unlistened
 
@@ -96,7 +95,7 @@ async fn lookup_recording_listened(
         \n", // \n    - Underated score: {}\
         recording_info.recording().format_with_credits(conn).await?,
         recording_info.recording().mbid,
-        recording_info.listen_count(),
+        recording_info.len(),
         recording_info
             .first_listen_date()
             .unwrap()

@@ -25,6 +25,10 @@ impl ListenCollection {
     pub fn push(&mut self, listen: Listen) {
         self.data.push(listen)
     }
+
+    pub fn len(&self) -> usize {
+        self.data.len()
+    }
 }
 
 impl From<Vec<Listen>> for ListenCollection {
