@@ -1,4 +1,6 @@
 pub mod work;
+use crate::database::get_db_client;
+use crate::database::listenbrainz::listens::{ListenFetchQuery, ListenFetchQueryReturn};
 use crate::models::cli::common::{GroupByTarget, SortSorterBy};
 use crate::models::data::listenbrainz::user_listens::UserListens;
 use crate::tools::stats::release_groups::stats_release_groups;
@@ -12,6 +14,18 @@ mod release_groups;
 mod releases;
 
 pub async fn stats_command(username: &str, target: GroupByTarget, sort_by: SortSorterBy) {
+    let listens = ListenFetchQuery::builder()
+        .fetch_recordings_redirects(true)
+        .returns(ListenFetchQueryReturn::Mapped)
+        .user(username.to_string())
+        .build()
+        .fetch(get_db_client().await)
+        .await
+        .expect("Couldn't fetch the new listens");
+
+    recordings::stats_recording(listens).await;
+    panic!();
+
     // Get the listens
     let user_listens = UserListens::get_user_with_refresh(username)
         .await
@@ -30,7 +44,7 @@ pub async fn stats_command(username: &str, target: GroupByTarget, sort_by: SortS
 
     match target {
         GroupByTarget::Recording => {
-            recordings::stats_recording(stats, sort_by).await;
+            recordings::stats_recording(listens).await;
         }
         GroupByTarget::Artist => {
             artists::stats_artist(stats, sort_by).await;
@@ -44,5 +58,20 @@ pub async fn stats_command(username: &str, target: GroupByTarget, sort_by: SortS
         GroupByTarget::Work => {
             stats_works(stats, sort_by).await;
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+
+    use crate::utils::println_cli_info;
+
+    use super::*;
+
+    #[tokio::test]
+    #[serial_test::serial]
+    async fn stats_command_recordings() {
+        println_cli_info("--- Starting test ---");
+        stats_command("RustyNova", GroupByTarget::Recording, SortSorterBy::Count).await;
     }
 }

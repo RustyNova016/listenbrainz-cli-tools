@@ -103,14 +103,14 @@ pub enum Commands {
     ///
     /// - Works (`work`)
     Stats {
-        //#[command(subcommand)]
-        //command: StatsCommand,
-        /// The type of entity to sort by.
-        #[arg(short, long)]
-        target: GroupByTarget,
 
         /// Name of the user to fetch stats listen from
         username: String,
+
+        //#[command(subcommand)]
+        //command: StatsCommand,
+        /// The type of entity to sort by.
+        target: GroupByTarget,
 
         /// Sort by:
         #[arg(short, long, default_value_t = SortSorterBy::Count)]

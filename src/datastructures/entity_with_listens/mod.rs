@@ -8,6 +8,8 @@ macro_rules! impl_entity_with_listens {
             pub fn len(&self) -> usize {
                 self.listens.len()
             }
+
+            
         }
     };
 }

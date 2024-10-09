@@ -19,6 +19,13 @@ impl RecordingWithListens {
         Self { listens, recording }
     }
 
+    pub async fn from_listencollection(
+        conn: &mut sqlx::SqliteConnection,
+        listens: ListenCollection,
+    ) -> Result<Vec<Self>, crate::Error> {
+        Ok(Self::from_group_by(listens.group_by_recording(conn).await?))
+    }
+
     pub fn from_group_by(group_by: GroupByRecordingID) -> Vec<Self> {
         let mut res = Vec::new();
 
