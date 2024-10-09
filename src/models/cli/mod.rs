@@ -13,6 +13,8 @@ use mapping::MappingCommand;
 
 use crate::models::cli::common::{GroupByTarget, SortSorterBy};
 use crate::models::cli::radio::RadioCommand;
+use crate::tools::bumps::bump_command;
+use crate::tools::bumps::bump_down_command;
 use crate::tools::compatibility::compatibility_command;
 use crate::tools::stats::stats_command;
 
@@ -66,8 +68,39 @@ impl Cli {
     }
 }
 
+/// Bump a recording to show up more frequently in radios. By default, it uses the lastest listen as target.
+///
+/// BumpDown is an alias for `bump <RECORDING> <DURATION> 0.9`
+///
+/// All the bumps are added multiplicatively, so a recording won't disapear. Use the blacklist to remove them.
+#[derive(Parser, Debug, Clone)]
+pub struct BumpCLI {
+    /// The recording to bump
+    pub recording: Option<String>,
+
+    /// The duration the bump last for (Default: 3 months)
+    #[arg(short, long)]
+    pub duration: Option<String>,
+
+    /// The multiplier added to the score (Default: 1.1)
+    #[arg(short, long)]
+    pub multiplier: Option<String>,
+
+    #[arg(short, long)]
+    pub username: Option<String>,
+}
+
 #[derive(Subcommand, Debug, Clone)]
 pub enum Commands {
+    Bump(BumpCLI),
+
+    /// Bump a recording to show up less frequently in radios. By default, it uses the lastest listen as target.
+    ///
+    /// BumpDown is an alias for `bump <RECORDING> <DURATION> 0.9`
+    ///    
+    /// All the bumps are added multiplicatively, so a recording won't disapear. Use the blacklist to remove them.
+    BumpDown(BumpCLI),
+
     /// Commands to deal with the local cache
     Cache(CacheCommand),
 
@@ -146,6 +179,10 @@ impl Commands {
             Self::Lookup(val) => val.run().await?,
 
             Self::Mapping(val) => val.run().await?,
+
+            Self::Bump(val) => bump_command(val.clone()).await,
+
+            Self::BumpDown(val) => bump_down_command(val.clone()).await,
         }
         Ok(())
     }

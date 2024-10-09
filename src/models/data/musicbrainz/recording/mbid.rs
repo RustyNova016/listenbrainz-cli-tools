@@ -17,7 +17,7 @@ use crate::utils::println_mus;
 use super::Recording;
 
 #[derive(
-    Debug, Clone, PartialEq, Eq, Deref, DerefMut, Into, From, Serialize, Deserialize, Hash, Display,
+    Debug, Clone, PartialEq, Eq, Deref, DerefMut, Into, From, Serialize, Deserialize, Hash, Display, Default
 )]
 pub struct RecordingMBID(String);
 
