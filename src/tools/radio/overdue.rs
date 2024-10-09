@@ -8,7 +8,7 @@ use crate::database::listenbrainz::listens::fetch_latest_listens_of_user;
 use crate::datastructures::listen_collection::ListenCollection;
 use crate::datastructures::recording_with_listens::RecordingWithListens;
 use crate::models::data::musicbrainz::recording::mbid::RecordingMBID;
-use crate::models::radio::{RadioConfig, RadioConfigBuilder};
+use crate::models::radio::RadioConfig;
 use crate::utils::playlist::PlaylistStub;
 
 pub async fn overdue_radio(
@@ -96,6 +96,7 @@ pub async fn overdue_radio(
 #[tokio::test]
 #[serial_test::serial]
 async fn overdue_by() {
+    use crate::models::radio::RadioConfigBuilder;
     let var_name = RadioConfigBuilder::default();
     overdue_radio("RustyNova", "t", None, 0, false, var_name.build().unwrap())
         .await

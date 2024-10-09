@@ -11,13 +11,24 @@ pub struct Logger {
 impl Logger {
     pub fn new() -> Self {
         Self {
-            print_override: None,
+            print_override: None, 
             bar_count: 0,
+        }
+    }
+
+    pub fn tick(&self) {
+        match &self.print_override {
+            Some(mpg) => {
+                mpg.suspend(|| 0);
+            }
+            None => {
+            }
         }
     }
 
     pub fn add_bar(&mut self, pg: ProgressBar) {
         self.bar_count += 1;
+
         match &self.print_override {
             Some(mpg) => {
                 mpg.add(pg);

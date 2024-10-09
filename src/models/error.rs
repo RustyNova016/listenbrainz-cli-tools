@@ -35,6 +35,9 @@ pub enum Error {
     #[error(transparent)]
     SQLxError(#[from] sqlx::Error),
 
+    #[error(transparent)]
+    MusicbrainzDBLiteError(#[from] musicbrainz_db_lite::Error),
+
     // --- Fetching Errors ---
     #[error("Error with the request.")]
     RequestError(reqwest::Error),

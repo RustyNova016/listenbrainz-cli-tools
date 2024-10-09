@@ -1,11 +1,19 @@
 use chrono::Duration;
 use chrono::Local;
 use humantime::format_duration;
+use musicbrainz_db_lite::models::listenbrainz::listen::selects::ListenQueryBuilder;
+use musicbrainz_db_lite::models::listenbrainz::listen::Listen;
+use musicbrainz_db_lite::models::musicbrainz::recording::Recording;
 use std::sync::Arc;
 
 use crate::core::entity_traits::mbid::IsMbid;
+use crate::database::get_db_client;
+use crate::database::listenbrainz::listens::fetch_latest_listens_of_user;
+use crate::database::listenbrainz::listens::ListenFetchQuery;
+use crate::database::listenbrainz::listens::ListenFetchQueryReturn;
+use crate::datastructures::listen_collection::ListenCollection;
+use crate::datastructures::recording_with_listens::RecordingWithListens;
 use crate::models::config::Config;
-use crate::models::data::listenbrainz::recording_with_listens::recording::RecordingWithListens;
 use crate::models::data::listenbrainz::user_listens::UserListens;
 use crate::models::data::musicbrainz::recording::mbid::RecordingMBID;
 use crate::utils::cli::await_next;
@@ -14,43 +22,64 @@ use crate::utils::extensions::chrono_ext::DurationExt;
 use crate::utils::println_cli;
 
 pub async fn lookup_recording(username: &str, id: RecordingMBID) -> color_eyre::Result<()> {
-    let listens = UserListens::get_user_with_refresh(username)
-        .await
-        .expect("Couldn't fetch the new listens")
-        .get_mapped_listens();
+    let db = get_db_client().await;
+    let conn = &mut *db.as_sqlx_pool().acquire().await?;
 
-    let recording_listens = listens.get_listens_of_recording(&id);
+    // Prefetch the listens. TODO: Merge specific rrecording fetching into query
+    ListenFetchQuery::builder()
+        .fetch_recordings_redirects(true)
+        .returns(ListenFetchQueryReturn::None)
+        .user(username.to_string())
+        .build()
+        .fetch(&db)
+        .await?;
 
-    let recording_info =
-        RecordingWithListens::new(Arc::new(id.get_or_fetch_entity().await?), recording_listens);
+    let Some(recording) = Recording::get_or_fetch(conn, &id.to_string()).await? else {
+        println_cli(format!("Couldn't find the recording with id: {}", id));
+        return Ok(());
+    };
 
-    if recording_info.is_listened() {
-        lookup_recording_listened(recording_info).await?;
-    } else {
-        lookup_recording_unlistened(recording_info).await?;
-    }
+    let listens = Listen::get_listens_of_recording_by_user(conn, username, recording.id).await?;
+    let grouped = ListenCollection::new(listens)
+        .group_by_recording(conn)
+        .await?;
+    let coupled = RecordingWithListens::from_group_by(conn, grouped)
+        .await?
+        .pop()
+        .unwrap(); //TODO: Handle unlistened
+
+    lookup_recording_listened(coupled, conn).await?;
+
+    //if recording_info.is_listened() {
+    //    lookup_recording_listened(recording_info).await?;
+    //} else {
+    //    lookup_recording_unlistened(recording_info).await?;
+    //}
 
     await_next();
 
     Ok(())
 }
 
-async fn lookup_recording_unlistened(
+// async fn lookup_recording_unlistened(
+//     recording_info: RecordingWithListens,
+// ) -> color_eyre::Result<()> {
+//     let data_string = format!(
+//         "\nHere are the statistics of {} ({})
+
+//         The recording hasn't been listened to yet",
+//         recording_info.recording().get_title_with_credits().await?,
+//         recording_info.recording_id()
+//     );
+
+//     println_cli(data_string);
+//     Ok(())
+// }
+
+async fn lookup_recording_listened(
     recording_info: RecordingWithListens,
+    conn: &mut sqlx::SqliteConnection,
 ) -> color_eyre::Result<()> {
-    let data_string = format!(
-        "\nHere are the statistics of {} ({})
-        
-        The recording hasn't been listened to yet",
-        recording_info.recording().get_title_with_credits().await?,
-        recording_info.recording_id()
-    );
-
-    println_cli(data_string);
-    Ok(())
-}
-
-async fn lookup_recording_listened(recording_info: RecordingWithListens) -> color_eyre::Result<()> {
     let conf = Config::load_or_panic();
     let data_string = format!(
         " ---
@@ -67,12 +96,11 @@ async fn lookup_recording_listened(recording_info: RecordingWithListens) -> colo
         {}
 
         \n [Radios]\
-        \n    - Underated score: {}\
         \n    - Overdue score: {}\
         \n    - Overdue score (with multiplier): {}\
-        \n",
-        recording_info.recording().get_title_with_credits().await?,
-        recording_info.recording_id(),
+        \n", // \n    - Underated score: {}\
+        recording_info.recording().format_with_credits(conn).await?,
+        recording_info.recording().mbid,
         recording_info.listen_count(),
         recording_info
             .first_listen_date()
@@ -97,16 +125,16 @@ async fn lookup_recording_listened(recording_info: RecordingWithListens) -> colo
             .floor_to_second()
             .with_timezone(&Local),
         get_overdue_line(&recording_info),
-        recording_info
-            .underated_score_single()
-            .await?
-            .trunc_with_scale(2),
-        recording_info.overdue_score().trunc_with_scale(2),
-        (recording_info.overdue_score() * conf.bumps.get_multiplier(recording_info.recording_id()))
+        //recording_info
+        //    .underated_score_single()
+        //    .await?
+        //    .trunc_with_scale(2),
+        recording_info.overdue_factor().trunc_with_scale(2),
+        (recording_info.overdue_factor() * conf.bumps.get_multiplier(&RecordingMBID::from(recording_info.recording().mbid.clone())))
             .trunc_with_scale(2)
     );
 
-    println_cli(data_string);
+    println!("{}", data_string);
     Ok(())
 }
 
