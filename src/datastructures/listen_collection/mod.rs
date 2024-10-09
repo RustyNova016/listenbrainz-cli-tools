@@ -1,8 +1,4 @@
-use musicbrainz_db_lite::models::{
-    listenbrainz::listen::Listen,
-    musicbrainz::{recording::Recording, release::Release},
-};
-
+use musicbrainz_db_lite::models::listenbrainz::listen::Listen;
 
 pub mod group_by;
 
@@ -25,6 +21,10 @@ impl ListenCollection {
     pub fn get_oldest_listen(&self) -> Option<&Listen> {
         self.data.iter().min_by_key(|listen| listen.listened_at)
     }
+
+    pub fn push(&mut self, listen: Listen) {
+        self.data.push(listen)
+    }
 }
 
 impl From<Vec<Listen>> for ListenCollection {
@@ -32,3 +32,4 @@ impl From<Vec<Listen>> for ListenCollection {
         Self { data: value }
     }
 }
+

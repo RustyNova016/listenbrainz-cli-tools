@@ -56,7 +56,7 @@ pub async fn overdue_radio(
     println!("Grouping...");
     let grouped = listens.group_by_recording(&mut *conn).await?;
 
-    let mut recordings = RecordingWithListens::from_group_by(&mut *conn, grouped).await?;
+    let mut recordings = RecordingWithListens::from_group_by(grouped).await?;
 
     recordings.retain(|data| data.listen_count() as u64 > min_listens.unwrap_or(1_u64));
 

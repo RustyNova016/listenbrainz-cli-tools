@@ -1,20 +1,15 @@
 use chrono::Duration;
 use chrono::Local;
 use humantime::format_duration;
-use musicbrainz_db_lite::models::listenbrainz::listen::selects::ListenQueryBuilder;
 use musicbrainz_db_lite::models::listenbrainz::listen::Listen;
 use musicbrainz_db_lite::models::musicbrainz::recording::Recording;
-use std::sync::Arc;
 
-use crate::core::entity_traits::mbid::IsMbid;
 use crate::database::get_db_client;
-use crate::database::listenbrainz::listens::fetch_latest_listens_of_user;
 use crate::database::listenbrainz::listens::ListenFetchQuery;
 use crate::database::listenbrainz::listens::ListenFetchQueryReturn;
 use crate::datastructures::listen_collection::ListenCollection;
 use crate::datastructures::recording_with_listens::RecordingWithListens;
 use crate::models::config::Config;
-use crate::models::data::listenbrainz::user_listens::UserListens;
 use crate::models::data::musicbrainz::recording::mbid::RecordingMBID;
 use crate::utils::cli::await_next;
 use crate::utils::extensions::chrono_ext::DateTimeUtcExt;
@@ -43,7 +38,7 @@ pub async fn lookup_recording(username: &str, id: RecordingMBID) -> color_eyre::
     let grouped = ListenCollection::new(listens)
         .group_by_recording(conn)
         .await?;
-    let coupled = RecordingWithListens::from_group_by(conn, grouped)
+    let coupled = RecordingWithListens::from_group_by(grouped)
         .await?
         .pop()
         .unwrap(); //TODO: Handle unlistened
