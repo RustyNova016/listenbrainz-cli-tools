@@ -2,7 +2,7 @@ use chrono::{DateTime, Duration, Utc};
 use derive_getters::Getters;
 use musicbrainz_db_lite::models::musicbrainz::recording::Recording;
 use rust_decimal::{prelude::FromPrimitive, Decimal};
-use sqlx::SqliteConnection;
+
 
 use super::listen_collection::ListenCollection;
 use crate::datastructures::listen_collection::group_by::GroupByRecordingID;
@@ -18,13 +18,10 @@ impl RecordingWithListens {
         Self { listens, recording }
     }
 
-    pub async fn from_group_by(
-        conn: &mut SqliteConnection,
-        group_by: GroupByRecordingID,
-    ) -> Result<Vec<Self>, crate::Error> {
+    pub async fn from_group_by(group_by: GroupByRecordingID) -> Result<Vec<Self>, crate::Error> {
         let mut res = Vec::new();
 
-        for (id, (recording, listens)) in group_by {
+        for (_, (recording, listens)) in group_by {
             res.push(Self { listens, recording })
         }
 
