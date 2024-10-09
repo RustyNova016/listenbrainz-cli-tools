@@ -108,7 +108,6 @@ pub enum Commands {
         //#[command(subcommand)]
         //command: StatsCommand,
         /// The type of entity to sort by.
-        #[arg(short, long)]
         target: GroupByTarget,
 
         /// Name of the user to fetch stats listen from
