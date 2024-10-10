@@ -20,16 +20,13 @@ cargo install cargo-bump
 git cliff -o CHANGELOG.md
 ```
 
-- Execute: 
-```
-cargo bump <version> --git-tag
-```
+- Edit changelog to add the version number
 
-- Merge branch
+- Edit cargo.toml to add the version number
 
+- Merge branch into main and develop
 
 - Create Release
-
 
 - Then run manual workflow:
 https://github.com/RustyNova016/listenbrainz-cli-tools/actions/workflows/release_manual.yml
