@@ -10,10 +10,7 @@ use crate::{
         config::Config,
         data::{
             listenbrainz::user_listens::UserListens,
-            musicbrainz::{
-                entity::entity_kind::MusicbrainzEntityKind, mbid::MBID,
-                recording::mbid::RecordingMBID,
-            },
+            musicbrainz::{entity::entity_kind::MusicbrainzEntityKind, mbid::MBID},
         },
     },
     utils::{extensions::chrono_ext::DurationExt, println_cli},

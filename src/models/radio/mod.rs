@@ -49,9 +49,7 @@ impl RadioConfig {
 
         recordings
             .into_iter()
-            .map(|(score, recording)| {
-                (score * conf.bumps.get_multiplier(&recording), recording)
-            })
+            .map(|(score, recording)| (score * conf.bumps.get_multiplier(&recording), recording))
             .sorted_by_key(|(score, _)| Reverse(score.clone()))
             .map(|(_, r)| r)
             .collect()

@@ -28,7 +28,7 @@ impl BumpList {
             expiration_date,
             recording,
             value,
-            username
+            username,
         })
     }
 
