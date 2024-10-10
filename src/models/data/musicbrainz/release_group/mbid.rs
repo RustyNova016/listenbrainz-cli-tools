@@ -24,7 +24,7 @@ impl IsMbid<ReleaseGroup> for ReleaseGroupMBID {
         ReleaseGroup::get_cached_or_fetch(self).await
     }
 
-    async fn fetch(&self) -> color_eyre::Result<ExternalMusicBrainzEntity> {
+    async fn fetch(&self) -> Result<ExternalMusicBrainzEntity, reqwest::Error> {
         println_mus(format!("Getting data for release group MBID: {}", &self));
 
         Ok(ReleaseGroupMS::fetch()
@@ -40,8 +40,7 @@ impl IsMbid<ReleaseGroup> for ReleaseGroupMBID {
             .with_url_relations()
             .with_tags()
             .execute()
-            .await
-            .context("Failed to fetch release group from MusicBrainz")?
+            .await?
             .into_entity())
     }
 

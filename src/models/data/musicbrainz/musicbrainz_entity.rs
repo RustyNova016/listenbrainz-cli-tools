@@ -3,6 +3,7 @@ use std::mem::discriminant;
 use derive_more::{From, IsVariant, Unwrap};
 use serde::{Deserialize, Serialize};
 
+use crate::core::caching::serde_cacache;
 use crate::core::entity_traits::mbid::HasMBID;
 use crate::core::entity_traits::updatable::Updatable;
 use crate::models::data::musicbrainz::artist::Artist;
@@ -24,7 +25,7 @@ pub enum MusicBrainzEntity {
 }
 
 impl MusicBrainzEntity {
-    pub async fn save_to_cache(&self) -> color_eyre::Result<()> {
+    pub async fn save_to_cache(&self) -> Result<(), serde_cacache::Error> {
         match self {
             Self::ReleaseGroup(val) => MUSICBRAINZ_DATABASE.release_groups().update(val).await?,
             Self::Release(val) => MUSICBRAINZ_DATABASE.releases().update(val).await?,

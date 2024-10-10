@@ -45,27 +45,37 @@ pub async fn listen_rate_radio(
         })
     });
 
-    let mut scores = listens
+    let mut rates = listens
         .get_listen_rates()
         .await
         .expect("Couldn't calculate the listens rates");
 
     // Filter minimum
-    scores.retain(|rate| *rate.1.listen_count() > min_listens.unwrap_or(3_u64));
+    rates.retain(|rate| *rate.1.listen_count() > min_listens.unwrap_or(3_u64));
 
     // Filter minimum rate
     if let Some(min_rate) = min_rate {
-        scores.retain(|rate| {
+        rates.retain(|rate| {
             rate.1.get_listen_rate(ListenRateRange::Year)
                 >= min_rate.get_listen_rate(ListenRateRange::Year)
         });
     }
 
-    // Sort
-    scores.sort_by_cached_key(|rate| rate.1.get_listen_rate(ListenRateRange::Year));
+    let scores = rates
+        .into_iter()
+        .map(|rate| {
+            (
+                rate.1.get_listen_rate(ListenRateRange::Year),
+                rate.1.recording().clone(),
+            )
+        })
+        .collect_vec();
 
-    let scores_as_recording = stream::iter(scores.clone())
-        .map(|(_, rate)| async move { rate.recording().get_or_fetch_entity().await })
+    // Sort
+    let sorted_scores = RadioConfig::sort_scores(scores);
+
+    let scores_as_recording = stream::iter(sorted_scores)
+        .map(|recording_id| async move { recording_id.get_or_fetch_entity().await })
         .buffered(1);
     let playlist = config.finalize_radio_playlist(scores_as_recording).await?;
 

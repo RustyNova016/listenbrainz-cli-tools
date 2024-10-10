@@ -1,7 +1,6 @@
 use std::mem::discriminant;
 use std::sync::Arc;
 
-use color_eyre::Report;
 use derive_getters::Getters;
 use once_cell::sync::Lazy;
 use tokio::try_join;
@@ -35,7 +34,7 @@ pub struct MusicBrainzDatabase {
 }
 
 impl MusicBrainzDatabase {
-    pub async fn remove(&self, id: &MBID) -> color_eyre::Result<()> {
+    pub async fn remove(&self, id: &MBID) -> Result<(), cacache::Error> {
         match id {
             MBID::Artist(id) => self.artists.remove(id).await?,
             MBID::Release(id) => self.releases.remove(id).await?,
@@ -51,7 +50,7 @@ impl MusicBrainzDatabase {
         &self,
         k: usize,
         keep_min: usize,
-    ) -> color_eyre::Result<()> {
+    ) -> Result<(), cacache::Error> {
         try_join!(
             self.artists.invalidate_last_entries(k, keep_min),
             self.releases.invalidate_last_entries(k, keep_min),
@@ -63,13 +62,10 @@ impl MusicBrainzDatabase {
         Ok(())
     }
 
-    pub async fn add_alias(&self, alias: &MBID, main: &MBID) -> color_eyre::Result<()> {
+    pub async fn add_alias(&self, alias: &MBID, main: &MBID) -> Result<(), Error> {
         // Check if both are the same variant
         if discriminant(alias) != discriminant(main) {
-            return Err(Report::from(Error::MBIDAliasError(
-                alias.clone(),
-                main.clone(),
-            )));
+            return Err(Error::MBIDAliasError(alias.clone(), main.clone()));
         }
 
         let main = main.clone();
@@ -78,23 +74,31 @@ impl MusicBrainzDatabase {
             MBID::Artist(alias) => {
                 self.artists
                     .insert_alias(alias, &main.unwrap_artist())
-                    .await?;
+                    .await
+                    .map_err(Error::CacheError)?;
             }
             MBID::Release(alias) => {
                 self.releases
                     .insert_alias(alias, &main.unwrap_release())
-                    .await?;
+                    .await
+                    .map_err(Error::CacheError)?;
             }
-            MBID::Work(alias) => self.works.insert_alias(alias, &main.unwrap_work()).await?,
+            MBID::Work(alias) => self
+                .works
+                .insert_alias(alias, &main.unwrap_work())
+                .await
+                .map_err(Error::CacheError)?,
             MBID::ReleaseGroup(alias) => {
                 self.release_groups
                     .insert_alias(alias, &main.unwrap_release_group())
-                    .await?;
+                    .await
+                    .map_err(Error::CacheError)?;
             }
             MBID::Recording(alias) => {
                 self.recordings
                     .insert_alias(alias, &main.unwrap_recording())
-                    .await?;
+                    .await
+                    .map_err(Error::CacheError)?;
             }
         }
 

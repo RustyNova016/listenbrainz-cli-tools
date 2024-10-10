@@ -1,12 +1,12 @@
 [package]
 name = "listenbrainz-cli-tools"
-version = "0.2.1"
+version = "0.2.2"
 edition = "2021"
 repository = "https://github.com/RustyNova016/listenbrainz-cli-tools"
 publish = true
 license = "MIT"
 description = "A CLI app containing a set of useful tools for Listenbrainz"
-rust-version = "1.75"
+rust-version = "1.75.0"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
@@ -14,46 +14,58 @@ rust-version = "1.75"
 # Main crate
 #listenbrainz = "0.7.0"
 # Self maintained upstream version
-listenbrainz = {version = "0.7.2", package = "listenbrainz_rs_nova"} # Fork with fixes
+listenbrainz = { version = "0.7.2", package = "listenbrainz_rs_nova" } # Fork with fixes
 #listenbrainz = { branch = "main", git = "https://github.com/InputUsername/listenbrainz-rs.git" }
 
 # Upstream version of the musicbrainz crate. Use "listenbrainz-cli-tools_master" for main builds, "listenbrainz-cli-tools_dev" for dev builds
 # This fixes:
 # - https://github.com/RustyNova016/listenbrainz-cli-tools/issues/97
 #musicbrainz_rs = "5.0.0" # Original musicbrainz_rs crate. It currently seems unmaintained, and need some PRs to pass
-musicbrainz_rs = {version = "0.6.0", package = "musicbrainz_rs_nova"} # Fork with fixes
+musicbrainz_rs = { version = "0.6.0", package = "musicbrainz_rs_nova" } # Fork with fixes
 #musicbrainz_rs = { branch = "listenbrainz-cli-tools_master", package = "musicbrainz_rs_nova", git = "https://github.com/RustyNova016/musicbrainz_rs.git" }
 #musicbrainz_rs = { path = "../musicbrainz_rs"} # For easy development, download the musicbrainz_rs crate for yourself. Don't forget to change it back as PRs will fail
 
-derive_builder = "0.20.0"
+derive_builder = "0.20.1"
 inquire = "0.7.5"
 itertools = "0.13.0"
 color-eyre = "0.6.3"
-rust_decimal = "1.35.0"
-clap = { version = "4.5.8", features = ["unicode", "wrap_help", "derive", "color"] }
-clap_complete = "4.5.7"
+rust_decimal = "1.36.0"
+clap = { version = "4.5.19", features = [
+    "unicode",
+    "wrap_help",
+    "derive",
+    "color",
+] }
+clap_complete = "4.5.32"
 chrono = "0.4.38"
-serde = { version = "1.0.204", features = ["rc"] }
-serde_json = "1.0.120"
-once_cell = "1.19.0"
+serde = { version = "1.0.210", features = ["rc"] }
+serde_json = "1.0.128"
+once_cell = "1.20.2"
 extend = "1.2.0"
 directories = "5.0.1"
 chashmap = "2.2.2"
-indicatif = { version = "0.17.8", features = ["rayon", "improved_unicode", "futures"] }
-tokio = { version = "1.38.0", features = ["full"] }
+indicatif = { version = "0.17.8", features = [
+    "rayon",
+    "improved_unicode",
+    "futures",
+] }
+tokio = { version = "1.40.0", features = ["full"] }
 rayon = "1.10.0"
-reqwest = { version = "0.12.5", features = ["json"] }
-cacache = { version = "13.0.0", default-features = false, features = ["tokio-runtime", "mmap"] }
+reqwest = { version = "0.12.8", features = ["json"] }
+cacache = { version = "13.0.0", default-features = false, features = [
+    "tokio-runtime",
+    "mmap",
+] }
 rmp-serde = "1.3.0"
 rand = "0.8.5"
-thiserror = "1.0.61"
-derive_more = { version = "0.99.18" }
-derive-new = "0.6.0"
-derive-getters = "0.4.0"
-rust_decimal_macros = "1.34.2"
-futures = "0.3.30"
+thiserror = "1.0.64"
+derive_more = { version = "1.0.0", features = ["full"] }
+derive-new = "0.7.0"
+derive-getters = "0.5.0"
+rust_decimal_macros = "1.36.0"
+futures = "0.3.31"
 humantime = "2.1.0"
-regex = "1.10.5"
+regex = "1.11.0"
 clap-markdown = "0.1.4"
 
 # The profile that 'cargo dist' will build with
@@ -81,9 +93,12 @@ manual_string_new = { level = "warn", priority = 1 }
 doc_markdown = { level = "warn", priority = 1 }
 uninlined_format_args = { level = "warn", priority = 1 }
 explicit_iter_loop = { level = "warn", priority = 1 }
+allow_attributes = { level = "warn", priority = 1 }
+suboptimal_flops= { level = "warn", priority = 1 }
+
 #unwrap_used = { level = "warn", priority = 1 } # Fix needed in separate PR
 
-# Won't apply
+# Won't apply... Yet
 must_use_candidate = { level = "allow", priority = 1 }
 map_unwrap_or = { level = "allow", priority = 1 }
 
@@ -96,6 +111,11 @@ ci = ["github"]
 # The installers to generate for each app
 installers = ["shell", "powershell"]
 # Target platforms to build apps for (Rust target-triple syntax)
-targets = ["aarch64-apple-darwin", "x86_64-apple-darwin", "x86_64-unknown-linux-gnu", "x86_64-pc-windows-msvc"]
+targets = [
+    "aarch64-apple-darwin",
+    "x86_64-apple-darwin",
+    "x86_64-unknown-linux-gnu",
+    "x86_64-pc-windows-msvc",
+]
 # Publish jobs to run in CI
 pr-run-mode = "plan"

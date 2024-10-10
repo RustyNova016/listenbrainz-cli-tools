@@ -26,7 +26,7 @@ impl IsMbid<Work> for WorkMBID {
         Work::get_cache().get_or_fetch(self).await
     }
 
-    async fn fetch(&self) -> color_eyre::Result<ExternalMusicBrainzEntity> {
+    async fn fetch(&self) -> Result<ExternalMusicBrainzEntity, reqwest::Error> {
         println_mus(format!("Getting data for work MBID: {}", &self));
 
         Ok(WorkMS::fetch()
@@ -42,8 +42,7 @@ impl IsMbid<Work> for WorkMBID {
             .with_url_relations()
             .with_work_relations()
             .execute()
-            .await
-            .context("Failed to fetch work from MusicBrainz")?
+            .await?
             .into_entity())
     }
 
