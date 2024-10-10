@@ -70,9 +70,20 @@ impl RecordingIDWithListens {
     }
 
     pub fn average_duration_between_listens(&self) -> Duration {
-        self.known_for()
-            .and_then(|dur| dur.checked_div(self.listen_count() as i32))
-            // If the recording haven't been listened to, then the average time is zero
+        // If the recording haven't been listened to, then the average time is zero
+        if self.listen_count() < 2 {
+            return Duration::zero();
+        }
+
+        let duration_between_first_and_last = self
+            .last_listen_date()
+            .expect("There's at least two listens")
+            - self
+                .first_listen_date()
+                .expect("There's at least two listens");
+
+        duration_between_first_and_last
+            .checked_div(self.listen_count() as i32)
             .unwrap_or_else(Duration::zero)
     }
 
