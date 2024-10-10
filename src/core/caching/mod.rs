@@ -15,6 +15,12 @@ pub static CACHE_LOCATION: Lazy<PathBuf> = Lazy::new(|| {
     path.push("listenbrainz_cli_tools");
     #[cfg(debug_assertions)]
     path.push("debug");
-    fs::create_dir_all(&path).expect("Couldn't create cache directory");
+
+    if !path
+        .try_exists()
+        .expect("Couldn't check cache directory's path")
+    {
+        fs::create_dir_all(&path).expect("Couldn't create cache directory");
+    }
     path
 });

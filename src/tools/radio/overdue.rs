@@ -7,9 +7,9 @@ use chrono::prelude::Utc;
 use chrono::Duration;
 use futures::stream;
 use futures::StreamExt;
+use itertools::Itertools;
 use rust_decimal::prelude::Decimal;
 use rust_decimal::prelude::FromPrimitive;
-use std::cmp::Reverse;
 
 pub async fn overdue_radio(
     username: &str,
@@ -37,31 +37,48 @@ pub async fn overdue_radio(
         .await
         .unwrap();
 
-    let mut scores = listens
+    let mut rates = listens
         .get_listen_rates()
         .await
         .expect("Couldn't calculate the listens rates");
 
     // Filter minimum
-    scores.retain(|rate| rate.1.listen_count() > &min_listens.unwrap_or(3_u64));
+    rates.retain(|rate| rate.1.listen_count() > &min_listens.unwrap_or(2_u64));
 
-    // Sort
-    if !overdue_factor {
-        scores.sort_by_cached_key(|rate| {
-            rate.1.get_estimated_date_of_next_listen(&rate.0) - Utc::now()
-        });
+    // Get scores
+    let scores = if !overdue_factor {
+        rates
+            .into_iter()
+            .map(|(listens, rate)| {
+                let time_elapsed_after_prediction =
+                    Utc::now() - rate.get_estimated_date_of_next_listen(&listens);
+
+                (
+                    Decimal::from(time_elapsed_after_prediction.num_seconds()),
+                    rate.recording().clone(),
+                )
+            })
+            .collect_vec()
     } else {
-        scores.sort_by_cached_key(|rate| {
-            Reverse(
-                Decimal::from_i64(rate.1.get_overdue_by(&rate.0).num_seconds()).unwrap()
-                    / Decimal::from_i64(rate.1.get_average_time_between_listens().num_seconds())
-                        .unwrap(),
-            )
-        });
-    }
+        rates
+            .into_iter()
+            .map(|(listens, rate)| {
+                let overdue_by =
+                    Decimal::from_i64(rate.get_overdue_by(&listens).num_seconds()).unwrap();
+                let time_for_listen =
+                    Decimal::from_i64(rate.get_average_time_between_listens().num_seconds())
+                        .unwrap();
+                let overdue_factor = overdue_by / time_for_listen;
 
-    let scores_as_recording = stream::iter(scores.clone())
-        .map(|(_, rate)| async move { rate.recording().get_or_fetch_entity().await })
+                (overdue_factor, rate.recording().clone())
+            })
+            .collect_vec()
+    };
+
+    let sorted_scores = RadioConfig::sort_scores(scores);
+
+    let scores_as_recording = stream::iter(sorted_scores)
+        .map(|recording_mbid| async move { recording_mbid.get_or_fetch_entity().await })
         .buffered(1);
     let playlist = config.finalize_radio_playlist(scores_as_recording).await?;
 

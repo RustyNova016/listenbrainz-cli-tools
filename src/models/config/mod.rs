@@ -1,4 +1,6 @@
+pub mod bumps;
 use crate::core::entity_traits::config_file::ConfigFile;
+use bumps::BumpList;
 use clap::CommandFactory;
 use derive_getters::Getters;
 use listen_config::ListenConfig;
@@ -25,6 +27,9 @@ pub struct Config {
     pub listens: ListenConfig,
 
     pub default_user: Option<String>,
+
+    #[serde(default)]
+    pub bumps: BumpList,
 }
 
 impl Config {
@@ -54,8 +59,8 @@ impl Config {
         Self::load_or_panic().default_user
     }
 
-    fn load_or_panic() -> Self {
-        Self::load().expect("Cannot load the configuration file. Aborting.")
+    pub fn load_or_panic() -> Self {
+        Self::load().expect("Cannot load the configuration file. Aborting")
     }
 
     pub fn check_username(s: &Option<String>) -> String {
