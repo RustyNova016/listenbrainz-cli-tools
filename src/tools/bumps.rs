@@ -9,7 +9,11 @@ use crate::{
         cli::BumpCLI,
         config::Config,
         data::{
-            listenbrainz::user_listens::UserListens, musicbrainz::recording::mbid::RecordingMBID,
+            listenbrainz::user_listens::UserListens,
+            musicbrainz::{
+                entity::entity_kind::MusicbrainzEntityKind, mbid::MBID,
+                recording::mbid::RecordingMBID,
+            },
         },
     },
     utils::{extensions::chrono_ext::DurationExt, println_cli},
@@ -19,7 +23,9 @@ pub async fn bump_command(bump: BumpCLI) {
     let username = Config::check_username(&bump.username);
 
     let recording = match bump.recording {
-        Some(val) => RecordingMBID::from(val)
+        Some(val) => MBID::from_string(&val, MusicbrainzEntityKind::Recording)
+            .expect("Couldn't parse MBID")
+            .unwrap_recording()
             .get_or_fetch_entity()
             .await
             .expect("Couldn't verify MBID"),
@@ -54,8 +60,12 @@ pub async fn bump_command(bump: BumpCLI) {
         duration.to_humantime().unwrap().to_string()
     ));
 
-    conf.bumps
-        .add_bump(recording.id().clone(), username, multiplier, Utc::now() + duration);
+    conf.bumps.add_bump(
+        recording.id().clone(),
+        username,
+        multiplier,
+        Utc::now() + duration,
+    );
     conf.save().unwrap();
 }
 
