@@ -37,7 +37,7 @@ pub async fn bump_command(bump: BumpCLI) {
             .expect("The latest listen isn't mapped. Canceling"),
     };
 
-    let multiplier = Decimal::from_str(&bump.multiplier.unwrap_or("1.1".to_string()))
+    let multiplier = Decimal::from_str(&bump.multiplier.unwrap_or_else(|| "1.1".to_string()))
         .expect("Couldn't parse the multiplier");
 
     let duration = match bump.duration {
@@ -54,7 +54,7 @@ pub async fn bump_command(bump: BumpCLI) {
             .await
             .expect("Error while getting recording credits"),
         multiplier,
-        duration.to_humantime().unwrap().to_string()
+        duration.to_humantime().unwrap()
     ));
 
     conf.bumps.add_bump(
@@ -68,5 +68,5 @@ pub async fn bump_command(bump: BumpCLI) {
 
 pub async fn bump_down_command(mut bump: BumpCLI) {
     bump.multiplier = bump.multiplier.or_else(|| Some("0.9".to_string()));
-    bump_command(bump).await
+    bump_command(bump).await;
 }

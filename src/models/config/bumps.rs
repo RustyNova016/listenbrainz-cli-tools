@@ -29,7 +29,7 @@ impl BumpList {
             recording,
             value,
             username,
-        })
+        });
     }
 
     pub fn get_multiplier(&self, recording: &RecordingMBID) -> Decimal {

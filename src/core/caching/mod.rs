@@ -16,7 +16,10 @@ pub static CACHE_LOCATION: Lazy<PathBuf> = Lazy::new(|| {
     #[cfg(debug_assertions)]
     path.push("debug");
 
-    if !fs::exists(&path).expect("Couldn't check cache directory's path") {
+    if !path
+        .try_exists()
+        .expect("Couldn't check cache directory's path")
+    {
         fs::create_dir_all(&path).expect("Couldn't create cache directory");
     }
     path
