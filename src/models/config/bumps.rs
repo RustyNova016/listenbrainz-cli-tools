@@ -32,11 +32,11 @@ impl BumpList {
         })
     }
 
-    pub fn get_multiplier(&self, recording: RecordingMBID) -> Decimal {
+    pub fn get_multiplier(&self, recording: &RecordingMBID) -> Decimal {
         let values = self
             .0
             .iter()
-            .filter(|b| b.recording == recording && b.expiration_date > Utc::now())
+            .filter(|b| &b.recording == recording && b.expiration_date > Utc::now())
             .map(|b| b.value);
         let mut res = Decimal::one();
 

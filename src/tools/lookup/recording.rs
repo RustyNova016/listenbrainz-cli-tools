@@ -4,6 +4,7 @@ use humantime::format_duration;
 use std::sync::Arc;
 
 use crate::core::entity_traits::mbid::IsMbid;
+use crate::models::config::Config;
 use crate::models::data::listenbrainz::recording_with_listens::recording::RecordingWithListens;
 use crate::models::data::listenbrainz::user_listens::UserListens;
 use crate::models::data::musicbrainz::recording::mbid::RecordingMBID;
@@ -50,6 +51,7 @@ async fn lookup_recording_unlistened(
 }
 
 async fn lookup_recording_listened(recording_info: RecordingWithListens) -> color_eyre::Result<()> {
+    let conf = Config::load_or_panic();
     let data_string = format!(
         " ---
         \nHere are the statistics of {} ({})\
@@ -67,6 +69,7 @@ async fn lookup_recording_listened(recording_info: RecordingWithListens) -> colo
         \n [Radios]\
         \n    - Underated score: {}\
         \n    - Overdue score: {}\
+        \n    - Overdue score (with multiplier): {}\
         \n",
         recording_info.recording().get_title_with_credits().await?,
         recording_info.recording_id(),
@@ -99,6 +102,8 @@ async fn lookup_recording_listened(recording_info: RecordingWithListens) -> colo
             .await?
             .trunc_with_scale(2),
         recording_info.overdue_score().trunc_with_scale(2),
+        (recording_info.overdue_score() * conf.bumps.get_multiplier(recording_info.recording_id()))
+            .trunc_with_scale(2)
     );
 
     println_cli(data_string);

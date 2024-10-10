@@ -68,7 +68,7 @@ impl Cli {
     }
 }
 
-/// Bump a recording to show up more frequently in radios. By default, it uses the lastest listen as target.
+/// Bump a recording to show up more frequently in radios that uses scores. By default, it uses the lastest listen as target.
 ///
 /// BumpDown is an alias for `bump <RECORDING> <DURATION> 0.9`
 ///
@@ -94,7 +94,7 @@ pub struct BumpCLI {
 pub enum Commands {
     Bump(BumpCLI),
 
-    /// Bump a recording to show up less frequently in radios. By default, it uses the lastest listen as target.
+    /// Bump a recording to show up more frequently in radios that uses scores. By default, it uses the lastest listen as target.
     ///
     /// BumpDown is an alias for `bump <RECORDING> <DURATION> 0.9`
     ///    

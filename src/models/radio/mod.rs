@@ -1,12 +1,18 @@
+use std::cmp::Reverse;
+
 use crate::utils::println_cli_info;
 
 use super::config::recording_timeout::RecordingTimeoutConfig;
+use super::config::Config;
+use super::data::musicbrainz::recording::mbid::RecordingMBID;
 use super::data::musicbrainz::recording::Recording;
 use chrono::Duration;
 use derive_builder::Builder;
 use futures::Stream;
 use futures::StreamExt;
+use itertools::Itertools;
 use once_cell::sync::Lazy;
+use rust_decimal::Decimal;
 
 #[derive(Debug, Clone, Builder)]
 #[builder(setter(into))]
@@ -36,6 +42,19 @@ impl RadioConfig {
             MinimumMode::Or => has_min_count || *has_min_duration,
             MinimumMode::And => has_min_count && *has_min_duration,
         }
+    }
+
+    pub fn sort_scores(recordings: Vec<(Decimal, RecordingMBID)>) -> Vec<RecordingMBID> {
+        let conf = Config::load_or_panic();
+
+        recordings
+            .into_iter()
+            .map(|(score, recording)| {
+                (score * conf.bumps.get_multiplier(&recording), recording)
+            })
+            .sorted_by_key(|(score, _)| Reverse(score.clone()))
+            .map(|(_, r)| r)
+            .collect()
     }
 
     pub async fn finalize_radio_playlist<I, E>(&self, mut generator: I) -> Result<Vec<Recording>, E>
