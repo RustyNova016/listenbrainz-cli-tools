@@ -25,7 +25,7 @@ musicbrainz_rs = { version = "0.6.0", package = "musicbrainz_rs_nova" } # Fork w
 #musicbrainz_rs = { branch = "listenbrainz-cli-tools_master", package = "musicbrainz_rs_nova", git = "https://github.com/RustyNova016/musicbrainz_rs.git" }
 #musicbrainz_rs = { path = "../musicbrainz_rs"} # For easy development, download the musicbrainz_rs crate for yourself. Don't forget to change it back as PRs will fail
 
-derive_builder = "0.20.1"
+derive_builder = "0.20.2"
 inquire = "0.7.5"
 itertools = "0.13.0"
 color-eyre = "0.6.3"
