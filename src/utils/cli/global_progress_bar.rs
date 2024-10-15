@@ -1,17 +1,11 @@
-use std::{
-    ops::Deref,
-    sync::{
-        atomic::{AtomicU64, Ordering},
-        Arc, Mutex, RwLock,
-    },
-    time::Duration,
-};
+use core::ops::Deref;
+use core::sync::atomic::{AtomicU64, Ordering};
+use std::sync::{Arc, RwLock};
 
-use color_eyre::owo_colors::OwoColorize;
 use indicatif::{ProgressBar, ProgressStyle};
 use once_cell::sync::Lazy;
 
-use crate::utils::{logger::Logger, STATIC_LOGGER};
+use crate::utils::logger::Logger;
 
 pub static PG_FETCHING: Lazy<GlobalProgressBar<'static>> =
     Lazy::new(|| GlobalProgressBar::new("Fetching MBIDs".to_string()));
@@ -59,9 +53,9 @@ impl<'a> GlobalProgressBar<'a> {
         list.push(Arc::new(submiter));
 
         if list.len() == 1 {
-            self.show()
+            self.show();
         }
-        
+
         self.pg.set_length(list.iter().map(|s| s.count).sum());
 
         list.iter()
@@ -75,7 +69,7 @@ impl<'a> GlobalProgressBar<'a> {
         list.retain(|t| Arc::ptr_eq(t, submiter));
 
         if list.len() == 0 {
-            self.hide()
+            self.hide();
         }
     }
 

@@ -44,7 +44,8 @@ pub async fn overdue_radio(
             AND msid_mapping.user = users.id 
 
             -- Give some recordings a cooldown period 
-            AND listened_at < ?",
+            AND listened_at < ?
+        ORDER BY msid_mapping.recording_mbid",
         username,
         time_stamp
     )
@@ -58,7 +59,7 @@ pub async fn overdue_radio(
 
     let mut recordings = RecordingWithListens::from_group_by(grouped);
 
-    recordings.retain(|data| data.len() as u64 > min_listens.unwrap_or(1_u64));
+    recordings.retain(|data| data.len() as u64 > min_listens.unwrap_or(2_u64));
 
     // Sort
     let scores = if !overdue_factor {

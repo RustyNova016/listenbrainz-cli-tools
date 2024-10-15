@@ -50,7 +50,7 @@ async fn setup_database() -> Result<DBClient, musicbrainz_db_lite::Error> {
     File::create_new(DB_LOCATION.to_str().unwrap()).unwrap();
 
     let client = DBClient::connect(DB_LOCATION.to_str().unwrap()).await?;
-    client.create_database().await?;
+    //client.create_database().await?;
 
     Ok(client)
 }
@@ -67,7 +67,7 @@ async fn connect_to_db() -> Result<Option<DBClient>, musicbrainz_db_lite::Error>
 
 async fn connect_and_setup() -> Result<DBClient, musicbrainz_db_lite::Error> {
     match connect_to_db().await? {
-        None => setup_database().await,
+        None => todo!(), //setup_database().await,
         Some(client) => {
             //if !check_db_integrity(&client).await.unwrap() {
             //    println!("Remaking Database File for new schema");

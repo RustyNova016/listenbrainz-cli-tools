@@ -30,7 +30,7 @@ impl RecordingWithListens {
         let mut res = Vec::new();
 
         for (_, (recording, listens)) in group_by {
-            res.push(Self { listens, recording })
+            res.push(Self { listens, recording });
         }
 
         res

@@ -23,11 +23,15 @@ impl ListenCollection {
     }
 
     pub fn push(&mut self, listen: Listen) {
-        self.data.push(listen)
+        self.data.push(listen);
     }
 
     pub fn len(&self) -> usize {
         self.data.len()
+    }
+
+    pub fn is_empty(&self) -> bool {
+        self.data.is_empty()
     }
 }
 

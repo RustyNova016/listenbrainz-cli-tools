@@ -138,10 +138,6 @@ pub enum Commands {
     ///
     /// - Works (`work`)
     Stats {
-
-        /// Name of the user to fetch stats listen from
-        username: String,
-
         //#[command(subcommand)]
         //command: StatsCommand,
         /// The type of entity to sort by.

@@ -62,5 +62,5 @@ async fn compatibility() {
         .await
         .unwrap();
 
-    assert!(true)
+    assert!(true);
 }

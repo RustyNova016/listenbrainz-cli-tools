@@ -4,7 +4,7 @@ use indicatif::{MultiProgress, ProgressBar};
 use std::fmt::Display;
 
 pub struct Logger {
-    print_override: Option<MultiProgress>,
+    print_override: Option<MultiProgress>, //TODO: Keep bar all the time?
     bar_count: u32,
 }
 

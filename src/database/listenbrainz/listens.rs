@@ -1,19 +1,15 @@
 use chrono::{DateTime, Utc};
 use listenbrainz::raw::Client;
 use macon::Builder;
-use musicbrainz_db_lite::{
-    connections::sqlite::SqliteClient,
-    database::client::DBClient,
-    models::{listenbrainz::listen::Listen, musicbrainz::recording::Recording},
-};
+use musicbrainz_db_lite::connections::sqlite::SqliteClient;
+use musicbrainz_db_lite::database::client::DBClient;
+use musicbrainz_db_lite::models::listenbrainz::listen::Listen;
+use musicbrainz_db_lite::models::musicbrainz::recording::Recording;
 use sqlx::SqliteConnection;
 
-use crate::{
-    core::entity_traits::mb_cached::MBCached,
-    datastructures::listen_collection::ListenCollection,
-    utils::{cli::global_progress_bar::PG_FETCHING, println_cli, println_cli_info, println_cli_warn, println_lis},
-    Error,
-};
+use crate::datastructures::listen_collection::ListenCollection;
+use crate::utils::cli::global_progress_bar::PG_FETCHING;
+use crate::utils::println_cli;
 
 /// Fetch the latest listens for the provided user. If the user has no listens, it will do a full listen fetch.
 pub async fn fetch_latest_listens_of_user(
@@ -81,7 +77,7 @@ impl ListenFetchQuery {
         conn: &mut SqliteConnection,
         user: &str,
     ) -> Result<(), crate::Error> {
-        let unfetched = Listen::get_unfetched_recordings_of_user(conn, &user).await?;
+        let unfetched = Listen::get_unfetched_recordings_of_user(conn, user).await?;
         let subm = PG_FETCHING.get_submitter(unfetched.len() as u64);
         
         for id in unfetched {

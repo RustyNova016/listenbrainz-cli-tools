@@ -9,7 +9,9 @@ macro_rules! impl_entity_with_listens {
                 self.listens.len()
             }
 
-            
+            pub fn is_empty(&self) -> bool {
+                self.listens.is_empty()
+            }
         }
     };
 }

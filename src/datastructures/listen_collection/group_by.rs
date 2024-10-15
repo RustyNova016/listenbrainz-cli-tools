@@ -52,7 +52,7 @@ impl ListenCollection {
                 group
                     .get_mut_col_or_create(release.id, release)
                     .get_mut_col_or_create(recording.id, recording.clone())
-                    .push(listen.clone())
+                    .push(listen.clone());
             }
 
             progress_bar.inc(1);
