@@ -9,6 +9,7 @@ use sqlx::SqliteConnection;
 
 use crate::datastructures::listen_collection::ListenCollection;
 use crate::utils::cli::global_progress_bar::PG_FETCHING;
+use crate::utils::env::in_offline_mode;
 use crate::utils::println_cli;
 
 /// Fetch the latest listens for the provided user. If the user has no listens, it will do a full listen fetch.
@@ -58,8 +59,13 @@ pub struct ListenFetchQuery {
 
 impl ListenFetchQuery {
     pub async fn fetch(self, client: &DBClient) -> Result<ListenCollection, crate::Error> {
-        fetch_latest_listens_of_user(client.as_welds_client(), &self.user).await?;
-        let conn = &mut *client.as_sqlx_pool().acquire().await?;
+        // Fetch the latest listens
+        // ... If it's not in offline mode
+        if !in_offline_mode() {
+            fetch_latest_listens_of_user(client.as_welds_client(), &self.user).await?;
+        }
+
+        let conn = &mut *client.connection.acquire().await?;
 
         if self.fetch_recordings_redirects {
             Self::fetch_recordings_redirects(conn, &self.user).await?;
@@ -79,7 +85,7 @@ impl ListenFetchQuery {
     ) -> Result<(), crate::Error> {
         let unfetched = Listen::get_unfetched_recordings_of_user(conn, user).await?;
         let subm = PG_FETCHING.get_submitter(unfetched.len() as u64);
-        
+
         for id in unfetched {
             Recording::get_or_fetch(conn, &id).await?;
             subm.inc(1);
