@@ -5,6 +5,8 @@ use clap::{Parser, Subcommand};
 
 use crate::core::statistics::listen_rate::ListenRate;
 use crate::core::statistics::listen_rate::ListenRateRange;
+use crate::datastructures::radio::collector::RadioCollector;
+use crate::datastructures::radio::collector::RadioCollectorBuilder;
 use crate::models::config::Config;
 use crate::models::radio::RadioConfig;
 use crate::models::radio::RadioConfigBuilder;
@@ -49,10 +51,34 @@ impl RadioCommand {
         config_builder.build().expect("Couldn't generate config")
     }
 
+    pub fn get_collector(&self) -> RadioCollector {
+        let collector = RadioCollectorBuilder::default();
+
+        let collector = match self.min_count {
+            Some(val) => collector.count(val),
+            None => collector.count_none(),
+        };
+
+        let collector = match self.min_duration.as_ref() {
+            Some(val) => {
+                let dura: humantime::Duration = val
+                    .clone()
+                    .parse()
+                    .expect("Couldn't parse mimimum lenght for radio");
+                let std_dura = dura.deref();
+                let chrono_dura = chrono::Duration::from_std(*std_dura).unwrap();
+                collector.duration(chrono_dura)
+            }
+            None => collector.duration_none(),
+        };
+
+        collector.build()
+    }
+
     pub async fn run(&self) -> color_eyre::Result<()> {
         let config = self.get_config();
 
-        self.command.run(config).await
+        self.command.run(config, self.get_collector()).await
     }
 }
 
@@ -158,7 +184,7 @@ pub enum RadioSubcommands {
 }
 
 impl RadioSubcommands {
-    pub async fn run(&self, config: RadioConfig) -> color_eyre::Result<()> {
+    pub async fn run(&self, config: RadioConfig, collector: RadioCollector) -> color_eyre::Result<()> {
         match self {
             Self::Circles {
                 username,
@@ -228,7 +254,7 @@ impl RadioSubcommands {
                     *min,
                     *cooldown,
                     *delay_factor,
-                    config,
+                    collector,
                 )
                 .await?;
             }

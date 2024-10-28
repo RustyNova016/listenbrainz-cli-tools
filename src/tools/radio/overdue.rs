@@ -1,15 +1,17 @@
-use chrono::{Duration, Utc};
-use itertools::Itertools;
-use musicbrainz_db_lite::models::listenbrainz::listen::Listen;
-use rust_decimal::Decimal;
+use chrono::Duration;
+use futures::{stream, StreamExt};
 
 use crate::database::get_db_client;
-use crate::database::listenbrainz::listens::fetch_latest_listens_of_user;
 use crate::datastructures::entity_with_listens::recording_with_listens::RecordingWithListens;
-use crate::datastructures::listen_collection::ListenCollection;
+use crate::datastructures::radio::collector::RadioCollector;
+use crate::datastructures::radio::filters::cooldown::cooldown_filter;
+use crate::datastructures::radio::filters::min_listens::min_listen_filter;
+use crate::datastructures::radio::filters::timeouts::timeout_filter;
+use crate::datastructures::radio::seeders::listens::ListenSeederBuilder;
+use crate::datastructures::radio::sorters::overdue::{overdue_factor_sorter, overdue_sorter};
 use crate::models::data::musicbrainz::recording::mbid::RecordingMBID;
-use crate::models::radio::RadioConfig;
 use crate::utils::playlist::PlaylistStub;
+use crate::utils::println_cli;
 
 pub async fn overdue_radio(
     username: &str,
@@ -17,82 +19,40 @@ pub async fn overdue_radio(
     min_listens: Option<u64>,
     cooldown: u64,
     overdue_factor: bool,
-    config: RadioConfig,
+    collector: RadioCollector,
 ) -> color_eyre::Result<()> {
     let db = get_db_client().await;
     let conn = &mut *db.connection.acquire().await?;
-    let deadline = Utc::now() - Duration::hours(cooldown as i64);
-    let time_stamp = deadline.timestamp();
 
-    // Get the listens
-    fetch_latest_listens_of_user(get_db_client().await.as_welds_client(), username).await?;
-    println!("Getting...");
-    let listens: ListenCollection = sqlx::query_as!(
-        Listen,
-        "
-        SELECT 
-            listens.*
-        FROM       
-            users 
-            INNER JOIN listens ON users.name = listens.user 
-            INNER JOIN msid_mapping ON listens.recording_msid = msid_mapping.recording_msid
-        WHERE
-            -- Only for this user
-            LOWER(listens.user) = LOWER(?)  
+    println_cli("[Seeding] Getting listens");
+    let recordings = ListenSeederBuilder::default().username(username).build().seed(conn).await.expect("Couldn't find seed listens");
+    
+    println_cli("[Filter] Filtering minimum listen count");
+    let recordings = min_listen_filter(stream::iter(recordings), min_listens.unwrap_or(3));
 
-            -- Keep only mapped listens 
-            AND msid_mapping.user = users.id 
+    println_cli("[Filter] Filtering listen cooldown");
+    let recordings = cooldown_filter(recordings, Duration::hours(cooldown as i64));
 
-            -- Give some recordings a cooldown period 
-            AND listened_at < ?
-        ORDER BY msid_mapping.recording_mbid",
-        username,
-        time_stamp
-    )
-    .fetch_all(&mut *conn)
-    .await?
-    .into();
+    println_cli("[Filter] Filtering listen timeouts");
+    let recordings = timeout_filter(recordings);
 
-    // Now let's group them by Recording ID
-    println!("Grouping...");
-    let mut recordings = RecordingWithListens::from_listencollection(conn, listens)
-        .await
-        .expect("Error while fetching recordings")
-        .into_values()
-        .collect_vec();
-
-    recordings.retain(|data| data.len() as u64 > min_listens.unwrap_or(2_u64));
-
-    // Sort
-    let scores = if !overdue_factor {
-        recordings
-            .into_iter()
-            .map(|r| {
-                (
-                    Decimal::from(r.overdue_by().num_seconds()),
-                    r.recording().clone(),
-                )
-            })
-            .collect_vec()
+    let recordings: Vec<RecordingWithListens> = if !overdue_factor {
+        println_cli("[Sorting] Sorting listen by overdue duration");
+        overdue_sorter(recordings.collect().await)
     } else {
-        recordings
-            .into_iter()
-            .map(|r| (r.overdue_factor(), r.recording().clone()))
-            .collect_vec()
+        println_cli("[Sorting] Sorting listen by overdue factor");
+        overdue_factor_sorter(recordings.collect().await)
     };
 
-    let sorted_scores = RadioConfig::sort_scores2(scores);
-
-    let playlist = config
-        .finalize_radio_playlist_from_vec::<()>(sorted_scores)
-        .await
-        .unwrap();
-
+    println_cli("[Finalising] Creating radio playlist");
+    let collected = collector.collect(stream::iter(recordings)).await;
+    
+    println_cli("[Sending] Sending radio playlist to listenbrainz");
     PlaylistStub::new(
         "Radio: Overdue listens".to_string(),
         Some(username.to_string()),
         true,
-        playlist
+        collected
             .into_iter()
             .map(|r| RecordingMBID::from(r.mbid))
             .collect(),
@@ -110,9 +70,8 @@ pub async fn overdue_radio(
 #[tokio::test]
 #[serial_test::serial]
 async fn overdue_by() {
-    use crate::models::radio::RadioConfigBuilder;
-    let var_name = RadioConfigBuilder::default();
-    overdue_radio("RustyNova", "t", None, 0, false, var_name.build().unwrap())
+    use crate::datastructures::radio::collector::RadioCollectorBuilder;
+    overdue_radio("RustyNova", "t", None, 0, false, RadioCollectorBuilder::default().count_default().duration_default().build())
         .await
         .unwrap();
 }

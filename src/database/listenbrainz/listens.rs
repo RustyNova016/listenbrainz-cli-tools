@@ -10,7 +10,7 @@ use sqlx::SqliteConnection;
 use crate::datastructures::listen_collection::ListenCollection;
 use crate::utils::cli::global_progress_bar::PG_FETCHING;
 use crate::utils::env::in_offline_mode;
-use crate::utils::println_cli;
+use crate::utils::println_lis;
 
 /// Fetch the latest listens for the provided user. If the user has no listens, it will do a full listen fetch.
 pub async fn fetch_latest_listens_of_user(
@@ -34,7 +34,7 @@ pub async fn fetch_latest_listens_of_user(
     while (latest_listen_ts.is_none() && pull_ts.is_some())
         || (latest_listen_ts.is_some_and(|a| pull_ts.is_some_and(|b| a <= b)))
     {
-        println_cli(format!(
+        println_lis(format!(
             "Getting listens from before: {} ({})",
             DateTime::from_timestamp(pull_ts.unwrap(), 0).unwrap(),
             pull_ts.unwrap(),
