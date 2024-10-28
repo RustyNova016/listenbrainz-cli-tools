@@ -1,34 +1,40 @@
+use core::cmp::Reverse;
+
+use itertools::Itertools;
+
 use crate::core::entity_traits::mb_cached::MBCached;
 use crate::core::entity_traits::relations::has_artist_credits::HasArtistCredits;
 use crate::core::statistics::statistic_sorter::StatisticSorter;
+use crate::database::get_conn;
+use crate::datastructures::entity_with_listens::release_with_listens::ReleaseWithListens;
+use crate::datastructures::listen_collection::ListenCollection;
 use crate::models::cli::common::SortSorterBy;
 use crate::models::data::musicbrainz::release::Release;
 use crate::utils::cli_paging::CLIPager;
 
-pub async fn stats_releases(stats: StatisticSorter, sort_by: SortSorterBy) {
-    let mut pager = CLIPager::new(5);
+pub async fn stats_releases(listens: ListenCollection) {
+    let mut groups = ReleaseWithListens::from_listencollection(&mut *get_conn().await, listens).await
+    .expect("Error while fetching recordings")
+    .into_values()
+    .collect_vec();
+    groups.sort_by_key(|a| Reverse(a.len()));
 
-    for (key, data) in stats.into_sorted_vec(sort_by) {
-        let release = Release::get_cached_or_fetch(&key.clone().into())
-            .await
-            .unwrap(); // TODO: Use MBIDs
+    let mut pager = CLIPager::new(10);
 
-        let artist_credit_string = release
-            .get_or_fetch_artist_credits()
-            .await
-            .unwrap()
-            .get_artist_credit_as_string();
-        let pager_continue = pager.execute(|| {
-            println!(
-                "[{}] - {} by {}",
-                data.len(),
-                release.title(),
-                artist_credit_string
-            );
-        });
+    for group in groups {
+        group.release().fetch_if_incomplete(&mut *get_conn().await).await.expect("Error while fetching release");
+        println!(
+            "[{}] {}",
+            group.len(),
+            group
+                .release()
+                .format_with_credits(&mut *get_conn().await)
+                .await
+                .expect("Error getting formated release name"),
+        );
 
-        if !pager_continue {
-            return;
-        };
+        if !pager.inc() {
+            break;
+        }
     }
 }

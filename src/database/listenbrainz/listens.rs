@@ -45,8 +45,6 @@ pub async fn fetch_latest_listens_of_user(
     Ok(())
 }
 
-
-
 #[derive(Builder)]
 pub struct ListenFetchQuery {
     #[builder(Default=!)]

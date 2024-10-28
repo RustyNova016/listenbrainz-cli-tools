@@ -1,10 +1,15 @@
+use std::collections::HashMap;
+
 use chrono::{DateTime, Duration, Utc};
 use derive_getters::Getters;
+use musicbrainz_db_lite::models::listenbrainz::listen::Listen;
 use musicbrainz_db_lite::models::musicbrainz::recording::Recording;
+use musicbrainz_db_lite::models::musicbrainz::user::User;
+use musicbrainz_db_lite::RowId;
 use rust_decimal::{prelude::FromPrimitive, Decimal};
 
-
-use crate::datastructures::listen_collection::{group_by::GroupByRecordingID, ListenCollection};
+use crate::database::listenbrainz::prefetching::prefetch_recordings_of_listens;
+use crate::datastructures::listen_collection::ListenCollection;
 
 use super::impl_entity_with_listens;
 
@@ -22,18 +27,47 @@ impl RecordingWithListens {
     pub async fn from_listencollection(
         conn: &mut sqlx::SqliteConnection,
         listens: ListenCollection,
-    ) -> Result<Vec<Self>, crate::Error> {
-        Ok(Self::from_group_by(listens.group_by_recording(conn).await?))
-    }
-
-    pub fn from_group_by(group_by: GroupByRecordingID) -> Vec<Self> {
-        let mut res = Vec::new();
-
-        for (_, (recording, listens)) in group_by {
-            res.push(Self { listens, recording });
+    ) -> Result<HashMap<i64, Self>, crate::Error> {
+        // If empty, early return
+        if listens.is_empty() {
+            return Ok(Default::default());
         }
 
-        res
+        // Prefetch the missing data
+        let user_name = listens
+            .first()
+            .expect("At least one listen should be there")
+            .user
+            .clone();
+
+        let user = User::find_by_name(conn, &user_name)
+            .await?
+            .ok_or(crate::Error::MissingUserError(user_name.clone()))?;
+
+        prefetch_recordings_of_listens(conn, user.id, &listens.data).await?;
+
+        // Get all the data from the DB
+        let joins = Listen::get_recordings_as_batch(conn, user.id, listens.data).await?;
+
+        // Convert into structs
+        let mut out = HashMap::new();
+
+        for (_, (listen, recordings)) in joins {
+            for recording in recordings {
+                out.entry(recording.get_row_id())
+                    .or_insert_with(|| Self {
+                        recording,
+                        listens: ListenCollection::default(),
+                    })
+                    .push(listen.clone());
+            }
+        }
+
+        Ok(out)
+    }
+
+    pub fn push(&mut self, listen: Listen) {
+        self.listens.push(listen)
     }
 
     pub fn first_listen_date(&self) -> Option<DateTime<Utc>> {

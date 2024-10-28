@@ -1,11 +1,13 @@
 use core::ops::Deref;
 use core::sync::atomic::{AtomicU64, Ordering};
+use core::time::Duration;
 use std::sync::{Arc, RwLock};
 
 use indicatif::{ProgressBar, ProgressStyle};
 use once_cell::sync::Lazy;
 
 use crate::utils::logger::Logger;
+use crate::utils::println_cli;
 
 pub static PG_FETCHING: Lazy<GlobalProgressBar<'static>> =
     Lazy::new(|| GlobalProgressBar::new("Fetching MBIDs".to_string()));
@@ -27,7 +29,7 @@ impl<'a> GlobalProgressBar<'a> {
             ProgressStyle::with_template(&style_string).expect("Couldn't convert template schema"),
         );
 
-        //progress_bar.enable_steady_tick(Duration::from_secs(1));
+        progress_bar.enable_steady_tick(Duration::from_secs(1));
 
         Self {
             pg: progress_bar,
@@ -66,7 +68,7 @@ impl<'a> GlobalProgressBar<'a> {
 
     pub(self) fn remove_submiter(&self, submiter: &Arc<SubmitterTask<'a>>) {
         let mut list = self.submitters.write().unwrap();
-        list.retain(|t| Arc::ptr_eq(t, submiter));
+        list.retain(|saved_submiter| saved_submiter.id != submiter.id);
 
         if list.len() == 0 {
             self.hide();

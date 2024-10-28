@@ -1,3 +1,4 @@
+pub mod env;
 pub mod radio;
 pub mod tracing;
 pub mod cli;

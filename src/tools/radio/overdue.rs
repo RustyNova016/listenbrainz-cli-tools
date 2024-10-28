@@ -20,7 +20,7 @@ pub async fn overdue_radio(
     config: RadioConfig,
 ) -> color_eyre::Result<()> {
     let db = get_db_client().await;
-    let conn = &mut *db.as_sqlx_pool().acquire().await?;
+    let conn = &mut *db.connection.acquire().await?;
     let deadline = Utc::now() - Duration::hours(cooldown as i64);
     let time_stamp = deadline.timestamp();
 
@@ -55,17 +55,30 @@ pub async fn overdue_radio(
 
     // Now let's group them by Recording ID
     println!("Grouping...");
-    let grouped = listens.group_by_recording(&mut *conn).await?;
-
-    let mut recordings = RecordingWithListens::from_group_by(grouped);
+    let mut recordings = RecordingWithListens::from_listencollection(conn, listens)
+        .await
+        .expect("Error while fetching recordings")
+        .into_values()
+        .collect_vec();
 
     recordings.retain(|data| data.len() as u64 > min_listens.unwrap_or(2_u64));
 
     // Sort
     let scores = if !overdue_factor {
-        recordings.into_iter().map(|r| (Decimal::from(r.overdue_by().num_seconds()), r.recording().clone())).collect_vec()
+        recordings
+            .into_iter()
+            .map(|r| {
+                (
+                    Decimal::from(r.overdue_by().num_seconds()),
+                    r.recording().clone(),
+                )
+            })
+            .collect_vec()
     } else {
-        recordings.into_iter().map(|r| (r.overdue_factor(), r.recording().clone())).collect_vec()
+        recordings
+            .into_iter()
+            .map(|r| (r.overdue_factor(), r.recording().clone()))
+            .collect_vec()
     };
 
     let sorted_scores = RadioConfig::sort_scores2(scores);

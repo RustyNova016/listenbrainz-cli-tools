@@ -1,6 +1,7 @@
 use chrono::Duration;
 use chrono::Local;
 use humantime::format_duration;
+use itertools::Itertools;
 use musicbrainz_db_lite::models::listenbrainz::listen::Listen;
 use musicbrainz_db_lite::models::musicbrainz::recording::Recording;
 
@@ -18,7 +19,7 @@ use crate::utils::println_cli;
 
 pub async fn lookup_recording(username: &str, id: RecordingMBID) -> color_eyre::Result<()> {
     let db = get_db_client().await;
-    let conn = &mut *db.as_sqlx_pool().acquire().await?;
+    let conn = &mut *db.connection.acquire().await?;
 
     // Prefetch the listens. TODO: Merge specific rrecording fetching into query
     ListenFetchQuery::builder()
@@ -30,15 +31,15 @@ pub async fn lookup_recording(username: &str, id: RecordingMBID) -> color_eyre::
         .await?;
 
     let Some(recording) = Recording::get_or_fetch(conn, &id.to_string()).await? else {
-        println_cli(format!("Couldn't find the recording with id: {}", id));
+        println_cli(format!("Couldn't find the recording with id: {id}"));
         return Ok(());
     };
 
     let listens = Listen::get_listens_of_recording_by_user(conn, username, recording.id).await?;
-    let grouped = ListenCollection::new(listens)
-        .group_by_recording(conn)
-        .await?;
-    let coupled = RecordingWithListens::from_group_by(grouped)
+  
+    let (_, coupled) = RecordingWithListens::from_listencollection(conn, listens.into()).await.expect("Couldn't load recording")
+        .into_iter()
+        .collect_vec()
         .pop()
         .unwrap(); //TODO: Handle unlistened
 

@@ -40,7 +40,7 @@ pub async fn get_db_client() -> &'static DBClient {
 pub async fn get_conn() -> sqlx::pool::PoolConnection<sqlx::Sqlite> {
     get_db_client()
         .await
-        .as_sqlx_pool()
+        .connection
         .acquire()
         .await
         .expect("Couldn't get connection to the SQLite database")

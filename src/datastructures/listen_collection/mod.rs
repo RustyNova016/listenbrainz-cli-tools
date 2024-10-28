@@ -1,7 +1,4 @@
 use musicbrainz_db_lite::models::listenbrainz::listen::Listen;
-
-pub mod group_by;
-
 #[derive(Debug, Clone, PartialEq, Eq, Default)]
 pub struct ListenCollection {
     pub data: Vec<Listen>,
@@ -33,6 +30,10 @@ impl ListenCollection {
     pub fn is_empty(&self) -> bool {
         self.data.is_empty()
     }
+
+    pub fn first(&self) -> Option<&Listen> {
+        self.data.first()
+    }
 }
 
 impl From<Vec<Listen>> for ListenCollection {
@@ -40,4 +41,3 @@ impl From<Vec<Listen>> for ListenCollection {
         Self { data: value }
     }
 }
-
