@@ -115,6 +115,4 @@ async fn overdue_by() {
     overdue_radio("RustyNova", "t", None, 0, false, var_name.build().unwrap())
         .await
         .unwrap();
-
-    assert!(true)
 }

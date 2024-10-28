@@ -17,12 +17,8 @@ impl Logger {
     }
 
     pub fn tick(&self) {
-        match &self.print_override {
-            Some(mpg) => {
-                mpg.suspend(|| 0);
-            }
-            None => {
-            }
+        if let Some(mpg) = &self.print_override {
+            mpg.suspend(|| 0);
         }
     }
 
@@ -43,12 +39,9 @@ impl Logger {
 
     pub fn remove_bar(&mut self, pg: ProgressBar) {
         self.bar_count -= 1;
-        match &self.print_override {
-            Some(mpg) => {
-                mpg.remove(&pg);
-                mpg.clear().expect("TODO: panic message");
-            }
-            None => {}
+        if let Some(mpg) = &self.print_override {
+            mpg.remove(&pg);
+            mpg.clear().expect("TODO: panic message");
         }
 
         if self.bar_count == 0 {

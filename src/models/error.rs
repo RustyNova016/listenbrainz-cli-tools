@@ -3,7 +3,7 @@ use std::io;
 use thiserror::Error;
 
 #[derive(Error, Debug)]
-#[allow(clippy::enum_variant_names)]
+//#[expect(clippy::enum_variant_names)]
 pub enum Error {
     /// Returned when an index was targeted to alias another of a different type
     #[error("MBID {1:?} couldn't be aliased to MBID {0:?}")]

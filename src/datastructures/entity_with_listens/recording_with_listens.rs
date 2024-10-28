@@ -67,7 +67,7 @@ impl RecordingWithListens {
     }
 
     pub fn push(&mut self, listen: Listen) {
-        self.listens.push(listen)
+        self.listens.push(listen);
     }
 
     pub fn first_listen_date(&self) -> Option<DateTime<Utc>> {

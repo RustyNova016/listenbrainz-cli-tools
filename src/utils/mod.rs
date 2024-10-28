@@ -22,7 +22,6 @@ pub mod tokio;
 pub mod traits;
 
 #[derive(Clone, Debug, PartialEq, Eq, Builder)]
-#[allow(missing_docs)]
 /// Reader for the User Listens endpoint
 pub struct ListenAPIPaginator {
     #[builder(setter(into, strip_option))]

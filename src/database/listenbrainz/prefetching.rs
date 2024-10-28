@@ -1,5 +1,3 @@
-use futures::{stream, StreamExt};
-use musicbrainz_db_lite::api::musicbrainz::recording;
 use musicbrainz_db_lite::models::listenbrainz::listen::Listen;
 use musicbrainz_db_lite::models::musicbrainz::recording::Recording;
 
@@ -9,7 +7,7 @@ use crate::utils::cli::global_progress_bar::PG_FETCHING;
 pub async fn prefetch_recordings_of_listens(
     conn: &mut sqlx::SqliteConnection,
     user_id: i64,
-    listens: &Vec<Listen>,
+    listens: &[Listen],
 ) -> Result<(), musicbrainz_db_lite::Error> {
     let recordings = Listen::get_unfetched_recordings_ids(conn, user_id, listens).await?;
     let progress_bar = PG_FETCHING.get_submitter(listens.len() as u64);

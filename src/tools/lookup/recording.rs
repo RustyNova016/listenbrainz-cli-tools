@@ -9,7 +9,6 @@ use crate::database::get_db_client;
 use crate::database::listenbrainz::listens::ListenFetchQuery;
 use crate::database::listenbrainz::listens::ListenFetchQueryReturn;
 use crate::datastructures::entity_with_listens::recording_with_listens::RecordingWithListens;
-use crate::datastructures::listen_collection::ListenCollection;
 use crate::models::config::Config;
 use crate::models::data::musicbrainz::recording::mbid::RecordingMBID;
 use crate::utils::cli::await_next;
@@ -129,7 +128,7 @@ async fn lookup_recording_listened(
             .trunc_with_scale(2)
     );
 
-    println!("{}", data_string);
+    println!("{data_string}");
     Ok(())
 }
 

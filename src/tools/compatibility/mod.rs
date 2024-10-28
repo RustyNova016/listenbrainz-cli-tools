@@ -61,6 +61,4 @@ async fn compatibility() {
     compatibility_command("RustyNova", "backhdlp")
         .await
         .unwrap();
-
-    assert!(true);
 }

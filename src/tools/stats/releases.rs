@@ -2,14 +2,9 @@ use core::cmp::Reverse;
 
 use itertools::Itertools;
 
-use crate::core::entity_traits::mb_cached::MBCached;
-use crate::core::entity_traits::relations::has_artist_credits::HasArtistCredits;
-use crate::core::statistics::statistic_sorter::StatisticSorter;
 use crate::database::get_conn;
 use crate::datastructures::entity_with_listens::release_with_listens::ReleaseWithListens;
 use crate::datastructures::listen_collection::ListenCollection;
-use crate::models::cli::common::SortSorterBy;
-use crate::models::data::musicbrainz::release::Release;
 use crate::utils::cli_paging::CLIPager;
 
 pub async fn stats_releases(listens: ListenCollection) {

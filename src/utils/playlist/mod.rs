@@ -11,7 +11,7 @@ use listenbrainz::raw::Client;
 #[derive(Clone, Builder)]
 pub struct PlaylistStub {
     title: String,
-    #[allow(dead_code)] // Temporary fix
+    #[expect(dead_code)] // Temporary fix
     description: Option<String>,
     username: Option<String>,
     public: bool,
