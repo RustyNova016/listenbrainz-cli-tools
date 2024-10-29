@@ -7,7 +7,6 @@ use indicatif::{ProgressBar, ProgressStyle};
 use once_cell::sync::Lazy;
 
 use crate::utils::logger::Logger;
-use crate::utils::println_cli;
 
 pub static PG_FETCHING: Lazy<GlobalProgressBar<'static>> =
     Lazy::new(|| GlobalProgressBar::new("Fetching MBIDs".to_string()));
@@ -82,7 +81,7 @@ impl<'a> GlobalProgressBar<'a> {
     #[must_use]
     pub fn get_submitter(&'a self, count: u64) -> SubmitterGuard<'a> {
         let id = self.id_counter.fetch_add(1, Ordering::Relaxed);
-        let task = SubmitterTask::new(id, &self, count);
+        let task = SubmitterTask::new(id, self, count);
         let arced = self.add_submiter(task);
 
         SubmitterGuard(arced)

@@ -13,7 +13,7 @@ pub async fn prefetch_recordings_of_listens(
     let progress_bar = PG_FETCHING.get_submitter(listens.len() as u64);
 
     for recording in recordings {
-        Recording::fetch_and_save(conn, &recording).await?;
+        Recording::get_or_fetch(conn, &recording).await?;
         progress_bar.inc(1);
     }
 
@@ -26,6 +26,7 @@ pub async fn prefetch_releases(
     recordings: &[&Recording] ,
 ) -> Result<(), musicbrainz_db_lite::Error> {
     let progress_bar = PG_FETCHING.get_submitter(recordings.len() as u64);
+    println!("Prefetch releases");
 
     for recording in recordings {
         recording.fetch_if_incomplete(conn).await?;

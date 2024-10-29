@@ -1,3 +1,4 @@
+pub mod cleanup;
 pub mod listenbrainz;
 use std::fs::{self, File};
 use std::path::PathBuf;
