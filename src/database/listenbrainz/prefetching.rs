@@ -1,3 +1,4 @@
+use itertools::Itertools;
 use musicbrainz_db_lite::models::listenbrainz::listen::Listen;
 use musicbrainz_db_lite::models::musicbrainz::recording::Recording;
 
@@ -26,9 +27,25 @@ pub async fn prefetch_releases(
     recordings: &[&Recording] ,
 ) -> Result<(), musicbrainz_db_lite::Error> {
     let progress_bar = PG_FETCHING.get_submitter(recordings.len() as u64);
-    println!("Prefetch releases");
 
     for recording in recordings {
+        recording.fetch_if_incomplete(conn).await?;
+        progress_bar.inc(1);
+    }
+
+    Ok(())
+}
+
+pub async fn fetch_recordings_as_complete(
+    conn: &mut sqlx::SqliteConnection,
+    recordings: &[&Recording] ,
+) -> Result<(), musicbrainz_db_lite::Error> {
+    // Eliminate all the recordings that are complete
+    let uncompletes = recordings.iter().filter(|r| !r.is_fully_fetched()).collect_vec();
+
+    let progress_bar = PG_FETCHING.get_submitter(uncompletes.len() as u64);
+
+    for recording in uncompletes {
         recording.fetch_if_incomplete(conn).await?;
         progress_bar.inc(1);
     }

@@ -1,6 +1,6 @@
 pub mod cleanup;
 pub mod listenbrainz;
-use std::fs::{self, File};
+use std::fs::{self};
 use std::path::PathBuf;
 
 use directories::BaseDirs;
@@ -45,15 +45,6 @@ pub async fn get_conn() -> sqlx::pool::PoolConnection<sqlx::Sqlite> {
         .acquire()
         .await
         .expect("Couldn't get connection to the SQLite database")
-}
-
-async fn setup_database() -> Result<DBClient, musicbrainz_db_lite::Error> {
-    File::create_new(DB_LOCATION.to_str().unwrap()).unwrap();
-
-    let client = DBClient::connect(DB_LOCATION.to_str().unwrap()).await?;
-    //client.create_database().await?;
-
-    Ok(client)
 }
 
 async fn connect_to_db() -> Result<Option<DBClient>, musicbrainz_db_lite::Error> {

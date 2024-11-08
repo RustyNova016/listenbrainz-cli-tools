@@ -126,6 +126,12 @@ dependencies = [
 ]
 
 [[package]]
+name = "anyhow"
+version = "1.0.93"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "4c95c10ba0b00a02636238b814946408b1322d5ac4760326e6fb8ec956d85775"
+
+[[package]]
 name = "arrayvec"
 version = "0.7.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1839,6 +1845,7 @@ dependencies = [
  "listenbrainz",
  "macon",
  "musicbrainz_db_lite_macros",
+ "musicbrainz_db_lite_schema",
  "musicbrainz_rs_nova 0.8.0",
  "serde",
  "serde_json",
@@ -1859,6 +1866,15 @@ dependencies = [
  "quote",
  "sqlx",
  "syn 2.0.79",
+]
+
+[[package]]
+name = "musicbrainz_db_lite_schema"
+version = "0.1.0"
+dependencies = [
+ "dotenvy",
+ "sqlx",
+ "tokio",
 ]
 
 [[package]]
@@ -3781,10 +3797,11 @@ dependencies = [
 
 [[package]]
 name = "welds"
-version = "0.4.1"
+version = "0.4.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "2e6a8a4d8805f9e032ef5f905623d8e0788dcb3116e5ace9dc96049dce6825ba"
+checksum = "7c6c191c07007ca536a2d2c7cc155d8426746820014ca24c9ef7c2931319bd1c"
 dependencies = [
+ "anyhow",
  "async-trait",
  "colored",
  "log",
@@ -3795,9 +3812,9 @@ dependencies = [
 
 [[package]]
 name = "welds-connections"
-version = "0.4.1"
+version = "0.4.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "94ec10a8075575322d5da7449f1a46bc8c88776d8cd4aa7074039e20b38236f5"
+checksum = "e4bdbec1510d29d8fbdd7720e5e2af542dc69705fcd6007c9a2f9f8c8a04c76a"
 dependencies = [
  "async-trait",
  "log",
@@ -3807,9 +3824,9 @@ dependencies = [
 
 [[package]]
 name = "welds-macros"
-version = "0.4.1"
+version = "0.4.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "a0b6a5b02ac297a578b92a021ba9ec139b4f48c02cd78d9a3cb7489049c570f7"
+checksum = "04539e193fff90f5cd27e9986ca1eef3adae0a145839991ecc6ca8d94dc51679"
 dependencies = [
  "log",
  "proc-macro2",
