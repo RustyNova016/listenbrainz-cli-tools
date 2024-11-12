@@ -2,6 +2,7 @@ use color_eyre::eyre::Context;
 use derive_getters::Getters;
 use tokio::sync::OnceCell;
 
+use crate::database::get_conn;
 use crate::database::get_db_client;
 use crate::database::listenbrainz::listens::fetch_latest_listens_of_user;
 use crate::models::data::listenbrainz::listen::collection::ListenCollection;
@@ -44,7 +45,7 @@ impl UserCompatibilityBuilder {
     pub async fn build_user_a_listens(&self) -> color_eyre::Result<ListenCollection> {
         Ok(match &self.user_a_listens {
             None => {
-                fetch_latest_listens_of_user(get_db_client().await.as_welds_client(), &self.user_a)
+                fetch_latest_listens_of_user(&mut *get_conn().await, &self.user_a)
                     .await?;
                 UserListens::get_user_with_refresh(&self.user_a)
                     .await
@@ -58,7 +59,7 @@ impl UserCompatibilityBuilder {
     pub async fn build_user_b_listens(&self) -> color_eyre::Result<ListenCollection> {
         Ok(match &self.user_b_listens {
             None => {
-                fetch_latest_listens_of_user(get_db_client().await.as_welds_client(), &self.user_a)
+                fetch_latest_listens_of_user(&mut *get_conn().await, &self.user_a)
                     .await?;
                 UserListens::get_user_with_refresh(&self.user_b)
                     .await

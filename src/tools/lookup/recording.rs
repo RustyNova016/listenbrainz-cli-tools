@@ -26,7 +26,7 @@ pub async fn lookup_recording(username: &str, id: RecordingMBID) -> color_eyre::
         .returns(ListenFetchQueryReturn::None)
         .user(username.to_string())
         .build()
-        .fetch(db)
+        .fetch(conn)
         .await?;
 
     let Some(recording) = Recording::get_or_fetch(conn, &id.to_string()).await? else {

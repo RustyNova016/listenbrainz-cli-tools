@@ -1,4 +1,4 @@
-use crate::database::get_db_client;
+use crate::database::get_conn;
 use crate::database::listenbrainz::listens::ListenFetchQuery;
 use crate::database::listenbrainz::listens::ListenFetchQueryReturn;
 use crate::models::cli::common::GroupByTarget;
@@ -16,7 +16,7 @@ pub async fn stats_command(username: &str, target: GroupByTarget, _sort_by: Sort
         .returns(ListenFetchQueryReturn::Mapped)
         .user(username.to_string())
         .build()
-        .fetch(get_db_client().await)
+        .fetch(&mut *get_conn().await)
         .await
         .expect("Couldn't fetch the new listens");
 

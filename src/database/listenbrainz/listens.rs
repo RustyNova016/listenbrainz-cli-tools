@@ -1,8 +1,6 @@
 use chrono::{DateTime, Utc};
 use listenbrainz::raw::Client;
 use macon::Builder;
-use musicbrainz_db_lite::connections::sqlite::SqliteClient;
-use musicbrainz_db_lite::database::client::DBClient;
 use musicbrainz_db_lite::models::listenbrainz::listen::Listen;
 use musicbrainz_db_lite::models::musicbrainz::recording::Recording;
 use sqlx::SqliteConnection;
@@ -14,11 +12,11 @@ use crate::utils::println_lis;
 
 /// Fetch the latest listens for the provided user. If the user has no listens, it will do a full listen fetch.
 pub async fn fetch_latest_listens_of_user(
-    client: &SqliteClient,
+    conn: &mut sqlx::SqliteConnection,
     user: &str,
 ) -> Result<(), musicbrainz_db_lite::Error> {
     let latest_listen_ts =
-        Listen::get_latest_listen_of_user(&mut *client.as_sqlx_pool().acquire().await?, user)
+        Listen::get_latest_listen_of_user(&mut *conn, user)
             .await?
             .map(|v| v.listened_at);
     let mut pull_ts = Some(Utc::now().timestamp());
@@ -39,7 +37,7 @@ pub async fn fetch_latest_listens_of_user(
             DateTime::from_timestamp(pull_ts.unwrap(), 0).unwrap(),
             pull_ts.unwrap(),
         ));
-        pull_ts = Listen::execute_listen_fetch(client, &lb_client, user, pull_ts.unwrap()).await?;
+        pull_ts = Listen::execute_listen_fetch(conn, &lb_client, user, pull_ts.unwrap()).await?;
     }
 
     Ok(())
@@ -56,14 +54,13 @@ pub struct ListenFetchQuery {
 }
 
 impl ListenFetchQuery {
-    pub async fn fetch(self, client: &DBClient) -> Result<ListenCollection, crate::Error> {
+    pub async fn fetch(self, conn: &mut sqlx::SqliteConnection) -> Result<ListenCollection, crate::Error> {
         // Fetch the latest listens
         // ... If it's not in offline mode
         if !in_offline_mode() {
-            fetch_latest_listens_of_user(client.as_welds_client(), &self.user).await?;
+            fetch_latest_listens_of_user(conn, &self.user).await?;
         }
 
-        let conn = &mut *client.connection.acquire().await?;
 
         if self.fetch_recordings_redirects {
             Self::fetch_recordings_redirects(conn, &self.user).await?;

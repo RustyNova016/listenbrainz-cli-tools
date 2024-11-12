@@ -17,7 +17,7 @@ pub struct ListenSeeder {
 impl ListenSeeder {
     pub async fn seed(self, conn: &mut sqlx::SqliteConnection) -> Result<Vec<RecordingWithListens>, crate::Error> {
         // Get the listens
-        fetch_latest_listens_of_user(get_db_client().await.as_welds_client(), &self.username).await?;
+        fetch_latest_listens_of_user(conn, &self.username).await?;
         
         let listens: ListenCollection = sqlx::query_as!(
             Listen,
