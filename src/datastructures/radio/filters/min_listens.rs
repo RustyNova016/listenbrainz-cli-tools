@@ -8,7 +8,5 @@ pub fn min_listen_filter(
     listens: impl StreamExt<Item = RecordingWithListens>,
     minimum_listens: u64,
 ) -> impl Stream<Item = RecordingWithListens> {
-    listens.filter(move |r| {
-        ready(r.len() as u64 >= minimum_listens)
-    })
+    listens.filter(move |r| ready(r.len() as u64 >= minimum_listens))
 }

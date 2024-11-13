@@ -9,10 +9,10 @@ use crate::utils::cli_paging::CLIPager;
 
 pub async fn stats_recording(listens: ListenCollection) {
     let mut groups = RecordingWithListens::from_listencollection(&mut *get_conn().await, listens)
-    .await
-    .expect("Error while fetching recordings")
-    .into_values()
-    .collect_vec();
+        .await
+        .expect("Error while fetching recordings")
+        .into_values()
+        .collect_vec();
     groups.sort_by_key(|a| Reverse(a.len()));
 
     let mut pager = CLIPager::new(10);

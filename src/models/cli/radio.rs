@@ -184,7 +184,11 @@ pub enum RadioSubcommands {
 }
 
 impl RadioSubcommands {
-    pub async fn run(&self, config: RadioConfig, collector: RadioCollector) -> color_eyre::Result<()> {
+    pub async fn run(
+        &self,
+        config: RadioConfig,
+        collector: RadioCollector,
+    ) -> color_eyre::Result<()> {
         match self {
             Self::Circles {
                 username,

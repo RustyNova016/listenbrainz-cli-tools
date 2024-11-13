@@ -12,7 +12,10 @@ pub struct RadioCollector {
 }
 
 impl RadioCollector {
-    pub async fn collect(&self, mut recordings: impl StreamExt<Item = RecordingWithListens> + Unpin) -> Vec<Recording>{
+    pub async fn collect(
+        &self,
+        mut recordings: impl StreamExt<Item = RecordingWithListens> + Unpin,
+    ) -> Vec<Recording> {
         let mut results = Vec::new();
         while let Some(recording) = recordings.next().await {
             results.push(recording.recording().clone());

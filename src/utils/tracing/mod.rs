@@ -9,5 +9,4 @@ impl TracingLayer {
 impl<S> tracing_subscriber::Layer<S> for TracingLayer where
     S: tracing::Subscriber + for<'a> tracing_subscriber::registry::LookupSpan<'a>
 {
-    
 }

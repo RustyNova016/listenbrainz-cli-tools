@@ -34,7 +34,9 @@ async fn main() -> color_eyre::Result<()> {
     if post_run {
         println_cli("Optional cleanup - This is fine to cancel");
         println_cli("Cleaning some old entries...");
-        cleanup_database(&mut *get_conn().await).await.expect("Error while cleaning the database");
+        cleanup_database(&mut *get_conn().await)
+            .await
+            .expect("Error while cleaning the database");
         println_cli("Done!");
     }
 

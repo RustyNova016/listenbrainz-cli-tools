@@ -45,8 +45,7 @@ impl UserCompatibilityBuilder {
     pub async fn build_user_a_listens(&self) -> color_eyre::Result<ListenCollection> {
         Ok(match &self.user_a_listens {
             None => {
-                fetch_latest_listens_of_user(&mut *get_conn().await, &self.user_a)
-                    .await?;
+                fetch_latest_listens_of_user(&mut *get_conn().await, &self.user_a).await?;
                 UserListens::get_user_with_refresh(&self.user_a)
                     .await
                     .context("Couldn't fetch the new listens")?
@@ -59,8 +58,7 @@ impl UserCompatibilityBuilder {
     pub async fn build_user_b_listens(&self) -> color_eyre::Result<ListenCollection> {
         Ok(match &self.user_b_listens {
             None => {
-                fetch_latest_listens_of_user(&mut *get_conn().await, &self.user_a)
-                    .await?;
+                fetch_latest_listens_of_user(&mut *get_conn().await, &self.user_a).await?;
                 UserListens::get_user_with_refresh(&self.user_b)
                     .await
                     .context("Couldn't fetch the new listens")?

@@ -11,7 +11,7 @@ pub struct Logger {
 impl Logger {
     pub fn new() -> Self {
         Self {
-            print_override: None, 
+            print_override: None,
             bar_count: 0,
         }
     }

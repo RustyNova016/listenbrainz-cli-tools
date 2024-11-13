@@ -52,7 +52,10 @@ impl ReleaseGroupWithListens<ReleaseWithListens> {
                         release_group,
                         listens: HashMap::new(),
                     })
-                    .insert_element(release_with_listens.release().get_row_id(), release_with_listens);
+                    .insert_element(
+                        release_with_listens.release().get_row_id(),
+                        release_with_listens,
+                    );
             }
         }
 
@@ -60,8 +63,7 @@ impl ReleaseGroupWithListens<ReleaseWithListens> {
     }
 }
 
-impl ListenCollectionLike for ReleaseGroupWithListens<ReleaseWithListens>{
-
+impl ListenCollectionLike for ReleaseGroupWithListens<ReleaseWithListens> {
     fn iter_listens(&self) -> impl Iterator<Item = &Listen> {
         self.listens.values().flat_map(|l| l.iter_listens())
     }

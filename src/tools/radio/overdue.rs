@@ -25,8 +25,13 @@ pub async fn overdue_radio(
     let conn = &mut *db.connection.acquire().await?;
 
     println_cli("[Seeding] Getting listens");
-    let recordings = ListenSeederBuilder::default().username(username).build().seed(conn).await.expect("Couldn't find seed listens");
-    
+    let recordings = ListenSeederBuilder::default()
+        .username(username)
+        .build()
+        .seed(conn)
+        .await
+        .expect("Couldn't find seed listens");
+
     println_cli("[Filter] Filtering minimum listen count");
     let recordings = min_listen_filter(stream::iter(recordings), min_listens.unwrap_or(3));
 
@@ -46,7 +51,7 @@ pub async fn overdue_radio(
 
     println_cli("[Finalising] Creating radio playlist");
     let collected = collector.collect(stream::iter(recordings)).await;
-    
+
     println_cli("[Sending] Sending radio playlist to listenbrainz");
     PlaylistStub::new(
         "Radio: Overdue listens".to_string(),
@@ -71,7 +76,17 @@ pub async fn overdue_radio(
 #[serial_test::serial]
 async fn overdue_by() {
     use crate::datastructures::radio::collector::RadioCollectorBuilder;
-    overdue_radio("RustyNova", "t", None, 0, false, RadioCollectorBuilder::default().count_default().duration_default().build())
-        .await
-        .unwrap();
+    overdue_radio(
+        "RustyNova",
+        "t",
+        None,
+        0,
+        false,
+        RadioCollectorBuilder::default()
+            .count_default()
+            .duration_default()
+            .build(),
+    )
+    .await
+    .unwrap();
 }

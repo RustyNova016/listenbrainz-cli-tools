@@ -15,10 +15,9 @@ pub async fn fetch_latest_listens_of_user(
     conn: &mut sqlx::SqliteConnection,
     user: &str,
 ) -> Result<(), musicbrainz_db_lite::Error> {
-    let latest_listen_ts =
-        Listen::get_latest_listen_of_user(&mut *conn, user)
-            .await?
-            .map(|v| v.listened_at);
+    let latest_listen_ts = Listen::get_latest_listen_of_user(&mut *conn, user)
+        .await?
+        .map(|v| v.listened_at);
     let mut pull_ts = Some(Utc::now().timestamp());
 
     let lb_client = Client::new();
@@ -54,13 +53,15 @@ pub struct ListenFetchQuery {
 }
 
 impl ListenFetchQuery {
-    pub async fn fetch(self, conn: &mut sqlx::SqliteConnection) -> Result<ListenCollection, crate::Error> {
+    pub async fn fetch(
+        self,
+        conn: &mut sqlx::SqliteConnection,
+    ) -> Result<ListenCollection, crate::Error> {
         // Fetch the latest listens
         // ... If it's not in offline mode
         if !in_offline_mode() {
             fetch_latest_listens_of_user(conn, &self.user).await?;
         }
-
 
         if self.fetch_recordings_redirects {
             Self::fetch_recordings_redirects(conn, &self.user).await?;

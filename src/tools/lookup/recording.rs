@@ -35,8 +35,10 @@ pub async fn lookup_recording(username: &str, id: RecordingMBID) -> color_eyre::
     };
 
     let listens = Listen::get_listens_of_recording_by_user(conn, username, recording.id).await?;
-  
-    let (_, coupled) = RecordingWithListens::from_listencollection(conn, listens.into()).await.expect("Couldn't load recording")
+
+    let (_, coupled) = RecordingWithListens::from_listencollection(conn, listens.into())
+        .await
+        .expect("Couldn't load recording")
         .into_iter()
         .collect_vec()
         .pop()
@@ -124,8 +126,11 @@ async fn lookup_recording_listened(
         //    .await?
         //    .trunc_with_scale(2),
         recording_info.overdue_factor().trunc_with_scale(2),
-        (recording_info.overdue_factor() * conf.bumps.get_multiplier(&RecordingMBID::from(recording_info.recording().mbid.clone())))
-            .trunc_with_scale(2)
+        (recording_info.overdue_factor()
+            * conf.bumps.get_multiplier(&RecordingMBID::from(
+                recording_info.recording().mbid.clone()
+            )))
+        .trunc_with_scale(2)
     );
 
     println!("{data_string}");

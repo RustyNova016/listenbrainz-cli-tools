@@ -9,16 +9,21 @@ use crate::datastructures::listen_collection::ListenCollection;
 use crate::utils::cli_paging::CLIPager;
 
 pub async fn stats_releases(listens: ListenCollection) {
-    let mut groups = ReleaseWithListens::from_listencollection(&mut *get_conn().await, listens).await
-    .expect("Error while fetching recordings")
-    .into_values()
-    .collect_vec();
+    let mut groups = ReleaseWithListens::from_listencollection(&mut *get_conn().await, listens)
+        .await
+        .expect("Error while fetching recordings")
+        .into_values()
+        .collect_vec();
     groups.sort_by_key(|a| Reverse(a.listen_count()));
 
     let mut pager = CLIPager::new(10);
 
     for group in groups {
-        group.release().fetch_if_incomplete(&mut *get_conn().await).await.expect("Error while fetching release");
+        group
+            .release()
+            .fetch_if_incomplete(&mut *get_conn().await)
+            .await
+            .expect("Error while fetching release");
         println!(
             "[{}] {}",
             group.listen_count(),

@@ -11,7 +11,5 @@ pub fn timeout_filter(
     let timeouts = RecordingTimeoutConfig::get_timed_out_recordings()
         .expect("Couldn't fetch the timeout config");
 
-    listens.filter(move |r| {
-        ready(!timeouts.iter().any(|t| **t == r.recording().mbid))
-    })
+    listens.filter(move |r| ready(!timeouts.iter().any(|t| **t == r.recording().mbid)))
 }

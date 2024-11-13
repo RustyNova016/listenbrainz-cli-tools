@@ -56,7 +56,6 @@ impl ReleaseWithListens {
 //impl_entity_with_listens!(ReleaseWithListens);
 
 impl ListenCollectionLike for ReleaseWithListens {
-
     fn iter_listens(&self) -> impl Iterator<Item = &Listen> {
         self.listens.iter().flat_map(|l| l.iter_listens())
     }
