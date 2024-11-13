@@ -2,11 +2,12 @@ use std::collections::HashMap;
 
 use derive_getters::Getters;
 use itertools::Itertools;
+use musicbrainz_db_lite::models::listenbrainz::listen::Listen;
 use musicbrainz_db_lite::models::musicbrainz::recording::Recording;
 use musicbrainz_db_lite::models::musicbrainz::release::Release;
 use musicbrainz_db_lite::RowId;
 
-use crate::database::listenbrainz::prefetching::prefetch_releases;
+use crate::datastructures::listen_collection::traits::ListenCollectionLike;
 use crate::datastructures::listen_collection::ListenCollection;
 
 use super::recording_with_listens::RecordingWithListens;
@@ -25,9 +26,7 @@ impl ReleaseWithListens {
         // Convert Recordings
         let recordings = RecordingWithListens::from_listencollection(conn, listens).await?;
 
-        // Prefetch Releases
         let recording_refs = recordings.values().map(|r| r.recording()).collect_vec();
-        prefetch_releases(conn, &recording_refs).await?;
 
         // Load Releases
         let results = Recording::get_releases_as_batch(conn, &recording_refs).await?;
@@ -52,15 +51,13 @@ impl ReleaseWithListens {
     pub fn push(&mut self, value: RecordingWithListens) {
         self.listens.push(value);
     }
-
-    /// Return the listen count
-    pub fn len(&self) -> usize {
-        self.listens.iter().map(|r| r.len()).sum()
-    }
-
-    pub fn is_empty(&self) -> bool {
-        self.len() == 0
-    }
 }
 
 //impl_entity_with_listens!(ReleaseWithListens);
+
+impl ListenCollectionLike for ReleaseWithListens {
+
+    fn iter_listens(&self) -> impl Iterator<Item = &Listen> {
+        self.listens.iter().flat_map(|l| l.iter_listens())
+    }
+}

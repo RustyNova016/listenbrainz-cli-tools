@@ -4,6 +4,7 @@ use itertools::Itertools;
 
 use crate::database::get_conn;
 use crate::datastructures::entity_with_listens::release_with_listens::ReleaseWithListens;
+use crate::datastructures::listen_collection::traits::ListenCollectionLike;
 use crate::datastructures::listen_collection::ListenCollection;
 use crate::utils::cli_paging::CLIPager;
 
@@ -12,7 +13,7 @@ pub async fn stats_releases(listens: ListenCollection) {
     .expect("Error while fetching recordings")
     .into_values()
     .collect_vec();
-    groups.sort_by_key(|a| Reverse(a.len()));
+    groups.sort_by_key(|a| Reverse(a.listen_count()));
 
     let mut pager = CLIPager::new(10);
 
@@ -20,7 +21,7 @@ pub async fn stats_releases(listens: ListenCollection) {
         group.release().fetch_if_incomplete(&mut *get_conn().await).await.expect("Error while fetching release");
         println!(
             "[{}] {}",
-            group.len(),
+            group.listen_count(),
             group
                 .release()
                 .format_with_credits(&mut *get_conn().await)

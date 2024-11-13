@@ -32,8 +32,7 @@ pub async fn stats_command(username: &str, target: GroupByTarget, _sort_by: Sort
             releases::stats_releases(listens).await;
         }
         GroupByTarget::ReleaseGroup => {
-            //stats_release_groups(stats, sort_by).await;
-            todo!()
+            release_groups::stats_release_groups(listens).await;
         }
         GroupByTarget::Work => {
             work::stats_works(listens).await;

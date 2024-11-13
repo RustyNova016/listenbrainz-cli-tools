@@ -1,34 +1,42 @@
-use crate::core::entity_traits::mb_cached::MBCached;
-use crate::core::entity_traits::relations::has_artist_credits::HasArtistCredits;
-use crate::core::statistics::statistic_sorter::StatisticSorter;
-use crate::models::cli::common::SortSorterBy;
-use crate::models::data::musicbrainz::release_group::ReleaseGroup;
+use core::cmp::Reverse;
+
+use itertools::Itertools;
+
+use crate::database::get_conn;
+use crate::datastructures::entity_with_listens::release_group_with_listens::ReleaseGroupWithListens;
+use crate::datastructures::listen_collection::traits::ListenCollectionLike;
+use crate::datastructures::listen_collection::ListenCollection;
 use crate::utils::cli_paging::CLIPager;
 
-pub async fn stats_release_groups(stats: StatisticSorter, sort_by: SortSorterBy) {
-    let mut pager = CLIPager::new(5);
-
-    for (key, data) in stats.into_sorted_vec(sort_by) {
-        let release_group = ReleaseGroup::get_cached_or_fetch(&key.clone().into())
+pub async fn stats_release_groups(listens: ListenCollection) {
+    let mut groups =
+        ReleaseGroupWithListens::from_listencollection(&mut *get_conn().await, listens)
             .await
-            .unwrap(); // TODO: Use MBIDs
+            .expect("Error while fetching recordings")
+            .into_values()
+            .collect_vec();
+    groups.sort_by_key(|a| Reverse(a.listen_count()));
 
-        let artist_credit_string = release_group
-            .get_or_fetch_artist_credits()
+    let mut pager = CLIPager::new(10);
+
+    for group in groups {
+        group
+            .release_group()
+            .fetch_if_incomplete(&mut *get_conn().await)
             .await
-            .unwrap()
-            .get_artist_credit_as_string();
-        let pager_continue = pager.execute(|| {
-            println!(
-                "[{}] - {} by {}",
-                data.len(),
-                release_group.title(),
-                artist_credit_string
-            );
-        });
+            .expect("Error while fetching release");
+        println!(
+            "[{}] {}",
+            group.listen_count(),
+            group
+                .release_group()
+                .format_with_credits(&mut *get_conn().await)
+                .await
+                .expect("Error getting formated release name"),
+        );
 
-        if !pager_continue {
-            return;
-        };
+        if !pager.inc() {
+            break;
+        }
     }
 }

@@ -9,6 +9,7 @@ use musicbrainz_db_lite::RowId;
 use rust_decimal::{prelude::FromPrimitive, Decimal};
 
 use crate::database::listenbrainz::prefetching::prefetch_recordings_of_listens;
+use crate::datastructures::listen_collection::traits::ListenCollectionLike;
 use crate::datastructures::listen_collection::ListenCollection;
 
 use super::impl_entity_with_listens;
@@ -138,3 +139,9 @@ impl RecordingWithListens {
 }
 
 impl_entity_with_listens!(RecordingWithListens);
+
+impl ListenCollectionLike for RecordingWithListens {
+    fn iter_listens(&self) -> impl Iterator<Item = &Listen> {
+        self.listens.iter_listens()
+    }
+}

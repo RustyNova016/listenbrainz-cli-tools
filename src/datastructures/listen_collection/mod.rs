@@ -1,4 +1,7 @@
 use musicbrainz_db_lite::models::listenbrainz::listen::Listen;
+
+pub mod traits;
+
 #[derive(Debug, Clone, PartialEq, Eq, Default)]
 pub struct ListenCollection {
     pub data: Vec<Listen>,

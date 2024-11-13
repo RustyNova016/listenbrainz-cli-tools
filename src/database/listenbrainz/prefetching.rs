@@ -1,8 +1,10 @@
 use itertools::Itertools;
 use musicbrainz_db_lite::models::listenbrainz::listen::Listen;
 use musicbrainz_db_lite::models::musicbrainz::recording::Recording;
+use musicbrainz_db_lite::models::musicbrainz::release::Release;
 
 use crate::utils::cli::global_progress_bar::PG_FETCHING;
+use crate::utils::println_cli;
 
 /// Prefetch all the recordings of a list of listens
 pub async fn prefetch_recordings_of_listens(
@@ -11,8 +13,9 @@ pub async fn prefetch_recordings_of_listens(
     listens: &[Listen],
 ) -> Result<(), musicbrainz_db_lite::Error> {
     let recordings = Listen::get_unfetched_recordings_ids(conn, user_id, listens).await?;
-    let progress_bar = PG_FETCHING.get_submitter(listens.len() as u64);
+    let progress_bar = PG_FETCHING.get_submitter(recordings.len() as u64);
 
+    println_cli("Fetching missing recording data");
     for recording in recordings {
         Recording::get_or_fetch(conn, &recording).await?;
         progress_bar.inc(1);
@@ -24,12 +27,19 @@ pub async fn prefetch_recordings_of_listens(
 /// Prefetch all the release of a list of recordings
 pub async fn prefetch_releases(
     conn: &mut sqlx::SqliteConnection,
-    recordings: &[&Recording] ,
+    releases: &[&Release],
 ) -> Result<(), musicbrainz_db_lite::Error> {
-    let progress_bar = PG_FETCHING.get_submitter(recordings.len() as u64);
+    // Eliminate all the recordings that are complete
+    let uncompletes = releases
+        .iter()
+        .filter(|r| !r.is_fully_fetched())
+        .collect_vec();
 
-    for recording in recordings {
-        recording.fetch_if_incomplete(conn).await?;
+    let progress_bar = PG_FETCHING.get_submitter(uncompletes.len() as u64);
+
+    println_cli("Fetching missing release data");
+    for release in uncompletes {
+        release.fetch_if_incomplete(conn).await?;
         progress_bar.inc(1);
     }
 
@@ -38,13 +48,17 @@ pub async fn prefetch_releases(
 
 pub async fn fetch_recordings_as_complete(
     conn: &mut sqlx::SqliteConnection,
-    recordings: &[&Recording] ,
+    recordings: &[&Recording],
 ) -> Result<(), musicbrainz_db_lite::Error> {
     // Eliminate all the recordings that are complete
-    let uncompletes = recordings.iter().filter(|r| !r.is_fully_fetched()).collect_vec();
+    let uncompletes = recordings
+        .iter()
+        .filter(|r| !r.is_fully_fetched())
+        .collect_vec();
 
     let progress_bar = PG_FETCHING.get_submitter(uncompletes.len() as u64);
 
+    println_cli("Fetching missing recording data");
     for recording in uncompletes {
         recording.fetch_if_incomplete(conn).await?;
         progress_bar.inc(1);
