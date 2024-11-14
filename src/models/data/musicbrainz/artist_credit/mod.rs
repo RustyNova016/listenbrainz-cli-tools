@@ -5,6 +5,7 @@ pub mod collection;
 pub mod converters;
 
 #[derive(Debug, Clone, Eq, PartialEq, Deserialize, Serialize, Getters)]
+#[deprecated]
 pub struct ArtistCredit {
     name: String,
     joinphrase: Option<String>,
