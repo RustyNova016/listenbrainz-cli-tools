@@ -36,10 +36,10 @@ pub async fn lookup_recording(username: &str, id: RecordingMBID) -> color_eyre::
 
     let listens = Listen::get_listens_of_recording_by_user(conn, username, recording.id).await?;
 
-    let (_, coupled) = RecordingWithListens::from_listencollection(conn, listens.into())
+    let coupled = RecordingWithListens::from_listencollection(conn, listens.into())
         .await
         .expect("Couldn't load recording")
-        .into_iter()
+        .into_values()
         .collect_vec()
         .pop()
         .unwrap(); //TODO: Handle unlistened

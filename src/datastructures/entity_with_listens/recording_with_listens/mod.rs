@@ -1,6 +1,8 @@
+pub mod collection;
 use std::collections::HashMap;
 
 use chrono::{DateTime, Duration, Utc};
+use collection::RecordingWithListensCollection;
 use derive_getters::Getters;
 use musicbrainz_db_lite::models::listenbrainz::listen::Listen;
 use musicbrainz_db_lite::models::musicbrainz::recording::Recording;
@@ -28,7 +30,7 @@ impl RecordingWithListens {
     pub async fn from_listencollection(
         conn: &mut sqlx::SqliteConnection,
         listens: ListenCollection,
-    ) -> Result<HashMap<i64, Self>, crate::Error> {
+    ) -> Result<RecordingWithListensCollection, crate::Error> {
         // If empty, early return
         if listens.is_empty() {
             return Ok(Default::default());
@@ -64,7 +66,7 @@ impl RecordingWithListens {
             }
         }
 
-        Ok(out)
+        Ok(out.into())
     }
 
     pub fn push(&mut self, listen: Listen) {

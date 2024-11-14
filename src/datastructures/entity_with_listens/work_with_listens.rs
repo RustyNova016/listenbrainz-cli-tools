@@ -26,7 +26,7 @@ impl WorkWithListens {
         let recordings = RecordingWithListens::from_listencollection(conn, listens).await?;
 
         // Prefetch Releases
-        let recording_refs = recordings.values().map(|r| r.recording()).collect_vec();
+        let recording_refs = recordings.iter_recordings().collect_vec();
         fetch_recordings_as_complete(conn, &recording_refs).await?;
 
         // Load Releases
@@ -42,7 +42,7 @@ impl WorkWithListens {
                         work,
                         listens: Vec::new(),
                     })
-                    .push(recordings.get(&recording.id).expect("The release has been fetched from the recording, so it should be there").clone());
+                    .push(recordings.0.get(&recording.id).expect("The release has been fetched from the recording, so it should be there").clone());
             }
         }
 

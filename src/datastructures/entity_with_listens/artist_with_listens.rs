@@ -26,7 +26,7 @@ impl ArtistWithListens {
         // Convert Recordings
         let recordings = RecordingWithListens::from_listencollection(conn, listens).await?;
 
-        let recording_refs = recordings.values().map(|r| r.recording()).collect_vec();
+        let recording_refs = recordings.iter_recordings().collect_vec();
 
         // Load artists
         let results = Recording::get_artist_from_credits_as_batch(conn, &recording_refs).await?;
@@ -41,7 +41,7 @@ impl ArtistWithListens {
                         artist,
                         listens: Vec::new(),
                     })
-                    .push(recordings.get(&recording.id).expect("The artist has been fetched from the recording, so it should be there").clone());
+                    .push(recordings.0.get(&recording.id).expect("The artist has been fetched from the recording, so it should be there").clone());
             }
         }
 

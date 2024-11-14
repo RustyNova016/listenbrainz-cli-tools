@@ -26,7 +26,7 @@ impl ReleaseWithListens {
         // Convert Recordings
         let recordings = RecordingWithListens::from_listencollection(conn, listens).await?;
 
-        let recording_refs = recordings.values().map(|r| r.recording()).collect_vec();
+        let recording_refs = recordings.iter_recordings().collect_vec();
 
         // Load Releases
         let results = Recording::get_releases_as_batch(conn, &recording_refs).await?;
@@ -41,7 +41,7 @@ impl ReleaseWithListens {
                         release,
                         listens: Vec::new(),
                     })
-                    .push(recordings.get(&recording.id).expect("The release has been fetched from the recording, so it should be there").clone());
+                    .push(recordings.0.get(&recording.id).expect("The release has been fetched from the recording, so it should be there").clone());
             }
         }
 

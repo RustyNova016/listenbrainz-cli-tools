@@ -45,6 +45,7 @@ impl ListenSeeder {
 
         Ok(RecordingWithListens::from_listencollection(conn, listens)
             .await?
+            .0
             .into_values()
             .collect_vec())
     }
