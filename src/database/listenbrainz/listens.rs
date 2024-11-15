@@ -71,6 +71,9 @@ impl ListenFetchQuery {
             ListenFetchQueryReturn::Mapped => Ok(ListenCollection::new(
                 Listen::get_mapped_listen_of_user(conn, &self.user).await?,
             )),
+            ListenFetchQueryReturn::Unmapped => Ok(ListenCollection::new(
+                Listen::get_unmapped_listen_of_user(conn, &self.user).await?,
+            )),
             ListenFetchQueryReturn::None => Ok(ListenCollection::default()),
         }
     }
@@ -93,5 +96,6 @@ impl ListenFetchQuery {
 
 pub enum ListenFetchQueryReturn {
     Mapped,
+    Unmapped,
     None,
 }

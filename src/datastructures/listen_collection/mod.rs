@@ -36,8 +36,15 @@ impl ListenCollection {
         self.data.is_empty()
     }
 
+    /// Return the first element of the collection
+    /// 
+    /// To return the oldest listen use `ListenCollection::get_oldest_listen`
     pub fn first(&self) -> Option<&Listen> {
         self.data.first()
+    }
+
+    pub fn iter(&self) -> impl Iterator<Item = &Listen> {
+        self.data.iter()
     }
 }
 
