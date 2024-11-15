@@ -3,8 +3,6 @@ use std::ops::Deref;
 use clap::ArgAction;
 use clap::{Parser, Subcommand};
 
-use crate::core::statistics::listen_rate::ListenRate;
-use crate::core::statistics::listen_rate::ListenRateRange;
 use crate::datastructures::radio::collector::RadioCollector;
 use crate::datastructures::radio::collector::RadioCollectorBuilder;
 use crate::models::config::Config;
@@ -118,7 +116,6 @@ pub enum RadioSubcommands {
     //     #[arg(short, long)]
     //     token: Option<String>,
     // },
-
     /// Generate playlists depending on the listen rate of recordings
     ///
     /// This algorythm bases itself on your listen rate of recording to get more forgotten tracks.
@@ -133,14 +130,6 @@ pub enum RadioSubcommands {
         /// If it's set in the config file, you can ignore this argument
         #[arg(short, long)]
         token: Option<String>,
-
-        /// Minimum listen rate
-        #[arg(long)]
-        min_rate: Option<u64>,
-
-        /// Minimum listen rate time range
-        #[arg(long)]
-        min_per: Option<ListenRateRange>,
 
         /// Minimum listen count
         #[arg(long)]
@@ -213,34 +202,18 @@ impl RadioSubcommands {
             //     )
             //     .await?;
             // }
-
             Self::Rate {
                 username,
                 token,
-                min_rate,
-                min_per,
                 min,
                 cooldown,
             } => {
-                let mut rate = None;
-
-                if let Some(min_rate) = min_rate {
-                    if let Some(min_per) = min_per {
-                        rate = Some(ListenRate::new(
-                            "*".to_string().into(),
-                            *min_rate,
-                            min_per.get_duration(),
-                        ));
-                    }
-                }
-
                 listen_rate_radio(
                     &Config::check_username(username),
                     &Config::check_token(&Config::check_username(username), token),
-                    rate,
                     *min,
                     *cooldown,
-                    config,
+                    collector,
                 )
                 .await?;
             }

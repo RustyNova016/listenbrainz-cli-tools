@@ -93,7 +93,7 @@ impl RecordingWithListens {
 
     pub fn average_duration_between_listens(&self) -> Duration {
         // If the recording haven't been listened to, then the average time is zero
-        if self.len() < 2 {
+        if self.listen_count() < 2 {
             return Duration::zero();
         }
 
@@ -105,7 +105,7 @@ impl RecordingWithListens {
                 .expect("There's at least two listens");
 
         duration_between_first_and_last
-            .checked_div(self.len() as i32)
+            .checked_div(self.listen_count() as i32)
             .unwrap_or_else(Duration::zero)
     }
 
@@ -138,6 +138,13 @@ impl RecordingWithListens {
             .expect("Recording should have a score")
             .0)
     } */
+
+    /// Get the number of listens estimated to be made for a time period
+    pub fn get_listen_rate(&self, period: Duration) -> Option<Decimal> {
+        Decimal::from(period.num_seconds()).checked_div(Decimal::from(
+            self.average_duration_between_listens().num_seconds(),
+        ))
+    }
 }
 
 impl_entity_with_listens!(RecordingWithListens);
