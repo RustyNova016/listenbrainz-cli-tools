@@ -18,7 +18,7 @@ use super::impl_entity_with_listens;
 
 #[derive(Debug, Clone, PartialEq, Eq, Getters)]
 pub struct RecordingWithListens {
-    recording: Recording,
+    pub(self) recording: Recording,
     listens: ListenCollection,
 }
 

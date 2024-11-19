@@ -1578,6 +1578,7 @@ dependencies = [
 name = "listenbrainz-cli-tools"
 version = "0.2.2"
 dependencies = [
+ "async-fn-stream",
  "async-lazy",
  "cacache",
  "chashmap",

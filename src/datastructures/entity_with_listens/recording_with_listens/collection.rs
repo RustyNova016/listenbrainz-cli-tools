@@ -18,6 +18,10 @@ impl RecordingWithListensCollection {
         self.0.values().map(|r| r.recording())
     }
 
+    pub fn into_iter_recordings(self) -> impl Iterator<Item = Recording> {
+        self.0.into_values().map(|r| r.recording)
+    }
+
     pub fn into_values(self) -> impl Iterator<Item = RecordingWithListens> {
         self.0.into_values()
     }
@@ -52,6 +56,8 @@ impl RecordingWithListensCollection {
     pub fn into_values_stream(self) -> impl Stream<Item = RecordingWithListens> {
         stream::iter(self.0.into_values())
     }
+
+    pub fn map_stream(&self)
 }
 
 impl ListenCollectionLike for RecordingWithListensCollection {

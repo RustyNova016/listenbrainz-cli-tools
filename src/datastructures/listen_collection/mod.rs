@@ -1,3 +1,5 @@
+use core::ops::Deref;
+
 use musicbrainz_db_lite::models::listenbrainz::listen::Listen;
 
 pub mod traits;
@@ -42,5 +44,13 @@ impl ListenCollection {
 impl From<Vec<Listen>> for ListenCollection {
     fn from(value: Vec<Listen>) -> Self {
         Self { data: value }
+    }
+}
+
+impl Deref for ListenCollection {
+    type Target = Vec<Listen>;
+
+    fn deref(&self) -> &Self::Target {
+        &self.data
     }
 }
