@@ -6,8 +6,6 @@ use clap::{Parser, Subcommand};
 use crate::datastructures::radio::collector::RadioCollector;
 use crate::datastructures::radio::collector::RadioCollectorBuilder;
 use crate::models::config::Config;
-use crate::models::radio::RadioConfig;
-use crate::models::radio::RadioConfigBuilder;
 use crate::tools::radio::circles::create_radio_mix;
 use crate::tools::radio::listen_rate::listen_rate_radio;
 use crate::tools::radio::overdue::overdue_radio;
@@ -29,26 +27,6 @@ pub struct RadioCommand {
 }
 
 impl RadioCommand {
-    pub fn get_config(&self) -> RadioConfig {
-        let mut config_builder = RadioConfigBuilder::default();
-
-        if let Some(val) = self.min_count {
-            config_builder.min_count(val);
-        }
-
-        if let Some(val) = self.min_duration.as_ref() {
-            let dura: humantime::Duration = val
-                .clone()
-                .parse()
-                .expect("Couldn't parse mimimum lenght for radio");
-            let std_dura = dura.deref();
-            let chrono_dura = chrono::Duration::from_std(*std_dura).unwrap();
-            config_builder.min_duration(chrono_dura);
-        }
-
-        config_builder.build().expect("Couldn't generate config")
-    }
-
     pub fn get_collector(&self) -> RadioCollector {
         let collector = RadioCollectorBuilder::default();
 
@@ -171,10 +149,7 @@ pub enum RadioSubcommands {
 }
 
 impl RadioSubcommands {
-    pub async fn run(
-        &self,
-        collector: RadioCollector,
-    ) -> color_eyre::Result<()> {
+    pub async fn run(&self, collector: RadioCollector) -> color_eyre::Result<()> {
         match self {
             Self::Circles {
                 username,
