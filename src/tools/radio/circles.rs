@@ -1,21 +1,17 @@
-use std::ops::Deref;
-
 use async_fn_stream::try_fn_stream;
+use futures::pin_mut;
 use futures::Stream;
 use futures::TryStreamExt;
 use itertools::Itertools;
-use listenbrainz::raw::Client;
 use musicbrainz_db_lite::models::musicbrainz::artist::Artist;
 use musicbrainz_db_lite::models::musicbrainz::recording::Recording;
 use rand::prelude::SliceRandom;
 use rand::thread_rng;
 
 use crate::database::get_db_client;
-use crate::datastructures::listen_collection::ListenCollection;
 use crate::datastructures::radio::collector::RadioCollector;
 use crate::datastructures::radio::seeders::listens::ListenSeederBuilder;
-use crate::models::data::listenbrainz::user_listens::UserListens;
-use crate::models::radio::RadioConfig;
+use crate::models::data::musicbrainz::recording::mbid::RecordingMBID;
 use crate::utils::playlist::PlaylistStub;
 use crate::utils::println_cli;
 
@@ -26,7 +22,11 @@ pub async fn create_radio_mix(
     collector: RadioCollector,
 ) {
     let db = get_db_client().await;
-    let conn = &mut *db.connection.acquire().await.expect("Couldn't get a database connection");
+    let conn = &mut *db
+        .connection
+        .acquire()
+        .await
+        .expect("Couldn't get a database connection");
 
     println_cli("[Seeding] Getting listens");
     let recordings_with_listens = ListenSeederBuilder::default()
@@ -42,14 +42,18 @@ pub async fn create_radio_mix(
     let radio_stream = radio.into_stream(conn, recordings);
 
     println_cli("[Finalising] Creating radio playlist");
-    let collected = collector.collect(radio_stream).await;
+    pin_mut!(radio_stream);
+    let collected = collector
+        .try_collect(radio_stream)
+        .await
+        .expect("Error while generating the playlist");
 
     PlaylistStub::new(
-        "Radio Mix".to_string(),
+        "Radio: Circles".to_string(),
         Some(username.to_string()),
         false,
         collected
-            .into_iteRecording
+            .into_iter()
             .map(|r| RecordingMBID::from(r.mbid))
             .collect(),
         Some(
@@ -57,16 +61,16 @@ pub async fn create_radio_mix(
                 .to_string(),
         ),
     )
-    .send(token)
+    .send(&token)
     .await
     .expect("Couldn't send playlist");
 }
 
-#[derive(Debug, Default)]
+#[derive(Debug)]
 pub struct RadioCircle {
     unlistened: bool,
-    artist_blacklist: Vec<Artist>,
-    recording_blacklist: Vec<Recording>,
+    artist_blacklist: Vec<String>,
+    recording_blacklist: Vec<String>,
 }
 
 impl RadioCircle {
@@ -82,6 +86,7 @@ impl RadioCircle {
         conn: &mut sqlx::SqliteConnection,
         artist: &Artist,
     ) -> Result<Option<Recording>, crate::Error> {
+        println_cli(format!("Checking artist: {}", artist.name));
         let mut recordings: Vec<Recording> = artist
             .browse_or_fetch_artist_recordings(conn)
             .try_collect()
@@ -90,7 +95,7 @@ impl RadioCircle {
         recordings.shuffle(&mut thread_rng());
 
         for recording in recordings {
-            if self.recording_blacklist.contains(&recording) {
+            if self.recording_blacklist.contains(&recording.mbid) {
                 continue;
             }
 
@@ -113,7 +118,7 @@ impl RadioCircle {
             artists.shuffle(&mut thread_rng());
 
             for artist in artists {
-                if self.artist_blacklist.contains(&artist) {
+                if self.artist_blacklist.contains(&artist.mbid) {
                     continue;
                 }
 
@@ -133,8 +138,7 @@ impl RadioCircle {
         if self.unlistened {
             recordings
                 .iter()
-                .map(|r| r.to_owned().to_owned())
-                .for_each(|r| self.recording_blacklist.push(r));
+                .for_each(|r| self.recording_blacklist.push(r.mbid.clone()));
         }
 
         loop {
@@ -148,11 +152,12 @@ impl RadioCircle {
 
                     match recording {
                         Some(recording) => {
-                            self.recording_blacklist.push(recording.clone());
+                            self.recording_blacklist.push(recording.mbid.clone());
                             return Ok(Some(recording));
                         }
                         None => {
-                            self.artist_blacklist.push(artist);
+                            println_cli(format!("{} has not enough recordings for generation. Consider adding more recordings to Musicbrainz!", artist.name));
+                            self.artist_blacklist.push(artist.mbid.clone());
                         }
                     }
                 }
@@ -173,5 +178,17 @@ impl RadioCircle {
 
             Ok(())
         })
+    }
+}
+impl Default for RadioCircle {
+    fn default() -> Self {
+        Self {
+            unlistened: false,
+            artist_blacklist: vec![
+                "125ec42a-7229-4250-afc5-e057484327fe".to_string(), // Ignore [unknown]
+                "89ad4ac3-39f7-470e-963a-56509c546377".to_string(), // Ignore Verious Artist
+            ],
+            recording_blacklist: Vec::new(),
+        }
     }
 }

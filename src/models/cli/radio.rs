@@ -74,9 +74,7 @@ impl RadioCommand {
     }
 
     pub async fn run(&self) -> color_eyre::Result<()> {
-        let config = self.get_config();
-
-        self.command.run(config, self.get_collector()).await
+        self.command.run(self.get_collector()).await
     }
 }
 
@@ -175,7 +173,6 @@ pub enum RadioSubcommands {
 impl RadioSubcommands {
     pub async fn run(
         &self,
-        config: RadioConfig,
         collector: RadioCollector,
     ) -> color_eyre::Result<()> {
         match self {
@@ -189,7 +186,7 @@ impl RadioSubcommands {
                     &Config::check_username(username),
                     Config::check_token(&Config::check_username(username), token),
                     *unlistened,
-                    config,
+                    collector,
                 )
                 .await;
             }

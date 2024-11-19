@@ -56,8 +56,6 @@ impl RecordingWithListensCollection {
     pub fn into_values_stream(self) -> impl Stream<Item = RecordingWithListens> {
         stream::iter(self.0.into_values())
     }
-
-    pub fn map_stream(&self)
 }
 
 impl ListenCollectionLike for RecordingWithListensCollection {

@@ -13,18 +13,25 @@ pub struct RadioCollector {
 impl RadioCollector {
     pub async fn collect(
         &self,
-        mut recordings: impl Stream<Item = Recording> + Unpin,
+        recordings: impl Stream<Item = Recording> + Unpin,
     ) -> Vec<Recording> {
+        self.try_collect(recordings.map(Ok)).await.expect("All the items are `Ok`, so no potential error")
+    }
+
+    pub async fn try_collect(
+        &self,
+        mut recordings: impl Stream<Item = Result<Recording, crate::Error>> + Unpin,
+    ) -> Result<Vec<Recording>, crate::Error> {
         let mut results = Vec::new();
-        while let Some(recording) = recordings.next().await {
-            results.push(recording);
+        while let Some(recording) = recordings.next().await.transpose()? {
+            results.push(recording.clone());
 
             if self.check_minimum_lenght(&results) {
-                return results;
+                return Ok(results);
             }
         }
 
-        results
+        Ok(results)
     }
 
     /// Return true if the lenght of the playlist satisfy the requested minimum time
