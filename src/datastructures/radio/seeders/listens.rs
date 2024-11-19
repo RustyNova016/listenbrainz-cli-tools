@@ -1,8 +1,8 @@
-use itertools::Itertools;
 use macon::Builder;
 use musicbrainz_db_lite::models::listenbrainz::listen::Listen;
 
 use crate::database::listenbrainz::listens::fetch_latest_listens_of_user;
+use crate::datastructures::entity_with_listens::recording_with_listens::collection::RecordingWithListensCollection;
 use crate::datastructures::entity_with_listens::recording_with_listens::RecordingWithListens;
 use crate::datastructures::listen_collection::ListenCollection;
 
@@ -17,7 +17,7 @@ impl ListenSeeder {
     pub async fn seed(
         self,
         conn: &mut sqlx::SqliteConnection,
-    ) -> Result<Vec<RecordingWithListens>, crate::Error> {
+    ) -> Result<RecordingWithListensCollection, crate::Error> {
         // Get the listens
         fetch_latest_listens_of_user(conn, &self.username).await?;
 
@@ -43,10 +43,6 @@ impl ListenSeeder {
         .await?
         .into();
 
-        Ok(RecordingWithListens::from_listencollection(conn, listens)
-            .await?
-            .0
-            .into_values()
-            .collect_vec())
+        RecordingWithListens::from_listencollection(conn, listens).await
     }
 }

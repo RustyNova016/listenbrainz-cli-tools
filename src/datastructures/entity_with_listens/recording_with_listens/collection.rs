@@ -1,5 +1,7 @@
 use std::collections::HashMap;
 
+use futures::stream;
+use futures::Stream;
 use musicbrainz_db_lite::models::musicbrainz::recording::Recording;
 use rust_decimal::Decimal;
 
@@ -43,7 +45,12 @@ impl RecordingWithListensCollection {
             .map(|r| r.listen_count())
             .unwrap_or(0);
 
-        Decimal::new(recording_listen_count.try_into().unwrap(), 0) / Decimal::new(self.listen_count().try_into().unwrap(), 0)
+        Decimal::new(recording_listen_count.try_into().unwrap(), 0)
+            / Decimal::new(self.listen_count().try_into().unwrap(), 0)
+    }
+
+    pub fn into_values_stream(self) -> impl Stream<Item = RecordingWithListens> {
+        stream::iter(self.0.into_values())
     }
 }
 
