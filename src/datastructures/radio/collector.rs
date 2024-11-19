@@ -1,9 +1,8 @@
 use chrono::Duration;
+use futures::Stream;
 use futures::StreamExt;
 use macon::Builder;
 use musicbrainz_db_lite::models::musicbrainz::recording::Recording;
-
-use crate::datastructures::entity_with_listens::recording_with_listens::RecordingWithListens;
 
 #[derive(Debug, Builder)]
 pub struct RadioCollector {
@@ -14,11 +13,11 @@ pub struct RadioCollector {
 impl RadioCollector {
     pub async fn collect(
         &self,
-        mut recordings: impl StreamExt<Item = RecordingWithListens> + Unpin,
+        mut recordings: impl Stream<Item = Recording> + Unpin,
     ) -> Vec<Recording> {
         let mut results = Vec::new();
         while let Some(recording) = recordings.next().await {
-            results.push(recording.recording().clone());
+            results.push(recording);
 
             if self.check_minimum_lenght(&results) {
                 return results;

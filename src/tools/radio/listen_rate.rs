@@ -43,7 +43,7 @@ pub async fn listen_rate_radio(
     let recordings = listen_rate_sorter(recordings.collect().await);
 
     println_cli("[Finalising] Creating radio playlist");
-    let collected = collector.collect(stream::iter(recordings)).await;
+    let collected = collector.collect(stream::iter(recordings).map(|r| r.recording().clone())).await;
 
     println_cli("[Sending] Sending radio playlist to listenbrainz");
     PlaylistStub::new(
