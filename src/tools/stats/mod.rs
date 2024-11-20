@@ -26,7 +26,6 @@ pub async fn stats_command(username: &str, target: GroupByTarget, _sort_by: Sort
         }
         GroupByTarget::Artist => {
             artists::stats_artist(listens).await;
-            
         }
         GroupByTarget::Release => {
             releases::stats_releases(listens).await;

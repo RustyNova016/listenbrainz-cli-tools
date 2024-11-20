@@ -37,7 +37,7 @@ impl ListenCollection {
     }
 
     /// Return the first element of the collection
-    /// 
+    ///
     /// To return the oldest listen use `ListenCollection::get_oldest_listen`
     pub fn first(&self) -> Option<&Listen> {
         self.data.first()

@@ -50,7 +50,9 @@ pub async fn overdue_radio(
     };
 
     println_cli("[Finalising] Creating radio playlist");
-    let collected = collector.collect(stream::iter(recordings).map(|r| r.recording().clone())).await;
+    let collected = collector
+        .collect(stream::iter(recordings).map(|r| r.recording().clone()))
+        .await;
 
     println_cli("[Sending] Sending radio playlist to listenbrainz");
     PlaylistStub::new(

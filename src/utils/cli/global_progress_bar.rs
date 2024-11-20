@@ -134,9 +134,9 @@ mod tests {
 
         let subm = pg.get_submitter(5);
 
-        for i in 0..5 {
+        for _ in 0..5 {
             thread::sleep(ten_millis);
-            subm.inc(1)
+            subm.inc(1);
         }
 
         thread::sleep(ten_millis);
@@ -144,9 +144,9 @@ mod tests {
         thread::sleep(ten_millis);
         drop(subm);
 
-        for i in 0..5 {
+        for _ in 0..5 {
             thread::sleep(ten_millis);
-            subm2.inc(1)
+            subm2.inc(1);
         }
 
         thread::sleep(ten_millis);

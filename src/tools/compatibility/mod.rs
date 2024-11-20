@@ -65,7 +65,5 @@ Compatibility results:
 #[tokio::test]
 #[serial_test::serial]
 async fn compatibility() {
-    compatibility_command("RustyNova", "backhdlp")
-        .await;
-
+    compatibility_command("RustyNova", "backhdlp").await;
 }

@@ -1,7 +1,3 @@
-pub mod cli;
-pub mod env;
-pub mod radio;
-pub mod tracing;
 use std::fmt::Display;
 use std::sync::{Arc, Mutex};
 
@@ -13,10 +9,13 @@ use once_cell::sync::Lazy;
 
 use logger::Logger;
 
+pub mod cli;
 pub mod cli_paging;
+pub mod env;
 pub mod extensions;
 pub mod logger;
 pub mod playlist;
+pub mod radio;
 pub mod regex;
 pub mod tokio;
 pub mod traits;

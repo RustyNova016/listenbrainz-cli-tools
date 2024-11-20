@@ -15,7 +15,9 @@ impl RadioCollector {
         &self,
         recordings: impl Stream<Item = Recording> + Unpin,
     ) -> Vec<Recording> {
-        self.try_collect(recordings.map(Ok)).await.expect("All the items are `Ok`, so no potential error")
+        self.try_collect(recordings.map(Ok))
+            .await
+            .expect("All the items are `Ok`, so no potential error")
     }
 
     pub async fn try_collect(
