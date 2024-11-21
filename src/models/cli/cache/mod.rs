@@ -8,8 +8,6 @@ use clap::ValueEnum;
 use clap::{Parser, Subcommand};
 use futures::try_join;
 
-pub mod load_listen_dump;
-
 #[derive(Parser, Debug, Clone)]
 #[command(version, about, long_about = None)]
 pub struct CacheCommand {
