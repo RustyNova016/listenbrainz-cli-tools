@@ -1,9 +1,9 @@
 use std::path::PathBuf;
 
-use crate::models::cli::cache::load_listen_dump::load_listen_dump;
 use crate::models::config::Config;
 use crate::models::data::entity_database::ENTITY_DATABASE;
 use crate::models::data::musicbrainz_database::MUSICBRAINZ_DATABASE;
+use crate::tools::listens::import::import_listen_dump;
 use clap::ValueEnum;
 use clap::{Parser, Subcommand};
 use futures::try_join;
@@ -43,7 +43,7 @@ impl CacheCommand {
     pub async fn run(&self) -> color_eyre::Result<()> {
         match &self.command {
             CacheSubcommands::LoadDump { username, path } => {
-                load_listen_dump(path, &Config::check_username(username)).await?;
+                import_listen_dump(path, &Config::check_username(username)).await;
             }
             CacheSubcommands::Clear { target } => {
                 let _ = try_join!(
