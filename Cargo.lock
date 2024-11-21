@@ -67,6 +67,56 @@ dependencies = [
 ]
 
 [[package]]
+name = "alistral"
+version = "0.2.2"
+dependencies = [
+ "async-fn-stream",
+ "async-lazy",
+ "cacache",
+ "chashmap",
+ "chrono",
+ "clap",
+ "clap-markdown",
+ "clap_complete",
+ "colog",
+ "color-eyre",
+ "derive-getters",
+ "derive-new",
+ "derive_builder",
+ "derive_more",
+ "directories",
+ "dotenvy",
+ "extend",
+ "futures",
+ "humantime",
+ "indicatif",
+ "inquire",
+ "itertools",
+ "listenbrainz",
+ "log",
+ "macon",
+ "musicbrainz-db-lite",
+ "musicbrainz_rs_nova 0.6.0",
+ "once_cell",
+ "rand 0.8.5",
+ "rayon",
+ "regex",
+ "reqwest",
+ "rmp-serde",
+ "rust_decimal",
+ "rust_decimal_macros",
+ "serde",
+ "serde_json",
+ "serial_test",
+ "sqlx",
+ "thiserror 2.0.3",
+ "tokio",
+ "tracing",
+ "tracing-subscriber",
+ "zip",
+]
+
+[[package]]
 name = "allocator-api2"
 version = "0.2.20"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1855,56 +1905,6 @@ dependencies = [
  "serde",
  "serde_json",
  "thiserror 1.0.69",
-]
-
-[[package]]
-name = "listenbrainz-cli-tools"
-version = "0.2.2"
-dependencies = [
- "async-fn-stream",
- "async-lazy",
- "cacache",
- "chashmap",
- "chrono",
- "clap",
- "clap-markdown",
- "clap_complete",
- "colog",
- "color-eyre",
- "derive-getters",
- "derive-new",
- "derive_builder",
- "derive_more",
- "directories",
- "dotenvy",
- "extend",
- "futures",
- "humantime",
- "indicatif",
- "inquire",
- "itertools",
- "listenbrainz",
- "log",
- "macon",
- "musicbrainz-db-lite",
- "musicbrainz_rs_nova 0.6.0",
- "once_cell",
- "rand 0.8.5",
- "rayon",
- "regex",
- "reqwest",
- "rmp-serde",
- "rust_decimal",
- "rust_decimal_macros",
- "serde",
- "serde_json",
- "serial_test",
- "sqlx",
- "thiserror 2.0.3",
- "tokio",
- "tracing",
- "tracing-subscriber",
- "zip",
 ]
 
 [[package]]

@@ -18,7 +18,7 @@ pub static DB_LOCATION: Lazy<PathBuf> = Lazy::new(|| {
         .cache_dir()
         .to_path_buf();
 
-    path.push("listenbrainz_cli_tools");
+    path.push("alistral");
 
     if !fs::exists(&path).unwrap() {
         fs::create_dir_all(&path).expect("Couldn't create cache directory");
