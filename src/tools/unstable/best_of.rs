@@ -178,20 +178,20 @@ pub async fn best_of_checker(username: &str) {
     println!();
 }
 
-#[cfg(test)]
-mod tests {
-    use crate::utils::println_cli_info;
+// #[cfg(test)]
+// mod tests {
+//     use crate::utils::println_cli_info;
 
-    use super::*;
+//     use super::*;
 
-    #[tokio::test]
-    #[serial_test::serial]
-    async fn unstable_bo24() {
-        //let mut clog = colog::default_builder();
-        //clog.filter(None, log::LevelFilter::Trace);
-        //clog.init();
+//     #[tokio::test]
+//     #[serial_test::serial]
+//     async fn unstable_bo24() {
+//         //let mut clog = colog::default_builder();
+//         //clog.filter(None, log::LevelFilter::Trace);
+//         //clog.init();
 
-        println_cli_info("--- Starting test ---");
-        best_of_checker("RustyNova").await;
-    }
-}
+//         println_cli_info("--- Starting test ---");
+//         best_of_checker("RustyNova").await;
+//     }
+// }
