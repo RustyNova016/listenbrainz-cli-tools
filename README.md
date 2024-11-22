@@ -14,6 +14,7 @@ The latest build can be found in the [release](https://github.com/RustyNova016/a
 ```shell
 git clone https://github.com/RustyNova016/alistral.git
 cd ./alistral
+export SQLX_OFFLINE=true
 cargo build --release
 ```
 
