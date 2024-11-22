@@ -58,7 +58,7 @@ impl Logger {
     }
 
     pub fn println_cli<T: Display>(&self, string: T) {
-        self.print(format!("{} {}", "[CLI Tools]".green(), string));
+        self.print(format!("{} {}", "[Alistral]".green(), string));
     }
 
     pub fn println_lis<T: Display>(&self, string: T) {

@@ -1,40 +1,43 @@
-Hello!
-# Command-Line Help for `listenbrainz-cli-tools`
+# Command-Line Help for `alistral`
 
-This document contains the help content for the `listenbrainz-cli-tools` command-line program.
+This document contains the help content for the `alistral` command-line program.
 
 **Command Overview:**
 
-* [`listenbrainz-cli-tools`↴](#listenbrainz-cli-tools)
-* [`listenbrainz-cli-tools cache`↴](#listenbrainz-cli-tools-cache)
-* [`listenbrainz-cli-tools cache load-dump`↴](#listenbrainz-cli-tools-cache-load-dump)
-* [`listenbrainz-cli-tools cache clear`↴](#listenbrainz-cli-tools-cache-clear)
-* [`listenbrainz-cli-tools compatibility`↴](#listenbrainz-cli-tools-compatibility)
-* [`listenbrainz-cli-tools config`↴](#listenbrainz-cli-tools-config)
-* [`listenbrainz-cli-tools config blacklist-mapper-msid`↴](#listenbrainz-cli-tools-config-blacklist-mapper-msid)
-* [`listenbrainz-cli-tools config set-token`↴](#listenbrainz-cli-tools-config-set-token)
-* [`listenbrainz-cli-tools config timeout`↴](#listenbrainz-cli-tools-config-timeout)
-* [`listenbrainz-cli-tools config listens`↴](#listenbrainz-cli-tools-config-listens)
-* [`listenbrainz-cli-tools config listens refresh-unmapped-listens`↴](#listenbrainz-cli-tools-config-listens-refresh-unmapped-listens)
-* [`listenbrainz-cli-tools lookup`↴](#listenbrainz-cli-tools-lookup)
-* [`listenbrainz-cli-tools mapping`↴](#listenbrainz-cli-tools-mapping)
-* [`listenbrainz-cli-tools mapping list-unmapped`↴](#listenbrainz-cli-tools-mapping-list-unmapped)
-* [`listenbrainz-cli-tools mapping mapper`↴](#listenbrainz-cli-tools-mapping-mapper)
-* [`listenbrainz-cli-tools radio`↴](#listenbrainz-cli-tools-radio)
-* [`listenbrainz-cli-tools radio circles`↴](#listenbrainz-cli-tools-radio-circles)
-* [`listenbrainz-cli-tools radio underrated`↴](#listenbrainz-cli-tools-radio-underrated)
-* [`listenbrainz-cli-tools radio rate`↴](#listenbrainz-cli-tools-radio-rate)
-* [`listenbrainz-cli-tools radio overdue`↴](#listenbrainz-cli-tools-radio-overdue)
-* [`listenbrainz-cli-tools stats`↴](#listenbrainz-cli-tools-stats)
+* [`alistral`↴](#alistral)
+* [`alistral bump`↴](#alistral-bump)
+* [`alistral bump-down`↴](#alistral-bump-down)
+* [`alistral cache`↴](#alistral-cache)
+* [`alistral cache load-dump`↴](#alistral-cache-load-dump)
+* [`alistral cache clear`↴](#alistral-cache-clear)
+* [`alistral compatibility`↴](#alistral-compatibility)
+* [`alistral config`↴](#alistral-config)
+* [`alistral config blacklist-mapper-msid`↴](#alistral-config-blacklist-mapper-msid)
+* [`alistral config set-token`↴](#alistral-config-set-token)
+* [`alistral config timeout`↴](#alistral-config-timeout)
+* [`alistral config listens`↴](#alistral-config-listens)
+* [`alistral config listens refresh-unmapped-listens`↴](#alistral-config-listens-refresh-unmapped-listens)
+* [`alistral config default-user`↴](#alistral-config-default-user)
+* [`alistral lookup`↴](#alistral-lookup)
+* [`alistral mapping`↴](#alistral-mapping)
+* [`alistral mapping list-unmapped`↴](#alistral-mapping-list-unmapped)
+* [`alistral mapping mapper`↴](#alistral-mapping-mapper)
+* [`alistral radio`↴](#alistral-radio)
+* [`alistral radio circles`↴](#alistral-radio-circles)
+* [`alistral radio rate`↴](#alistral-radio-rate)
+* [`alistral radio overdue`↴](#alistral-radio-overdue)
+* [`alistral stats`↴](#alistral-stats)
 
-## `listenbrainz-cli-tools`
+## `alistral`
 
 A CLI app containing a set of useful tools for Listenbrainz
 
-**Usage:** `listenbrainz-cli-tools <COMMAND>`
+**Usage:** `alistral [OPTIONS] [COMMAND]`
 
 ###### **Subcommands:**
 
+* `bump` — bump a recording to show up more frequently in radios that uses scores. By default, it uses the lastest listen as target
+* `bump-down` — bump a recording to show up more frequently in radios that uses scores. By default, it uses the lastest listen as target
 * `cache` — Commands to deal with the local cache
 * `compatibility` — 
 * `config` — Commands to deal with the app's configuration
@@ -43,13 +46,64 @@ A CLI app containing a set of useful tools for Listenbrainz
 * `radio` — Generate radio playlists for you
 * `stats` — Shows top statistics for a specific target
 
+###### **Options:**
+
+* `--generate <GENERATOR>`
+
+  Possible values: `bash`, `elvish`, `fish`, `powershell`, `zsh`
 
 
-## `listenbrainz-cli-tools cache`
+
+
+## `alistral bump`
+
+bump a recording to show up more frequently in radios that uses scores. By default, it uses the lastest listen as target.
+
+bump-down is an alias for `bump <RECORDING> <DURATION> 0.9`
+
+All the bumps are added multiplicatively, so a recording won't disapear. Use the blacklist to remove them.
+
+**Usage:** `alistral bump [OPTIONS] [RECORDING]`
+
+###### **Arguments:**
+
+* `<RECORDING>` — The recording to bump
+
+###### **Options:**
+
+* `-d`, `--duration <DURATION>` — The duration the bump last for (Default: 3 months)
+* `-m`, `--multiplier <MULTIPLIER>` — The multiplier added to the score (Default: 1.1)
+* `-u`, `--username <USERNAME>`
+
+
+
+## `alistral bump-down`
+
+bump a recording to show up more frequently in radios that uses scores. By default, it uses the lastest listen as target.
+
+bump-down is an alias for `bump <RECORDING> <DURATION> 0.9`
+
+All the bumps are added multiplicatively, so a recording won't disapear. Use the blacklist to remove them.
+
+**Usage:** `alistral bump-down [OPTIONS] [RECORDING]`
+
+###### **Arguments:**
+
+* `<RECORDING>` — The recording to bump
+
+###### **Options:**
+
+* `-d`, `--duration <DURATION>` — The duration the bump last for (Default: 3 months)
+* `-m`, `--multiplier <MULTIPLIER>` — The multiplier added to the score (Default: 1.1)
+* `-u`, `--username <USERNAME>`
+
+
+
+## `alistral cache`
 
 Commands to deal with the local cache
 
-**Usage:** `listenbrainz-cli-tools cache <COMMAND>`
+**Usage:** `alistral cache <COMMAND>`
 
 ###### **Subcommands:**
 
@@ -58,7 +112,7 @@ Commands to deal with the local cache
 
 
 
-## `listenbrainz-cli-tools cache load-dump`
+## `alistral cache load-dump`
 
 Load a listen dump from the website
 
@@ -66,22 +120,22 @@ Allows to load an exported dump of you listens. This is often faster than using 
 
 You can get a listen dump [here](https://listenbrainz.org/settings/export/)
 
-**Usage:** `listenbrainz-cli-tools cache load-dump <USERNAME> <PATH>`
+**Usage:** `alistral cache load-dump <PATH> [USERNAME]`
 
 ###### **Arguments:**
 
-* `<USERNAME>` — Name of the user to import those listens for
 * `<PATH>` — Path to the dump file
+* `<USERNAME>` — Name of the user to import those listens for
 
 
 
-## `listenbrainz-cli-tools cache clear`
+## `alistral cache clear`
 
 Wipe the cache's data
 
 This is useful if you need disk space, or need to manually rebuild in case of corruption
 
-**Usage:** `listenbrainz-cli-tools cache clear <TARGET>`
+**Usage:** `alistral cache clear <TARGET>`
 
 ###### **Arguments:**
 
@@ -92,9 +146,9 @@ This is useful if you need disk space, or need to manually rebuild in case of co
 
 
 
-## `listenbrainz-cli-tools compatibility`
+## `alistral compatibility`
 
-**Usage:** `listenbrainz-cli-tools compatibility <USER_A> <USER_B>`
+**Usage:** `alistral compatibility <USER_A> <USER_B>`
 
 ###### **Arguments:**
 
@@ -103,11 +157,11 @@ This is useful if you need disk space, or need to manually rebuild in case of co
 
 
 
-## `listenbrainz-cli-tools config`
+## `alistral config`
 
 Commands to deal with the app's configuration
 
-**Usage:** `listenbrainz-cli-tools config <COMMAND>`
+**Usage:** `alistral config <COMMAND>`
 
 ###### **Subcommands:**
 
@@ -115,14 +169,15 @@ Commands to deal with the app's configuration
 * `set-token` — Associate an user token to an username. This makes `--token` arguments optional, and prevent always having to insert it
 * `timeout` — Prevent the recording to appear on radios for a while. If you're burn out of a track and need it gone, use this
 * `listens` — Configuration targeting listen data
+* `default-user` — Set the default username
 
 
 
-## `listenbrainz-cli-tools config blacklist-mapper-msid`
+## `alistral config blacklist-mapper-msid`
 
 Prevent an MSID to appear in the mbid mapper
 
-**Usage:** `listenbrainz-cli-tools config blacklist-mapper-msid [OPTIONS] <MSID>`
+**Usage:** `alistral config blacklist-mapper-msid [OPTIONS] <MSID>`
 
 ###### **Arguments:**
 
@@ -134,11 +189,11 @@ Prevent an MSID to appear in the mbid mapper
 
 
 
-## `listenbrainz-cli-tools config set-token`
+## `alistral config set-token`
 
 Associate an user token to an username. This makes `--token` arguments optional, and prevent always having to insert it
 
-**Usage:** `listenbrainz-cli-tools config set-token <USERNAME> <TOKEN>`
+**Usage:** `alistral config set-token <USERNAME> <TOKEN>`
 
 ###### **Arguments:**
 
@@ -147,11 +202,11 @@ Associate an user token to an username. This makes `--token` arguments optional,
 
 
 
-## `listenbrainz-cli-tools config timeout`
+## `alistral config timeout`
 
 Prevent the recording to appear on radios for a while. If you're burn out of a track and need it gone, use this
 
-**Usage:** `listenbrainz-cli-tools config timeout <RECORDING> <DURATION>`
+**Usage:** `alistral config timeout <RECORDING> <DURATION>`
 
 ###### **Arguments:**
 
@@ -160,11 +215,11 @@ Prevent the recording to appear on radios for a while. If you're burn out of a t
 
 
 
-## `listenbrainz-cli-tools config listens`
+## `alistral config listens`
 
 Configuration targeting listen data
 
-**Usage:** `listenbrainz-cli-tools config listens <COMMAND>`
+**Usage:** `alistral config listens <COMMAND>`
 
 ###### **Subcommands:**
 
@@ -172,11 +227,11 @@ Configuration targeting listen data
 
 
 
-## `listenbrainz-cli-tools config listens refresh-unmapped-listens`
+## `alistral config listens refresh-unmapped-listens`
 
 Toggle / Set whether the unmapped listens should be automatically updated when fetching listens
 
-**Usage:** `listenbrainz-cli-tools config listens refresh-unmapped-listens <STATE>`
+**Usage:** `alistral config listens refresh-unmapped-listens <STATE>`
 
 ###### **Arguments:**
 
@@ -187,28 +242,40 @@ Toggle / Set whether the unmapped listens should be automatically updated when f
 
 
 
-## `listenbrainz-cli-tools lookup`
+## `alistral config default-user`
 
-Get detailled information about an entity
+Set the default username
 
-**Usage:** `listenbrainz-cli-tools lookup <USERNAME> <ENTITY_TYPE> <ID>`
+**Usage:** `alistral config default-user <USERNAME>`
 
 ###### **Arguments:**
 
-* `<USERNAME>` — Name of the user to look up stats from
+* `<USERNAME>`
+
+
+
+## `alistral lookup`
+
+Get detailled information about an entity
+
+**Usage:** `alistral lookup <ENTITY_TYPE> <ID> [USERNAME]`
+
+###### **Arguments:**
+
 * `<ENTITY_TYPE>` — The type of entity to look for
 
   Possible values: `recording`
 
 * `<ID>` — The id of the entity (Accept URLs)
+* `<USERNAME>` — Name of the user to look up stats from
 
 
 
-## `listenbrainz-cli-tools mapping`
+## `alistral mapping`
 
 Commands for interacting with listen mappings
 
-**Usage:** `listenbrainz-cli-tools mapping <COMMAND>`
+**Usage:** `alistral mapping <COMMAND>`
 
 ###### **Subcommands:**
 
@@ -217,7 +284,7 @@ Commands for interacting with listen mappings
 
 
 
-## `listenbrainz-cli-tools mapping list-unmapped`
+## `alistral mapping list-unmapped`
 
 List all of your unlinked listens
 
@@ -233,11 +300,11 @@ Total: 8 unlinked recordings
 
 ```
 
-> Note: Listens are grouped by "Messybrainz ID" (MSID). This is the way Listenbrainz recognize similar listens by attributing them the same MSID. Linking a listen will link the others as long as they have the same MSID.
+> Note: Listens are grouped by "Messybrainz ID" (MSID). This is the way Listenbrainz recognize similar listens > by attributing them the same MSID. Linking a listen will link the others as long as they have the same MSID.
 
-> This also means that the same recording can be shown twice in the list. For example: "Panic - Dion Timer" won't have the same MSID as "Panic by Dion Timmer", even if they are the same recording.
+> This also means that the same recording can be shown twice in the list. > For example: "Panic - Dion Timer" won't have the same MSID as "Panic by Dion Timmer", even if they are the same recording.
 
-**Usage:** `listenbrainz-cli-tools mapping list-unmapped [OPTIONS] <USERNAME>`
+**Usage:** `alistral mapping list-unmapped [OPTIONS] [USERNAME]`
 
 ###### **Arguments:**
 
@@ -258,13 +325,13 @@ Total: 8 unlinked recordings
 
 
 
-## `listenbrainz-cli-tools mapping mapper`
+## `alistral mapping mapper`
 
 Easy and faster mapping of recordings.
 
 It goes through each unmapped recordings, and give a few suggested recordings for the mapping. This is the exact same as mapping recording in the web UI.
 
-**Usage:** `listenbrainz-cli-tools mapping mapper [OPTIONS] <USERNAME>`
+**Usage:** `alistral mapping mapper [OPTIONS] [USERNAME]`
 
 ###### **Arguments:**
 
@@ -282,16 +349,15 @@ It goes through each unmapped recordings, and give a few suggested recordings fo
 
 
 
-## `listenbrainz-cli-tools radio`
+## `alistral radio`
 
 Generate radio playlists for you
 
-**Usage:** `listenbrainz-cli-tools radio [OPTIONS] <COMMAND>`
+**Usage:** `alistral radio [OPTIONS] <COMMAND>`
 
 ###### **Subcommands:**
 
 * `circles` — Randomly adds recordings from artists you already listened to
-* `underrated` — Generate a playlist containing your underrated listens
 * `rate` — Generate playlists depending on the listen rate of recordings
 * `overdue` — Generate playlists based on recording that the user should have listened to by now
 
@@ -302,11 +368,11 @@ Generate radio playlists for you
 
 
 
-## `listenbrainz-cli-tools radio circles`
+## `alistral radio circles`
 
 Randomly adds recordings from artists you already listened to
 
-**Usage:** `listenbrainz-cli-tools radio circles [OPTIONS] <USERNAME> [TOKEN]`
+**Usage:** `alistral radio circles [OPTIONS] [USERNAME] [TOKEN]`
 
 ###### **Arguments:**
 
@@ -321,35 +387,13 @@ Randomly adds recordings from artists you already listened to
 
 
 
-## `listenbrainz-cli-tools radio underrated`
-
-Generate a playlist containing your underrated listens
-
-This radio will create a playlist containing all the tracks that you listen to, but seemingly no one else does.
-
-> The mix is made by calculating a score for each listen. This score is composed of two values: > - The rank in the user's top 1000 recording of all time (First place get 100 points, second get 999.9, etc...) > - The percentage of the recording's listens being from the user (Made with this formula: (user listens / worldwide listens) *100)
-
-**Usage:** `listenbrainz-cli-tools radio underrated [OPTIONS] <USERNAME>`
-
-###### **Arguments:**
-
-* `<USERNAME>` — Name of the user to fetch listens from
-
-###### **Options:**
-
-* `-t`, `--token <TOKEN>` — Your user token.
-
-   You can find it at <https://listenbrainz.org/settings/>. If it's set in the config file, you can ignore this argument
-
-
-
-## `listenbrainz-cli-tools radio rate`
+## `alistral radio rate`
 
 Generate playlists depending on the listen rate of recordings
 
 This algorythm bases itself on your listen rate of recording to get more forgotten tracks. It takes the recordings with the lowest listen rates, and put them into a playlist
 
-**Usage:** `listenbrainz-cli-tools radio rate [OPTIONS] <USERNAME>`
+**Usage:** `alistral radio rate [OPTIONS] [USERNAME]`
 
 ###### **Arguments:**
 
@@ -360,11 +404,6 @@ This algorythm bases itself on your listen rate of recording to get more forgott
 * `-t`, `--token <TOKEN>` — Your user token.
 
    You can find it at <https://listenbrainz.org/settings/>. If it's set in the config file, you can ignore this argument
-* `--min-rate <MIN_RATE>` — Minimum listen rate
-* `--min-per <MIN_PER>` — Minimum listen rate time range
-
-  Possible values: `year`, `month`
-
 * `--min <MIN>` — Minimum listen count
 * `-c`, `--cooldown <COOLDOWN>` — The amount of hours needed to wait after a recording have been given before it is re-suggested
 
@@ -372,13 +411,13 @@ This algorythm bases itself on your listen rate of recording to get more forgott
 
 
 
-## `listenbrainz-cli-tools radio overdue`
+## `alistral radio overdue`
 
 Generate playlists based on recording that the user should have listened to by now
 
 Similar to listen rates, this algorithm calculate the average time between listens, and estimate when the next listen will happen. It then put together a playlist made out of recordings you should have listened by now.
 
-**Usage:** `listenbrainz-cli-tools radio overdue [OPTIONS] <USERNAME>`
+**Usage:** `alistral radio overdue [OPTIONS] [USERNAME]`
 
 ###### **Arguments:**
 
@@ -401,7 +440,7 @@ Similar to listen rates, this algorithm calculate the average time between liste
 
 
 
-## `listenbrainz-cli-tools stats`
+## `alistral stats`
 
 Shows top statistics for a specific target
 
@@ -417,17 +456,17 @@ Target is the entity type to group the stats by. Currently, those entities stats
 
 - Works (`work`)
 
-**Usage:** `listenbrainz-cli-tools stats [OPTIONS] --target <TARGET> <USERNAME>`
+**Usage:** `alistral stats [OPTIONS] <TARGET> [USERNAME]`
 
 ###### **Arguments:**
+
+* `<TARGET>` — The type of entity to sort by
+
+  Possible values: `recording`, `artist`, `release`, `release-group`, `work`
 
 * `<USERNAME>` — Name of the user to fetch stats listen from
 
 ###### **Options:**
-
-* `-t`, `--target <TARGET>` — The type of entity to sort by
-
-  Possible values: `recording`, `artist`, `release`, `release-group`, `work`
 
 * `-s`, `--sort <SORT>` — Sort by:
 

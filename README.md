@@ -1,30 +1,30 @@
-# Listenbrainz CLI Tools
+# Alistral
 
-[![Crate](https://img.shields.io/crates/v/listenbrainz-cli-tools)](https://crates.io/crates/listenbrainz-cli-tools)
-[![CI builder](https://github.com/RustyNova016/listenbrainz-cli-tools/actions/workflows/rust.yml/badge.svg)](https://github.com/RustyNova016/listenbrainz-cli-tools/actions/workflows/rust.yml)
-[![License](https://img.shields.io/crates/l/listenbrainz-cli-tools)](https://github.com/RustyNova016/listenbrainz-cli-tools/blob/master/LICENSE)
+[![Crate](https://img.shields.io/crates/v/alistral)](https://crates.io/crates/alistral)
+[![CI builder](https://github.com/RustyNova016/alistral/actions/workflows/rust.yml/badge.svg)](https://github.com/RustyNova016/alistral/actions/workflows/rust.yml)
+[![License](https://img.shields.io/crates/l/alistral)](https://github.com/RustyNova016/alistral/blob/master/LICENSE)
 
 A collection of CLI based tools for Listenbrainz.
 
 # Installing
 ## Builds
-The latest build can be found in the [release](https://github.com/RustyNova016/listenbrainz-cli-tools/releases) tab
+The latest build can be found in the [release](https://github.com/RustyNova016/alistral/releases) tab
 
 ## Manual build
 ```shell
-git clone https://github.com/RustyNova016/listenbrainz-cli-tools.git
-cd ./listenbrainz-cli-tools
+git clone https://github.com/RustyNova016/alistral.git
+cd ./alistral
 cargo build --release
 ```
 
 # Usage
 
-Full markdown help can be found under [docs/CommandLineHelp.md](https://github.com/RustyNova016/listenbrainz-cli-tools/blob/master/docs/CommandLineHelp.md), but full `--help` support exists too. 
+Full markdown help can be found under [docs/CommandLineHelp.md](https://github.com/RustyNova016/alistral/blob/master/docs/CommandLineHelp.md), but full `--help` support exists too. 
 
 # Tools
 ## Unmapped listens 
 
-[Usage > Command Line documentation](https://github.com/RustyNova016/listenbrainz-cli-tools/blob/master/docs/CommandLineHelp.md#listenbrainz-cli-tools-mapping-list-unmapped)
+[Usage > Command Line documentation](https://github.com/RustyNova016/alistral/blob/master/docs/CommandLineHelp.md#alistral-mapping-list-unmapped)
 
 This will list all your unmapped listens, grouped by similarity. 
 It also gives a link to quickly look up the listen in listenbrainz, and go link it
@@ -45,13 +45,13 @@ Total: 8 unlinked recordings
 
 ## Interactive mass mapper
 
-[Usage > Command Line documentation](https://github.com/RustyNova016/listenbrainz-cli-tools/blob/master/docs/CommandLineHelp.md#listenbrainz-cli-tools-mapping-mapper)
+[Usage > Command Line documentation](https://github.com/RustyNova016/alistral/blob/master/docs/CommandLineHelp.md#alistral-mapping-mapper)
 
 This tool allows for easy and faster mapping of recordings. It goes through each unmapped recordings, and give a few suggested recordings for the mapping. This is the exact same as mapping recording in the web UI.
 
 ## Statistics
 
-[Usage > Command Line documentation](https://github.com/RustyNova016/listenbrainz-cli-tools/blob/master/docs/CommandLineHelp.md#listenbrainz-cli-tools-stats)
+[Usage > Command Line documentation](https://github.com/RustyNova016/alistral/blob/master/docs/CommandLineHelp.md#alistral-stats)
 
 While ListenBrainz have its own statistic page, it only refreshes daily, and is limited to only some entities. Furthermore, bugs in ListenBrainz statitics lead to misleading result.
 
@@ -63,7 +63,7 @@ A few radio algorithms have been made to generate playlists for you
 
 ### Artist Circles
 
-[Usage > Command Line documentation](https://github.com/RustyNova016/listenbrainz-cli-tools/blob/master/docs/CommandLineHelp.md#listenbrainz-cli-tools-radio-circles)
+[Usage > Command Line documentation](https://github.com/RustyNova016/alistral/blob/master/docs/CommandLineHelp.md#alistral-radio-circles)
 
 This algorithm keep your playlist close to the artists you are listening to. The way it generate is as follow:
 
@@ -75,7 +75,7 @@ There is the option to only get unlistened recordings, making an alternative to 
 
 ### Underrated tracks
 
-[Usage > Command Line documentation](https://github.com/RustyNova016/listenbrainz-cli-tools/blob/master/docs/CommandLineHelp.md#listenbrainz-cli-tools-radio-underrated)
+[Usage > Command Line documentation](https://github.com/RustyNova016/alistral/blob/master/docs/CommandLineHelp.md#alistral-radio-underrated)
 
 This radio will create a playlist containing all the tracks that you listen to, but seemingly no one else does. 
 
@@ -90,14 +90,14 @@ This radio will create a playlist containing all the tracks that you listen to, 
 
 ### Listen rate
 
-[Usage > Command Line documentation](https://github.com/RustyNova016/listenbrainz-cli-tools/blob/master/docs/CommandLineHelp.md#listenbrainz-cli-tools-radio-rate)
+[Usage > Command Line documentation](https://github.com/RustyNova016/alistral/blob/master/docs/CommandLineHelp.md#alistral-radio-rate)
 
 This algorithm bases itself on your listen rate of recording to get more forgotten tracks. It takes the recordings with the lowest listen rates, and put them into a playlist
 
 
 ### Overdue listens
 
-[Usage > Command Line documentation](https://github.com/RustyNova016/listenbrainz-cli-tools/blob/master/docs/CommandLineHelp.md#listenbrainz-cli-tools-radio-rate)
+[Usage > Command Line documentation](https://github.com/RustyNova016/alistral/blob/master/docs/CommandLineHelp.md#alistral-radio-rate)
 
 Similar to listen rates, this algorithm calculate the average time between listens, and estimate when the next listen will happen. 
 It thens put together a playlist made out of recordings you should have listened by now.
@@ -106,7 +106,7 @@ Another mode is the "Overdue factor". Instead of sorting by date, the listens ar
 
 # User Compatibility
 
-[Usage > Command Line documentation](https://github.com/RustyNova016/listenbrainz-cli-tools/blob/master/docs/CommandLineHelp.md#listenbrainz-cli-tools-compatibility)
+[Usage > Command Line documentation](https://github.com/RustyNova016/alistral/blob/master/docs/CommandLineHelp.md#alistral-compatibility)
 
 Similarly to Listenbrainz, a compatibility calculator is available, using a new algorithm that may provide more accurate results.
 
@@ -129,13 +129,13 @@ How to use value hints and generate shell completions.
 
 Usage with zsh:
 ```console
-$ listenbrainz-cli-tools --generate=zsh > /usr/local/share/zsh/site-functions/_listenbrainz-cli-tools
+$ alistral --generate=zsh > /usr/local/share/zsh/site-functions/_alistral
 $ compinit
 ```
 fish:
 ```console
-$ listenbrainz-cli-tools --generate=fish > listenbrainz-cli-tools.fish
-$ . ./listenbrainz-cli-tools.fish
+$ alistral --generate=fish > alistral.fish
+$ . ./alistral.fish
 ```
 
 # Other infos

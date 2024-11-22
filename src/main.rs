@@ -27,8 +27,6 @@ async fn main() -> color_eyre::Result<()> {
 
     let cli = Cli::parse();
 
-    println!("Hello!");
-
     let post_run = cli.run().await.expect("An error occured in the app");
 
     if post_run {

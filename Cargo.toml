@@ -1,8 +1,8 @@
 [package]
-name = "listenbrainz-cli-tools"
+name = "alistral"
 version = "0.2.2"
 edition = "2021"
-repository = "https://github.com/RustyNova016/listenbrainz-cli-tools"
+repository = "https://github.com/RustyNova016/alistral"
 publish = true
 license = "MIT"
 description = "A CLI app containing a set of useful tools for Listenbrainz"
