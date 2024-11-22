@@ -16,6 +16,8 @@ jobs:
                     id: get-latest-tag
 
       release-linux:
+            env: 
+              SQLX_OFFLINE: true
             name: Create Release Linux
             runs-on: ubuntu-latest
             strategy:
@@ -42,6 +44,8 @@ jobs:
                       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       release-windows:
+            env: 
+              SQLX_OFFLINE: true
             name: Create Release Windows
             runs-on: windows-latest
             strategy:
