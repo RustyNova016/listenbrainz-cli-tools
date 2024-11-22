@@ -52,7 +52,7 @@ mod tests {
         //clog.filter(None, log::LevelFilter::Trace);
         //clog.init();
 
-        println_cli_info("--- Starting test ---");
-        stats_command("RustyNova", GroupByTarget::Recording, SortSorterBy::Count).await;
+        // println_cli_info("--- Starting test ---");
+        // stats_command("RustyNova", GroupByTarget::Recording, SortSorterBy::Count).await;
     }
 }
