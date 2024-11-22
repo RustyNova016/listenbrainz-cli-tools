@@ -3,7 +3,7 @@ use std::io;
 use thiserror::Error;
 
 #[derive(Error, Debug)]
-#[allow(clippy::enum_variant_names)]
+//#[expect(clippy::enum_variant_names)]
 pub enum Error {
     /// Returned when an index was targeted to alias another of a different type
     #[error("MBID {1:?} couldn't be aliased to MBID {0:?}")]
@@ -28,6 +28,21 @@ pub enum Error {
     // --- Cache Errors ---
     #[error("Error with the cache.")]
     CacheError(serde_cacache::error::Error),
+
+    #[error("Tried to get row id {0} but couldn't be found")]
+    MissingRowInDB(i64),
+
+    #[error(transparent)]
+    SQLxError(#[from] sqlx::Error),
+
+    #[error(transparent)]
+    MusicbrainzDBLiteError(#[from] musicbrainz_db_lite::Error),
+
+    #[error("Tried to get user {0} but couldn't be found")]
+    MissingUserError(String),
+
+    #[error("Tried to open the database {0} but it couldn't be found")]
+    MissingDatabaseFile(String),
 
     // --- Fetching Errors ---
     #[error("Error with the request.")]

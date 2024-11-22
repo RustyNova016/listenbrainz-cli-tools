@@ -10,6 +10,7 @@ use rust_decimal::prelude::FromPrimitive;
 use rust_decimal::Decimal;
 
 #[derive(Debug, Clone, PartialEq, Eq, Getters)]
+#[deprecated]
 pub struct RecordingIDWithListens {
     recording_id: RecordingMBID,
     listens: ListenCollection,

@@ -30,7 +30,6 @@ where
     T: HasMBID<I>,
     I: IsMbid<T>,
 {
-    #[allow(async_fn_in_trait)]
     async fn get_or_fetch_entities(&self) -> color_eyre::Result<Vec<T>> {
         let mut result = Vec::new();
 

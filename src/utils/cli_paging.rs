@@ -20,6 +20,10 @@ impl CLIPager {
     {
         f();
 
+        self.inc()
+    }
+
+    pub fn inc(&mut self) -> bool {
         self.count += 1;
 
         if self.count == self.max_count {

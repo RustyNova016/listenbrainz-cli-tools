@@ -4,7 +4,7 @@ use indicatif::{MultiProgress, ProgressBar};
 use std::fmt::Display;
 
 pub struct Logger {
-    print_override: Option<MultiProgress>,
+    print_override: Option<MultiProgress>, //TODO: Keep bar all the time?
     bar_count: u32,
 }
 
@@ -16,8 +16,15 @@ impl Logger {
         }
     }
 
+    pub fn tick(&self) {
+        if let Some(mpg) = &self.print_override {
+            mpg.suspend(|| 0);
+        }
+    }
+
     pub fn add_bar(&mut self, pg: ProgressBar) {
         self.bar_count += 1;
+
         match &self.print_override {
             Some(mpg) => {
                 mpg.add(pg);
@@ -32,12 +39,9 @@ impl Logger {
 
     pub fn remove_bar(&mut self, pg: ProgressBar) {
         self.bar_count -= 1;
-        match &self.print_override {
-            Some(mpg) => {
-                mpg.remove(&pg);
-                mpg.clear().expect("TODO: panic message");
-            }
-            None => {}
+        if let Some(mpg) = &self.print_override {
+            mpg.remove(&pg);
+            mpg.clear().expect("TODO: panic message");
         }
 
         if self.bar_count == 0 {

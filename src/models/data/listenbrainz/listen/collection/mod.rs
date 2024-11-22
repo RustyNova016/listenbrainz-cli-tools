@@ -20,6 +20,7 @@ mod underrated;
 
 /// Wrapper for a vector of listens
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, Deref, DerefMut, IntoIterator)]
+#[deprecated]
 pub struct ListenCollection {
     #[deref]
     #[deref_mut]
