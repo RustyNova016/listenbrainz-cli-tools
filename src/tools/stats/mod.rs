@@ -41,9 +41,9 @@ pub async fn stats_command(username: &str, target: GroupByTarget, _sort_by: Sort
 
 #[cfg(test)]
 mod tests {
-    use crate::utils::println_cli_info;
+    // use crate::utils::println_cli_info;
 
-    use super::*;
+    // use super::*;
 
     #[tokio::test]
     #[serial_test::serial]

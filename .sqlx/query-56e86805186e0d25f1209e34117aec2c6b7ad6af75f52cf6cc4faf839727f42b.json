@@ -1,6 +1,6 @@
 {
   "db_name": "SQLite",
-  "query": "\n        SELECT \n            listens.* \n        FROM       \n            users \n            INNER JOIN listens ON users.name = listens.user \n            INNER JOIN msid_mapping ON listens.recording_msid = msid_mapping.recording_msid\n        WHERE\n            -- Only for this user\n            LOWER(listens.user) = LOWER(?)  \n\n            -- Keep only mapped listens \n            AND msid_mapping.user = users.id \n\n            -- Give some recordings a cooldown period \n            AND listened_at < ?",
+  "query": "\n            SELECT \n                listens.*\n            FROM       \n                users \n                INNER JOIN listens ON users.name = listens.user \n                INNER JOIN msid_mapping ON listens.recording_msid = msid_mapping.recording_msid\n            WHERE\n                -- Only for this user\n                LOWER(listens.user) = LOWER(?)  \n    \n                -- Keep only mapped listens \n                AND msid_mapping.user = users.id \n            ORDER BY msid_mapping.recording_mbid",
   "describe": {
     "columns": [
       {
@@ -30,7 +30,7 @@
       }
     ],
     "parameters": {
-      "Right": 2
+      "Right": 1
     },
     "nullable": [
       false,
@@ -40,5 +40,5 @@
       true
     ]
   },
-  "hash": "f92e49286d5024464f00b4d4578ff63baeed1e6d2ccbbbc7190d4e35a94c98c8"
+  "hash": "56e86805186e0d25f1209e34117aec2c6b7ad6af75f52cf6cc4faf839727f42b"
 }
