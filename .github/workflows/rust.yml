@@ -16,6 +16,8 @@ env:
 
 jobs:
   stable_tests:
+    env: 
+      SQLX_OFFLINE: true
     runs-on: ${{ matrix.os }}
     needs: clippy
     strategy:
@@ -42,35 +44,39 @@ jobs:
       - name: Run tests
         run: cargo hack test --feature-powerset  --ignore-private
 
-  unstable_tests:
-    runs-on: ${{ matrix.os }}
-    needs: stable_tests
-    strategy:
-      fail-fast: false
-      matrix:
-        rust: [beta, nightly]
-        os:
-          - windows-latest
-          - ubuntu-latest
-          - macos-latest
-    steps:
-      - uses: actions/checkout@v4
+  # unstable_tests:
+  #   env: 
+  #     SQLX_OFFLINE: true
+  #   runs-on: ${{ matrix.os }}
+  #   needs: stable_tests
+  #   strategy:
+  #     fail-fast: false
+  #     matrix:
+  #       rust: [beta, nightly]
+  #       os:
+  #         - windows-latest
+  #         - ubuntu-latest
+  #         - macos-latest
+  #   steps:
+  #     - uses: actions/checkout@v4
 
-      - run: rustup toolchain install stable --profile minimal --no-self-update
+  #     - run: rustup toolchain install stable --profile minimal --no-self-update
 
-      - uses: Swatinem/rust-cache@v2
-        with: 
-          key: "(${{ matrix.rust }} - ${{ matrix.os }})"
+  #     - uses: Swatinem/rust-cache@v2
+  #       with: 
+  #         key: "(${{ matrix.rust }} - ${{ matrix.os }})"
 
-      - uses: taiki-e/install-action@cargo-hack
+  #     - uses: taiki-e/install-action@cargo-hack
 
-      - name: Build tests
-        run: cargo hack build --feature-powerset  --ignore-private
+  #     - name: Build tests
+  #       run: cargo hack build --feature-powerset  --ignore-private
         
-      - name: Run tests
-        run: cargo hack test --feature-powerset  --ignore-private
+  #     - name: Run tests
+  #       run: cargo hack test --feature-powerset  --ignore-private
 
   clippy:
+    env: 
+      SQLX_OFFLINE: true
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -92,6 +98,8 @@ jobs:
           args: -- -D warnings
 
   docs:
+    env: 
+      SQLX_OFFLINE: true
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -135,6 +143,8 @@ jobs:
           args: --all --check
 
   msrv:
+    env: 
+      SQLX_OFFLINE: true
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4

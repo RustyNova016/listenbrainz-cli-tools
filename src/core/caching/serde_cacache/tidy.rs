@@ -192,9 +192,11 @@ where
                 let data = self.inner_delete_entry(&entry_to_delete.key).await;
                 #[cfg(debug_assertions)]
                 println!("Deleted: {}", entry_to_delete.key);
-                #[allow(clippy::let_and_return)]
+                #[cfg_attr(not(debug_assertions), expect(clippy::let_and_return))]
                 // This fixes clippy complaining about non debug builds
-                data
+                {
+                    data
+                }
             })
             .collect_vec();
 

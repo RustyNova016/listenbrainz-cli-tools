@@ -3,15 +3,13 @@ use std::ops::Deref;
 use clap::ArgAction;
 use clap::{Parser, Subcommand};
 
-use crate::core::statistics::listen_rate::ListenRate;
-use crate::core::statistics::listen_rate::ListenRateRange;
+use crate::datastructures::radio::collector::RadioCollector;
+use crate::datastructures::radio::collector::RadioCollectorBuilder;
 use crate::models::config::Config;
-use crate::models::radio::RadioConfig;
-use crate::models::radio::RadioConfigBuilder;
 use crate::tools::radio::circles::create_radio_mix;
 use crate::tools::radio::listen_rate::listen_rate_radio;
 use crate::tools::radio::overdue::overdue_radio;
-use crate::tools::radio::underrated::underrated_mix;
+//use crate::tools::radio::underrated::underrated_mix;
 
 #[derive(Parser, Debug, Clone)]
 #[command(version, about, long_about = None)]
@@ -29,30 +27,32 @@ pub struct RadioCommand {
 }
 
 impl RadioCommand {
-    pub fn get_config(&self) -> RadioConfig {
-        let mut config_builder = RadioConfigBuilder::default();
+    pub fn get_collector(&self) -> RadioCollector {
+        let collector = RadioCollectorBuilder::default();
 
-        if let Some(val) = self.min_count {
-            config_builder.min_count(val);
-        }
+        let collector = match self.min_count {
+            Some(val) => collector.count(val),
+            None => collector.count_none(),
+        };
 
-        if let Some(val) = self.min_duration.as_ref() {
-            let dura: humantime::Duration = val
-                .clone()
-                .parse()
-                .expect("Couldn't parse mimimum lenght for radio");
-            let std_dura = dura.deref();
-            let chrono_dura = chrono::Duration::from_std(*std_dura).unwrap();
-            config_builder.min_duration(chrono_dura);
-        }
+        let collector = match self.min_duration.as_ref() {
+            Some(val) => {
+                let dura: humantime::Duration = val
+                    .clone()
+                    .parse()
+                    .expect("Couldn't parse mimimum lenght for radio");
+                let std_dura = dura.deref();
+                let chrono_dura = chrono::Duration::from_std(*std_dura).unwrap();
+                collector.duration(chrono_dura)
+            }
+            None => collector.duration_none(),
+        };
 
-        config_builder.build().expect("Couldn't generate config")
+        collector.build()
     }
 
     pub async fn run(&self) -> color_eyre::Result<()> {
-        let config = self.get_config();
-
-        self.command.run(config).await
+        self.command.run(self.get_collector()).await
     }
 }
 
@@ -74,25 +74,24 @@ pub enum RadioSubcommands {
         unlistened: bool,
     },
 
-    /// Generate a playlist containing your underrated listens
-    ///
-    /// This radio will create a playlist containing all the tracks that you listen to, but seemingly no one else does.
-    ///
-    ///> The mix is made by calculating a score for each listen. This score is composed of two values:
-    ///> - The rank in the user's top 1000 recording of all time (First place get 100 points, second get 999.9, etc...)
-    ///> - The percentage of the recording's listens being from the user (Made with this formula: (user listens / worldwide listens) *100)
-    Underrated {
-        /// Name of the user to fetch listens from
-        username: Option<String>,
+    // /// Generate a playlist containing your underrated listens
+    // ///
+    // /// This radio will create a playlist containing all the tracks that you listen to, but seemingly no one else does.
+    // ///
+    // ///> The mix is made by calculating a score for each listen. This score is composed of two values:
+    // ///> - The rank in the user's top 1000 recording of all time (First place get 100 points, second get 999.9, etc...)
+    // ///> - The percentage of the recording's listens being from the user (Made with this formula: (user listens / worldwide listens) *100)
+    // Underrated {
+    //     /// Name of the user to fetch listens from
+    //     username: Option<String>,
 
-        /// Your user token.
-        ///
-        /// You can find it at <https://listenbrainz.org/settings/>.
-        /// If it's set in the config file, you can ignore this argument
-        #[arg(short, long)]
-        token: Option<String>,
-    },
-
+    //     /// Your user token.
+    //     ///
+    //     /// You can find it at <https://listenbrainz.org/settings/>.
+    //     /// If it's set in the config file, you can ignore this argument
+    //     #[arg(short, long)]
+    //     token: Option<String>,
+    // },
     /// Generate playlists depending on the listen rate of recordings
     ///
     /// This algorythm bases itself on your listen rate of recording to get more forgotten tracks.
@@ -107,14 +106,6 @@ pub enum RadioSubcommands {
         /// If it's set in the config file, you can ignore this argument
         #[arg(short, long)]
         token: Option<String>,
-
-        /// Minimum listen rate
-        #[arg(long)]
-        min_rate: Option<u64>,
-
-        /// Minimum listen rate time range
-        #[arg(long)]
-        min_per: Option<ListenRateRange>,
 
         /// Minimum listen count
         #[arg(long)]
@@ -158,7 +149,7 @@ pub enum RadioSubcommands {
 }
 
 impl RadioSubcommands {
-    pub async fn run(&self, config: RadioConfig) -> color_eyre::Result<()> {
+    pub async fn run(&self, collector: RadioCollector) -> color_eyre::Result<()> {
         match self {
             Self::Circles {
                 username,
@@ -170,47 +161,31 @@ impl RadioSubcommands {
                     &Config::check_username(username),
                     Config::check_token(&Config::check_username(username), token),
                     *unlistened,
-                    config,
+                    collector,
                 )
                 .await;
             }
 
-            Self::Underrated { username, token } => {
-                underrated_mix(
-                    Config::check_username(username),
-                    Config::check_token(&Config::check_username(username), token),
-                    config,
-                )
-                .await?;
-            }
-
+            // Self::Underrated { username, token } => {
+            //     underrated_mix(
+            //         Config::check_username(username),
+            //         Config::check_token(&Config::check_username(username), token),
+            //         config,
+            //     )
+            //     .await?;
+            // }
             Self::Rate {
                 username,
                 token,
-                min_rate,
-                min_per,
                 min,
                 cooldown,
             } => {
-                let mut rate = None;
-
-                if let Some(min_rate) = min_rate {
-                    if let Some(min_per) = min_per {
-                        rate = Some(ListenRate::new(
-                            "*".to_string().into(),
-                            *min_rate,
-                            min_per.get_duration(),
-                        ));
-                    }
-                }
-
                 listen_rate_radio(
                     &Config::check_username(username),
                     &Config::check_token(&Config::check_username(username), token),
-                    rate,
                     *min,
                     *cooldown,
-                    config,
+                    collector,
                 )
                 .await?;
             }
@@ -228,7 +203,7 @@ impl RadioSubcommands {
                     *min,
                     *cooldown,
                     *delay_factor,
-                    config,
+                    collector,
                 )
                 .await?;
             }

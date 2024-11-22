@@ -26,6 +26,7 @@ pub mod mbid;
 
 #[derive(Debug, Clone, Eq, PartialEq, Deserialize, Serialize, Getters)]
 #[serde(rename_all = "kebab-case")]
+#[deprecated]
 pub struct Artist {
     id: ArtistMBID,
     name: String,

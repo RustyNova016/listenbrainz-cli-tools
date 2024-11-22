@@ -17,6 +17,7 @@ pub mod getters;
 pub mod mapped_listen;
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[deprecated]
 pub struct Listen {
     /// The username of the user who listened to it
     pub user: String,

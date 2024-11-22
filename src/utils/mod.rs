@@ -1,4 +1,3 @@
-pub mod cli;
 use std::fmt::Display;
 use std::sync::{Arc, Mutex};
 
@@ -10,16 +9,18 @@ use once_cell::sync::Lazy;
 
 use logger::Logger;
 
+pub mod cli;
 pub mod cli_paging;
+pub mod env;
 pub mod extensions;
 pub mod logger;
 pub mod playlist;
+pub mod radio;
 pub mod regex;
 pub mod tokio;
 pub mod traits;
 
 #[derive(Clone, Debug, PartialEq, Eq, Builder)]
-#[allow(missing_docs)]
 /// Reader for the User Listens endpoint
 pub struct ListenAPIPaginator {
     #[builder(setter(into, strip_option))]

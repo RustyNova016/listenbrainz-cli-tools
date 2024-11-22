@@ -5,7 +5,6 @@ use serde::de::DeserializeOwned;
 
 #[ext]
 pub impl<'a, T: Send> BrowseQuery<T> {
-    #[allow(async_fn_in_trait)] // This is fine for this application, and if the lint is applied, it will complain about the huge async block...
     async fn execute_all(&mut self, limit: u8) -> color_eyre::Result<BrowseResult<T>>
     where
         T: Fetch<'a> + DeserializeOwned + Browsable + Clone,

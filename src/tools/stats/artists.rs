@@ -1,23 +1,33 @@
-use crate::core::entity_traits::mb_cached::MBCached;
-use crate::core::statistics::statistic_sorter::StatisticSorter;
-use crate::models::cli::common::SortSorterBy;
-use crate::models::data::musicbrainz::artist::Artist;
+use core::cmp::Reverse;
+
+use itertools::Itertools;
+
+use crate::database::get_conn;
+use crate::datastructures::entity_with_listens::artist_with_listens::ArtistWithListens;
+use crate::datastructures::listen_collection::traits::ListenCollectionLike;
+use crate::datastructures::listen_collection::ListenCollection;
 use crate::utils::cli_paging::CLIPager;
 
-pub async fn stats_artist(stats: StatisticSorter, sort_by: SortSorterBy) {
-    let mut pager = CLIPager::new(5);
+pub async fn stats_artist(listens: ListenCollection) {
+    let mut groups = ArtistWithListens::from_listencollection(&mut *get_conn().await, listens)
+        .await
+        .expect("Error while fetching recordings")
+        .into_values()
+        .collect_vec();
+    groups.sort_by_key(|a| Reverse(a.listen_count()));
 
-    for (key, data) in stats.into_sorted_vec(sort_by) {
-        let artist = Artist::get_cached_or_fetch(&key.clone().into())
+    let mut pager = CLIPager::new(10);
+
+    for group in groups {
+        group
+            .artist()
+            .fetch_if_incomplete(&mut *get_conn().await)
             .await
-            .unwrap(); // TODO: Use MBIDs
+            .expect("Error while fetching release");
+        println!("[{}] {}", group.listen_count(), group.artist().name);
 
-        let pager_continue = pager.execute(|| {
-            println!("[{}] - {}", data.len(), artist.name());
-        });
-
-        if !pager_continue {
-            return;
-        };
+        if !pager.inc() {
+            break;
+        }
     }
 }
