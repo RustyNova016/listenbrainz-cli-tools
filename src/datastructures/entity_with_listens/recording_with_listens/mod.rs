@@ -9,6 +9,8 @@ use musicbrainz_db_lite::models::musicbrainz::recording::Recording;
 use musicbrainz_db_lite::models::musicbrainz::user::User;
 use musicbrainz_db_lite::RowId;
 use rust_decimal::{prelude::FromPrimitive, Decimal};
+use serde::Deserialize;
+use serde::Serialize;
 
 use crate::database::listenbrainz::prefetching::prefetch_recordings_of_listens;
 use crate::datastructures::listen_collection::traits::ListenCollectionLike;
@@ -16,7 +18,7 @@ use crate::datastructures::listen_collection::ListenCollection;
 
 use super::impl_entity_with_listens;
 
-#[derive(Debug, Clone, PartialEq, Eq, Getters)]
+#[derive(Debug, Clone, PartialEq, Eq, Getters, Deserialize, Serialize)]
 pub struct RecordingWithListens {
     pub(self) recording: Recording,
     listens: ListenCollection,
@@ -106,6 +108,20 @@ impl RecordingWithListens {
 
         duration_between_first_and_last
             .checked_div(self.listen_count() as i32)
+            .unwrap_or_else(Duration::zero)
+    }
+
+    pub fn average_duration_between_listens_and_date(&self, date: DateTime<Utc>) -> Duration {
+        // If the recording haven't been listened to, then the average time is zero
+        if self.is_empty() {
+            return Duration::zero();
+        }
+
+        let duration_between_first_and_last =
+            date - self.first_listen_date().expect("There's at least a listen");
+
+        duration_between_first_and_last
+            .checked_div(self.len() as i32)
             .unwrap_or_else(Duration::zero)
     }
 

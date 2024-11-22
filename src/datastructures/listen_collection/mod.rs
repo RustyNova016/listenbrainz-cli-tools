@@ -1,10 +1,12 @@
 use core::ops::Deref;
 
 use musicbrainz_db_lite::models::listenbrainz::listen::Listen;
+use serde::Deserialize;
+use serde::Serialize;
 
 pub mod traits;
 
-#[derive(Debug, Clone, PartialEq, Eq, Default)]
+#[derive(Debug, Clone, PartialEq, Eq, Default, Deserialize, Serialize)]
 pub struct ListenCollection {
     pub data: Vec<Listen>,
 }

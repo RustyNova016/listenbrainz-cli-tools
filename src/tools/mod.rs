@@ -6,3 +6,4 @@ pub mod lookup;
 pub mod musicbrainz;
 pub mod radio;
 pub mod stats;
+pub mod unstable;

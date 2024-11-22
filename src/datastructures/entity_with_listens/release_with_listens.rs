@@ -6,13 +6,15 @@ use musicbrainz_db_lite::models::listenbrainz::listen::Listen;
 use musicbrainz_db_lite::models::musicbrainz::recording::Recording;
 use musicbrainz_db_lite::models::musicbrainz::release::Release;
 use musicbrainz_db_lite::RowId;
+use serde::Deserialize;
+use serde::Serialize;
 
 use crate::datastructures::listen_collection::traits::ListenCollectionLike;
 use crate::datastructures::listen_collection::ListenCollection;
 
 use super::recording_with_listens::RecordingWithListens;
 
-#[derive(Debug, Clone, PartialEq, Eq, Getters)]
+#[derive(Debug, Clone, PartialEq, Eq, Getters, Deserialize, Serialize)]
 pub struct ReleaseWithListens {
     release: Release,
     listens: Vec<RecordingWithListens>,
@@ -50,6 +52,15 @@ impl ReleaseWithListens {
 
     pub fn push(&mut self, value: RecordingWithListens) {
         self.listens.push(value);
+    }
+
+    /// Return the listen count
+    pub fn len(&self) -> usize {
+        self.listens.iter().map(|r| r.len()).sum()
+    }
+
+    pub fn is_empty(&self) -> bool {
+        self.len() == 0
     }
 }
 

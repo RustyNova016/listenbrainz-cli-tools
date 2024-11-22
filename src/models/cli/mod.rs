@@ -1,3 +1,4 @@
+pub mod unstable;
 use std::io;
 
 use cache::CacheCommand;
@@ -10,6 +11,7 @@ use clap_complete::Shell;
 use config::ConfigCli;
 use lookup::LookupCommand;
 use mapping::MappingCommand;
+use unstable::UnstableCommand;
 
 use crate::models::cli::common::{GroupByTarget, SortSorterBy};
 use crate::models::cli::radio::RadioCommand;
@@ -150,6 +152,8 @@ pub enum Commands {
         #[arg(short, long, default_value_t = SortSorterBy::Count)]
         sort: SortSorterBy,
     },
+
+    Unstable(UnstableCommand),
 }
 
 impl Commands {
@@ -183,6 +187,8 @@ impl Commands {
             Self::Bump(val) => bump_command(val.clone()).await,
 
             Self::BumpDown(val) => bump_down_command(val.clone()).await,
+
+            Self::Unstable(val) => val.command.run().await,
         }
         Ok(())
     }
