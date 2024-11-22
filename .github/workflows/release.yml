@@ -36,7 +36,7 @@ jobs:
                   - name: Release
                     uses: softprops/action-gh-release@v2
                     with:
-                      files: target/release/listenbrainz-cli-tools
+                      files: target/release/alistral
                       tag_name: ${{needs.get-tag.outputs.tag}}
                     env:
                       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -62,7 +62,7 @@ jobs:
                   - name: Release
                     uses: softprops/action-gh-release@v2
                     with:
-                         files: target/release/listenbrainz-cli-tools.exe
+                         files: target/release/alistral.exe
                          tag_name: ${{needs.get-tag.outputs.tag}}
                     env:
                       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
