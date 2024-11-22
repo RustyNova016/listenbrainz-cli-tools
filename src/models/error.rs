@@ -41,6 +41,9 @@ pub enum Error {
     #[error("Tried to get user {0} but couldn't be found")]
     MissingUserError(String),
 
+    #[error("Tried to open the database {0} but it couldn't be found")]
+    MissingDatabaseFile(String),
+
     // --- Fetching Errors ---
     #[error("Error with the request.")]
     RequestError(reqwest::Error),
