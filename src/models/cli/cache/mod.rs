@@ -1,13 +1,14 @@
 use std::path::PathBuf;
 
 use crate::database::get_conn;
-use crate::models::config::Config;
+//use crate::models::config::Config;
 use crate::models::data::entity_database::ENTITY_DATABASE;
 use crate::models::data::musicbrainz_database::MUSICBRAINZ_DATABASE;
 use crate::tools::cache::delete_database;
-use crate::tools::listens::import::import_listen_dump;
+//use crate::tools::listens::import::import_listen_dump;
 use clap::ValueEnum;
 use clap::{Parser, Subcommand};
+use color_eyre::owo_colors::OwoColorize;
 use futures::try_join;
 
 #[derive(Parser, Debug, Clone)]
@@ -55,8 +56,17 @@ impl CacheCommand {
                 }
                 get_conn().await;
             }
-            CacheSubcommands::LoadDump { username, path } => {
-                import_listen_dump(path, &Config::check_username(username)).await;
+            CacheSubcommands::LoadDump {
+                username: _,
+                path: _,
+            } => {
+                println!();
+                println!("   {}", "Temporary unavailable :(".black().on_red().bold());
+                println!("The data dumps currently don't have enough information to be useful, and may give false informations.");
+                println!("So the feature is temporarily disabled");
+                println!();
+                println!("Please see: https://tickets.metabrainz.org/browse/LB-1687");
+                //import_listen_dump(path, &Config::check_username(username)).await;
             }
             CacheSubcommands::Clear { target } => {
                 let _ = try_join!(

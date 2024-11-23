@@ -147,27 +147,22 @@ impl ImportListen {
 
 #[cfg(test)]
 mod tests {
-    use std::path::PathBuf;
+    // use std::path::PathBuf;
+    // use musicbrainz_db_lite::models::listenbrainz::listen::Listen;
+    // use crate::database::get_conn;
+    // use crate::tools::listens::import::import_listen_dump;
 
-    use crate::tools::listens::import::import_listen_dump;
-
-    #[tokio::test]
-    async fn load_listen_dump_test() {
-        import_listen_dump(
-            &PathBuf::from("tests/data/listen_dump.zip".to_string()),
-            "TestNova",
-        )
-        .await;
-
-        // let listens = ENTITY_DATABASE
-        //     .user_listens()
-        //     .get("testnova")
-        //     .await
-        //     .unwrap();
-        // assert!(listens.is_some());
-
-        // let listens = listens.unwrap();
-
-        // assert_eq!(listens.len(), 12994);
-    }
+    // #[tokio::test]
+    // async fn load_listen_dump_test() {
+    //     import_listen_dump(
+    //         &PathBuf::from("tests/data/listen_dump.zip".to_string()),
+    //         "TestNova",
+    //     )
+    //     .await;
+    //
+    //     let conn = &mut *get_conn().await;
+    //
+    //     let listen = sqlx::query_as!(Listen, "SELECT * FROM listens WHERE listened_at = 1705054374").fetch_one(&mut *conn).await.expect("This listen should exist");
+    //     listen.get_recording_or_fetch(conn).await.expect("The listen should be mapped");
+    // }
 }
