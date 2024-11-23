@@ -14,7 +14,7 @@ static MUSICBRAINZ_LITE: OnceCell<DBClient> = OnceCell::new();
 
 pub static DB_LOCATION: Lazy<PathBuf> = Lazy::new(|| {
     let mut path = BaseDirs::new()
-        .expect("Couldn't find standard directory. Is your system an oddball one?")
+        .expect("Couldn't find the standard cache directory. Is your system an oddball one?")
         .cache_dir()
         .to_path_buf();
 

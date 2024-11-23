@@ -1,8 +1,10 @@
 use std::path::PathBuf;
 
+use crate::database::get_conn;
 use crate::models::config::Config;
 use crate::models::data::entity_database::ENTITY_DATABASE;
 use crate::models::data::musicbrainz_database::MUSICBRAINZ_DATABASE;
+use crate::tools::cache::delete_database;
 use crate::tools::listens::import::import_listen_dump;
 use clap::ValueEnum;
 use clap::{Parser, Subcommand};
@@ -17,6 +19,13 @@ pub struct CacheCommand {
 
 #[derive(Subcommand, Debug, Clone)]
 pub enum CacheSubcommands {
+    /// Initialise the database.
+    InitDatabase {
+        /// Wipe the database file beforehand
+        #[arg(long)]
+        reset: bool,
+    },
+
     /// Load a listen dump from the website
     ///
     /// Allows to load an exported dump of you listens. This is often faster than using the app.
@@ -40,6 +49,12 @@ pub enum CacheSubcommands {
 impl CacheCommand {
     pub async fn run(&self) -> color_eyre::Result<()> {
         match &self.command {
+            CacheSubcommands::InitDatabase { reset } => {
+                if *reset {
+                    delete_database().expect("Failed to delete the database");
+                }
+                get_conn().await;
+            }
             CacheSubcommands::LoadDump { username, path } => {
                 import_listen_dump(path, &Config::check_username(username)).await;
             }

@@ -44,6 +44,9 @@ pub enum Error {
     #[error("Tried to open the database {0} but it couldn't be found")]
     MissingDatabaseFile(String),
 
+    #[error("Filesystem error when accessing the cache")]
+    DatabaseIoError(io::Error),
+
     // --- Fetching Errors ---
     #[error("Error with the request.")]
     RequestError(reqwest::Error),
