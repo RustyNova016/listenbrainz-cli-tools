@@ -85,7 +85,6 @@ dependencies = [
  "derive_builder",
  "derive_more",
  "directories",
- "dotenvy",
  "extend",
  "futures",
  "humantime",
