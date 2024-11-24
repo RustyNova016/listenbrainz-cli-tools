@@ -16,6 +16,8 @@ jobs:
                     id: get-latest-tag
 
       release-linux:
+            env: 
+              SQLX_OFFLINE: true
             name: Create Release Linux
             runs-on: ubuntu-latest
             strategy:
@@ -36,12 +38,14 @@ jobs:
                   - name: Release
                     uses: softprops/action-gh-release@v2
                     with:
-                      files: target/release/listenbrainz-cli-tools
+                      files: target/release/alistral
                       tag_name: ${{needs.get-tag.outputs.tag}}
                     env:
                       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       release-windows:
+            env: 
+              SQLX_OFFLINE: true
             name: Create Release Windows
             runs-on: windows-latest
             strategy:
@@ -62,7 +66,7 @@ jobs:
                   - name: Release
                     uses: softprops/action-gh-release@v2
                     with:
-                         files: target/release/listenbrainz-cli-tools.exe
+                         files: target/release/alistral.exe
                          tag_name: ${{needs.get-tag.outputs.tag}}
                     env:
                       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

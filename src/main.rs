@@ -20,7 +20,6 @@ pub use crate::models::error::Error;
 #[tokio::main]
 async fn main() -> color_eyre::Result<()> {
     color_eyre::install()?;
-    dotenvy::dotenv().expect("Couldn't read the environment file");
     //let mut clog = colog::default_builder();
     //clog.filter(None, log::LevelFilter::Trace);
     //clog.init();

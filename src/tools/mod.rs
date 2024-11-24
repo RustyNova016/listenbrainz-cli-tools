@@ -1,4 +1,5 @@
 pub mod bumps;
+pub mod cache;
 pub mod compatibility;
 pub mod interactive_mapper;
 pub mod listens;
