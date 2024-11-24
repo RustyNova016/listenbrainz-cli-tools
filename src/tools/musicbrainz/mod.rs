@@ -1,3 +1,4 @@
+pub mod clippy;
 use crate::core::entity_traits::has_id::HasID;
 use crate::core::entity_traits::mb_cached::MBCached;
 use crate::core::entity_traits::mbid::{HasMBID, VecIExt};
