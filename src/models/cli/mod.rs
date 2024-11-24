@@ -20,6 +20,7 @@ use crate::models::cli::radio::RadioCommand;
 use crate::tools::bumps::bump_command;
 use crate::tools::bumps::bump_down_command;
 use crate::tools::compatibility::compatibility_command;
+use crate::tools::musicbrainz::clippy::mb_clippy;
 use crate::tools::daily::daily_report;
 use crate::tools::stats::stats_command;
 
@@ -99,6 +100,7 @@ pub struct BumpCLI {
 
 #[derive(Subcommand, Debug, Clone)]
 pub enum Commands {
+    A,
     Bump(BumpCLI),
 
     /// bump a recording to show up more frequently in radios that uses scores. By default, it uses the lastest listen as target.
@@ -173,6 +175,9 @@ pub enum Commands {
 impl Commands {
     pub async fn run(&self, conn: &mut sqlx::SqliteConnection) -> color_eyre::Result<()> {
         match self {
+            Self::A => {
+                mb_clippy().await;
+            },
             Self::Stats {
                 username,
                 target,

@@ -29,6 +29,8 @@ pub static RELEASE_DB_LOCATION: Lazy<PathBuf> = Lazy::new(|| {
     }
     path.push("data.db");
 
+    println!("{}", path.to_string_lossy());
+
     path
 });
 
