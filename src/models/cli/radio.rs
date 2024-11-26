@@ -5,11 +5,17 @@ use clap::{Parser, Subcommand};
 
 use crate::datastructures::radio::collector::RadioCollector;
 use crate::datastructures::radio::collector::RadioCollectorBuilder;
+use crate::datastructures::radio::seeders::listens::ListenSeeder;
+use crate::datastructures::radio::seeders::listens::ListenSeederBuilder;
+use crate::datastructures::radio::seeders::SeederSettings;
+use crate::datastructures::radio::seeders::SeederSettingsBuilder;
 use crate::models::config::Config;
 use crate::tools::radio::circles::create_radio_mix;
 use crate::tools::radio::listen_rate::listen_rate_radio;
 use crate::tools::radio::overdue::overdue_radio;
 //use crate::tools::radio::underrated::underrated_mix;
+
+use super::common::Timeframe;
 
 #[derive(Parser, Debug, Clone)]
 #[command(version, about, long_about = None)]
@@ -24,6 +30,14 @@ pub struct RadioCommand {
     /// The minimum duration the playlist should last for. This accept natural language (Ex: "1 hour 36 mins")
     #[arg(long)]
     min_duration: Option<String>,
+
+    /// For radios based on listens, what time range of listens to use as reference
+    #[arg(long)]
+    seed_listen_range: Option<Timeframe>,
+
+    /// When used with `seed_listen_range`, how many listens should be given as a minimum, even if they are outside of the range (Default: 3)
+    #[arg(long)]
+    min_seed_listens: Option<u64>,
 }
 
 impl RadioCommand {
@@ -51,8 +65,23 @@ impl RadioCommand {
         collector.build()
     }
 
+    fn get_seeder_settings(&self) -> SeederSettings {
+        SeederSettingsBuilder::default()
+            .min_listen_per_recording(self.min_seed_listens.unwrap_or(3))
+            .min_listened_at(self.seed_listen_range.map(|r| r.get_start_date()))
+            .max_listened_at_default()
+            .build()
+    }
+
+    fn get_listen_seeder(&self, username: &Option<String>) -> ListenSeeder {
+        ListenSeederBuilder::default()
+            .username(Config::check_username(username))
+            .settings(self.get_seeder_settings())
+            .build()
+    }
+
     pub async fn run(&self) -> color_eyre::Result<()> {
-        self.command.run(self.get_collector()).await
+        self.command.run(self.get_collector(), self).await
     }
 }
 
@@ -149,7 +178,11 @@ pub enum RadioSubcommands {
 }
 
 impl RadioSubcommands {
-    pub async fn run(&self, collector: RadioCollector) -> color_eyre::Result<()> {
+    pub async fn run(
+        &self,
+        collector: RadioCollector,
+        command: &RadioCommand,
+    ) -> color_eyre::Result<()> {
         match self {
             Self::Circles {
                 username,
@@ -158,7 +191,7 @@ impl RadioSubcommands {
                 //cooldown
             } => {
                 create_radio_mix(
-                    &Config::check_username(username),
+                    command.get_listen_seeder(username),
                     Config::check_token(&Config::check_username(username), token),
                     *unlistened,
                     collector,
@@ -181,7 +214,7 @@ impl RadioSubcommands {
                 cooldown,
             } => {
                 listen_rate_radio(
-                    &Config::check_username(username),
+                    command.get_listen_seeder(username),
                     &Config::check_token(&Config::check_username(username), token),
                     *min,
                     *cooldown,
@@ -198,12 +231,12 @@ impl RadioSubcommands {
                 overdue_factor: delay_factor,
             } => {
                 overdue_radio(
-                    &Config::check_username(username),
+                    command.get_listen_seeder(username),
                     &Config::check_token(&Config::check_username(username), token),
                     *min,
                     *cooldown,
                     *delay_factor,
-                    collector,
+                    command.get_collector(),
                 )
                 .await?;
             }
