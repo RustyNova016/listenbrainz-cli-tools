@@ -17,10 +17,8 @@ cargo install cargo-bump
 
 - Execute: 
 ```
-git cliff -o CHANGELOG.md
+git cliff -o CHANGELOG.md --tag <tag>
 ```
-
-- Edit changelog to add the version number
 
 - Edit cargo.toml to add the version number
 
