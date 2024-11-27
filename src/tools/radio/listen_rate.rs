@@ -7,28 +7,24 @@ use crate::datastructures::radio::collector::RadioCollector;
 use crate::datastructures::radio::filters::cooldown::cooldown_filter;
 use crate::datastructures::radio::filters::min_listens::min_listen_filter;
 use crate::datastructures::radio::filters::timeouts::timeout_filter;
-use crate::datastructures::radio::seeders::listens::ListenSeederBuilder;
+use crate::datastructures::radio::seeders::listens::ListenSeeder;
 use crate::datastructures::radio::sorters::listen_rate::listen_rate_sorter;
 use crate::models::data::musicbrainz::recording::mbid::RecordingMBID;
 use crate::utils::playlist::PlaylistStub;
 use crate::utils::println_cli;
 
 pub async fn listen_rate_radio(
-    username: &str,
+    seeder: ListenSeeder,
     token: &str,
     min_listens: Option<u64>,
     cooldown: u64,
     collector: RadioCollector,
 ) -> color_eyre::Result<()> {
     let conn = &mut *get_conn().await;
+    let username = seeder.username().clone();
 
     println_cli("[Seeding] Getting listens");
-    let recordings = ListenSeederBuilder::default()
-        .username(username)
-        .build()
-        .seed(conn)
-        .await
-        .expect("Couldn't find seed listens");
+    let recordings = seeder.seed(conn).await.expect("Couldn't find seed listens");
 
     println_cli("[Filter] Filtering minimum listen count");
     let recordings = min_listen_filter(recordings.into_values_stream(), min_listens.unwrap_or(3));

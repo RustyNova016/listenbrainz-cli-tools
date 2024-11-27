@@ -10,13 +10,13 @@ use rand::thread_rng;
 
 use crate::database::get_db_client;
 use crate::datastructures::radio::collector::RadioCollector;
-use crate::datastructures::radio::seeders::listens::ListenSeederBuilder;
+use crate::datastructures::radio::seeders::listens::ListenSeeder;
 use crate::models::data::musicbrainz::recording::mbid::RecordingMBID;
 use crate::utils::playlist::PlaylistStub;
 use crate::utils::println_cli;
 
 pub async fn create_radio_mix(
-    username: &str,
+    seeder: ListenSeeder,
     token: String,
     unlistened: bool,
     collector: RadioCollector,
@@ -28,13 +28,10 @@ pub async fn create_radio_mix(
         .await
         .expect("Couldn't get a database connection");
 
+    let username = seeder.username().clone();
+
     println_cli("[Seeding] Getting listens");
-    let recordings_with_listens = ListenSeederBuilder::default()
-        .username(username)
-        .build()
-        .seed(conn)
-        .await
-        .expect("Couldn't find seed listens");
+    let recordings_with_listens = seeder.seed(conn).await.expect("Couldn't find seed listens");
 
     let recordings = recordings_with_listens.iter_recordings().collect_vec();
 
