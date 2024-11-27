@@ -1,9 +1,11 @@
 use std::path::PathBuf;
 
 use crate::database::get_conn;
+use crate::database::DB_LOCATION;
 //use crate::models::config::Config;
 use crate::models::data::entity_database::ENTITY_DATABASE;
 use crate::models::data::musicbrainz_database::MUSICBRAINZ_DATABASE;
+use crate::tools::cache::copy_to_debug;
 use crate::tools::cache::delete_database;
 //use crate::tools::listens::import::import_listen_dump;
 use clap::ValueEnum;
@@ -20,6 +22,14 @@ pub struct CacheCommand {
 
 #[derive(Subcommand, Debug, Clone)]
 pub enum CacheSubcommands {
+    /// Copy the release database to the debug one.
+    ///
+    /// ⚠️ This wipe the debug database.
+    ///
+    /// ⚠️ If there is migrations, do `cargo sqlx migrate run` next
+    #[cfg(debug_assertions)]
+    CopyToDebug,
+
     /// Initialise the database.
     InitDatabase {
         /// Wipe the database file beforehand
@@ -50,9 +60,14 @@ pub enum CacheSubcommands {
 impl CacheCommand {
     pub async fn run(&self) -> color_eyre::Result<()> {
         match &self.command {
+            #[cfg(debug_assertions)]
+            CacheSubcommands::CopyToDebug => {
+                copy_to_debug();
+            }
+
             CacheSubcommands::InitDatabase { reset } => {
                 if *reset {
-                    delete_database().expect("Failed to delete the database");
+                    delete_database(&DB_LOCATION).expect("Failed to delete the database");
                 }
                 get_conn().await;
             }
