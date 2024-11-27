@@ -2,7 +2,98 @@
 
 All notable changes to this project will be documented in this file.
 
-## [0.2.2]
+## [0.3.2] - 2024-11-27
+
+### 🚀 Features
+
+- Copy release db to debug
+
+### ⚙️ Miscellaneous Tasks
+
+- Remove old migrations
+- Macos Build
+- Update manual release build
+- Bump version
+
+## [0.3.1] - 2024-11-24
+
+### 🚀 Features
+
+- Init database
+
+### 🐛 Bug Fixes
+
+- Remove dotenvy
+- Disable load dump
+
+### ⚙️ Miscellaneous Tasks
+
+- Bump version
+
+## [0.3.0] - 2024-11-22
+
+### 🚀 Features
+
+- Convert overdue radio to sqlite
+- Convert recording lookup
+- Recursive group by
+- ReleaseWithListens
+- Convert recording statistics
+- Convert release statistics
+- Use modular radio generation
+- Added cleanup for old values
+- Work stats
+- Release group stats
+- Migrate artist stats
+- BestOf2024
+
+### 🐛 Bug Fixes
+
+- Clippy fixes
+- Clippy Fixes
+- Debug assertion only lint
+- Create database if not exist
+- Release CI not being in OFFLINE mode
+- Not updated
+
+### 🚜 Refactor
+
+- Remove Welds
+- Set some deprecations
+- Migrated compatibility
+- Migrate listen rate radio
+- Listen seeder giving RecordingWithListensCollection
+- Change collector to only need recordings
+- Migrate radio circles
+- Radio cleanup
+- Migrate unmapped listen list
+- Cleanup
+- Migrate listen dump import
+- Remove old listen importer
+- Changed project name
+
+### 🎨 Styling
+
+- Cargo fmt
+- Cargo fmt
+
+### 🧪 Testing
+
+- Remove broken tests
+- Remove test as way too slow to run
+
+### ⚙️ Miscellaneous Tasks
+
+- Deactivate underrated radio for now
+- Update depandencies
+- Fix SQLX offline
+- Bump version
+
+### CI
+
+- Fix release CI
+
+## [0.2.2] - 2024-10-10
 
 ### 🚀 Features
 
@@ -23,6 +114,8 @@ All notable changes to this project will be documented in this file.
 - Clippy fixes
 - MBID parsing
 - Clippy fixes
+- Properly calculate average time between listens
+- 1.80 clippy warnings
 
 ### 🧪 Testing
 
@@ -31,6 +124,7 @@ All notable changes to this project will be documented in this file.
 ### ⚙️ Miscellaneous Tasks
 
 - Add .env to gitingore
+- Release
 
 ## [0.2.1] - 2024-07-08
 
