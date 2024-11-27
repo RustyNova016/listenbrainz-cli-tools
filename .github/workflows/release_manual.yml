@@ -14,6 +14,8 @@ jobs:
                     id: get-latest-tag
 
       release-linux:
+            env: 
+              SQLX_OFFLINE: true
             name: Create Release Linux
             runs-on: ubuntu-latest
             strategy:
@@ -30,16 +32,21 @@ jobs:
 
                   - name: Build
                     run: cargo build --all --release
+
+                  - name: Rename
+                    run: mv target/release/alistral target/release/alistral-linux
         
                   - name: Release
                     uses: softprops/action-gh-release@v2
                     with:
-                      files: target/release/listenbrainz-cli-tools
+                      files: target/release/alistral-linux
                       tag_name: ${{needs.get-tag.outputs.tag}}
                     env:
                       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       release-windows:
+            env: 
+              SQLX_OFFLINE: true
             name: Create Release Windows
             runs-on: windows-latest
             strategy:
@@ -56,11 +63,45 @@ jobs:
 
                   - name: Build
                     run: cargo build --all --release    
+
+                  - name: Rename
+                    run: mv target/release/alistral.exe target/release/alistral-windows.exe
         
                   - name: Release
                     uses: softprops/action-gh-release@v2
                     with:
-                         files: target/release/listenbrainz-cli-tools.exe
+                         files: target/release/alistral-windows.exe
+                         tag_name: ${{needs.get-tag.outputs.tag}}
+                    env:
+                      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      release-macos:
+            env: 
+              SQLX_OFFLINE: true
+            name: Create Release Windows
+            runs-on: macos-latest
+            strategy:
+                  fail-fast: false
+            needs: get-tag
+            steps:
+                  - uses: actions/checkout@v4
+
+                  - name: Install toolchain
+                    uses: actions-rs/toolchain@v1
+                    with:
+                      toolchain: stable
+                      override: true
+
+                  - name: Build
+                    run: cargo build --all --release    
+
+                  - name: Rename
+                    run: mv target/release/alistral target/release/alistral-macos
+        
+                  - name: Release
+                    uses: softprops/action-gh-release@v2
+                    with:
+                         files: target/release/alistral-macos
                          tag_name: ${{needs.get-tag.outputs.tag}}
                     env:
                       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
