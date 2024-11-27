@@ -1,4 +1,5 @@
 pub mod collection;
+pub mod info;
 use std::collections::HashMap;
 
 use chrono::{DateTime, Duration, Utc};
