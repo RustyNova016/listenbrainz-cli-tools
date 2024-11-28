@@ -1,3 +1,4 @@
+pub mod listens;
 pub mod unstable;
 use std::io;
 
@@ -9,6 +10,7 @@ use clap_complete::generate;
 use clap_complete::Generator;
 use clap_complete::Shell;
 use config::ConfigCli;
+use listens::ListenCommand;
 use lookup::LookupCommand;
 use mapping::MappingCommand;
 use unstable::UnstableCommand;
@@ -117,6 +119,9 @@ pub enum Commands {
     /// Commands to deal with the app's configuration
     Config(ConfigCli),
 
+    /// Commands to edit listens
+    Listens(ListenCommand),
+
     /// Get detailled information about an entity
     Lookup(LookupCommand),
 
@@ -179,6 +184,8 @@ impl Commands {
             Self::Cache(val) => val.run().await?,
 
             Self::Config(val) => val.command.run().await?,
+
+            Self::Listens(val) => val.run().await,
 
             Self::Lookup(val) => val.run().await?,
 

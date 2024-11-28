@@ -49,7 +49,7 @@ pub enum Error {
 
     // --- Fetching Errors ---
     #[error("Error with the request.")]
-    RequestError(reqwest::Error),
+    RequestError(#[from] reqwest::Error),
 
     #[error("Couldn't decode the server's responce")]
     RequestDecodeError(reqwest::Error),
