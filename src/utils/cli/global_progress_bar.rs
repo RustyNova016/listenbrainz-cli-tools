@@ -114,7 +114,7 @@ impl<'pg> Deref for SubmitterGuard<'pg> {
     }
 }
 
-impl<'pg> Drop for SubmitterGuard<'pg> {
+impl Drop for SubmitterGuard<'_> {
     fn drop(&mut self) {
         self.0.bar.remove_submiter(&self.0);
     }
