@@ -25,7 +25,7 @@ pub async fn lookup_recording(username: &str, id: RecordingMBID) -> color_eyre::
         .fetch(conn)
         .await?;
 
-    let Some(recording) = Recording::get_or_fetch(conn, &id.to_string()).await? else {
+    let Some(recording) = Recording::fetch_and_save(conn, &id.to_string()).await? else {
         println_cli(format!("Couldn't find the recording with id: {id}"));
         return Ok(());
     };
