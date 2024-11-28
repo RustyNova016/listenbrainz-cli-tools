@@ -41,7 +41,7 @@ pub struct GlobalConfigGuard<'a> {
     pub(self) config: RwLockWriteGuard<'a, Config>,
 }
 
-impl<'a> Drop for GlobalConfigGuard<'a> {
+impl Drop for GlobalConfigGuard<'_> {
     fn drop(&mut self) {
         if panicking() {
             return;
@@ -51,7 +51,7 @@ impl<'a> Drop for GlobalConfigGuard<'a> {
     }
 }
 
-impl<'a> Deref for GlobalConfigGuard<'a> {
+impl Deref for GlobalConfigGuard<'_> {
     type Target = Config;
 
     fn deref(&self) -> &Self::Target {
@@ -59,7 +59,7 @@ impl<'a> Deref for GlobalConfigGuard<'a> {
     }
 }
 
-impl<'a> DerefMut for GlobalConfigGuard<'a> {
+impl DerefMut for GlobalConfigGuard<'_> {
     fn deref_mut(&mut self) -> &mut Self::Target {
         self.config.deref_mut()
     }

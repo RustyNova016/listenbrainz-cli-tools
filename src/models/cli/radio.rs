@@ -171,7 +171,6 @@ pub enum RadioSubcommands {
         /// Sort the recordings by the time overdue / the average time between listens
         ///
         /// Instead of sorting by date, the listens are sorted by how many estimated listens should have happened by now (Time elapsed since last listen / Average time per listens)
-
         #[arg(short, long, default_value_t = false)]
         overdue_factor: bool,
     },
