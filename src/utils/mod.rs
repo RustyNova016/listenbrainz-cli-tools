@@ -13,6 +13,7 @@ pub mod cli;
 pub mod cli_paging;
 pub mod env;
 pub mod extensions;
+pub mod listenbrainz_api;
 pub mod logger;
 pub mod playlist;
 pub mod radio;
