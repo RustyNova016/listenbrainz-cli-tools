@@ -52,7 +52,7 @@ indicatif = { version = "0.17.8", features = [
 tokio = { version = "1.40.0", features = ["full"] }
 rayon = "1.10.0"
 reqwest = { version = "0.12.8", features = ["json"] }
-cacache = { version = "13.0.0", default-features = false, features = [
+cacache = { version = "13.1.0", default-features = false, features = [
     "tokio-runtime",
     "mmap",
 ] }
