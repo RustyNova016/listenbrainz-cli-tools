@@ -3,6 +3,7 @@ use chrono::Local;
 use color_eyre::owo_colors::OwoColorize;
 use humantime::format_duration;
 use indoc::formatdoc;
+use rust_decimal::Decimal;
 
 use crate::datastructures::listen_collection::traits::ListenCollectionLike;
 use crate::models::config::Config;
@@ -82,9 +83,9 @@ The recording hasn't been listened to yet",
             .unwrap()
             .floor_to_second(),
             overdue = get_overdue_line(self),
-            overdue_score = self.overdue_factor().trunc_with_scale(2),
-            overdue_mul = (self.overdue_factor()
-            * conf.bumps.get_multiplier(&RecordingMBID::from(
+            overdue_score = self.overdue_factor().trunc_with_scale(2)  + Decimal::ONE,
+            overdue_mul = ((self.overdue_factor() + Decimal::ONE)
+            * conf.bumps.get_multiplier2(&RecordingMBID::from(
                 self.recording().mbid.clone()
             )))
         .trunc_with_scale(2)
@@ -100,7 +101,7 @@ fn get_overdue_line(recording_info: &RecordingWithListens) -> String {
     }
 
     format!(
-        "\n    - Overdue by: {}",
+        "    - Overdue by: {}",
         format_duration(time.floor_to_minute().to_std().unwrap())
     )
 }
