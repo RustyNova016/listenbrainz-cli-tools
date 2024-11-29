@@ -14,13 +14,13 @@ use config::ConfigCli;
 use listens::ListenCommand;
 use lookup::LookupCommand;
 use mapping::MappingCommand;
+use musicbrainz::MusicbrainzCommand;
 use unstable::UnstableCommand;
 
 use crate::models::cli::radio::RadioCommand;
 use crate::tools::bumps::bump_command;
 use crate::tools::bumps::bump_down_command;
 use crate::tools::compatibility::compatibility_command;
-use crate::tools::musicbrainz::clippy::mb_clippy;
 use crate::tools::daily::daily_report;
 use crate::tools::stats::stats_command;
 
@@ -30,8 +30,10 @@ pub mod cache;
 pub mod common;
 pub mod config;
 pub mod listens;
+pub mod listens;
 pub mod lookup;
 pub mod mapping;
+pub mod musicbrainz;
 pub mod radio;
 pub mod unstable;
 
@@ -100,7 +102,6 @@ pub struct BumpCLI {
 
 #[derive(Subcommand, Debug, Clone)]
 pub enum Commands {
-    A,
     Bump(BumpCLI),
 
     /// bump a recording to show up more frequently in radios that uses scores. By default, it uses the lastest listen as target.
@@ -139,6 +140,9 @@ pub enum Commands {
     /// Commands for interacting with listen mappings
     Mapping(MappingCommand),
 
+    /// Commands for musicbrainz stuff
+    Musicbrainz(MusicbrainzCommand),
+
     /// Generate radio playlists for you
     Radio(RadioCommand),
 
@@ -175,9 +179,6 @@ pub enum Commands {
 impl Commands {
     pub async fn run(&self, conn: &mut sqlx::SqliteConnection) -> color_eyre::Result<()> {
         match self {
-            Self::A => {
-                mb_clippy().await;
-            },
             Self::Stats {
                 username,
                 target,
@@ -209,6 +210,8 @@ impl Commands {
             Self::Lookup(val) => val.run().await?,
 
             Self::Mapping(val) => val.run(conn).await?,
+
+            Self::Musicbrainz(val) => val.run().await,
 
             Self::Bump(val) => bump_command(conn, val.clone()).await,
 

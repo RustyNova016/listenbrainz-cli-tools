@@ -11,13 +11,13 @@ use crate::{
     models::clippy::MbClippyLint,
 };
 
-pub async fn mb_clippy() {
+pub async fn mb_clippy(start_mbid: &str) {
     let mut conn = get_conn().await;
 
-    let start_node = Recording::fetch_and_save(&mut conn, "543bb836-fb00-470a-8a27-25941fe0294c")
+    let start_node = Recording::fetch_and_save(&mut conn,start_mbid)
         .await
         .unwrap()
-        .unwrap();
+        .expect("Couldn't find MBID");
 
     let mut queue = VecDeque::new();
     queue.push_back(MainEntity::Recording(start_node));
@@ -118,6 +118,6 @@ mod tests {
 
     #[tokio::test]
     async fn mb_clippy_test() {
-        mb_clippy().await;
+        mb_clippy("543bb836-fb00-470a-8a27-25941fe0294c").await;
     }
 }

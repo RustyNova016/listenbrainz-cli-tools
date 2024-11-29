@@ -37,8 +37,8 @@ impl MbClippyLint for MissingWorkLint {
         conn: &mut sqlx::SqliteConnection,
     ) -> Result<impl std::fmt::Display, crate::Error> {
         Ok(format!("Recording \"{}\" has no associated works
--> Recordings should all have works associated to them. Please check if a work exists for a recording and add it / create it
-                ", self.recording.format_with_credits(conn).await?))
+-> Recordings should have works associated to them. Please check if a work exists for a recording and add it / create it"
+, self.recording.format_with_credits(conn).await?))
     }
 
     async fn get_links(
