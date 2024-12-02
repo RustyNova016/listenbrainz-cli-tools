@@ -22,9 +22,9 @@ pub enum MusicbrainzSubcommands {
     /// Search for potential mistakes, missing data and style issues. This allows to quickly pin down errors that can be corrected
     ///
     /// ⚠️ All tips are suggestions. Take them with a grain of salt. If you are unsure, it's preferable to skip.
-    Clippy { 
+    Clippy {
         /// The MBID of a recording to start from
-        start_mbid: Option<String> 
+        start_mbid: Option<String>,
     },
 }
 

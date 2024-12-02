@@ -65,4 +65,12 @@ impl MbClippyLint for MissingWorkLint {
 
         Ok(out)
     }
+
+    async fn get_hints(
+        &self,
+        conn: &mut sqlx::SqliteConnection,
+    ) -> Result<Vec<crate::models::clippy::MbClippyLintHint>, crate::Error> {
+        // TODO: Remix hint
+        Ok(Vec::new())
+    }
 }

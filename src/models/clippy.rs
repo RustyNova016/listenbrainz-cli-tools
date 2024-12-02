@@ -20,6 +20,11 @@ pub trait MbClippyLint: Sized {
         &self,
         conn: &mut sqlx::SqliteConnection,
     ) -> Result<Vec<MbClippyLintLink>, crate::Error>;
+
+    async fn get_hints(
+        &self,
+        conn: &mut sqlx::SqliteConnection,
+    ) -> Result<Vec<MbClippyLintHint>, crate::Error>;
 }
 
 pub struct MbClippyLintLink {
@@ -30,6 +35,18 @@ pub struct MbClippyLintLink {
 impl Display for MbClippyLintLink {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}: {}", self.name, self.url.blue())?;
+
+        Ok(())
+    }
+}
+
+pub struct MbClippyLintHint {
+    text: String,
+}
+
+impl Display for MbClippyLintHint {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "= Hint: {}", self.text)?;
 
         Ok(())
     }

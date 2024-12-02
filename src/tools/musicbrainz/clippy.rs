@@ -2,19 +2,19 @@ use std::collections::VecDeque;
 
 use color_eyre::owo_colors::OwoColorize;
 use futures::TryStreamExt;
-use musicbrainz_db_lite::models::musicbrainz::{main_entities::MainEntity, recording::Recording};
+use musicbrainz_db_lite::models::musicbrainz::main_entities::MainEntity;
+use musicbrainz_db_lite::models::musicbrainz::recording::Recording;
 
+use crate::database::get_conn;
+use crate::datastructures::clippy::missing_release_barcode::MissingBarcodeLint;
+use crate::models::clippy::MbClippyLint;
 use crate::utils::cli::await_next;
 use crate::utils::println_cli;
-use crate::{
-    database::get_conn, datastructures::clippy::missing_work::MissingWorkLint,
-    models::clippy::MbClippyLint,
-};
 
 pub async fn mb_clippy(start_mbid: &str) {
     let mut conn = get_conn().await;
 
-    let start_node = Recording::fetch_and_save(&mut conn,start_mbid)
+    let start_node = Recording::fetch_and_save(&mut conn, start_mbid)
         .await
         .unwrap()
         .expect("Couldn't find MBID");
@@ -24,11 +24,15 @@ pub async fn mb_clippy(start_mbid: &str) {
     let mut seen = Vec::new();
 
     while let Some(entity) = queue.pop_back() {
-        if seen.iter().any(|done: &MainEntity| done.is_equal_by_mbid(&entity)) {
+        if seen
+            .iter()
+            .any(|done: &MainEntity| done.is_equal_by_mbid(&entity))
+        {
             continue;
         }
 
-        check_lint::<MissingWorkLint>(&mut conn, &entity).await;
+        //check_lint::<MissingWorkLint>(&mut conn, &entity).await;
+        check_lint::<MissingBarcodeLint>(&mut conn, &entity).await;
 
         queue.extend(
             get_new_nodes(&mut conn, &entity)
