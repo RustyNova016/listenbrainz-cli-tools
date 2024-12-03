@@ -1,8 +1,6 @@
 # Alistral
 
-[![Crate](https://img.shields.io/crates/v/alistral)](https://crates.io/crates/alistral)
 [![CI builder](https://github.com/RustyNova016/alistral/actions/workflows/rust.yml/badge.svg)](https://github.com/RustyNova016/alistral/actions/workflows/rust.yml)
-[![License](https://img.shields.io/crates/l/alistral)](https://github.com/RustyNova016/alistral/blob/master/LICENSE)
 
 A collection of CLI based tools for Listenbrainz.
 
