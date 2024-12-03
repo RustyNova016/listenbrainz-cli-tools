@@ -2,11 +2,26 @@
 
 All notable changes to this project will be documented in this file.
 
-## [0.3.2] - 2024-11-27
+## [0.3.3] - 2024-12-03
 
 ### 🚀 Features
 
 - Copy release db to debug
+- Seed time range for radio
+- Add listen msid remapper
+- Daily report
+
+### 🐛 Bug Fixes
+
+- Refresh recording on lookup
+- Rust 1.83 fixes
+- Bump score in lookup
+- Comment out tests
+- Remove broken badges
+
+### 🚜 Refactor
+
+- Move lookup report to recording_with_listens
 
 ### ⚙️ Miscellaneous Tasks
 
@@ -14,6 +29,7 @@ All notable changes to this project will be documented in this file.
 - Macos Build
 - Update manual release build
 - Bump version
+- Update CMD help
 
 ## [0.3.1] - 2024-11-24
 
