@@ -3,11 +3,9 @@ use derive_new::new;
 use rust_decimal::{prelude::One, Decimal};
 use serde::{Deserialize, Serialize};
 
-use crate::models::data::musicbrainz::recording::mbid::RecordingMBID;
-
 #[derive(Serialize, Deserialize, new, Default, Debug)]
 pub struct Bump {
-    pub(self) recording: RecordingMBID,
+    pub(self) recording: String,
     pub(self) username: String,
     pub(self) value: Decimal,
     pub(self) expiration_date: DateTime<Utc>,
@@ -19,7 +17,7 @@ pub struct BumpList(Vec<Bump>);
 impl BumpList {
     pub fn add_bump(
         &mut self,
-        recording: RecordingMBID,
+        recording: String,
         username: String,
         value: Decimal,
         expiration_date: DateTime<Utc>,
