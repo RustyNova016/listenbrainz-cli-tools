@@ -18,6 +18,10 @@ impl RecordingWithListensCollection {
         self.0.values().map(|r| r.recording())
     }
 
+    pub fn values(&self) -> impl Iterator<Item = &RecordingWithListens> {
+        self.0.values()
+    }
+
     pub fn into_iter_recordings(self) -> impl Iterator<Item = Recording> {
         self.0.into_values().map(|r| r.recording)
     }
