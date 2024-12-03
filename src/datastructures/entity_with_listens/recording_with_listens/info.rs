@@ -7,7 +7,6 @@ use rust_decimal::Decimal;
 
 use crate::datastructures::listen_collection::traits::ListenCollectionLike;
 use crate::models::config::Config;
-use crate::models::data::musicbrainz::recording::mbid::RecordingMBID;
 use crate::utils::extensions::chrono_ext::DateTimeUtcExt;
 use crate::utils::extensions::chrono_ext::DurationExt;
 
