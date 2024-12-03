@@ -18,6 +18,10 @@ impl RecordingWithListensCollection {
         self.0.values().map(|r| r.recording())
     }
 
+    pub fn values(&self) -> impl Iterator<Item = &RecordingWithListens> {
+        self.0.values()
+    }
+
     pub fn into_iter_recordings(self) -> impl Iterator<Item = Recording> {
         self.0.into_values().map(|r| r.recording)
     }
@@ -56,6 +60,31 @@ impl RecordingWithListensCollection {
     pub fn into_values_stream(self) -> impl Stream<Item = RecordingWithListens> {
         stream::iter(self.0.into_values())
     }
+
+    /// Remove all the recordings with less or equal than the provided count
+    pub fn retain_more_than_count(&mut self, count: usize) {
+        let mut deathlist = Vec::new();
+
+        for (id, entity) in &self.0 {
+            if entity.listen_count() <= count {
+                deathlist.push(*id);
+            }
+        }
+
+        for id in deathlist {
+            self.0.remove(&id);
+        }
+    }
+
+    pub fn merge(&mut self, other: Self) {
+        for (new_id, new_entity) in other.0 {
+            if let Some(old_entity) = self.0.get_mut(&new_id) {
+                old_entity.merge(new_entity);
+            } else {
+                self.0.insert(new_id, new_entity);
+            }
+        }
+    }
 }
 
 impl ListenCollectionLike for RecordingWithListensCollection {
@@ -75,5 +104,17 @@ impl From<HashMap<i64, RecordingWithListens>> for RecordingWithListensCollection
 impl From<RecordingWithListensCollection> for HashMap<i64, RecordingWithListens> {
     fn from(value: RecordingWithListensCollection) -> Self {
         value.0
+    }
+}
+
+impl From<Vec<RecordingWithListens>> for RecordingWithListensCollection {
+    fn from(value: Vec<RecordingWithListens>) -> Self {
+        let mut out = HashMap::new();
+
+        for val in value {
+            out.insert(val.recording().id, val);
+        }
+
+        out.into()
     }
 }

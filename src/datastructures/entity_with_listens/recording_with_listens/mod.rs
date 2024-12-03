@@ -1,4 +1,5 @@
 pub mod collection;
+pub mod info;
 use std::collections::HashMap;
 
 use chrono::{DateTime, Duration, Utc};
@@ -160,6 +161,18 @@ impl RecordingWithListens {
         Decimal::from(period.num_seconds()).checked_div(Decimal::from(
             self.average_duration_between_listens().num_seconds(),
         ))
+    }
+
+    pub fn merge(&mut self, other: Self) {
+        if self.recording.id != other.recording.id {
+            #[cfg(debug_assertions)] // This is an awkward situation. Let's crash in debug to catch those cases
+            panic!("Tried to merge two different recordings");
+
+            #[cfg(not(debug_assertions))]
+            return;
+        }
+
+        self.listens.merge_by_index(other.listens);
     }
 }
 

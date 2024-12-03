@@ -25,10 +25,9 @@ impl StatisticSorter {
 
         let new = Mutex::new(ListenCollection::new());
         self.listens.insert(key.to_string(), new);
-        return self
-            .listens
+        self.listens
             .get(key)
-            .expect("Failed to get element just inserted");
+            .expect("Failed to get element just inserted")
     }
 
     pub fn insert(&self, key: &str, listen: Arc<Listen>) {

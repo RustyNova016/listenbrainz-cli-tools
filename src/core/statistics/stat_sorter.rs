@@ -19,10 +19,9 @@ pub trait StatSorter {
                 .insert(key.clone(), ListenCollection::new());
         }
 
-        return self
-            .get_map_mut()
+        self.get_map_mut()
             .get_mut(key)
-            .expect("Could not retrieve EntityStats from stat list");
+            .expect("Could not retrieve EntityStats from stat list")
     }
 
     #[expect(async_fn_in_trait)] // This temporary until the sorters get redone

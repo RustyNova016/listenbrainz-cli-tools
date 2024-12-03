@@ -89,7 +89,7 @@ impl UserListens {
 
         // While we have still items, and that we aren't already reached the cached listens
         while last_count != 0
-            && !latest_cached_listen_date.is_some_and(|cache_date| cache_date > before_date)
+            && latest_cached_listen_date.is_none_or(|cache_date| cache_date <= before_date)
         {
             // We fetch a page of listens
             let result = Self::fetch_before(username, before_date).await?;

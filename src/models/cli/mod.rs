@@ -1,23 +1,26 @@
-pub mod unstable;
 use std::io;
 
 use cache::CacheCommand;
 use clap::Command;
 use clap::CommandFactory;
-use clap::{Parser, Subcommand};
+use clap::Parser;
+use clap::Subcommand;
 use clap_complete::generate;
 use clap_complete::Generator;
 use clap_complete::Shell;
+use common::GroupByTarget;
+use common::SortSorterBy;
 use config::ConfigCli;
+use listens::ListenCommand;
 use lookup::LookupCommand;
 use mapping::MappingCommand;
 use unstable::UnstableCommand;
 
-use crate::models::cli::common::{GroupByTarget, SortSorterBy};
 use crate::models::cli::radio::RadioCommand;
 use crate::tools::bumps::bump_command;
 use crate::tools::bumps::bump_down_command;
 use crate::tools::compatibility::compatibility_command;
+use crate::tools::daily::daily_report;
 use crate::tools::stats::stats_command;
 
 use super::config::Config;
@@ -25,9 +28,11 @@ use super::config::Config;
 pub mod cache;
 pub mod common;
 pub mod config;
+pub mod listens;
 pub mod lookup;
 pub mod mapping;
 pub mod radio;
+pub mod unstable;
 
 /// Tools for Listenbrainz
 #[derive(Parser, Debug, Clone)]
@@ -117,6 +122,15 @@ pub enum Commands {
     /// Commands to deal with the app's configuration
     Config(ConfigCli),
 
+    /// Daily report
+    Daily {
+        /// Name of the user to fetch stats listen from
+        username: Option<String>,
+    },
+
+    /// Commands to edit listens
+    Listens(ListenCommand),
+
     /// Get detailled information about an entity
     Lookup(LookupCommand),
 
@@ -179,6 +193,10 @@ impl Commands {
             Self::Cache(val) => val.run().await?,
 
             Self::Config(val) => val.command.run().await?,
+
+            Self::Daily { username } => daily_report(&Config::check_username(username)).await,
+
+            Self::Listens(val) => val.run().await,
 
             Self::Lookup(val) => val.run().await?,
 

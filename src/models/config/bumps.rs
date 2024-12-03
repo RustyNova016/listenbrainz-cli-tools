@@ -32,22 +32,6 @@ impl BumpList {
         });
     }
 
-    #[deprecated]
-    pub fn get_multiplier(&self, recording: &RecordingMBID) -> Decimal {
-        let values = self
-            .0
-            .iter()
-            .filter(|b| &b.recording == recording && b.expiration_date > Utc::now())
-            .map(|b| b.value);
-        let mut res = Decimal::one();
-
-        for val in values {
-            res *= val;
-        }
-
-        res
-    }
-
     pub fn get_multiplier2(&self, recording_mbid: &str) -> Decimal {
         let values = self
             .0

@@ -8,6 +8,8 @@ This document contains the help content for the `alistral` command-line program.
 * [`alistral bump`↴](#alistral-bump)
 * [`alistral bump-down`↴](#alistral-bump-down)
 * [`alistral cache`↴](#alistral-cache)
+* [`alistral cache copy-to-debug`↴](#alistral-cache-copy-to-debug)
+* [`alistral cache init-database`↴](#alistral-cache-init-database)
 * [`alistral cache load-dump`↴](#alistral-cache-load-dump)
 * [`alistral cache clear`↴](#alistral-cache-clear)
 * [`alistral compatibility`↴](#alistral-compatibility)
@@ -18,6 +20,9 @@ This document contains the help content for the `alistral` command-line program.
 * [`alistral config listens`↴](#alistral-config-listens)
 * [`alistral config listens refresh-unmapped-listens`↴](#alistral-config-listens-refresh-unmapped-listens)
 * [`alistral config default-user`↴](#alistral-config-default-user)
+* [`alistral daily`↴](#alistral-daily)
+* [`alistral listens`↴](#alistral-listens)
+* [`alistral listens remap-msid`↴](#alistral-listens-remap-msid)
 * [`alistral lookup`↴](#alistral-lookup)
 * [`alistral mapping`↴](#alistral-mapping)
 * [`alistral mapping list-unmapped`↴](#alistral-mapping-list-unmapped)
@@ -27,6 +32,8 @@ This document contains the help content for the `alistral` command-line program.
 * [`alistral radio rate`↴](#alistral-radio-rate)
 * [`alistral radio overdue`↴](#alistral-radio-overdue)
 * [`alistral stats`↴](#alistral-stats)
+* [`alistral unstable`↴](#alistral-unstable)
+* [`alistral unstable best-of-mc`↴](#alistral-unstable-best-of-mc)
 
 ## `alistral`
 
@@ -41,10 +48,13 @@ A CLI app containing a set of useful tools for Listenbrainz
 * `cache` — Commands to deal with the local cache
 * `compatibility` — 
 * `config` — Commands to deal with the app's configuration
+* `daily` — Daily report
+* `listens` — Commands to edit listens
 * `lookup` — Get detailled information about an entity
 * `mapping` — Commands for interacting with listen mappings
 * `radio` — Generate radio playlists for you
 * `stats` — Shows top statistics for a specific target
+* `unstable` — A CLI app containing a set of useful tools for Listenbrainz
 
 ###### **Options:**
 
@@ -107,8 +117,34 @@ Commands to deal with the local cache
 
 ###### **Subcommands:**
 
+* `copy-to-debug` — Copy the release database to the debug one
+* `init-database` — Initialise the database
 * `load-dump` — Load a listen dump from the website
 * `clear` — Wipe the cache's data
+
+
+
+## `alistral cache copy-to-debug`
+
+Copy the release database to the debug one.
+
+⚠️ This wipe the debug database.
+
+⚠️ If there is migrations, do `cargo sqlx migrate run` next
+
+**Usage:** `alistral cache copy-to-debug`
+
+
+
+## `alistral cache init-database`
+
+Initialise the database
+
+**Usage:** `alistral cache init-database [OPTIONS]`
+
+###### **Options:**
+
+* `--reset` — Wipe the database file beforehand
 
 
 
@@ -254,6 +290,45 @@ Set the default username
 
 
 
+## `alistral daily`
+
+Daily report
+
+**Usage:** `alistral daily [USERNAME]`
+
+###### **Arguments:**
+
+* `<USERNAME>` — Name of the user to fetch stats listen from
+
+
+
+## `alistral listens`
+
+Commands to edit listens
+
+**Usage:** `alistral listens <COMMAND>`
+
+###### **Subcommands:**
+
+* `remap-msid` — Changes all the listens of a recording into another. Useful if LB mapped to a recording you never listened
+
+
+
+## `alistral listens remap-msid`
+
+Changes all the listens of a recording into another. Useful if LB mapped to a recording you never listened
+
+**Usage:** `alistral listens remap-msid <ORIGINAL_ID> <NEW_ID> [USERNAME] [TOKEN]`
+
+###### **Arguments:**
+
+* `<ORIGINAL_ID>` — The MBID of the recording
+* `<NEW_ID>` — The MBID of the recorind to replace it with
+* `<USERNAME>` — Your username
+* `<TOKEN>` — Your account token
+
+
+
 ## `alistral lookup`
 
 Get detailled information about an entity
@@ -365,6 +440,17 @@ Generate radio playlists for you
 
 * `--min-count <MIN_COUNT>` — The minimum count of tracks the radio should add to the playlist. (Default: 50, gets overidden by `--min-duration`)
 * `--min-duration <MIN_DURATION>` — The minimum duration the playlist should last for. This accept natural language (Ex: "1 hour 36 mins")
+* `--seed-listen-range <SEED_LISTEN_RANGE>` — For radios based on listens, what time range of listens to use as reference
+
+  Possible values:
+  - `last30-days`:
+    Uses the last 30 days from now
+  - `last90-days`:
+    Uses the last 30 days from now
+  - `last365-days`:
+    Uses the last 365 days from now
+
+* `--min-seed-listens <MIN_SEED_LISTENS>` — When used with `seed_listen_range`, how many listens should be given as a minimum, even if they are outside of the range (Default: 3)
 
 
 
@@ -480,6 +566,32 @@ Target is the entity type to group the stats by. Currently, those entities stats
   - `oldest`:
     The oldest element
 
+
+
+
+## `alistral unstable`
+
+A CLI app containing a set of useful tools for Listenbrainz
+
+**Usage:** `alistral unstable <COMMAND>`
+
+###### **Subcommands:**
+
+* `best-of-mc` — See what your favourite Monstercat releases of this year are, and have an easier time voting for this year's Best of 2024!
+
+
+
+## `alistral unstable best-of-mc`
+
+See what your favourite Monstercat releases of this year are, and have an easier time voting for this year's Best of 2024!
+
+You can get a listen dump [here](https://listenbrainz.org/settings/export/)
+
+**Usage:** `alistral unstable best-of-mc [USERNAME]`
+
+###### **Arguments:**
+
+* `<USERNAME>` — Name of the user to look up stats from
 
 
 
