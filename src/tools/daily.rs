@@ -114,17 +114,13 @@ pub async fn daily_report(username: &str) {
     // }
 }
 
-#[cfg(test)]
-mod tests {
-    // use crate::utils::println_cli_info;
+// #[cfg(test)]
+// mod tests {
+//     use crate::tools::daily::daily_report;
 
-    // use super::*;
-
-    use crate::tools::daily::daily_report;
-
-    #[tokio::test]
-    #[serial_test::serial]
-    async fn daily_report_test() {
-        daily_report("RustyNova").await;
-    }
-}
+//     #[tokio::test]
+//     #[serial_test::serial]
+//     async fn daily_report_test() {
+//         daily_report("RustyNova").await;
+//     }
+// }

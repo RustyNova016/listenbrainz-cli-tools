@@ -39,20 +39,20 @@ pub async fn stats_command(username: &str, target: GroupByTarget, _sort_by: Sort
     }
 }
 
-#[cfg(test)]
-mod tests {
-    // use crate::utils::println_cli_info;
+// #[cfg(test)]
+// mod tests {
+//     // use crate::utils::println_cli_info;
 
-    // use super::*;
+//     // use super::*;
 
-    #[tokio::test]
-    #[serial_test::serial]
-    async fn stats_command_recordings() {
-        //let mut clog = colog::default_builder();
-        //clog.filter(None, log::LevelFilter::Trace);
-        //clog.init();
+//     #[tokio::test]
+//     #[serial_test::serial]
+//     async fn stats_command_recordings() {
+//         //let mut clog = colog::default_builder();
+//         //clog.filter(None, log::LevelFilter::Trace);
+//         //clog.init();
 
-        // println_cli_info("--- Starting test ---");
-        // stats_command("RustyNova", GroupByTarget::Recording, SortSorterBy::Count).await;
-    }
-}
+//         // println_cli_info("--- Starting test ---");
+//         // stats_command("RustyNova", GroupByTarget::Recording, SortSorterBy::Count).await;
+//     }
+// }
