@@ -1,3 +1,4 @@
+pub mod musicbrainz;
 use std::fs::{self};
 use std::path::PathBuf;
 
