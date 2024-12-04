@@ -7,6 +7,7 @@ use musicbrainz_db_lite::models::musicbrainz::artist::Artist;
 use musicbrainz_db_lite::models::musicbrainz::recording::Recording;
 use musicbrainz_db_lite::RowId;
 
+use crate::database::listenbrainz::prefetching::fetch_recordings_as_complete;
 use crate::datastructures::listen_collection::traits::ListenCollectionLike;
 use crate::datastructures::listen_collection::ListenCollection;
 
@@ -27,6 +28,7 @@ impl ArtistWithListens {
         let recordings = RecordingWithListens::from_listencollection(conn, listens).await?;
 
         let recording_refs = recordings.iter_recordings().collect_vec();
+        fetch_recordings_as_complete(conn, &recording_refs).await?;
 
         // Load artists
         let results = Recording::get_artist_from_credits_as_batch(conn, &recording_refs).await?;
