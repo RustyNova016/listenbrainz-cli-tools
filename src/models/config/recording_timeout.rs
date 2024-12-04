@@ -7,7 +7,7 @@ use itertools::Itertools;
 use serde::Deserialize;
 use serde::Serialize;
 
-use crate::core::entity_traits::config_file::ConfigFile;
+use crate::models::config::ConfigFile;
 
 #[derive(Debug, Clone, Serialize, Deserialize, Default)]
 pub struct RecordingTimeoutConfig(HashMap<String, DateTime<Utc>>);
