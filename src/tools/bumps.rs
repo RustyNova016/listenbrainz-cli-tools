@@ -5,7 +5,6 @@ use chrono::Utc;
 use musicbrainz_db_lite::models::musicbrainz::recording::Recording;
 use rust_decimal::Decimal;
 
-use crate::core::entity_traits::config_file::ConfigFile;
 use crate::database::listenbrainz::listens::ListenFetchQuery;
 use crate::database::listenbrainz::listens::ListenFetchQueryReturn;
 use crate::models::cli::BumpCLI;
@@ -55,7 +54,7 @@ pub async fn bump_command(conn: &mut sqlx::SqliteConnection, bump: BumpCLI) {
         None => Duration::from_human_string("3 months").expect("Couldn't parse the duration."),
     };
 
-    let mut conf = Config::load_or_panic();
+    let conf = Config::load_or_panic();
 
     println_cli(format!(
         "Adding bump to {}, giving a {} multiplier for {}",
@@ -66,13 +65,12 @@ pub async fn bump_command(conn: &mut sqlx::SqliteConnection, bump: BumpCLI) {
         duration.to_humantime().unwrap()
     ));
 
-    conf.bumps.add_bump(
+    conf.write_or_panic().bumps.add_bump(
         recording.mbid.clone(),
         username,
         multiplier,
         Utc::now() + duration,
     );
-    conf.save().expect("Couldn't save configuration file");
 }
 
 pub async fn bump_down_command(conn: &mut sqlx::SqliteConnection, mut bump: BumpCLI) {

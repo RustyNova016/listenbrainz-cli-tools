@@ -1,5 +1,5 @@
-use crate::core::entity_traits::config_file::ConfigFile;
 use crate::models::cli::common::SortListensBy;
+use crate::models::config::config_trait::ConfigFile as _;
 use crate::models::config::Config;
 use crate::models::data::listenbrainz::listen::collection::ListenCollection;
 use crate::models::data::listenbrainz::listen::Listen;
@@ -20,6 +20,7 @@ pub async fn interactive_mapper(
     sort: Option<SortListensBy>,
 ) -> color_eyre::Result<()> {
     let blacklisted = Config::load()?
+        .read_or_panic()
         .mapper()
         .as_ref()
         .map(|conf| conf.backlisted().clone())

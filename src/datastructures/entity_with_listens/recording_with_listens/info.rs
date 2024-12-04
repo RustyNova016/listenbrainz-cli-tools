@@ -85,7 +85,7 @@ The recording hasn't been listened to yet",
             overdue = get_overdue_line(self),
             overdue_score = self.overdue_factor().trunc_with_scale(2)  + Decimal::ONE,
             overdue_mul = ((self.overdue_factor() + Decimal::ONE)
-            * conf.bumps.get_multiplier2(&RecordingMBID::from(
+            * conf.read_or_panic().bumps.get_multiplier(&RecordingMBID::from(
                 self.recording().mbid.clone()
             )))
         .trunc_with_scale(2)

@@ -1,7 +1,11 @@
 pub mod bumps;
-use crate::core::entity_traits::config_file::ConfigFile;
+pub mod config_guard;
+pub mod config_trait;
+
 use bumps::BumpList;
 use clap::CommandFactory;
+use config_guard::ConfigGuard;
+use config_trait::ConfigFile;
 use derive_getters::Getters;
 use listen_config::ListenConfig;
 use mapper::MapperConfig;
@@ -33,6 +37,12 @@ pub struct Config {
 }
 
 impl Config {
+    pub fn load_or_panic() -> ConfigGuard<Self> {
+        Self::load().expect("Cannot load the configuration file. Aborting")
+    }
+
+    // Token methods
+
     pub fn set_token(&mut self, username: String, token: String) {
         self.tokens.insert(username.to_lowercase(), token);
     }
@@ -42,7 +52,7 @@ impl Config {
             return arg.clone();
         }
 
-        match Self::load_or_panic().tokens.get(&username.to_lowercase()) {
+        match Self::load_or_panic().read_or_panic().tokens.get(&username.to_lowercase()) {
             Some(val) => val.clone(),
             None => {
                 Cli::command()
@@ -55,12 +65,9 @@ impl Config {
         }
     }
 
+    // Username methods
     pub fn get_default_user() -> Option<String> {
-        Self::load_or_panic().default_user
-    }
-
-    pub fn load_or_panic() -> Self {
-        Self::load().expect("Cannot load the configuration file. Aborting")
+        Self::load_or_panic().read_or_panic().default_user.clone()
     }
 
     pub fn check_username(s: &Option<String>) -> String {

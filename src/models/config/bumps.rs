@@ -22,6 +22,9 @@ impl BumpList {
         value: Decimal,
         expiration_date: DateTime<Utc>,
     ) {
+        let now = Utc::now();
+        self.0.retain(|bump| bump.expiration_date > now);
+
         self.0.push(Bump {
             expiration_date,
             recording,
@@ -30,7 +33,7 @@ impl BumpList {
         });
     }
 
-    pub fn get_multiplier2(&self, recording_mbid: &str) -> Decimal {
+    pub fn get_multiplier(&self, recording_mbid: &str) -> Decimal {
         let values = self
             .0
             .iter()
