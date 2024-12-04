@@ -9,6 +9,7 @@ use musicbrainz_db_lite::RowId;
 use serde::Deserialize;
 use serde::Serialize;
 
+use crate::database::listenbrainz::prefetching::fetch_recordings_as_complete;
 use crate::datastructures::listen_collection::traits::ListenCollectionLike;
 use crate::datastructures::listen_collection::ListenCollection;
 
@@ -29,6 +30,8 @@ impl ReleaseWithListens {
         let recordings = RecordingWithListens::from_listencollection(conn, listens).await?;
 
         let recording_refs = recordings.iter_recordings().collect_vec();
+
+        fetch_recordings_as_complete(conn, &recording_refs).await?;
 
         // Load Releases
         let results = Recording::get_releases_as_batch(conn, &recording_refs).await?;
