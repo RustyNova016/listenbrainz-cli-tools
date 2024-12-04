@@ -6,7 +6,7 @@ use musicbrainz_db_lite::models::musicbrainz::recording::Recording;
 pub async fn get_recordings_aniversaries(
     conn: &mut sqlx::SqliteConnection,
     date: &DateTime<Utc>,
-) -> Result<Vec<Recording>, crate::Error> {
+) -> Result<Vec<Recording>, crate::ErrorKind> {
     let month = date.month();
     let day = date.day();
 

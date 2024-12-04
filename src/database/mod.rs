@@ -74,20 +74,20 @@ pub async fn get_conn() -> sqlx::pool::PoolConnection<sqlx::Sqlite> {
 }
 
 /// Try to connect to the database if the file is present
-async fn try_connect_to_db() -> Result<DBClient, crate::Error> {
+async fn try_connect_to_db() -> Result<DBClient, crate::ErrorKind> {
     if std::fs::exists(DB_LOCATION.to_str().unwrap()).unwrap() {
         return Ok(DBClient::connect(DB_LOCATION.to_str().unwrap()).await?);
     }
 
-    Err(crate::Error::MissingDatabaseFile(
+    Err(crate::ErrorKind::MissingDatabaseFile(
         DB_LOCATION.to_string_lossy().to_string(),
     ))
 }
 
-async fn connect_and_setup() -> Result<DBClient, crate::Error> {
+async fn connect_and_setup() -> Result<DBClient, crate::ErrorKind> {
     match try_connect_to_db().await {
         Ok(db) => Ok(db),
-        Err(crate::Error::MissingDatabaseFile(_)) => {
+        Err(crate::ErrorKind::MissingDatabaseFile(_)) => {
             println_cli("Creating database file");
             Ok(DBClient::create_database_file(&DB_LOCATION.to_string_lossy()).await?)
         }

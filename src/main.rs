@@ -11,12 +11,13 @@ pub mod api;
 pub mod core;
 pub mod database;
 pub mod datastructures;
+pub mod error;
 pub mod models;
 /// This is the module containing all the different tools of this app
 pub mod tools;
 pub mod utils;
 
-pub use crate::models::error::Error;
+pub use crate::error::ErrorKind;
 
 #[tokio::main]
 async fn main() -> color_eyre::Result<()> {

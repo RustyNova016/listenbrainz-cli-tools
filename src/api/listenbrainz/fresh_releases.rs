@@ -24,7 +24,7 @@ impl FreshReleaseRequest {
         )
     }
 
-    pub async fn fetch(&self) -> Result<Vec<FreshReleaseResponse>, crate::Error> {
+    pub async fn fetch(&self) -> Result<Vec<FreshReleaseResponse>, crate::ErrorKind> {
         let response = reqwest::get(format!(
             "https://api.listenbrainz.org/1/explore/fresh-releases/{}",
             self.get_parameters()

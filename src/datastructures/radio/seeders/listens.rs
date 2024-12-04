@@ -24,7 +24,7 @@ impl ListenSeeder {
     pub async fn seed(
         self,
         conn: &mut sqlx::SqliteConnection,
-    ) -> Result<RecordingWithListensCollection, crate::Error> {
+    ) -> Result<RecordingWithListensCollection, crate::ErrorKind> {
         // Get the listens
         fetch_latest_listens_of_user(conn, &self.username).await?;
 
@@ -81,7 +81,7 @@ impl ListenSeeder {
     async fn get_minimum_listens(
         &self,
         conn: &mut sqlx::SqliteConnection,
-    ) -> Result<RecordingWithListensCollection, crate::Error> {
+    ) -> Result<RecordingWithListensCollection, crate::ErrorKind> {
         // Early exit if no minimums
         if self.settings.min_listen_per_recording == 0 {
             return Ok(Default::default());

@@ -15,7 +15,7 @@ use crate::core::entity_traits::mbid::{HasMBID, IsMbid};
 use crate::core::entity_traits::updatable::Updatable;
 use crate::models::data::musicbrainz::external_musicbrainz_entity::FlattenedMBEntityExt;
 use crate::models::data::musicbrainz::relation::external::RelationContentExt;
-use crate::models::error::Error;
+use crate::error::ErrorKind;
 use crate::utils::{println_cli, println_cli_warn};
 
 use super::serde_cacache;
@@ -167,14 +167,14 @@ where
         }
     }
 
-    pub async fn get_or_fetch_primary_mbid_alias(&self, mbid: &K) -> Result<K, Error> {
+    pub async fn get_or_fetch_primary_mbid_alias(&self, mbid: &K) -> Result<K, ErrorKind> {
         match self.alias_cache.get_or_option(mbid).await {
             Ok(Some(val)) => Ok(val),
             Ok(None) | Err(serde_cacache::Error::CacheDeserializationError(_)) => {
                 let fetch_res = self.force_fetch_and_save(mbid).await;
 
                 match fetch_res {
-                    Err(Error::RequestDecodeError(err)) => {
+                    Err(ErrorKind::RequestDecodeError(err)) => {
                         // Server responded badly. There's an high chance of being a deleted MBID
                         //TODO: Change musicbrainz_rs to actually handle errors instead of generic decode error
 
@@ -192,10 +192,10 @@ where
                     .alias_cache
                     .get_or_option(mbid)
                     .await
-                    .map_err(Error::CacheError)?
+                    .map_err(ErrorKind::CacheError)?
                     .expect("Couldn't retrieve the primary alias of MBID after fetching"))
             }
-            Err(val) => Err(Error::CacheError(val)),
+            Err(val) => Err(ErrorKind::CacheError(val)),
         }
     }
 
@@ -260,11 +260,11 @@ where
             .expect("Fetched data should be in the cache"))
     }
 
-    async fn fetch_and_save(mbid: &K) -> Result<(), Error> {
+    async fn fetch_and_save(mbid: &K) -> Result<(), ErrorKind> {
         let fetch_result = mbid
             .fetch()
             .await
-            .map_err(Error::from_musicbrainz_rs_error)?;
+            .map_err(ErrorKind::from_musicbrainz_rs_error)?;
         let converted_fetch = fetch_result.flattened();
 
         converted_fetch
@@ -278,7 +278,7 @@ where
     ///
     /// ⚠️ Waiting for a permit doesn't cancel the request. It only delays it.
     /// If the intention is to only fetch once, see [`Self::get_or_fetch`]
-    pub async fn force_fetch_and_save(&self, mbid: &K) -> Result<V, Error> {
+    pub async fn force_fetch_and_save(&self, mbid: &K) -> Result<V, ErrorKind> {
         let lock = self.get_fetch_lock(mbid);
         let _permit = lock.acquire().await.expect("Couldn't get permit");
 
@@ -291,7 +291,7 @@ where
         Ok(self
             .get(mbid)
             .await
-            .map_err(Error::CacheError)?
+            .map_err(ErrorKind::CacheError)?
             .expect("Fetched data should be in the cache"))
     }
 

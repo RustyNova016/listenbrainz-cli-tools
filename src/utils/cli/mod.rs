@@ -54,7 +54,7 @@ pub fn title_with_credits(title: &str, title_link: &str, credits: &ArtistCredits
 pub async fn print_recording(
     conn: &mut sqlx::SqliteConnection,
     recording: &Recording,
-) -> Result<String, crate::Error> {
+) -> Result<String, crate::ErrorKind> {
     Ok(title_with_credits(
         &recording.title,
         &format!("https://musicbrainz.org/recording/{}", recording.mbid),
@@ -65,7 +65,7 @@ pub async fn print_recording(
 pub async fn print_release_group_lb(
     conn: &mut sqlx::SqliteConnection,
     val: &ReleaseGroup,
-) -> Result<String, crate::Error> {
+) -> Result<String, crate::ErrorKind> {
     Ok(title_with_credits(
         &val.title,
         &format!("https://listenbrainz.org/album/{}", val.mbid),

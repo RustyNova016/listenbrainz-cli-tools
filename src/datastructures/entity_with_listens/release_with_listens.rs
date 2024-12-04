@@ -24,7 +24,7 @@ impl ReleaseWithListens {
     pub async fn from_listencollection(
         conn: &mut sqlx::SqliteConnection,
         listens: ListenCollection,
-    ) -> Result<HashMap<i64, Self>, crate::Error> {
+    ) -> Result<HashMap<i64, Self>, crate::ErrorKind> {
         // Convert Recordings
         let recordings = RecordingWithListens::from_listencollection(conn, listens).await?;
 

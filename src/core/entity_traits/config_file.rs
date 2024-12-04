@@ -8,7 +8,7 @@ use directories::BaseDirs;
 use serde::de::DeserializeOwned;
 use serde::Serialize;
 
-use crate::models::error::Error;
+use crate::error::ErrorKind;
 
 pub trait ConfigFile: Serialize + DeserializeOwned + Default {
     fn file_name() -> &'static str;
@@ -24,20 +24,20 @@ pub trait ConfigFile: Serialize + DeserializeOwned + Default {
         path
     }
 
-    fn save(&self) -> Result<(), Error> {
+    fn save(&self) -> Result<(), ErrorKind> {
         let config_file = File::create(Self::path_to_config().as_path())
-            .map_err(Error::ConfigFileCreationError)?;
-        serde_json::to_writer_pretty(config_file, self).map_err(Error::ConfigFileWriteError)?;
+            .map_err(ErrorKind::ConfigFileCreationError)?;
+        serde_json::to_writer_pretty(config_file, self).map_err(ErrorKind::ConfigFileWriteError)?;
         Ok(())
     }
 
-    fn load() -> Result<Self, Error> {
+    fn load() -> Result<Self, ErrorKind> {
         match Self::get_config_reader() {
             Ok(Some(data)) => {
-                serde_json::from_reader(data).map_err(Error::ConfigLoadDeserializationError)
+                serde_json::from_reader(data).map_err(ErrorKind::ConfigLoadDeserializationError)
             }
             Ok(None) => Ok(Self::default()),
-            Err(err) => Err(Error::ConfigLoadError(err)),
+            Err(err) => Err(ErrorKind::ConfigLoadError(err)),
         }
     }
 

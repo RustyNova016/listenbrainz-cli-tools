@@ -82,7 +82,7 @@ impl RadioCircle {
         &self,
         conn: &mut sqlx::SqliteConnection,
         artist: &Artist,
-    ) -> Result<Option<Recording>, crate::Error> {
+    ) -> Result<Option<Recording>, crate::ErrorKind> {
         println_cli(format!("Checking artist: {}", artist.name));
         let mut recordings: Vec<Recording> = artist
             .browse_or_fetch_artist_recordings(conn)
@@ -106,7 +106,7 @@ impl RadioCircle {
         &self,
         conn: &mut sqlx::SqliteConnection,
         mut recordings: Vec<&Recording>,
-    ) -> Result<Option<Artist>, crate::Error> {
+    ) -> Result<Option<Artist>, crate::ErrorKind> {
         recordings.shuffle(&mut thread_rng());
 
         for recording in recordings {
@@ -131,7 +131,7 @@ impl RadioCircle {
         &mut self,
         conn: &mut sqlx::SqliteConnection,
         recordings: Vec<&Recording>,
-    ) -> Result<Option<Recording>, crate::Error> {
+    ) -> Result<Option<Recording>, crate::ErrorKind> {
         if self.unlistened {
             recordings
                 .iter()
@@ -167,7 +167,7 @@ impl RadioCircle {
         mut self,
         conn: &'conn mut sqlx::SqliteConnection,
         recordings: Vec<&'recordings Recording>,
-    ) -> impl Stream<Item = Result<Recording, crate::Error>> + use<'conn, 'recordings> {
+    ) -> impl Stream<Item = Result<Recording, crate::ErrorKind>> + use<'conn, 'recordings> {
         try_fn_stream(|emitter| async move {
             while let Some(val) = self.get_random_item(conn, recordings.clone()).await? {
                 emitter.emit(val).await;

@@ -33,7 +33,7 @@ impl RecordingWithListens {
     pub async fn from_listencollection(
         conn: &mut sqlx::SqliteConnection,
         listens: ListenCollection,
-    ) -> Result<RecordingWithListensCollection, crate::Error> {
+    ) -> Result<RecordingWithListensCollection, crate::ErrorKind> {
         // If empty, early return
         if listens.is_empty() {
             return Ok(Default::default());
@@ -48,7 +48,7 @@ impl RecordingWithListens {
 
         let user = User::find_by_name(conn, &user_name)
             .await?
-            .ok_or(crate::Error::MissingUserError(user_name.clone()))?;
+            .ok_or(crate::ErrorKind::MissingUserError(user_name.clone()))?;
 
         prefetch_recordings_of_listens(conn, user.id, &listens.data).await?;
 

@@ -1,5 +1,5 @@
 use crate::core::entity_traits::config_file::ConfigFile;
-use crate::models::error::Error;
+use crate::error::ErrorKind;
 use derive_getters::Getters;
 use serde::Deserialize;
 use serde::Serialize;
@@ -13,7 +13,7 @@ pub struct MapperConfig {
 }
 
 impl Config {
-    pub fn add_blacklisted_msid(msid: String) -> Result<(), Error> {
+    pub fn add_blacklisted_msid(msid: String) -> Result<(), ErrorKind> {
         let mut config = Self::load()?;
 
         let mut mapper_config = config.mapper.unwrap_or_default();
@@ -25,7 +25,7 @@ impl Config {
         Ok(())
     }
 
-    pub fn remove_blacklisted_msid(msid: &String) -> Result<(), Error> {
+    pub fn remove_blacklisted_msid(msid: &String) -> Result<(), ErrorKind> {
         let mut config = Self::load()?;
 
         let mut mapper_config = config.mapper.unwrap_or_default();

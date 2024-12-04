@@ -30,7 +30,7 @@ impl ReleaseGroupWithListens<ReleaseWithListens> {
     pub async fn from_listencollection(
         conn: &mut sqlx::SqliteConnection,
         listens: ListenCollection,
-    ) -> Result<HashMap<i64, Self>, crate::Error> {
+    ) -> Result<HashMap<i64, Self>, crate::ErrorKind> {
         // Convert Releases
         let releases = ReleaseWithListens::from_listencollection(conn, listens).await?;
 

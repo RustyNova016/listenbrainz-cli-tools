@@ -27,7 +27,7 @@ impl RecordingWithListens {
     pub async fn get_lookup_report_async(
         &self,
         conn: &mut sqlx::SqliteConnection,
-    ) -> Result<String, crate::Error> {
+    ) -> Result<String, crate::ErrorKind> {
         if self.is_empty() {
             return Ok(self.generate_empty_report(&self.recording.format_with_credits(conn).await?));
         }

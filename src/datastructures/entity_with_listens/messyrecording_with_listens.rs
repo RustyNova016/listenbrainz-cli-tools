@@ -16,7 +16,7 @@ impl MessyRecordingWithListens {
     pub async fn from_listencollection<T: ListenCollectionLike>(
         conn: &mut sqlx::SqliteConnection,
         listens: T,
-    ) -> Result<HashMap<String, Self>, crate::Error> {
+    ) -> Result<HashMap<String, Self>, crate::ErrorKind> {
         let listens = listens.iter_listens().collect_vec();
         let results = Listen::get_messybrainz_data_from_listen_as_batch(conn, &listens).await?;
 

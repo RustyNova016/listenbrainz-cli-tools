@@ -6,6 +6,7 @@ use once_cell::sync::Lazy;
 use tokio::try_join;
 
 use crate::core::caching::musicbrainz_cache::MusicbrainzCache;
+use crate::error::ErrorKind;
 use crate::models::cli::cache::ClearTarget;
 use crate::models::data::musicbrainz::artist::mbid::ArtistMBID;
 use crate::models::data::musicbrainz::mbid::MBID;
@@ -14,7 +15,6 @@ use crate::models::data::musicbrainz::release::mbid::ReleaseMBID;
 use crate::models::data::musicbrainz::release_group::mbid::ReleaseGroupMBID;
 use crate::models::data::musicbrainz::release_group::ReleaseGroup;
 use crate::models::data::musicbrainz::work::mbid::WorkMBID;
-use crate::models::error::Error;
 
 use super::musicbrainz::artist::Artist;
 use super::musicbrainz::recording::Recording;
@@ -62,10 +62,10 @@ impl MusicBrainzDatabase {
         Ok(())
     }
 
-    pub async fn add_alias(&self, alias: &MBID, main: &MBID) -> Result<(), Error> {
+    pub async fn add_alias(&self, alias: &MBID, main: &MBID) -> Result<(), ErrorKind> {
         // Check if both are the same variant
         if discriminant(alias) != discriminant(main) {
-            return Err(Error::MBIDAliasError(alias.clone(), main.clone()));
+            return Err(ErrorKind::MBIDAliasError(alias.clone(), main.clone()));
         }
 
         let main = main.clone();
@@ -75,30 +75,30 @@ impl MusicBrainzDatabase {
                 self.artists
                     .insert_alias(alias, &main.unwrap_artist())
                     .await
-                    .map_err(Error::CacheError)?;
+                    .map_err(ErrorKind::CacheError)?;
             }
             MBID::Release(alias) => {
                 self.releases
                     .insert_alias(alias, &main.unwrap_release())
                     .await
-                    .map_err(Error::CacheError)?;
+                    .map_err(ErrorKind::CacheError)?;
             }
             MBID::Work(alias) => self
                 .works
                 .insert_alias(alias, &main.unwrap_work())
                 .await
-                .map_err(Error::CacheError)?,
+                .map_err(ErrorKind::CacheError)?,
             MBID::ReleaseGroup(alias) => {
                 self.release_groups
                     .insert_alias(alias, &main.unwrap_release_group())
                     .await
-                    .map_err(Error::CacheError)?;
+                    .map_err(ErrorKind::CacheError)?;
             }
             MBID::Recording(alias) => {
                 self.recordings
                     .insert_alias(alias, &main.unwrap_recording())
                     .await
-                    .map_err(Error::CacheError)?;
+                    .map_err(ErrorKind::CacheError)?;
             }
         }
 

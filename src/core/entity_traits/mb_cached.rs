@@ -7,7 +7,7 @@ use crate::core::caching::musicbrainz_cache::MusicbrainzCache;
 use crate::core::caching::serde_cacache;
 use crate::core::entity_traits::mbid::{HasMBID, IsMbid};
 use crate::core::entity_traits::updatable::Updatable;
-use crate::Error;
+use crate::ErrorKind;
 
 pub trait MBCached<K>
 where
@@ -30,7 +30,7 @@ where
         Self::get_cache().update(self).await
     }
 
-    async fn refresh(&self) -> Result<Self, Error> {
+    async fn refresh(&self) -> Result<Self, ErrorKind> {
         Self::get_cache()
             .force_fetch_and_save(&self.get_mbid())
             .await

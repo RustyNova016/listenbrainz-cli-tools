@@ -1,5 +1,5 @@
 use crate::core::entity_traits::mb_cached::MBCached;
-use crate::Error;
+use crate::ErrorKind;
 
 use super::HasMBID;
 use super::IsMbid;
@@ -13,7 +13,7 @@ where
         Ok(T::get_cache().get_primary_mbid_alias(self).await?)
     }
 
-    async fn get_or_fetch_primary_mbid_alias(&self) -> Result<Self, Error> {
+    async fn get_or_fetch_primary_mbid_alias(&self) -> Result<Self, ErrorKind> {
         T::get_cache().get_or_fetch_primary_mbid_alias(self).await
     }
 }

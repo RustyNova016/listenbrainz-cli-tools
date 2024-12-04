@@ -91,7 +91,7 @@ impl ImportListen {
         self,
         conn: &mut sqlx::SqliteConnection,
         user_name: &str,
-    ) -> Result<(), crate::Error> {
+    ) -> Result<(), crate::ErrorKind> {
         // First, get the user
         User::insert_or_ignore(&mut *conn, user_name).await.unwrap();
 

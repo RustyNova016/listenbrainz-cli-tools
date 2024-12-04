@@ -22,8 +22,8 @@ impl RadioCollector {
 
     pub async fn try_collect(
         &self,
-        mut recordings: impl Stream<Item = Result<Recording, crate::Error>> + Unpin,
-    ) -> Result<Vec<Recording>, crate::Error> {
+        mut recordings: impl Stream<Item = Result<Recording, crate::ErrorKind>> + Unpin,
+    ) -> Result<Vec<Recording>, crate::ErrorKind> {
         let mut results = Vec::new();
         while let Some(recording) = recordings.next().await.transpose()? {
             results.push(recording.clone());

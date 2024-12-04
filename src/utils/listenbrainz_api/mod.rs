@@ -1,7 +1,7 @@
 use std::collections::HashMap;
 
 /// Map a listen MSID to a recording MBID in listenbrainz
-pub async fn map_msid_to_mbid(msid: &str, mbid: &str, token: &str) -> Result<(), crate::Error> {
+pub async fn map_msid_to_mbid(msid: &str, mbid: &str, token: &str) -> Result<(), crate::ErrorKind> {
     let client = reqwest::Client::new();
 
     let mut body_json = HashMap::new();

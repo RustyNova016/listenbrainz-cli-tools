@@ -1,10 +1,14 @@
+pub mod tracable_error;
 use crate::{core::caching::serde_cacache, models::data::musicbrainz::mbid::MBID};
 use std::io;
 use thiserror::Error;
+use tracable_error::TracingError;
+
+pub type Error = TracingError<ErrorKind>;
 
 #[derive(Error, Debug)]
 //#[expect(clippy::enum_variant_names)]
-pub enum Error {
+pub enum ErrorKind {
     /// Returned when an index was targeted to alias another of a different type
     #[error("MBID {1:?} couldn't be aliased to MBID {0:?}")]
     MBIDAliasError(MBID, MBID),
@@ -55,7 +59,7 @@ pub enum Error {
     RequestDecodeError(reqwest::Error),
 }
 
-impl Error {
+impl ErrorKind {
     pub fn from_musicbrainz_rs_error(err: reqwest::Error) -> Self {
         if err.is_decode() {
             return Self::RequestDecodeError(err);

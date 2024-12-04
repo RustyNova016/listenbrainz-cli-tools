@@ -56,7 +56,7 @@ impl ListenFetchQuery {
     pub async fn fetch(
         self,
         conn: &mut sqlx::SqliteConnection,
-    ) -> Result<ListenCollection, crate::Error> {
+    ) -> Result<ListenCollection, crate::ErrorKind> {
         // Fetch the latest listens
         // ... If it's not in offline mode
         if !in_offline_mode() {
@@ -81,7 +81,7 @@ impl ListenFetchQuery {
     async fn fetch_recordings_redirects(
         conn: &mut SqliteConnection,
         user: &str,
-    ) -> Result<(), crate::Error> {
+    ) -> Result<(), crate::ErrorKind> {
         let unfetched = Listen::get_unfetched_recordings_of_user(conn, user).await?;
         let subm = PG_FETCHING.get_submitter(unfetched.len() as u64);
 
