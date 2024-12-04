@@ -68,7 +68,9 @@ impl ConfigCommands {
                 duration,
             } => {
                 let id = read_mbid_from_input(recording).expect("Couldn't parse MBID");
-                RecordingTimeoutConfig::set_timeout(&id, Duration::from_human_string(duration)?)?;
+                let config_guard = RecordingTimeoutConfig::load()?;
+                let mut config = config_guard.write_or_panic();
+                config.set_timeout(&id, Duration::from_human_string(duration)?);
             }
 
             Self::BlacklistMapperMSID { msid, remove } => {

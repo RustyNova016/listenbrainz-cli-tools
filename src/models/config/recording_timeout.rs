@@ -7,33 +7,27 @@ use itertools::Itertools;
 use serde::Deserialize;
 use serde::Serialize;
 
-use crate::core::entity_traits::config_file::ConfigFile;
+use crate::models::config::ConfigFile;
 
 #[derive(Debug, Clone, Serialize, Deserialize, Default)]
 pub struct RecordingTimeoutConfig(HashMap<String, DateTime<Utc>>);
 
 impl RecordingTimeoutConfig {
-    pub fn set_timeout(recording: &str, duration: Duration) -> color_eyre::Result<()> {
-        let mut conf = Self::load()?;
-        conf.0.insert(recording.to_string(), Utc::now() + duration);
-        conf.save()?;
-
-        Ok(())
+    pub fn set_timeout(&mut self, recording: &str, duration: Duration) {
+        self.0.insert(recording.to_string(), Utc::now() + duration);
     }
 
-    pub fn get_timed_out_recordings() -> color_eyre::Result<Vec<String>> {
-        let conf = Self::load()?;
-
-        Ok(conf
-            .0
-            .into_iter()
+    pub fn get_timed_out_recordings(&self) -> Vec<String> {
+        self.0
+            .iter()
             .filter_map(|(id, deadline)| {
-                if Utc::now() < deadline {
+                if &Utc::now() < deadline {
                     return Some(id);
                 }
                 None
             })
-            .collect_vec())
+            .cloned()
+            .collect_vec()
     }
 }
 
