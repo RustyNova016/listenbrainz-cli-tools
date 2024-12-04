@@ -1,4 +1,4 @@
-use crate::core::entity_traits::config_file::ConfigFile;
+use crate::models::config::config_trait::ConfigFile as _;
 use crate::models::config::recording_timeout::RecordingTimeoutConfig;
 use crate::models::config::Config;
 use crate::models::data::musicbrainz::entity::entity_kind::MusicbrainzEntityKind;
@@ -59,9 +59,9 @@ impl ConfigCommands {
     pub async fn run(&self) -> color_eyre::Result<()> {
         match self {
             Self::SetToken { username, token } => {
-                let mut conf = Config::load()?;
-                conf.set_token(username.clone(), token.clone());
-                conf.save()?;
+                let conf = Config::load()?;
+                conf.write_or_panic()
+                    .set_token(username.clone(), token.clone());
             }
 
             Self::Timeout {
@@ -76,18 +76,19 @@ impl ConfigCommands {
             }
 
             Self::BlacklistMapperMSID { msid, remove } => {
+                let conf = Config::load()?;
                 if !remove {
-                    Config::add_blacklisted_msid(msid.to_string())?;
+                    conf.write_or_panic()
+                        .add_blacklisted_msid(msid.to_string())?;
                 } else {
-                    Config::remove_blacklisted_msid(msid)?;
+                    conf.write_or_panic().remove_blacklisted_msid(msid)?;
                 }
             }
             Self::Listens(val) => val.run().await?,
 
             Self::DefaultUser { username } => {
-                let mut conf = Config::load()?;
-                conf.default_user = Some(username.clone());
-                conf.save()?;
+                let conf = Config::load()?;
+                conf.write_or_panic().default_user = Some(username.clone());
             }
         }
 

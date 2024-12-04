@@ -3,12 +3,12 @@ use std::ops::DerefMut;
 use std::sync::Arc;
 use std::thread::panicking;
 
-use crate::core::entity_traits::config_file::ConfigFile;
 use once_cell::sync::Lazy;
 use tokio::sync::RwLock;
 use tokio::sync::RwLockReadGuard;
 use tokio::sync::RwLockWriteGuard;
 
+use super::config_trait::ConfigFile as _;
 use super::Config;
 
 pub(crate) static CONFIG: Lazy<GlobalConfig> = Lazy::new(GlobalConfig::load);
@@ -21,7 +21,7 @@ impl GlobalConfig {
     pub fn load() -> Self {
         Self {
             config: Arc::new(RwLock::new(
-                Config::load().expect("Couldn't load the configuration file"),
+                Config::load_unguarded().expect("Couldn't load the configuration file"),
             )),
         }
     }
