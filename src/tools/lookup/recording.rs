@@ -6,13 +6,12 @@ use crate::database::get_db_client;
 use crate::database::listenbrainz::listens::ListenFetchQuery;
 use crate::database::listenbrainz::listens::ListenFetchQueryReturn;
 use crate::datastructures::entity_with_listens::recording_with_listens::RecordingWithListens;
-use crate::models::data::musicbrainz::recording::mbid::RecordingMBID;
 use crate::utils::println_cli;
 
 #[cfg(not(test))]
 use crate::utils::cli::await_next;
 
-pub async fn lookup_recording(username: &str, id: RecordingMBID) -> color_eyre::Result<()> {
+pub async fn lookup_recording(username: &str, id: &str) -> color_eyre::Result<()> {
     let db = get_db_client().await;
     let conn = &mut *db.connection.acquire().await?;
 
@@ -25,7 +24,7 @@ pub async fn lookup_recording(username: &str, id: RecordingMBID) -> color_eyre::
         .fetch(conn)
         .await?;
 
-    let Some(recording) = Recording::fetch_and_save(conn, &id.to_string()).await? else {
+    let Some(recording) = Recording::fetch_and_save(conn, id).await? else {
         println_cli(format!("Couldn't find the recording with id: {id}"));
         return Ok(());
     };
