@@ -50,7 +50,7 @@ pub struct Cli {
 }
 
 impl Cli {
-    pub async fn run(&self) -> color_eyre::Result<bool> {
+    pub async fn run(&self, conn: &mut sqlx::SqliteConnection) -> color_eyre::Result<bool> {
         // Invoked as: `$ my-app --markdown-help`
         if self.markdown_help {
             clap_markdown::print_help_markdown::<Self>();
@@ -64,7 +64,7 @@ impl Cli {
         }
 
         if let Some(command) = &self.command {
-            command.run().await?;
+            command.run(conn).await?;
         }
 
         Ok(true)
@@ -171,7 +171,7 @@ pub enum Commands {
 }
 
 impl Commands {
-    pub async fn run(&self) -> color_eyre::Result<()> {
+    pub async fn run(&self, conn: &mut sqlx::SqliteConnection) -> color_eyre::Result<()> {
         match self {
             Self::Stats {
                 username,
@@ -179,6 +179,7 @@ impl Commands {
                 sort,
             } => {
                 stats_command(
+                    conn,
                     &Config::check_username(username).to_lowercase(),
                     *target,
                     *sort,
@@ -186,27 +187,29 @@ impl Commands {
                 .await;
             }
 
-            Self::Compatibility { user_a, user_b } => compatibility_command(user_a, user_b).await,
+            Self::Compatibility { user_a, user_b } => {
+                compatibility_command(conn, user_a, user_b).await;
+            }
 
-            Self::Radio(val) => val.run().await?,
+            Self::Radio(val) => val.run(conn).await?,
 
-            Self::Cache(val) => val.run().await?,
+            Self::Cache(val) => val.run(conn).await?,
 
             Self::Config(val) => val.command.run().await?,
 
-            Self::Daily { username } => daily_report(&Config::check_username(username)).await,
+            Self::Daily { username } => daily_report(conn, &Config::check_username(username)).await,
 
-            Self::Listens(val) => val.run().await,
+            Self::Listens(val) => val.run(conn).await,
 
             Self::Lookup(val) => val.run().await?,
 
-            Self::Mapping(val) => val.run().await?,
+            Self::Mapping(val) => val.run(conn).await?,
 
-            Self::Bump(val) => bump_command(val.clone()).await,
+            Self::Bump(val) => bump_command(conn, val.clone()).await,
 
-            Self::BumpDown(val) => bump_down_command(val.clone()).await,
+            Self::BumpDown(val) => bump_down_command(conn, val.clone()).await,
 
-            Self::Unstable(val) => val.command.run().await,
+            Self::Unstable(val) => val.command.run(conn).await,
         }
         Ok(())
     }

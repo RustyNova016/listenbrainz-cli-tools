@@ -4,24 +4,23 @@ use chrono::Utc;
 use color_eyre::owo_colors::OwoColorize;
 use itertools::Itertools;
 
-use crate::database::get_conn;
 use crate::database::listenbrainz::listens::ListenFetchQuery;
 use crate::database::listenbrainz::listens::ListenFetchQueryReturn;
 use crate::datastructures::entity_with_listens::release_with_listens::ReleaseWithListens;
 use crate::utils::cli::global_progress_bar::PG_FETCHING;
 use crate::utils::extensions::chrono_ext::DurationExt;
 
-pub async fn best_of_checker(username: &str) {
+pub async fn best_of_checker(conn: &mut sqlx::SqliteConnection, username: &str) {
     let listens = ListenFetchQuery::builder()
         //.fetch_recordings_redirects(true)
         .returns(ListenFetchQueryReturn::Mapped)
         .user(username.to_string())
         .build()
-        .fetch(&mut *get_conn().await)
+        .fetch(conn)
         .await
         .expect("Couldn't fetch the new listens");
 
-    let releases = ReleaseWithListens::from_listencollection(&mut *get_conn().await, listens)
+    let releases = ReleaseWithListens::from_listencollection(conn, listens)
         .await
         .expect("Error while fetching recordings")
         .into_values()
@@ -37,7 +36,7 @@ pub async fn best_of_checker(username: &str) {
 
         let label_info = release
             .release()
-            .get_label_infos_or_fetch(&mut *get_conn().await)
+            .get_label_infos_or_fetch(conn)
             .await
             .expect("Couldn't get label info");
 
@@ -84,7 +83,7 @@ pub async fn best_of_checker(username: &str) {
             recording
                 .1
                 .recording()
-                .format_with_credits(&mut *get_conn().await)
+                .format_with_credits(conn)
                 .await
                 .expect("Couldn't get recording's artist credits")
         );
@@ -115,7 +114,7 @@ pub async fn best_of_checker(username: &str) {
             recording
                 .1
                 .recording()
-                .format_with_credits(&mut *get_conn().await)
+                .format_with_credits(conn)
                 .await
                 .expect("Couldn't get recording's artist credits")
         );
@@ -169,7 +168,7 @@ pub async fn best_of_checker(username: &str) {
             recording
                 .1
                 .recording()
-                .format_with_credits(&mut *get_conn().await)
+                .format_with_credits(conn)
                 .await
                 .expect("Couldn't get recording's artist credits")
         );

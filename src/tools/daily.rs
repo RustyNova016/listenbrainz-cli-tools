@@ -4,7 +4,6 @@ use chrono::Utc;
 use color_eyre::owo_colors::OwoColorize;
 use itertools::Itertools;
 
-use crate::database::get_conn;
 use crate::database::listenbrainz::listens::ListenFetchQuery;
 use crate::database::listenbrainz::listens::ListenFetchQueryReturn;
 use crate::database::musicbrainz::anniversaries::get_recordings_aniversaries;
@@ -12,25 +11,24 @@ use crate::datastructures::entity_with_listens::recording_with_listens::Recordin
 use crate::datastructures::listen_collection::traits::ListenCollectionLike;
 use crate::utils::cli::print_recording;
 
-pub async fn daily_report(username: &str) {
-    let mut conn = get_conn().await;
+pub async fn daily_report(conn: &mut sqlx::SqliteConnection, username: &str) {
     let listens = ListenFetchQuery::builder()
         //.fetch_recordings_redirects(true)
         .returns(ListenFetchQueryReturn::Mapped)
         .user(username.to_string())
         .build()
-        .fetch(&mut conn)
+        .fetch(conn)
         .await
         .expect("Couldn't fetch the new listens");
 
-    let recordings = RecordingWithListens::from_listencollection(&mut *get_conn().await, listens)
+    let recordings = RecordingWithListens::from_listencollection(conn, listens)
         .await
         .expect("Couldn't get listen's recordings");
 
     // release days
     let today = Utc::now();
     //let today = Utc.timestamp_opt(1728508067, 0).unwrap();
-    let release_day_recordings = get_recordings_aniversaries(&mut conn, &today)
+    let release_day_recordings = get_recordings_aniversaries(conn, &today)
         .await
         .expect("Couldn't get the recording anniversaries");
 
@@ -47,7 +45,7 @@ pub async fn daily_report(username: &str) {
         for rec in anniversary_recordings {
             println!(
                 "   - {} ({}, {} Listens)",
-                print_recording(&mut conn, rec.recording())
+                print_recording(conn, rec.recording())
                     .await
                     .expect("Couldn't get artist credits"),
                 Utc.timestamp_opt(rec.recording().first_release_date.unwrap(), 0)
@@ -80,7 +78,7 @@ pub async fn daily_report(username: &str) {
         for rec in first_discoveries {
             println!(
                 "   - {} ({}, {} Listens)",
-                print_recording(&mut conn, rec.recording())
+                print_recording(conn, rec.recording())
                     .await
                     .expect("Couldn't get artist credits"),
                 rec.first_listen_date()

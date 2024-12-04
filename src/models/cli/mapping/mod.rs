@@ -16,8 +16,8 @@ pub struct MappingCommand {
 }
 
 impl MappingCommand {
-    pub async fn run(&self) -> color_eyre::Result<()> {
-        self.subcommand.run().await
+    pub async fn run(&self, conn: &mut sqlx::SqliteConnection) -> color_eyre::Result<()> {
+        self.subcommand.run(conn).await
     }
 }
 
@@ -75,10 +75,15 @@ pub enum MappingSubcommands {
 }
 
 impl MappingSubcommands {
-    pub async fn run(&self) -> color_eyre::Result<()> {
+    pub async fn run(&self, conn: &mut sqlx::SqliteConnection) -> color_eyre::Result<()> {
         match self {
             Self::ListUnmapped { username, sort } => {
-                unmapped_command(&Config::check_username(username).to_lowercase(), *sort).await;
+                unmapped_command(
+                    conn,
+                    &Config::check_username(username).to_lowercase(),
+                    *sort,
+                )
+                .await;
             }
 
             Self::Mapper {

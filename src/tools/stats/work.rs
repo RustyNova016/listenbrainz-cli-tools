@@ -2,13 +2,12 @@ use core::cmp::Reverse;
 
 use itertools::Itertools;
 
-use crate::database::get_conn;
 use crate::datastructures::entity_with_listens::work_with_listens::WorkWithListens;
 use crate::datastructures::listen_collection::ListenCollection;
 use crate::utils::cli_paging::CLIPager;
 
-pub async fn stats_works(listens: ListenCollection) {
-    let mut groups = WorkWithListens::from_listencollection(&mut *get_conn().await, listens)
+pub async fn stats_works(conn: &mut sqlx::SqliteConnection, listens: ListenCollection) {
+    let mut groups = WorkWithListens::from_listencollection(conn, listens)
         .await
         .expect("Error while fetching recordings")
         .into_values()

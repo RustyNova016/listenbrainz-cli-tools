@@ -58,7 +58,7 @@ pub enum CacheSubcommands {
 }
 
 impl CacheCommand {
-    pub async fn run(&self) -> color_eyre::Result<()> {
+    pub async fn run(&self, _conn: &mut sqlx::SqliteConnection) -> color_eyre::Result<()> {
         match &self.command {
             #[cfg(debug_assertions)]
             CacheSubcommands::CopyToDebug => {

@@ -2,7 +2,6 @@ use chrono::Duration;
 use futures::stream;
 use futures::StreamExt;
 
-use crate::database::get_conn;
 use crate::datastructures::radio::collector::RadioCollector;
 use crate::datastructures::radio::filters::cooldown::cooldown_filter;
 use crate::datastructures::radio::filters::min_listens::min_listen_filter;
@@ -14,13 +13,13 @@ use crate::utils::playlist::PlaylistStub;
 use crate::utils::println_cli;
 
 pub async fn listen_rate_radio(
+    conn: &mut sqlx::SqliteConnection,
     seeder: ListenSeeder,
     token: &str,
     min_listens: Option<u64>,
     cooldown: u64,
     collector: RadioCollector,
 ) -> color_eyre::Result<()> {
-    let conn = &mut *get_conn().await;
     let username = seeder.username().clone();
 
     println_cli("[Seeding] Getting listens");

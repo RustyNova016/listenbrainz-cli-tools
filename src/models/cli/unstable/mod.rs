@@ -22,11 +22,11 @@ pub enum UnstableSubcommands {
 }
 
 impl UnstableSubcommands {
-    pub async fn run(&self) {
+    pub async fn run(&self, conn: &mut sqlx::SqliteConnection) {
         match self {
             Self::BestOfMC { username } => {
                 let username = Config::check_username(username);
-                best_of_checker(&username).await;
+                best_of_checker(conn, &username).await;
             }
         }
     }
