@@ -1,7 +1,6 @@
 use clap::Parser;
 use clap::Subcommand;
 
-use crate::database::get_conn;
 use crate::models::config::Config;
 use crate::tools::listens::mapper::listen_mapper_convert_mbids;
 use crate::utils::cli::read_mbid_from_input;
@@ -14,8 +13,8 @@ pub struct ListenCommand {
 }
 
 impl ListenCommand {
-    pub async fn run(&self) {
-        self.subcommand.run().await;
+    pub async fn run(&self, conn: &mut sqlx::SqliteConnection) {
+        self.subcommand.run(conn).await;
     }
 }
 
@@ -38,7 +37,7 @@ pub enum ListenSubcommands {
 }
 
 impl ListenSubcommands {
-    pub async fn run(&self) {
+    pub async fn run(&self, conn: &mut sqlx::SqliteConnection) {
         match self {
             Self::RemapMsid {
                 original_id,
@@ -46,9 +45,8 @@ impl ListenSubcommands {
                 username,
                 token,
             } => {
-                let mut conn = get_conn().await;
                 listen_mapper_convert_mbids(
-                    &mut conn,
+                    conn,
                     &read_mbid_from_input(original_id)
                         .expect("Couldn't read `original_id` as MBID"),
                     &read_mbid_from_input(new_id).expect("Couldn't read `new_id` as MBID"),

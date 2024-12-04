@@ -80,8 +80,8 @@ impl RadioCommand {
             .build()
     }
 
-    pub async fn run(&self) -> color_eyre::Result<()> {
-        self.command.run(self.get_collector(), self).await
+    pub async fn run(&self, conn: &mut sqlx::SqliteConnection) -> color_eyre::Result<()> {
+        self.command.run(conn, self.get_collector(), self).await
     }
 }
 
@@ -179,6 +179,7 @@ pub enum RadioSubcommands {
 impl RadioSubcommands {
     pub async fn run(
         &self,
+        conn: &mut sqlx::SqliteConnection,
         collector: RadioCollector,
         command: &RadioCommand,
     ) -> color_eyre::Result<()> {
@@ -213,6 +214,7 @@ impl RadioSubcommands {
                 cooldown,
             } => {
                 listen_rate_radio(
+                    conn,
                     command.get_listen_seeder(username),
                     &Config::check_token(&Config::check_username(username), token),
                     *min,
