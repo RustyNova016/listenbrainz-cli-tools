@@ -1,8 +1,7 @@
 use crate::models::config::config_trait::ConfigFile as _;
 use crate::models::config::recording_timeout::RecordingTimeoutConfig;
 use crate::models::config::Config;
-use crate::models::data::musicbrainz::entity::entity_kind::MusicbrainzEntityKind;
-use crate::models::data::musicbrainz::mbid::MBID;
+use crate::utils::cli::read_mbid_from_input;
 use crate::utils::extensions::chrono_ext::DurationExt;
 use chrono::Duration;
 use clap::Parser;
@@ -68,11 +67,8 @@ impl ConfigCommands {
                 recording,
                 duration,
             } => {
-                RecordingTimeoutConfig::set_timeout(
-                    MBID::from_string(recording, MusicbrainzEntityKind::Recording)?
-                        .unwrap_recording(),
-                    Duration::from_human_string(duration)?,
-                )?;
+                let id = read_mbid_from_input(recording).expect("Couldn't parse MBID");
+                RecordingTimeoutConfig::set_timeout(&id, Duration::from_human_string(duration)?)?;
             }
 
             Self::BlacklistMapperMSID { msid, remove } => {

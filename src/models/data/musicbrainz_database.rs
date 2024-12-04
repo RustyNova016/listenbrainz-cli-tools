@@ -65,7 +65,7 @@ impl MusicBrainzDatabase {
     pub async fn add_alias(&self, alias: &MBID, main: &MBID) -> Result<(), Error> {
         // Check if both are the same variant
         if discriminant(alias) != discriminant(main) {
-            return Err(Error::MBIDAliasError(alias.clone(), main.clone()));
+            return Err(Error::MBIDAliasError(alias.to_string(), main.to_string()));
         }
 
         let main = main.clone();

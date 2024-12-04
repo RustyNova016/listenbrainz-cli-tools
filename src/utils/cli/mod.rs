@@ -1,14 +1,18 @@
 pub mod global_progress_bar;
+pub mod parsing;
+use core::fmt;
 use core::fmt::Display;
 use std::fmt::Write as _;
 use std::io;
 
+use clap::CommandFactory as _;
 use color_eyre::owo_colors::OwoColorize as _;
 use musicbrainz_db_lite::models::musicbrainz::artist_credit::ArtistCredits;
 use musicbrainz_db_lite::models::musicbrainz::recording::Recording;
 use musicbrainz_db_lite::models::musicbrainz::release_group::ReleaseGroup;
 
 use super::regex::is_string_mbid;
+use crate::models::cli::Cli;
 use crate::utils::regex::get_raw_mbid_from_url;
 
 /// Block the current trhead until the user press enter
@@ -71,4 +75,8 @@ pub async fn print_release_group_lb(
         &format!("https://listenbrainz.org/album/{}", val.mbid),
         &val.get_artist_credits_or_fetch(conn).await?,
     ))
+}
+
+pub fn clap_error(msg: impl fmt::Display, error: clap::error::ErrorKind) -> ! {
+    Cli::command().error(error, msg).exit()
 }

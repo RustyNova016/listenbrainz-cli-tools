@@ -1,7 +1,7 @@
+use crate::database::get_conn;
 use crate::models::config::Config;
-use crate::models::data::musicbrainz::entity::entity_kind::MusicbrainzEntityKind;
-use crate::models::data::musicbrainz::mbid::MBID;
 use crate::tools::lookup::lookup_command;
+use crate::utils::cli::parsing::assert_recording_mbid;
 use clap::Parser;
 use clap::ValueEnum;
 
@@ -20,13 +20,15 @@ pub struct LookupCommand {
 
 impl LookupCommand {
     pub async fn run(&self) -> color_eyre::Result<()> {
-        let id = match self.entity_type {
-            LookupTarget::Recording => {
-                MBID::from_string(&self.id, MusicbrainzEntityKind::Recording)?
-            }
-        };
+        let mut conn = get_conn().await;
+        let id = assert_recording_mbid(&mut conn, &self.id).await;
 
-        lookup_command(&Config::check_username(&self.username), id).await?;
+        lookup_command(
+            &Config::check_username(&self.username),
+            &id,
+            self.entity_type,
+        )
+        .await?;
         Ok(())
     }
 }

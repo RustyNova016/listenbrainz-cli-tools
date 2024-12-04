@@ -10,7 +10,6 @@ use crate::models::data::musicbrainz::release::mbid::ReleaseMBID;
 use crate::models::data::musicbrainz::release_group::mbid::ReleaseGroupMBID;
 use crate::models::data::musicbrainz::work::mbid::WorkMBID;
 
-pub mod converters;
 pub mod extensions;
 pub mod generic_mbid;
 pub mod is_musicbrainz_id;

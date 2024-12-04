@@ -8,21 +8,20 @@ use serde::Deserialize;
 use serde::Serialize;
 
 use crate::core::entity_traits::config_file::ConfigFile;
-use crate::models::data::musicbrainz::recording::mbid::RecordingMBID;
 
 #[derive(Debug, Clone, Serialize, Deserialize, Default)]
-pub struct RecordingTimeoutConfig(HashMap<RecordingMBID, DateTime<Utc>>);
+pub struct RecordingTimeoutConfig(HashMap<String, DateTime<Utc>>);
 
 impl RecordingTimeoutConfig {
-    pub fn set_timeout(recording: RecordingMBID, duration: Duration) -> color_eyre::Result<()> {
+    pub fn set_timeout(recording: &str, duration: Duration) -> color_eyre::Result<()> {
         let mut conf = Self::load()?;
-        conf.0.insert(recording, Utc::now() + duration);
+        conf.0.insert(recording.to_string(), Utc::now() + duration);
         conf.save()?;
 
         Ok(())
     }
 
-    pub fn get_timed_out_recordings() -> color_eyre::Result<Vec<RecordingMBID>> {
+    pub fn get_timed_out_recordings() -> color_eyre::Result<Vec<String>> {
         let conf = Self::load()?;
 
         Ok(conf
