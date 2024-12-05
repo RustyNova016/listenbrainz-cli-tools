@@ -1,5 +1,3 @@
-pub mod collection;
-pub mod info;
 use std::collections::HashMap;
 
 use chrono::{DateTime, Duration, Utc};
@@ -19,6 +17,8 @@ use crate::datastructures::listen_collection::ListenCollection;
 
 use super::impl_entity_with_listens;
 
+pub mod collection;
+pub mod info;
 #[derive(Debug, Clone, PartialEq, Eq, Getters, Deserialize, Serialize)]
 pub struct RecordingWithListens {
     pub(self) recording: Recording,

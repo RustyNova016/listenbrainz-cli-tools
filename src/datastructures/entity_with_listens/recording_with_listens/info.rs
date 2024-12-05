@@ -11,49 +11,49 @@ use crate::models::data::musicbrainz::recording::mbid::RecordingMBID;
 use crate::utils::extensions::chrono_ext::DateTimeUtcExt;
 use crate::utils::extensions::chrono_ext::DurationExt;
 
+use super::collection::RecordingWithListensCollection;
 use super::RecordingWithListens;
 
 impl RecordingWithListens {
     /// Generate a formated string with all the informations to display in reports
-    pub fn get_lookup_report(&self) -> String {
+    pub async fn get_lookup_report(
+        &self,
+        conn: &mut sqlx::SqliteConnection,
+        other_listens: &RecordingWithListensCollection,
+    ) -> Result<String, crate::Error> {
         if self.is_empty() {
-            return self.generate_empty_report(&self.recording.title);
+            return self.generate_empty_report(conn).await;
         }
 
-        self.generate_full_report(&self.recording.title)
+        self.generate_full_report(conn, other_listens).await
     }
 
-    /// Generate a formated string with all the informations to display in reports
-    pub async fn get_lookup_report_async(
+    async fn generate_empty_report(
         &self,
         conn: &mut sqlx::SqliteConnection,
     ) -> Result<String, crate::Error> {
-        if self.is_empty() {
-            return Ok(self.generate_empty_report(&self.recording.format_with_credits(conn).await?));
-        }
-
-        Ok(self.generate_full_report(&self.recording.format_with_credits(conn).await?))
+        Ok(format!(
+            "{}
+                    
+        The recording hasn't been listened to yet",
+            self.get_title(conn).await?,
+        ))
     }
 
-    fn generate_empty_report(&self, name: &str) -> String {
-        format!(
-            "{}{}
-            
-The recording hasn't been listened to yet",
-            "Statistics of ".black().on_green(),
-            name.black().on_green(),
-        )
-    }
-
-    fn generate_full_report(&self, name: &str) -> String {
+    async fn generate_full_report(
+        &self,
+        conn: &mut sqlx::SqliteConnection,
+        other_listens: &RecordingWithListensCollection,
+    ) -> Result<String, crate::Error> {
         let conf = Config::load_or_panic();
-        formatdoc! {"
-            {pre_title}{statistics_of}{name_f}{post_title}
+        let text = formatdoc! {"
+            {title}
             
             [General]
+               - Rank: #{rank}
                - Listen count: {listen_count}
-               - First listened: {first_listened}
-               - Last listened: {last_listened}
+               - First listened on: {first_listened}
+               - Last listened on: {last_listened}
         
             [Listening rate]
                - Average duration between listens: {average_dur}
@@ -64,10 +64,8 @@ The recording hasn't been listened to yet",
                - Overdue score: {overdue_score}
                - Overdue score (with multiplier): {overdue_mul}
             ",
-            pre_title = "".green().bold(),
-            post_title = "".green().bold(),
-            statistics_of = " Statistics of ".on_green().bold().black(),
-            name_f = format!("{name} ").on_green().bold().black(),
+            title = self.get_title(conn).await?,
+            rank = other_listens.get_rank(&self.recording().mbid).expect("The recording should be listened"),
             listen_count = self.listen_count(),
             first_listened = self.first_listen_date().unwrap().floor_to_second().with_timezone(&Local),
             last_listened = self.last_listen_date().unwrap().floor_to_second().with_timezone(&Local),
@@ -89,7 +87,17 @@ The recording hasn't been listened to yet",
                 self.recording().mbid.clone()
             )))
         .trunc_with_scale(2)
-        }
+        };
+
+        Ok(text)
+    }
+
+    async fn get_title(&self, conn: &mut sqlx::SqliteConnection) -> Result<String, crate::Error> {
+        let raw = format!(
+            "\n Statistics of {} ",
+            self.recording().format_with_credits(conn).await?
+        );
+        Ok(format!("{}", raw.on_green().black().bold()))
     }
 }
 
