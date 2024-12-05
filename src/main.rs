@@ -12,6 +12,8 @@ pub mod core;
 pub mod database;
 pub mod datastructures;
 pub mod models;
+#[cfg(test)]
+pub mod testing;
 /// This is the module containing all the different tools of this app
 pub mod tools;
 pub mod utils;
