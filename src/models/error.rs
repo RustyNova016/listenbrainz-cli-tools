@@ -51,7 +51,7 @@ pub enum Error {
     RequestDecodeError(reqwest::Error),
 
     #[error("Listenbrainz responded with an error")]
-    ListenbrainzError(#[from] listenbrainz::Error)
+    ListenbrainzError(#[from] listenbrainz::Error),
 }
 
 impl Error {
