@@ -1,7 +1,3 @@
-pub mod bumps;
-pub mod config_guard;
-pub mod config_trait;
-
 use bumps::BumpList;
 use clap::CommandFactory;
 use config_guard::ConfigGuard;
@@ -15,6 +11,9 @@ use std::collections::HashMap;
 
 use super::cli::Cli;
 
+pub mod bumps;
+pub mod config_guard;
+pub mod config_trait;
 pub mod global_config;
 pub mod listen_config;
 pub mod mapper;

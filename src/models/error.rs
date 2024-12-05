@@ -1,8 +1,6 @@
 use std::io;
 use thiserror::Error;
 
-use crate::core::caching::serde_cacache;
-
 #[derive(Error, Debug)]
 //#[expect(clippy::enum_variant_names)]
 pub enum Error {
@@ -27,9 +25,6 @@ pub enum Error {
     ConfigFileWriteError(serde_json::Error),
 
     // --- Cache Errors ---
-    #[error("Error with the cache.")]
-    CacheError(serde_cacache::error::Error),
-
     #[error("Tried to get row id {0} but couldn't be found")]
     MissingRowInDB(i64),
 
@@ -56,7 +51,7 @@ pub enum Error {
     RequestDecodeError(reqwest::Error),
 
     #[error("Listenbrainz responded with an error")]
-    ListenbrainzError(#[from] listenbrainz::Error)
+    ListenbrainzError(#[from] listenbrainz::Error),
 }
 
 impl Error {

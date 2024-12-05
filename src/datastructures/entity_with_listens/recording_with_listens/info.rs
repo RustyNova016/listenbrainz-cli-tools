@@ -7,7 +7,6 @@ use rust_decimal::Decimal;
 
 use crate::datastructures::listen_collection::traits::ListenCollectionLike;
 use crate::models::config::Config;
-use crate::models::data::musicbrainz::recording::mbid::RecordingMBID;
 use crate::utils::extensions::chrono_ext::DateTimeUtcExt;
 use crate::utils::extensions::chrono_ext::DurationExt;
 
@@ -87,9 +86,7 @@ impl RecordingWithListens {
             underrated_score = self.get_underated_score(other_listens, global_count).trunc_with_scale(2),
             overdue_score = self.overdue_factor().trunc_with_scale(2)  + Decimal::ONE,
             overdue_mul = ((self.overdue_factor() + Decimal::ONE)
-            * conf.read_or_panic().bumps.get_multiplier(&RecordingMBID::from(
-                self.recording().mbid.clone()
-            )))
+            * conf.read_or_panic().bumps.get_multiplier(&self.recording().mbid.clone()))
         .trunc_with_scale(2)
         };
 

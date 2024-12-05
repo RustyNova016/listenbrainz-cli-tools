@@ -1,5 +1,3 @@
-pub mod global_progress_bar;
-pub mod parsing;
 use core::fmt;
 use core::fmt::Display;
 use std::fmt::Write as _;
@@ -14,6 +12,10 @@ use musicbrainz_db_lite::models::musicbrainz::release_group::ReleaseGroup;
 use super::regex::is_string_mbid;
 use crate::models::cli::Cli;
 use crate::utils::regex::get_raw_mbid_from_url;
+
+pub mod progress_bar;
+
+pub mod parsing;
 
 /// Block the current trhead until the user press enter
 pub fn await_next() {

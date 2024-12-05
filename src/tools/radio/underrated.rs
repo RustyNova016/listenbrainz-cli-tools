@@ -9,8 +9,7 @@ use crate::datastructures::entity_with_listens::recording_with_listens::Recordin
 use crate::datastructures::radio::collector::RadioCollector;
 use crate::datastructures::radio::seeders::listens::ListenSeeder;
 use crate::datastructures::radio::sorters::underrated::underrated_sorter;
-use crate::models::data::musicbrainz::recording::mbid::RecordingMBID;
-use crate::utils::playlist::PlaylistStub;
+use crate::models::playlist_stub::PlaylistStub;
 use crate::utils::println_cli;
 
 pub async fn underrated_mix(
@@ -64,7 +63,7 @@ pub async fn underrated_mix(
         true,
         collected
             .into_iter()
-            .map(|r| RecordingMBID::from(r.mbid))
+            .map(|r| r.mbid)
             .collect(),
         Some(
             format!("A playlist containing all the tracks that {username} listen to, 
