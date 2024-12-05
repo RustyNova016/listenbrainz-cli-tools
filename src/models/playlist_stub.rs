@@ -1,12 +1,11 @@
-use crate::models::data::musicbrainz::recording::mbid::RecordingMBID;
-use color_eyre::eyre::Context;
-use derive_builder::Builder;
-use listenbrainz::raw::request::{
-    PlaylistCreate, PlaylistCreatePlaylist, PlaylistCreatePlaylistExtension,
-    PlaylistCreatePlaylistExtensionInner, PlaylistCreatePlaylistTrack,
-};
+use listenbrainz::raw::request::PlaylistCreate;
+use listenbrainz::raw::request::PlaylistCreatePlaylist;
+use listenbrainz::raw::request::PlaylistCreatePlaylistExtension;
+use listenbrainz::raw::request::PlaylistCreatePlaylistExtensionInner;
+use listenbrainz::raw::request::PlaylistCreatePlaylistTrack;
 use listenbrainz::raw::response::PlaylistCreateResponse;
 use listenbrainz::raw::Client;
+use macon::Builder;
 
 #[derive(Clone, Builder)]
 pub struct PlaylistStub {
@@ -14,7 +13,7 @@ pub struct PlaylistStub {
     description: Option<String>,
     username: Option<String>,
     public: bool,
-    tracks: Vec<RecordingMBID>,
+    tracks: Vec<String>,
 }
 
 impl PlaylistStub {
@@ -22,7 +21,7 @@ impl PlaylistStub {
         title: String,
         username: Option<String>,
         public: bool,
-        tracks: Vec<RecordingMBID>,
+        tracks: Vec<String>,
         description: Option<String>,
     ) -> Self {
         Self {
@@ -62,9 +61,7 @@ impl PlaylistStub {
         }
     }
 
-    pub async fn send(self, token: &str) -> color_eyre::Result<PlaylistCreateResponse> {
-        Client::new()
-            .playlist_create(token, self.into_jspf())
-            .context("Couldn't send the playlist")
+    pub async fn send(self, token: &str) -> Result<PlaylistCreateResponse, crate::Error> {
+        Ok(Client::new().playlist_create(token, self.into_jspf())?)
     }
 }
