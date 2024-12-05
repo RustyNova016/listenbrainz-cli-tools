@@ -1,7 +1,6 @@
 use chrono::Duration;
 use futures::{stream, StreamExt};
 
-use crate::database::get_db_client;
 use crate::datastructures::entity_with_listens::recording_with_listens::RecordingWithListens;
 use crate::datastructures::radio::collector::RadioCollector;
 use crate::datastructures::radio::filters::cooldown::cooldown_filter;
@@ -14,6 +13,7 @@ use crate::utils::playlist::PlaylistStub;
 use crate::utils::println_cli;
 
 pub async fn overdue_radio(
+    conn: &mut sqlx::SqliteConnection,
     seeder: ListenSeeder,
     token: &str,
     min_listens: Option<u64>,
@@ -21,8 +21,6 @@ pub async fn overdue_radio(
     overdue_factor: bool,
     collector: RadioCollector,
 ) -> color_eyre::Result<()> {
-    let db = get_db_client().await;
-    let conn = &mut *db.connection.acquire().await?;
     let username = seeder.username().clone();
 
     println_cli("[Seeding] Getting listens");

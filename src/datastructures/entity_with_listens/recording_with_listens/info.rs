@@ -46,12 +46,14 @@ impl RecordingWithListens {
         other_listens: &RecordingWithListensCollection,
     ) -> Result<String, crate::Error> {
         let conf = Config::load_or_panic();
+        let global_count = self.get_global_listen_count().await?;
+
         let text = formatdoc! {"
             {title}
             
             [General]
                - Rank: #{rank}
-               - Listen count: {listen_count}
+               - Listen count: {listen_count} ({global_count} worldwide)
                - First listened on: {first_listened}
                - Last listened on: {last_listened}
         
@@ -61,6 +63,7 @@ impl RecordingWithListens {
                {overdue}
 
             [Radios]
+               - Underrated score: {underrated_score}
                - Overdue score: {overdue_score}
                - Overdue score (with multiplier): {overdue_mul}
             ",
@@ -81,6 +84,7 @@ impl RecordingWithListens {
             .unwrap()
             .floor_to_second(),
             overdue = get_overdue_line(self),
+            underrated_score = self.get_underated_score(other_listens, global_count).trunc_with_scale(2),
             overdue_score = self.overdue_factor().trunc_with_scale(2)  + Decimal::ONE,
             overdue_mul = ((self.overdue_factor() + Decimal::ONE)
             * conf.read_or_panic().bumps.get_multiplier(&RecordingMBID::from(
