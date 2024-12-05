@@ -2,7 +2,6 @@ pub mod bumps;
 pub mod cache;
 pub mod compatibility;
 pub mod daily;
-pub mod interactive_mapper;
 pub mod listens;
 pub mod lookup;
 pub mod musicbrainz;
