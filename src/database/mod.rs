@@ -5,7 +5,10 @@ use std::path::PathBuf;
 use directories::BaseDirs;
 use musicbrainz_db_lite::database::client::DBClient;
 use once_cell::sync::{Lazy, OnceCell};
+use sqlx::Pool;
+use sqlx::Sqlite;
 
+use crate::tools::cache::delete_database;
 use crate::utils::println_cli;
 
 pub mod cleanup;
@@ -91,6 +94,24 @@ async fn connect_and_setup() -> Result<DBClient, crate::Error> {
             println_cli("Creating database file");
             Ok(DBClient::create_database_file(&DB_LOCATION.to_string_lossy()).await?)
         }
+        Err(crate::Error::MusicbrainzDBLiteError(err)) => {
+            if has_migration_log().await? {
+                return Err(err.into());
+            }
+
+            delete_database(&DB_LOCATION)?;
+            Ok(DBClient::create_database_file(&DB_LOCATION.to_string_lossy()).await?)
+        }
         Err(err) => Err(err),
     }
+}
+
+async fn has_migration_log() -> Result<bool, crate::Error> {
+    let pool = Pool::<Sqlite>::connect_lazy(&format!("sqlite:{}", DB_LOCATION.to_string_lossy()))?;
+
+    let result = sqlx::query("SELECT * FROM `_sqlx_migrations` LIMIT 1")
+        .fetch_optional(&pool)
+        .await?;
+
+    Ok(result.is_some())
 }
