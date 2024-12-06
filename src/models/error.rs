@@ -1,18 +1,9 @@
 use std::io;
 use thiserror::Error;
 
-use crate::core::caching::serde_cacache;
-
 #[derive(Error, Debug)]
 //#[expect(clippy::enum_variant_names)]
 pub enum Error {
-    /// Returned when an index was targeted to alias another of a different type
-    #[error("MBID {1:?} couldn't be aliased to MBID {0:?}")]
-    MBIDAliasError(String, String),
-
-    #[error("Couldn't parse the string for any MBID. If you are sure that there is one, but see this error, please send a ticket.")]
-    MBIDStringParsingError,
-
     // --- Config Errors ---
     #[error("An error occured when trying to load the configuration file.")]
     ConfigLoadError(io::Error),
@@ -27,12 +18,6 @@ pub enum Error {
     ConfigFileWriteError(serde_json::Error),
 
     // --- Cache Errors ---
-    #[error("Error with the cache.")]
-    CacheError(serde_cacache::error::Error),
-
-    #[error("Tried to get row id {0} but couldn't be found")]
-    MissingRowInDB(i64),
-
     #[error(transparent)]
     SQLxError(#[from] sqlx::Error),
 
@@ -54,6 +39,9 @@ pub enum Error {
 
     #[error("Couldn't decode the server's responce")]
     RequestDecodeError(reqwest::Error),
+
+    #[error("Listenbrainz responded with an error")]
+    ListenbrainzError(#[from] listenbrainz::Error),
 }
 
 impl Error {

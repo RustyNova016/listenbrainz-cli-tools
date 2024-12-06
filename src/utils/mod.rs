@@ -15,7 +15,6 @@ pub mod env;
 pub mod extensions;
 pub mod listenbrainz_api;
 pub mod logger;
-pub mod playlist;
 pub mod radio;
 pub mod regex;
 pub mod tokio;

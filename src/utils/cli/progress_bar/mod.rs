@@ -5,6 +5,8 @@ use indicatif::{ProgressBar, ProgressStyle};
 
 use crate::utils::logger::Logger;
 
+pub mod global_progress_bar;
+
 pub struct ProgressBarCli {
     pg: ProgressBar,
 }

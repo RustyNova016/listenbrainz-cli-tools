@@ -7,7 +7,7 @@ use itertools::Itertools;
 use crate::database::listenbrainz::listens::ListenFetchQuery;
 use crate::database::listenbrainz::listens::ListenFetchQueryReturn;
 use crate::datastructures::entity_with_listens::release_with_listens::ReleaseWithListens;
-use crate::utils::cli::global_progress_bar::PG_FETCHING;
+use crate::utils::cli::progress_bar::global_progress_bar::PG_FETCHING;
 use crate::utils::extensions::chrono_ext::DurationExt;
 
 pub async fn best_of_checker(conn: &mut sqlx::SqliteConnection, username: &str) {

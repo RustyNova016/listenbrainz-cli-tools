@@ -8,7 +8,6 @@ use models::cli::Cli;
 use crate::utils::println_cli;
 
 pub mod api;
-pub mod core;
 pub mod database;
 pub mod datastructures;
 pub mod models;
