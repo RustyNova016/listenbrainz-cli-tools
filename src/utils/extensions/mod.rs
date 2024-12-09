@@ -6,7 +6,6 @@ use listenbrainz::raw::response::{UserListensListen, UserListensMBIDMapping, Use
 
 pub mod chrono_ext;
 pub mod listenbrainz_ext;
-pub mod musicbrainz_ext;
 
 #[ext]
 pub impl UserListensPayload {
