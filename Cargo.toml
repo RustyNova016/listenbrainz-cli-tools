@@ -12,17 +12,8 @@ rust-version = "1.83.0"
 
 [dependencies]
 listenbrainz = "0.8.0"
-
-# Upstream version of the musicbrainz crate. Use "listenbrainz-cli-tools_master" for main builds, "listenbrainz-cli-tools_dev" for dev builds
-# This fixes:
-# - https://github.com/RustyNova016/listenbrainz-cli-tools/issues/97
-#musicbrainz_rs = "5.0.0" # Original musicbrainz_rs crate. It currently seems unmaintained, and need some PRs to pass
-musicbrainz_rs = { version = "0.6.0", package = "musicbrainz_rs_nova" } # Fork with fixes
-#musicbrainz_rs = { branch = "listenbrainz-cli-tools_master", package = "musicbrainz_rs_nova", git = "https://github.com/RustyNova016/musicbrainz_rs.git" }
-#musicbrainz_rs = { path = "../musicbrainz_rs_nova", package = "musicbrainz_rs_nova"} # For easy development, download the musicbrainz_rs crate for yourself. Don't forget to change it back as PRs will fail
-
-#musicbrainz-db-lite = { version = "0.1.0", path = "../musicbrainz-db-lite" }
 musicbrainz-db-lite = { branch = "develop", git = "https://github.com/RustyNova016/musicbrainz_db_lite.git" }
+#musicbrainz-db-lite = { version = "0.1.0", path = "../musicbrainz-db-lite" }
 
 derive_builder = "0.20.2"
 inquire = "0.7.5"

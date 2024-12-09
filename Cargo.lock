@@ -92,7 +92,6 @@ dependencies = [
  "log",
  "macon",
  "musicbrainz-db-lite",
- "musicbrainz_rs_nova 0.6.0",
  "once_cell",
  "rand",
  "rayon",
@@ -1976,7 +1975,7 @@ dependencies = [
  "macon",
  "musicbrainz_db_lite_macros",
  "musicbrainz_db_lite_schema",
- "musicbrainz_rs_nova 0.8.0",
+ "musicbrainz_rs_nova",
  "serde",
  "serde_json",
  "sqlx",
@@ -2004,22 +2003,6 @@ dependencies = [
  "dotenvy",
  "sqlx",
  "tokio",
-]
-
-[[package]]
-name = "musicbrainz_rs_nova"
-version = "0.6.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "8e669045631bd59a35fe9188e5d00d79ab1ec1a244a32969852273ab855f0dc8"
-dependencies = [
- "chrono",
- "lucene_query_builder",
- "once_cell",
- "reqwest",
- "serde",
- "serde_json",
- "tokio",
- "wasm-timer",
 ]
 
 [[package]]
