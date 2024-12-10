@@ -9,6 +9,7 @@ use crate::database::get_conn;
 use crate::datastructures::clippy::missing_release_barcode::MissingBarcodeLint;
 use crate::models::clippy::MbClippyLint;
 use crate::utils::cli::await_next;
+use crate::utils::cli::display::MainEntityExt;
 use crate::utils::println_cli;
 
 pub async fn mb_clippy(start_mbid: &str) {
@@ -34,6 +35,14 @@ pub async fn mb_clippy(start_mbid: &str) {
         //check_lint::<MissingWorkLint>(&mut conn, &entity).await;
         check_lint::<MissingBarcodeLint>(&mut conn, &entity).await;
 
+        println!(
+            "Checked {}",
+            entity
+                .pretty_format(&mut conn)
+                .await
+                .expect("Error while formating the name of the entity")
+        );
+
         queue.extend(
             get_new_nodes(&mut conn, &entity)
                 .await
@@ -54,7 +63,7 @@ async fn check_lint<L: MbClippyLint>(conn: &mut sqlx::SqliteConnection, entity: 
         return;
     };
 
-    println!("{}", L::get_name().on_yellow().black());
+    println!("\n{}", L::get_name().on_yellow().black());
     println!();
     println!(
         "{}",

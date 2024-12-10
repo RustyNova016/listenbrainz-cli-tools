@@ -30,7 +30,6 @@ pub mod cache;
 pub mod common;
 pub mod config;
 pub mod listens;
-pub mod listens;
 pub mod lookup;
 pub mod mapping;
 pub mod musicbrainz;
