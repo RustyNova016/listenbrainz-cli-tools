@@ -37,7 +37,7 @@ pub async fn underrated_mix(
             - The rank in {username}'s top 1000 recording of all time (First place get 100 points, second get 999.9, etc...)<br>
             - The percentage of the recording's listens being from {username} (Made with this formula: (user listens / worldwide listens) *100)<br>
             <br>
-            Made with: https://github.com/RustyNova016/listenbrainz-cli-tools"
+            Made with: https://github.com/RustyNova016/Alistral"
         )),
     ).send(&token).await?;
 
