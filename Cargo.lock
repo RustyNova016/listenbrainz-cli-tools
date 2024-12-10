@@ -1963,7 +1963,7 @@ dependencies = [
 [[package]]
 name = "musicbrainz-db-lite"
 version = "0.1.0"
-source = "git+https://github.com/RustyNova016/musicbrainz_db_lite.git?branch=develop#180851e3bda210e72f2d1d49ce957a0d5f82c2ef"
+source = "git+https://github.com/RustyNova016/musicbrainz_db_lite.git?branch=develop#35a894da2f87dc3ad0583229feafb727f46fe45b"
 dependencies = [
  "async-fn-stream",
  "async-trait",
@@ -1986,7 +1986,7 @@ dependencies = [
 [[package]]
 name = "musicbrainz_db_lite_macros"
 version = "0.1.0"
-source = "git+https://github.com/RustyNova016/musicbrainz_db_lite.git?branch=develop#180851e3bda210e72f2d1d49ce957a0d5f82c2ef"
+source = "git+https://github.com/RustyNova016/musicbrainz_db_lite.git?branch=develop#35a894da2f87dc3ad0583229feafb727f46fe45b"
 dependencies = [
  "darling",
  "proc-macro2",
@@ -1998,11 +1998,9 @@ dependencies = [
 [[package]]
 name = "musicbrainz_db_lite_schema"
 version = "0.1.1"
-source = "git+https://github.com/RustyNova016/musicbrainz_db_lite.git?branch=develop#180851e3bda210e72f2d1d49ce957a0d5f82c2ef"
+source = "git+https://github.com/RustyNova016/musicbrainz_db_lite.git?branch=develop#35a894da2f87dc3ad0583229feafb727f46fe45b"
 dependencies = [
- "dotenvy",
  "sqlx",
- "tokio",
 ]
 
 [[package]]
