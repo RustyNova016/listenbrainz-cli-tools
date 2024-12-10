@@ -25,18 +25,22 @@ pub enum MusicbrainzSubcommands {
     Clippy {
         /// The MBID of a recording to start from
         start_mbid: Option<String>,
+
+        /// Whether to check new elements first
+        #[arg(short, long)]
+        new_first: bool
     },
 }
 
 impl MusicbrainzSubcommands {
     pub async fn run(&self) {
         match self {
-            Self::Clippy { start_mbid } => {
+            Self::Clippy { start_mbid, new_first } => {
                 let mbid = start_mbid
                     .clone()
                     .unwrap_or_else(|| "8f3471b5-7e6a-48da-86a9-c1c07a0f47ae".to_string());
 
-                mb_clippy(&read_mbid_from_input(&mbid).expect("Couldn't read mbid")).await;
+                mb_clippy(&read_mbid_from_input(&mbid).expect("Couldn't read mbid"), !new_first).await;
             }
         }
     }

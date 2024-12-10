@@ -1,6 +1,7 @@
 use musicbrainz_db_lite::models::musicbrainz::{main_entities::MainEntity, recording::Recording};
 
 use crate::models::clippy::{MbClippyLint, MbClippyLintLink};
+use crate::utils::cli::display::RecordingExt;
 
 pub struct MissingWorkLint {
     recording: Recording,
@@ -37,8 +38,8 @@ impl MbClippyLint for MissingWorkLint {
         conn: &mut sqlx::SqliteConnection,
     ) -> Result<impl std::fmt::Display, crate::Error> {
         Ok(format!("Recording \"{}\" has no associated works
--> Recordings should have works associated to them. Please check if a work exists for a recording and add it / create it"
-, self.recording.format_with_credits(conn).await?))
+-> All recordings should have a work associated to them. Please check if a work exists for a recording and add it / create it"
+, self.recording.pretty_format_with_credits(conn, false).await?))
     }
 
     async fn get_links(
@@ -68,7 +69,7 @@ impl MbClippyLint for MissingWorkLint {
 
     async fn get_hints(
         &self,
-        conn: &mut sqlx::SqliteConnection,
+        _conn: &mut sqlx::SqliteConnection,
     ) -> Result<Vec<crate::models::clippy::MbClippyLintHint>, crate::Error> {
         // TODO: Remix hint
         Ok(Vec::new())
