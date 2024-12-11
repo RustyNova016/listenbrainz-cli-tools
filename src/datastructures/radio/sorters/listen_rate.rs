@@ -12,7 +12,11 @@ pub fn listen_rate_sorter(mut recordings: Vec<RecordingWithListens>) -> Vec<Reco
         let score = r
             .get_listen_rate(Duration::days(365))
             .unwrap_or_else(|| Decimal::from(2147483646));
-        score * conf.bumps.get_multiplier2(&r.recording().mbid)
+        score
+            * conf
+                .read_or_panic()
+                .bumps
+                .get_multiplier(&r.recording().mbid)
     });
 
     recordings

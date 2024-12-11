@@ -1,8 +1,7 @@
-use crate::database::get_conn;
 use crate::database::listenbrainz::listens::ListenFetchQuery;
 use crate::database::listenbrainz::listens::ListenFetchQueryReturn;
-use crate::models::cli::common::GroupByTarget;
 use crate::models::cli::common::SortSorterBy;
+use crate::models::cli::common::StatsTarget;
 
 mod artists;
 mod recordings;
@@ -10,31 +9,39 @@ mod release_groups;
 mod releases;
 mod work;
 
-pub async fn stats_command(username: &str, target: GroupByTarget, _sort_by: SortSorterBy) {
+pub async fn stats_command(
+    conn: &mut sqlx::SqliteConnection,
+    username: &str,
+    target: StatsTarget,
+    _sort_by: SortSorterBy,
+) {
     let listens = ListenFetchQuery::builder()
         //.fetch_recordings_redirects(true)
         .returns(ListenFetchQueryReturn::Mapped)
         .user(username.to_string())
         .build()
-        .fetch(&mut *get_conn().await)
+        .fetch(conn)
         .await
         .expect("Couldn't fetch the new listens");
 
     match target {
-        GroupByTarget::Recording => {
-            recordings::stats_recording(listens).await;
+        StatsTarget::Recording => {
+            recordings::stats_recording(conn, listens).await;
         }
-        GroupByTarget::Artist => {
-            artists::stats_artist(listens).await;
+        StatsTarget::RecordingTime => {
+            recordings::stats_recording_time(conn, listens).await;
         }
-        GroupByTarget::Release => {
-            releases::stats_releases(listens).await;
+        StatsTarget::Artist => {
+            artists::stats_artist(conn, listens).await;
         }
-        GroupByTarget::ReleaseGroup => {
-            release_groups::stats_release_groups(listens).await;
+        StatsTarget::Release => {
+            releases::stats_releases(conn, listens).await;
         }
-        GroupByTarget::Work => {
-            work::stats_works(listens).await;
+        StatsTarget::ReleaseGroup => {
+            release_groups::stats_release_groups(conn, listens).await;
+        }
+        StatsTarget::Work => {
+            work::stats_works(conn, listens).await;
         }
     }
 }

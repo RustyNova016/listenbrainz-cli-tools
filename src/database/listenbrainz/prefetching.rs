@@ -3,7 +3,7 @@ use musicbrainz_db_lite::models::listenbrainz::listen::Listen;
 use musicbrainz_db_lite::models::musicbrainz::recording::Recording;
 use musicbrainz_db_lite::models::musicbrainz::release::Release;
 
-use crate::utils::cli::global_progress_bar::PG_FETCHING;
+use crate::utils::cli::progress_bar::global_progress_bar::PG_FETCHING;
 use crate::utils::println_cli;
 
 /// Prefetch all the recordings of a list of listens

@@ -1,7 +1,9 @@
+use core::cmp::Reverse;
 use std::collections::HashMap;
 
 use futures::stream;
 use futures::Stream;
+use itertools::Itertools;
 use musicbrainz_db_lite::models::musicbrainz::recording::Recording;
 use rust_decimal::Decimal;
 
@@ -46,6 +48,12 @@ impl RecordingWithListensCollection {
         self.0.values().find(|r| r.recording().mbid == mbid)
     }
 
+    pub fn get_or_new(&mut self, recording: Recording) -> &RecordingWithListens {
+        self.0
+            .entry(recording.id)
+            .or_insert_with(|| RecordingWithListens::new(recording, Default::default()))
+    }
+
     /// Return the ratio of listens being from a recording
     pub fn get_listen_ratio(&self, recording: &Recording) -> Decimal {
         let recording_listen_count = self
@@ -84,6 +92,28 @@ impl RecordingWithListensCollection {
                 self.0.insert(new_id, new_entity);
             }
         }
+    }
+
+    /// Return the rank of the listened recording
+    pub fn get_rank(&self, recording_mbid: &str) -> Option<usize> {
+        let mut rec_ref = self.values().collect_vec();
+        rec_ref.sort_by_cached_key(|rec| Reverse(rec.listen_count()));
+
+        let mut rank = 1;
+        let mut last_listen_count = 0;
+        for (i, rec) in rec_ref.iter().enumerate() {
+            if last_listen_count != rec.listen_count() {
+                rank = i;
+            }
+
+            if rec.recording().mbid == recording_mbid {
+                return Some(rank);
+            }
+
+            last_listen_count = rec.listen_count();
+        }
+
+        None
     }
 }
 

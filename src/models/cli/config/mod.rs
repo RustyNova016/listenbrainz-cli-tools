@@ -1,8 +1,7 @@
-use crate::core::entity_traits::config_file::ConfigFile;
+use crate::models::config::config_trait::ConfigFile as _;
 use crate::models::config::recording_timeout::RecordingTimeoutConfig;
 use crate::models::config::Config;
-use crate::models::data::musicbrainz::entity::entity_kind::MusicbrainzEntityKind;
-use crate::models::data::musicbrainz::mbid::MBID;
+use crate::utils::cli::read_mbid_from_input;
 use crate::utils::extensions::chrono_ext::DurationExt;
 use chrono::Duration;
 use clap::Parser;
@@ -59,35 +58,35 @@ impl ConfigCommands {
     pub async fn run(&self) -> color_eyre::Result<()> {
         match self {
             Self::SetToken { username, token } => {
-                let mut conf = Config::load()?;
-                conf.set_token(username.clone(), token.clone());
-                conf.save()?;
+                let conf = Config::load()?;
+                conf.write_or_panic()
+                    .set_token(username.clone(), token.clone());
             }
 
             Self::Timeout {
                 recording,
                 duration,
             } => {
-                RecordingTimeoutConfig::set_timeout(
-                    MBID::from_string(recording, MusicbrainzEntityKind::Recording)?
-                        .unwrap_recording(),
-                    Duration::from_human_string(duration)?,
-                )?;
+                let id = read_mbid_from_input(recording).expect("Couldn't parse MBID");
+                let config_guard = RecordingTimeoutConfig::load()?;
+                let mut config = config_guard.write_or_panic();
+                config.set_timeout(&id, Duration::from_human_string(duration)?);
             }
 
             Self::BlacklistMapperMSID { msid, remove } => {
+                let conf = Config::load()?;
                 if !remove {
-                    Config::add_blacklisted_msid(msid.to_string())?;
+                    conf.write_or_panic()
+                        .add_blacklisted_msid(msid.to_string())?;
                 } else {
-                    Config::remove_blacklisted_msid(msid)?;
+                    conf.write_or_panic().remove_blacklisted_msid(msid)?;
                 }
             }
             Self::Listens(val) => val.run().await?,
 
             Self::DefaultUser { username } => {
-                let mut conf = Config::load()?;
-                conf.default_user = Some(username.clone());
-                conf.save()?;
+                let conf = Config::load()?;
+                conf.write_or_panic().default_user = Some(username.clone());
             }
         }
 

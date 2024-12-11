@@ -13,6 +13,7 @@ use crate::models::config::Config;
 use crate::tools::radio::circles::create_radio_mix;
 use crate::tools::radio::listen_rate::listen_rate_radio;
 use crate::tools::radio::overdue::overdue_radio;
+use crate::tools::radio::underrated::underrated_mix;
 //use crate::tools::radio::underrated::underrated_mix;
 
 use super::common::Timeframe;
@@ -80,8 +81,8 @@ impl RadioCommand {
             .build()
     }
 
-    pub async fn run(&self) -> color_eyre::Result<()> {
-        self.command.run(self.get_collector(), self).await
+    pub async fn run(&self, conn: &mut sqlx::SqliteConnection) -> color_eyre::Result<()> {
+        self.command.run(conn, self.get_collector(), self).await
     }
 }
 
@@ -103,24 +104,24 @@ pub enum RadioSubcommands {
         unlistened: bool,
     },
 
-    // /// Generate a playlist containing your underrated listens
-    // ///
-    // /// This radio will create a playlist containing all the tracks that you listen to, but seemingly no one else does.
-    // ///
-    // ///> The mix is made by calculating a score for each listen. This score is composed of two values:
-    // ///> - The rank in the user's top 1000 recording of all time (First place get 100 points, second get 999.9, etc...)
-    // ///> - The percentage of the recording's listens being from the user (Made with this formula: (user listens / worldwide listens) *100)
-    // Underrated {
-    //     /// Name of the user to fetch listens from
-    //     username: Option<String>,
+    /// Generate a playlist containing your underrated listens
+    ///
+    /// This radio will create a playlist containing all the tracks that you listen to, but seemingly no one else does.
+    ///
+    ///> The mix is made by calculating a score for each listen. This score is composed of two values:
+    ///> - The rank in the user's top 1000 recording of all time (First place get 100 points, second get 999.9, etc...)
+    ///> - The percentage of the recording's listens being from the user (Made with this formula: (user listens / worldwide listens) *100)
+    Underrated {
+        /// Name of the user to fetch listens from
+        username: Option<String>,
+        /// Your user token.
+        ///
+        /// You can find it at <https://listenbrainz.org/settings/>.
+        /// If it's set in the config file, you can ignore this argument
+        #[arg(short, long)]
+        token: Option<String>,
+    },
 
-    //     /// Your user token.
-    //     ///
-    //     /// You can find it at <https://listenbrainz.org/settings/>.
-    //     /// If it's set in the config file, you can ignore this argument
-    //     #[arg(short, long)]
-    //     token: Option<String>,
-    // },
     /// Generate playlists depending on the listen rate of recordings
     ///
     /// This algorythm bases itself on your listen rate of recording to get more forgotten tracks.
@@ -179,6 +180,7 @@ pub enum RadioSubcommands {
 impl RadioSubcommands {
     pub async fn run(
         &self,
+        conn: &mut sqlx::SqliteConnection,
         collector: RadioCollector,
         command: &RadioCommand,
     ) -> color_eyre::Result<()> {
@@ -198,14 +200,15 @@ impl RadioSubcommands {
                 .await;
             }
 
-            // Self::Underrated { username, token } => {
-            //     underrated_mix(
-            //         Config::check_username(username),
-            //         Config::check_token(&Config::check_username(username), token),
-            //         config,
-            //     )
-            //     .await?;
-            // }
+            Self::Underrated { username, token } => {
+                underrated_mix(
+                    conn,
+                    command.get_listen_seeder(username),
+                    collector,
+                    &Config::check_token(&Config::check_username(username), token),
+                )
+                .await?;
+            }
             Self::Rate {
                 username,
                 token,
@@ -213,6 +216,7 @@ impl RadioSubcommands {
                 cooldown,
             } => {
                 listen_rate_radio(
+                    conn,
                     command.get_listen_seeder(username),
                     &Config::check_token(&Config::check_username(username), token),
                     *min,
@@ -230,6 +234,7 @@ impl RadioSubcommands {
                 overdue_factor: delay_factor,
             } => {
                 overdue_radio(
+                    conn,
                     command.get_listen_seeder(username),
                     &Config::check_token(&Config::check_username(username), token),
                     *min,

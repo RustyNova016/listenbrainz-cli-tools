@@ -8,10 +8,11 @@ use models::cli::Cli;
 use crate::utils::println_cli;
 
 pub mod api;
-pub mod core;
 pub mod database;
 pub mod datastructures;
 pub mod models;
+#[cfg(test)]
+pub mod testing;
 /// This is the module containing all the different tools of this app
 pub mod tools;
 pub mod utils;
@@ -21,18 +22,24 @@ pub use crate::models::error::Error;
 #[tokio::main]
 async fn main() -> color_eyre::Result<()> {
     color_eyre::install()?;
-    //let mut clog = colog::default_builder();
-    //clog.filter(None, log::LevelFilter::Trace);
-    //clog.init();
+
+    // Set up the database
+    let mut conn = get_conn().await;
 
     let cli = Cli::parse();
 
-    let post_run = cli.run().await.expect("An error occured in the app");
+    let post_run = cli
+        .run(&mut conn)
+        .await
+        .expect("An error occured in the app");
+
+    // The details of the connection may have changed. We recreate the connection
+    let mut conn = get_conn().await;
 
     if post_run {
         println_cli("Optional cleanup - This is fine to cancel");
         println_cli("Cleaning some old entries...");
-        cleanup_database(&mut *get_conn().await)
+        cleanup_database(&mut conn)
             .await
             .expect("Error while cleaning the database");
         println_cli("Done!");

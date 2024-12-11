@@ -2,10 +2,8 @@ use clap::Parser;
 use clap::Subcommand;
 
 use crate::models::config::Config;
-use crate::tools::interactive_mapper::interactive_mapper;
 use crate::tools::listens::unlinked::unmapped_command;
 
-use super::common::SortListensBy;
 use super::common::SortSorterBy;
 
 #[derive(Parser, Debug, Clone)]
@@ -16,8 +14,8 @@ pub struct MappingCommand {
 }
 
 impl MappingCommand {
-    pub async fn run(&self) -> color_eyre::Result<()> {
-        self.subcommand.run().await
+    pub async fn run(&self, conn: &mut sqlx::SqliteConnection) -> color_eyre::Result<()> {
+        self.subcommand.run(conn).await
     }
 }
 
@@ -53,45 +51,18 @@ pub enum MappingSubcommands {
         #[arg(short, long)]
         sort: Option<SortSorterBy>,
     },
-
-    /// Easy and faster mapping of recordings.
-    ///
-    /// It goes through each unmapped recordings, and give a few suggested recordings for the mapping. This is the exact same as mapping recording in the web UI.
-    Mapper {
-        /// Name of the user to fetch listens from
-        username: Option<String>,
-
-        /// Your user token.
-        ///
-        /// You can find it at <https://listenbrainz.org/settings/>.
-        /// If it's set in the config file, you can ignore this argument
-        #[arg(short, long)]
-        token: Option<String>,
-
-        /// Sort the listens by type
-        #[arg(short, long)]
-        sort: Option<SortListensBy>,
-    },
 }
 
 impl MappingSubcommands {
-    pub async fn run(&self) -> color_eyre::Result<()> {
+    pub async fn run(&self, conn: &mut sqlx::SqliteConnection) -> color_eyre::Result<()> {
         match self {
             Self::ListUnmapped { username, sort } => {
-                unmapped_command(&Config::check_username(username).to_lowercase(), *sort).await;
-            }
-
-            Self::Mapper {
-                username,
-                token,
-                sort,
-            } => {
-                interactive_mapper(
-                    &Config::check_username(username),
-                    Config::check_token(&Config::check_username(username), token),
+                unmapped_command(
+                    conn,
+                    &Config::check_username(username).to_lowercase(),
                     *sort,
                 )
-                .await?;
+                .await;
             }
         }
 

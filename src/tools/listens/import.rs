@@ -13,10 +13,13 @@ use serde::Deserialize;
 use serde::Serialize;
 use sqlx::Acquire;
 
-use crate::database::get_conn;
 use crate::utils::println_cli_info;
 
-pub async fn import_listen_dump(dump_path: &Path, username: &str) {
+pub async fn import_listen_dump(
+    conn: &mut sqlx::SqliteConnection,
+    dump_path: &Path,
+    username: &str,
+) {
     let zip_file = File::open(dump_path).expect("Couldn't access zip file.");
     let mut archive = zip::ZipArchive::new(zip_file).expect("Couldn't read zip file.");
 
@@ -49,11 +52,7 @@ pub async fn import_listen_dump(dump_path: &Path, username: &str) {
 
         // Then save the content
         let mut count = 0;
-        let mut pool_connection = get_conn().await;
-        let mut trans = pool_connection
-            .begin()
-            .await
-            .expect("Couldn't start transaction");
+        let mut trans = conn.begin().await.expect("Couldn't start transaction");
         for line in content {
             let line = line.expect("Couldn't read line");
             //println!("{line}");

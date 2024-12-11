@@ -1,5 +1,3 @@
-pub mod collection;
-pub mod info;
 use std::collections::HashMap;
 
 use chrono::{DateTime, Duration, Utc};
@@ -13,11 +11,16 @@ use rust_decimal::{prelude::FromPrimitive, Decimal};
 use serde::Deserialize;
 use serde::Serialize;
 
+use crate::api::listenbrainz::global_listen_counts::get_global_listen_counts;
 use crate::database::listenbrainz::prefetching::prefetch_recordings_of_listens;
 use crate::datastructures::listen_collection::traits::ListenCollectionLike;
 use crate::datastructures::listen_collection::ListenCollection;
 
 use super::impl_entity_with_listens;
+
+pub mod collection;
+pub mod info;
+pub mod radios;
 
 #[derive(Debug, Clone, PartialEq, Eq, Getters, Deserialize, Serialize)]
 pub struct RecordingWithListens {
@@ -138,8 +141,12 @@ impl RecordingWithListens {
     }
 
     pub fn overdue_factor(&self) -> Decimal {
-        Decimal::from_i64(self.overdue_by().num_seconds()).unwrap()
-            / Decimal::from_i64(self.average_duration_between_listens().num_seconds()).unwrap()
+        Decimal::from_i64(self.overdue_by().num_seconds())
+            .unwrap()
+            .checked_div(
+                Decimal::from_i64(self.average_duration_between_listens().num_seconds()).unwrap(),
+            )
+            .unwrap_or(Decimal::NEGATIVE_ONE)
     }
 
     pub fn is_listened(&self) -> bool {
@@ -173,6 +180,21 @@ impl RecordingWithListens {
         }
 
         self.listens.merge_by_index(other.listens);
+    }
+
+    pub async fn get_global_listen_count(&self) -> Result<u64, crate::Error> {
+        let counts = get_global_listen_counts(&[self.recording.mbid.to_string()]).await?;
+        let Some(count) = counts.first() else {
+            return Ok(0);
+        };
+        Ok(count.total_listen_count.unwrap_or(0))
+    }
+
+    /// Return the total time the recording has been listened at
+    pub fn get_time_listened(&self) -> Option<Duration> {
+        self.recording()
+            .length_as_duration()
+            .map(|dur| dur * self.listen_count().try_into().unwrap())
     }
 }
 

@@ -3,15 +3,12 @@ use std::path::PathBuf;
 use crate::database::get_conn;
 use crate::database::DB_LOCATION;
 //use crate::models::config::Config;
-use crate::models::data::entity_database::ENTITY_DATABASE;
-use crate::models::data::musicbrainz_database::MUSICBRAINZ_DATABASE;
 use crate::tools::cache::copy_to_debug;
 use crate::tools::cache::delete_database;
 //use crate::tools::listens::import::import_listen_dump;
 use clap::ValueEnum;
 use clap::{Parser, Subcommand};
 use color_eyre::owo_colors::OwoColorize;
-use futures::try_join;
 
 #[derive(Parser, Debug, Clone)]
 #[command(version, about, long_about = None)]
@@ -29,6 +26,12 @@ pub enum CacheSubcommands {
     /// ⚠️ If there is migrations, do `cargo sqlx migrate run` next
     #[cfg(debug_assertions)]
     CopyToDebug,
+
+    /// Clear all the listens from the database
+    ClearListens {
+        /// Only delete listens of user
+        user: Option<String>,
+    },
 
     /// Initialise the database.
     InitDatabase {
@@ -54,11 +57,11 @@ pub enum CacheSubcommands {
     /// Wipe the cache's data
     ///
     /// This is useful if you need disk space, or need to manually rebuild in case of corruption
-    Clear { target: ClearTarget },
+    Clear,
 }
 
 impl CacheCommand {
-    pub async fn run(&self) -> color_eyre::Result<()> {
+    pub async fn run(&self, conn: &mut sqlx::SqliteConnection) -> color_eyre::Result<()> {
         match &self.command {
             #[cfg(debug_assertions)]
             CacheSubcommands::CopyToDebug => {
@@ -83,12 +86,24 @@ impl CacheCommand {
                 println!("Please see: https://tickets.metabrainz.org/browse/LB-1687");
                 //import_listen_dump(path, &Config::check_username(username)).await;
             }
-            CacheSubcommands::Clear { target } => {
-                let _ = try_join!(
-                    MUSICBRAINZ_DATABASE.clear(target),
-                    ENTITY_DATABASE.clear(*target)
-                )?;
+            CacheSubcommands::Clear => {
+                delete_database(&DB_LOCATION).expect("Failed to delete the database");
             }
+
+            CacheSubcommands::ClearListens { user } => match user {
+                Some(user) => {
+                    sqlx::query!("DELETE FROM listens WHERE LOWER(user) = LOWER(?)", user)
+                        .execute(conn)
+                        .await
+                        .expect("Couldn't delete listens");
+                }
+                None => {
+                    sqlx::query!("DELETE FROM listens")
+                        .execute(conn)
+                        .await
+                        .expect("Couldn't delete listens");
+                }
+            },
         }
 
         Ok(())

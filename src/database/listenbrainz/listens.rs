@@ -6,7 +6,7 @@ use musicbrainz_db_lite::models::musicbrainz::recording::Recording;
 use sqlx::SqliteConnection;
 
 use crate::datastructures::listen_collection::ListenCollection;
-use crate::utils::cli::global_progress_bar::PG_FETCHING;
+use crate::utils::cli::progress_bar::global_progress_bar::PG_FETCHING;
 use crate::utils::env::in_offline_mode;
 use crate::utils::println_lis;
 
