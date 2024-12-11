@@ -39,18 +39,20 @@ impl Display for SortSorterBy {
 }
 
 #[derive(ValueEnum, Clone, Debug, Copy, IsVariant)]
-pub enum GroupByTarget {
+pub enum StatsTarget {
     Recording,
+    RecordingTime,
     Artist,
     Release,
     ReleaseGroup,
     Work,
 }
 
-impl GroupByTarget {
+impl StatsTarget {
     pub fn to_str(&self) -> &str {
         match self {
             Self::Recording => "recording",
+            Self::RecordingTime => "recording_time",
             Self::Artist => "artist",
             Self::Release => "release",
             Self::ReleaseGroup => "release_group",
