@@ -12,6 +12,7 @@ use crate::database::get_db_client;
 use crate::datastructures::radio::collector::RadioCollector;
 use crate::datastructures::radio::seeders::listens::ListenSeeder;
 use crate::models::playlist_stub::PlaylistStub;
+use crate::utils::cli::display::ArtistExt;
 use crate::utils::println_cli;
 
 pub async fn create_radio_mix(
@@ -76,7 +77,10 @@ impl RadioCircle {
         conn: &mut sqlx::SqliteConnection,
         artist: &Artist,
     ) -> Result<Option<Recording>, crate::Error> {
-        println_cli(format!("Checking artist: {}", artist.name));
+        println_cli(format!(
+            "Checking artist: {}",
+            artist.pretty_format(true).await.unwrap()
+        ));
         let mut recordings: Vec<Recording> = artist
             .browse_or_fetch_artist_recordings(conn)
             .try_collect()

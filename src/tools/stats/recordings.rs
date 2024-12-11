@@ -4,6 +4,7 @@ use itertools::Itertools;
 
 use crate::datastructures::entity_with_listens::recording_with_listens::RecordingWithListens;
 use crate::datastructures::listen_collection::ListenCollection;
+use crate::utils::cli::display::RecordingExt;
 use crate::utils::cli_paging::CLIPager;
 use crate::utils::extensions::chrono_ext::DurationExt;
 
@@ -23,7 +24,7 @@ pub async fn stats_recording(conn: &mut sqlx::SqliteConnection, listens: ListenC
             group.len(),
             group
                 .recording()
-                .format_with_credits(conn)
+                .pretty_format_with_credits(conn, true)
                 .await
                 .expect("Error getting formated recording name"),
         );
@@ -53,7 +54,7 @@ pub async fn stats_recording_time(conn: &mut sqlx::SqliteConnection, listens: Li
                 .unwrap_or_else(|| "??".to_string()),
             group
                 .recording()
-                .format_with_credits(conn)
+                .pretty_format_with_credits(conn, true)
                 .await
                 .expect("Error getting formated recording name"),
         );
