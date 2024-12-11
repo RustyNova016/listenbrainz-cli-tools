@@ -66,7 +66,7 @@ impl MbClippyLint for MissingBarcodeLint {
         &self,
         _conn: &mut sqlx::SqliteConnection,
     ) -> Result<Vec<crate::models::clippy::MbClippyLintHint>, crate::Error> {
-        let mut hints = Vec::new();
+        let hints = Vec::new();
 
         // TODO: Harmony hint
 

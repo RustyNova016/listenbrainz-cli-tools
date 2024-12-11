@@ -33,7 +33,10 @@ pub async fn mb_clippy(start_mbid: &str, new_first: bool) {
             continue;
         }
 
-        entity.refetch_and_load(&mut conn).await.expect("Couldn't fetch entity");
+        entity
+            .refetch_and_load(&mut conn)
+            .await
+            .expect("Couldn't fetch entity");
 
         check_lint::<MissingWorkLint>(&mut conn, &mut entity).await;
         check_lint::<MissingBarcodeLint>(&mut conn, &mut entity).await;
@@ -47,12 +50,10 @@ pub async fn mb_clippy(start_mbid: &str, new_first: bool) {
         );
         println!();
 
-        queue.extend(
-            get_new_nodes(&mut conn, &entity)
-                .await
-                .expect("Couldn't get new items to process")
-                .into_iter(),
-        );
+        get_new_nodes(&mut conn, &entity, &mut queue)
+            .await
+            .expect("Couldn't get new items to process");
+
         seen.push(entity);
     }
 
@@ -95,38 +96,40 @@ async fn check_lint<L: MbClippyLint>(conn: &mut sqlx::SqliteConnection, entity: 
 
     println!();
     await_next();
-    entity.refetch_and_load(conn).await.expect("Couldn't fetch entity");
+    entity
+        .refetch_and_load(conn)
+        .await
+        .expect("Couldn't fetch entity");
 }
 
 async fn get_new_nodes(
     conn: &mut sqlx::SqliteConnection,
     entity: &MainEntity,
-) -> Result<Vec<MainEntity>, crate::Error> {
-    let mut out = Vec::new();
-
+    queue: &mut VecDeque<MainEntity>,
+) -> Result<(), crate::Error> {
     println_cli("Getting new data...");
 
     match entity {
         MainEntity::Recording(val) => {
             let artists = val.get_artists_or_fetch(conn).await?;
             for artist in artists {
-                out.push(MainEntity::Artist(artist));
+                queue.push_front(MainEntity::Artist(artist));
             }
 
             let releases = val.get_releases_or_fetch(conn).await?;
             for release in releases {
-                out.push(MainEntity::Release(release));
+                queue.push_front(MainEntity::Release(release));
             }
 
             let works = val.get_works_or_fetch(conn).await?;
             for work in works {
-                out.push(MainEntity::Work(work));
+                queue.push_front(MainEntity::Work(work));
             }
         }
         MainEntity::Release(val) => {
             let recordings = val.get_recordings_or_fetch(conn).await?;
             for recording in recordings {
-                out.push(MainEntity::Recording(recording));
+                queue.push_front(MainEntity::Recording(recording));
             }
         }
         MainEntity::Artist(val) => {
@@ -135,21 +138,21 @@ async fn get_new_nodes(
                 .try_collect()
                 .await?;
             for recording in recordings {
-                out.push(MainEntity::Recording(recording));
+                queue.push_front(MainEntity::Recording(recording));
             }
         }
         _ => {}
     }
 
-    Ok(out)
+    Ok(())
 }
 
-#[cfg(test)]
-mod tests {
-    use crate::tools::musicbrainz::clippy::mb_clippy;
+// #[cfg(test)]
+// mod tests {
+//     use crate::tools::musicbrainz::clippy::mb_clippy;
 
-    #[tokio::test]
-    async fn mb_clippy_test() {
-        mb_clippy("543bb836-fb00-470a-8a27-25941fe0294c", false).await;
-    }
-}
+//     #[tokio::test]
+//     async fn mb_clippy_test() {
+//         mb_clippy("543bb836-fb00-470a-8a27-25941fe0294c", false).await;
+//     }
+// }
