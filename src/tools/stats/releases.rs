@@ -5,6 +5,7 @@ use itertools::Itertools;
 use crate::datastructures::entity_with_listens::release_with_listens::ReleaseWithListens;
 use crate::datastructures::listen_collection::traits::ListenCollectionLike;
 use crate::datastructures::listen_collection::ListenCollection;
+use crate::utils::cli::display::ReleaseExt as _;
 use crate::utils::cli_paging::CLIPager;
 
 pub async fn stats_releases(conn: &mut sqlx::SqliteConnection, listens: ListenCollection) {
@@ -28,7 +29,7 @@ pub async fn stats_releases(conn: &mut sqlx::SqliteConnection, listens: ListenCo
             group.listen_count(),
             group
                 .release()
-                .format_with_credits(conn)
+                .pretty_format_with_credits(conn, true)
                 .await
                 .expect("Error getting formated release name"),
         );

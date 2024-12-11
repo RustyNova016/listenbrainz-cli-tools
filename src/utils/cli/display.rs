@@ -8,6 +8,7 @@ use musicbrainz_db_lite::models::musicbrainz::label::Label;
 use musicbrainz_db_lite::models::musicbrainz::main_entities::MainEntity;
 use musicbrainz_db_lite::models::musicbrainz::recording::Recording;
 use musicbrainz_db_lite::models::musicbrainz::release::Release;
+use musicbrainz_db_lite::models::musicbrainz::release_group::ReleaseGroup;
 use musicbrainz_db_lite::models::musicbrainz::work::Work;
 
 use super::hyperlink_rename;
@@ -180,5 +181,41 @@ pub impl Work {
             ),
             &format!("https://musicbrainz.org/work/{}", &self.mbid),
         ))
+    }
+}
+
+#[ext]
+pub impl ReleaseGroup {
+    async fn pretty_format(&self, listenbrainz: bool) -> Result<String, crate::Error> {
+        Ok(hyperlink_rename(
+            &format_disambiguation(
+                &self.title.truecolor(254, 173, 75).to_string(),
+                &Some(self.disambiguation.clone()),
+            ),
+            &self.get_url_link(listenbrainz),
+        ))
+    }
+
+    async fn pretty_format_with_credits(
+        &self,
+        conn: &mut sqlx::SqliteConnection,
+        listenbrainz: bool,
+    ) -> Result<String, crate::Error> {
+        Ok(format!(
+            "{} by {}",
+            self.pretty_format(listenbrainz).await?,
+            self.get_artist_credits_or_fetch(conn)
+                .await?
+                .pretty_format(listenbrainz)
+                .await?
+        ))
+    }
+
+    fn get_url_link(&self, listenbrainz: bool) -> String {
+        if !listenbrainz {
+            format!("https://musicbrainz.org/release-group/{}", &self.mbid)
+        } else {
+            format!("https://listenbrainz.org/album/{}", &self.mbid)
+        }
     }
 }

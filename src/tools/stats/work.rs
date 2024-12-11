@@ -4,6 +4,7 @@ use itertools::Itertools;
 
 use crate::datastructures::entity_with_listens::work_with_listens::WorkWithListens;
 use crate::datastructures::listen_collection::ListenCollection;
+use crate::utils::cli::display::WorkExt as _;
 use crate::utils::cli_paging::CLIPager;
 
 pub async fn stats_works(conn: &mut sqlx::SqliteConnection, listens: ListenCollection) {
@@ -21,7 +22,15 @@ pub async fn stats_works(conn: &mut sqlx::SqliteConnection, listens: ListenColle
     }
 
     for group in groups {
-        println!("[{}] {}", group.len(), group.work().title,);
+        println!(
+            "[{}] {}",
+            group.len(),
+            group
+                .work()
+                .pretty_format()
+                .await
+                .expect("Couldn't format the work")
+        );
 
         if !pager.inc() {
             break;

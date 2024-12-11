@@ -9,7 +9,7 @@ use crate::database::listenbrainz::listens::ListenFetchQuery;
 use crate::database::listenbrainz::listens::ListenFetchQueryReturn;
 use crate::models::cli::BumpCLI;
 use crate::models::config::Config;
-use crate::utils::cli::print_recording;
+use crate::utils::cli::display::RecordingExt as _;
 use crate::utils::cli::read_mbid_from_input;
 use crate::utils::extensions::chrono_ext::DurationExt as _;
 use crate::utils::println_cli;
@@ -58,7 +58,8 @@ pub async fn bump_command(conn: &mut sqlx::SqliteConnection, bump: BumpCLI) {
 
     println_cli(format!(
         "Adding bump to {}, giving a {} multiplier for {}",
-        print_recording(conn, &recording)
+        recording
+            .pretty_format_with_credits(conn, true)
             .await
             .expect("Error while getting recording credits"),
         multiplier,

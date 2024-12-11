@@ -9,7 +9,7 @@ use crate::database::listenbrainz::listens::ListenFetchQueryReturn;
 use crate::database::musicbrainz::anniversaries::get_recordings_aniversaries;
 use crate::datastructures::entity_with_listens::recording_with_listens::RecordingWithListens;
 use crate::datastructures::listen_collection::traits::ListenCollectionLike;
-use crate::utils::cli::print_recording;
+use crate::utils::cli::display::RecordingExt as _;
 
 pub async fn daily_report(conn: &mut sqlx::SqliteConnection, username: &str) {
     let listens = ListenFetchQuery::builder()
@@ -45,7 +45,8 @@ pub async fn daily_report(conn: &mut sqlx::SqliteConnection, username: &str) {
         for rec in anniversary_recordings {
             println!(
                 "   - {} ({}, {} Listens)",
-                print_recording(conn, rec.recording())
+                rec.recording()
+                    .pretty_format_with_credits(conn, true)
                     .await
                     .expect("Couldn't get artist credits"),
                 Utc.timestamp_opt(rec.recording().first_release_date.unwrap(), 0)
@@ -78,7 +79,8 @@ pub async fn daily_report(conn: &mut sqlx::SqliteConnection, username: &str) {
         for rec in first_discoveries {
             println!(
                 "   - {} ({}, {} Listens)",
-                print_recording(conn, rec.recording())
+                rec.recording()
+                    .pretty_format_with_credits(conn, true)
                     .await
                     .expect("Couldn't get artist credits"),
                 rec.first_listen_date()

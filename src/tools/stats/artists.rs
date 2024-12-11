@@ -5,6 +5,7 @@ use itertools::Itertools;
 use crate::datastructures::entity_with_listens::artist_with_listens::ArtistWithListens;
 use crate::datastructures::listen_collection::traits::ListenCollectionLike;
 use crate::datastructures::listen_collection::ListenCollection;
+use crate::utils::cli::display::ArtistExt;
 use crate::utils::cli_paging::CLIPager;
 
 pub async fn stats_artist(conn: &mut sqlx::SqliteConnection, listens: ListenCollection) {
@@ -23,7 +24,15 @@ pub async fn stats_artist(conn: &mut sqlx::SqliteConnection, listens: ListenColl
             .fetch_if_incomplete(conn)
             .await
             .expect("Error while fetching release");
-        println!("[{}] {}", group.listen_count(), group.artist().name);
+        println!(
+            "[{}] {}",
+            group.listen_count(),
+            group
+                .artist()
+                .pretty_format(true)
+                .await
+                .expect("Couldn't format entity")
+        );
 
         if !pager.inc() {
             break;
