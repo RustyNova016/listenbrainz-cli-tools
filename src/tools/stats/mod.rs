@@ -1,7 +1,7 @@
 use crate::database::listenbrainz::listens::ListenFetchQuery;
 use crate::database::listenbrainz::listens::ListenFetchQueryReturn;
-use crate::models::cli::common::GroupByTarget;
 use crate::models::cli::common::SortSorterBy;
+use crate::models::cli::common::StatsTarget;
 
 mod artists;
 mod recordings;
@@ -12,7 +12,7 @@ mod work;
 pub async fn stats_command(
     conn: &mut sqlx::SqliteConnection,
     username: &str,
-    target: GroupByTarget,
+    target: StatsTarget,
     _sort_by: SortSorterBy,
 ) {
     let listens = ListenFetchQuery::builder()
@@ -25,19 +25,22 @@ pub async fn stats_command(
         .expect("Couldn't fetch the new listens");
 
     match target {
-        GroupByTarget::Recording => {
+        StatsTarget::Recording => {
             recordings::stats_recording(conn, listens).await;
         }
-        GroupByTarget::Artist => {
+        StatsTarget::RecordingTime => {
+            recordings::stats_recording_time(conn, listens).await;
+        }
+        StatsTarget::Artist => {
             artists::stats_artist(conn, listens).await;
         }
-        GroupByTarget::Release => {
+        StatsTarget::Release => {
             releases::stats_releases(conn, listens).await;
         }
-        GroupByTarget::ReleaseGroup => {
+        StatsTarget::ReleaseGroup => {
             release_groups::stats_release_groups(conn, listens).await;
         }
-        GroupByTarget::Work => {
+        StatsTarget::Work => {
             work::stats_works(conn, listens).await;
         }
     }

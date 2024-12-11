@@ -3,6 +3,8 @@ use chrono::Duration;
 use chrono::OutOfRangeError;
 use chrono::Utc;
 use extend::ext;
+use rust_decimal::Decimal;
+use rust_decimal_macros::dec;
 
 #[ext]
 pub impl Duration {
@@ -18,6 +20,25 @@ pub impl Duration {
     #[must_use]
     fn floor_to_minute(self) -> Self {
         Self::minutes(self.num_minutes())
+    }
+
+    fn deci_minutes(&self) -> Decimal {
+        Decimal::from(self.num_seconds()) / dec!(60)
+    }
+
+    fn deci_hours(&self) -> Decimal {
+        self.deci_minutes() / dec!(60)
+    }
+
+    fn format_hh_mm(&self) -> String {
+        let minutes = self.num_minutes().rem_euclid(60);
+        let formatted_minutes = if minutes < 10 {
+            format!("0{minutes}")
+        } else {
+            format!("{minutes}")
+        };
+
+        format!("{}:{formatted_minutes}", self.num_hours())
     }
 }
 

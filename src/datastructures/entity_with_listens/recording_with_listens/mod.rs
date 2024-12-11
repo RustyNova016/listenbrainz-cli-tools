@@ -189,6 +189,13 @@ impl RecordingWithListens {
         };
         Ok(count.total_listen_count.unwrap_or(0))
     }
+
+    /// Return the total time the recording has been listened at
+    pub fn get_time_listened(&self) -> Option<Duration> {
+        self.recording()
+            .length_as_duration()
+            .map(|dur| dur * self.listen_count().try_into().unwrap())
+    }
 }
 
 impl_entity_with_listens!(RecordingWithListens);

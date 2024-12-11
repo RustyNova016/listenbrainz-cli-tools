@@ -8,8 +8,8 @@ use clap::Subcommand;
 use clap_complete::generate;
 use clap_complete::Generator;
 use clap_complete::Shell;
-use common::GroupByTarget;
 use common::SortSorterBy;
+use common::StatsTarget;
 use config::ConfigCli;
 use listens::ListenCommand;
 use lookup::LookupCommand;
@@ -157,7 +157,7 @@ pub enum Commands {
         //#[command(subcommand)]
         //command: StatsCommand,
         /// The type of entity to sort by.
-        target: GroupByTarget,
+        target: StatsTarget,
 
         /// Name of the user to fetch stats listen from
         username: Option<String>,

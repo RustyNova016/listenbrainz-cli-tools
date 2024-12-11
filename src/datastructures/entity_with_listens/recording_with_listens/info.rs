@@ -53,6 +53,7 @@ impl RecordingWithListens {
             [General]
                - Rank: #{rank}
                - Listen count: {listen_count} ({global_count} worldwide)
+               - Time listened: {minu_listened} minutes ({hours_listened} hours)
                - First listened on: {first_listened}
                - Last listened on: {last_listened}
         
@@ -69,6 +70,8 @@ impl RecordingWithListens {
             title = self.get_title(conn).await?,
             rank = other_listens.get_rank(&self.recording().mbid).expect("The recording should be listened"),
             listen_count = self.listen_count(),
+            minu_listened = self.get_time_listened().map(|dur| dur.deci_minutes().trunc_with_scale(2)).unwrap_or(Decimal::ZERO), // TODO: Proper error
+            hours_listened = self.get_time_listened().map(|dur| dur.format_hh_mm()).unwrap_or_else(|| "??".to_string()), // TODO: Proper error
             first_listened = self.first_listen_date().unwrap().floor_to_second().with_timezone(&Local),
             last_listened = self.last_listen_date().unwrap().floor_to_second().with_timezone(&Local),
             average_dur = format_duration(
