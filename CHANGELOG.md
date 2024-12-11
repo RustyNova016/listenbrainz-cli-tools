@@ -2,7 +2,52 @@
 
 All notable changes to this project will be documented in this file.
 
-## [0.3.3] - 2024-12-03
+## [0.4.0] - 2024-12-11
+
+### 🚀 Features
+
+- Added rank to lookup
+- Add time listened stats
+- Clippy + MissingWorkLint
+- Add musicbrainz clippy command
+- Add missing_release_barcode
+- Display checked entities
+- More display for main entities
+- Change formatting to pretty prints
+
+### 🐛 Bug Fixes
+
+- Missing recording prefetching in stats
+- Migration
+
+### 🚜 Refactor
+
+- Migrate bumps
+- Move connection to top level
+- Migrate config
+- Migrate cache clear
+- Remove MBID from used code
+- Underrated radio
+- Migrate timeouts
+- Migrate playlist stub
+- Move interactive_mapper to dev branch
+- Removed unused errors
+- Remove musicbrainz_rs_nova
+- Changed deque order
+
+### 📚 Documentation
+
+- Add CONTRIBUTING.mb
+
+### 🧪 Testing
+
+- Created test fixtures
+
+### ⚙️ Miscellaneous Tasks
+
+- Remove useless dependancies
+
+## [0.3.2] - 2024-11-27
 
 ### 🚀 Features
 
@@ -30,6 +75,7 @@ All notable changes to this project will be documented in this file.
 - Update manual release build
 - Bump version
 - Update CMD help
+- Release v0.3.3
 
 ## [0.3.1] - 2024-11-24
 
