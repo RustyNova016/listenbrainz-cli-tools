@@ -14,6 +14,7 @@ use config::ConfigCli;
 use listens::ListenCommand;
 use lookup::LookupCommand;
 use mapping::MappingCommand;
+use musicbrainz::MusicbrainzCommand;
 use unstable::UnstableCommand;
 
 use crate::models::cli::radio::RadioCommand;
@@ -31,6 +32,7 @@ pub mod config;
 pub mod listens;
 pub mod lookup;
 pub mod mapping;
+pub mod musicbrainz;
 pub mod radio;
 pub mod unstable;
 
@@ -137,6 +139,9 @@ pub enum Commands {
     /// Commands for interacting with listen mappings
     Mapping(MappingCommand),
 
+    /// Commands for musicbrainz stuff
+    Musicbrainz(MusicbrainzCommand),
+
     /// Generate radio playlists for you
     Radio(RadioCommand),
 
@@ -204,6 +209,8 @@ impl Commands {
             Self::Lookup(val) => val.run().await?,
 
             Self::Mapping(val) => val.run(conn).await?,
+
+            Self::Musicbrainz(val) => val.run().await,
 
             Self::Bump(val) => bump_command(conn, val.clone()).await,
 

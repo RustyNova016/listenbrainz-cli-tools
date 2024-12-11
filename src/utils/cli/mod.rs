@@ -1,3 +1,4 @@
+pub mod display;
 use core::fmt;
 use core::fmt::Display;
 use std::fmt::Write as _;
