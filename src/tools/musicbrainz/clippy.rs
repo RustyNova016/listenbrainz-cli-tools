@@ -84,6 +84,20 @@ async fn check_lint<L: MbClippyLint>(conn: &mut sqlx::SqliteConnection, entity: 
             .await
             .expect("Error while processing lint body")
     );
+
+    // Hints
+    let hints = lint
+        .get_hints(conn)
+        .await
+        .expect("Error while processing lint hints");
+    if !hints.is_empty() {
+        println!();
+        for hint in hints {
+            println!("{hint}");
+        }
+    }
+
+    // Links
     println!();
     println!("Links:");
     for link in lint

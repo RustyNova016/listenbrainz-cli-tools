@@ -28,7 +28,7 @@ pub async fn stats_command(
         StatsTarget::Recording => {
             recordings::stats_recording(conn, listens).await;
         }
-        StatsTarget::RecordingTime => {
+        StatsTarget::RecordingPlaytime => {
             recordings::stats_recording_time(conn, listens).await;
         }
         StatsTarget::Artist => {

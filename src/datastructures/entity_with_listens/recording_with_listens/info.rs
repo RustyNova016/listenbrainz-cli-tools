@@ -53,7 +53,7 @@ impl RecordingWithListens {
             [General]
                - Rank: #{rank}
                - Listen count: {listen_count} ({global_count} worldwide)
-               - Time listened: {minu_listened} minutes ({hours_listened} hours)
+               - Total playtime: {minu_listened} minutes ({hours_listened} hours)
                - First listened on: {first_listened}
                - Last listened on: {last_listened}
         
@@ -113,7 +113,7 @@ fn get_overdue_line(recording_info: &RecordingWithListens) -> String {
     }
 
     format!(
-        "    - Overdue by: {}",
+        "- Overdue by: {}",
         format_duration(time.floor_to_minute().to_std().unwrap())
     )
 }
