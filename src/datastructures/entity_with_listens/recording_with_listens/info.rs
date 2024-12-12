@@ -113,7 +113,7 @@ fn get_overdue_line(recording_info: &RecordingWithListens) -> String {
     }
 
     format!(
-        "    - Overdue by: {}",
+        "- Overdue by: {}",
         format_duration(time.floor_to_minute().to_std().unwrap())
     )
 }
