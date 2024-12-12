@@ -53,7 +53,7 @@ impl RecordingWithListens {
             [General]
                - Rank: #{rank}
                - Listen count: {listen_count} ({global_count} worldwide)
-               - Time listened: {minu_listened} minutes ({hours_listened} hours)
+               - Total playtime: {minu_listened} minutes ({hours_listened} hours)
                - First listened on: {first_listened}
                - Last listened on: {last_listened}
         
