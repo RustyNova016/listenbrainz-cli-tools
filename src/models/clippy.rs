@@ -45,8 +45,8 @@ pub struct MbClippyLintHint {
 }
 
 impl MbClippyLintHint {
-    pub fn new(text: String) -> Self{
-        Self {text}
+    pub fn new(text: String) -> Self {
+        Self { text }
     }
 }
 

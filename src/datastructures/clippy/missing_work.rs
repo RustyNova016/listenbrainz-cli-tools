@@ -67,13 +67,12 @@ impl MbClippyLint for MissingWorkLint {
 
         Ok(out)
     }
-    
+
     #[expect(clippy::vec_init_then_push)]
     async fn get_hints(
         &self,
         _conn: &mut sqlx::SqliteConnection,
     ) -> Result<Vec<crate::models::clippy::MbClippyLintHint>, crate::Error> {
-        
         let mut hints = Vec::new();
 
         hints.push(MbClippyLintHint::new("Recordings of more spontaneous actions like improvisations and field recordings generally don't need works".to_string()));
