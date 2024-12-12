@@ -1,5 +1,6 @@
 use musicbrainz_db_lite::models::musicbrainz::{main_entities::MainEntity, recording::Recording};
 
+use crate::models::clippy::MbClippyLintHint;
 use crate::models::clippy::{MbClippyLint, MbClippyLintLink};
 use crate::utils::cli::display::RecordingExt;
 
@@ -38,7 +39,7 @@ impl MbClippyLint for MissingWorkLint {
         conn: &mut sqlx::SqliteConnection,
     ) -> Result<impl std::fmt::Display, crate::Error> {
         Ok(format!("Recording \"{}\" has no associated works
--> All recordings should have a work associated to them. Please check if a work exists for a recording and add it / create it"
+-> Most recordings should have a work associated to them. Please check if a work exists for a recording and add it / create it"
 , self.recording.pretty_format_with_credits(conn, false).await?))
     }
 
@@ -66,12 +67,18 @@ impl MbClippyLint for MissingWorkLint {
 
         Ok(out)
     }
-
+    
+    #[expect(clippy::vec_init_then_push)]
     async fn get_hints(
         &self,
         _conn: &mut sqlx::SqliteConnection,
     ) -> Result<Vec<crate::models::clippy::MbClippyLintHint>, crate::Error> {
+        
+        let mut hints = Vec::new();
+
+        hints.push(MbClippyLintHint::new("Recordings of more spontaneous actions like improvisations and field recordings generally don't need works".to_string()));
+
         // TODO: Remix hint
-        Ok(Vec::new())
+        Ok(hints)
     }
 }
