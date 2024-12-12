@@ -6,6 +6,18 @@ All notable changes to this project will be documented in this file.
 
 ### 🚀 Features
 
+- *(lints)* Add improvisation hint
+
+### 🐛 Bug Fixes
+
+- Overdue line getting offset in lookup
+- Remove database path print
+- Rename recording time to playtime
+
+## [0.3.3] - 2024-12-03
+
+### 🚀 Features
+
 - Added rank to lookup
 - Add time listened stats
 - Clippy + MissingWorkLint
@@ -46,6 +58,7 @@ All notable changes to this project will be documented in this file.
 ### ⚙️ Miscellaneous Tasks
 
 - Remove useless dependancies
+- Release v0.4.0
 
 ## [0.3.2] - 2024-11-27
 
