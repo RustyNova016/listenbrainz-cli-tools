@@ -60,6 +60,8 @@ macon = "1.2.0"
 async-fn-stream = "0.2.2"
 zip = "2.2.0"
 indoc = "2.0.5"
+strsim = "0.11.1"
+strum_macros = "0.26.4"
 
 # The profile that 'cargo dist' will build with
 [profile.dist]

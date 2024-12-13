@@ -103,6 +103,8 @@ dependencies = [
  "serde_json",
  "serial_test",
  "sqlx",
+ "strsim",
+ "strum_macros",
  "thiserror 2.0.6",
  "tokio",
  "tracing",
@@ -1963,7 +1965,7 @@ dependencies = [
 [[package]]
 name = "musicbrainz-db-lite"
 version = "0.1.0"
-source = "git+https://github.com/RustyNova016/musicbrainz_db_lite.git?branch=develop#78f42aa64e8da0e6918ed127efa8da449c7c80e9"
+source = "git+https://github.com/RustyNova016/musicbrainz_db_lite.git?branch=develop#3373ddf8c70fdde9ada0ccd0b58f177197ad320c"
 dependencies = [
  "async-fn-stream",
  "async-trait",
@@ -1986,7 +1988,7 @@ dependencies = [
 [[package]]
 name = "musicbrainz_db_lite_macros"
 version = "0.1.0"
-source = "git+https://github.com/RustyNova016/musicbrainz_db_lite.git?branch=develop#78f42aa64e8da0e6918ed127efa8da449c7c80e9"
+source = "git+https://github.com/RustyNova016/musicbrainz_db_lite.git?branch=develop#3373ddf8c70fdde9ada0ccd0b58f177197ad320c"
 dependencies = [
  "darling",
  "proc-macro2",
@@ -1998,7 +2000,7 @@ dependencies = [
 [[package]]
 name = "musicbrainz_db_lite_schema"
 version = "0.1.1"
-source = "git+https://github.com/RustyNova016/musicbrainz_db_lite.git?branch=develop#78f42aa64e8da0e6918ed127efa8da449c7c80e9"
+source = "git+https://github.com/RustyNova016/musicbrainz_db_lite.git?branch=develop#3373ddf8c70fdde9ada0ccd0b58f177197ad320c"
 dependencies = [
  "sqlx",
 ]
@@ -2399,9 +2401,9 @@ dependencies = [
 
 [[package]]
 name = "quanta"
-version = "0.12.3"
+version = "0.12.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "8e5167a477619228a0b284fac2674e3c388cba90631d7b7de620e6f1fcd08da5"
+checksum = "773ce68d0bb9bc7ef20be3536ffe94e223e1f365bd374108b2659fac0c65cfe6"
 dependencies = [
  "crossbeam-utils",
  "libc",
@@ -2743,6 +2745,12 @@ dependencies = [
  "rustls-pki-types",
  "untrusted",
 ]
+
+[[package]]
+name = "rustversion"
+version = "1.0.18"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "0e819f2bc632f285be6d7cd36e25940d45b2391dd6d9b939e79de557f7014248"
 
 [[package]]
 name = "ryu"
@@ -3249,6 +3257,19 @@ name = "strsim"
 version = "0.11.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "7da8b5736845d9f2fcb837ea5d9e2628564b3b043a70948a3f0b778838c5fb4f"
+
+[[package]]
+name = "strum_macros"
+version = "0.26.4"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "4c6bee85a5a24955dc440386795aa378cd9cf82acd5f764469152d2270e581be"
+dependencies = [
+ "heck",
+ "proc-macro2",
+ "quote",
+ "rustversion",
+ "syn 2.0.89",
+]
 
 [[package]]
 name = "subtle"
