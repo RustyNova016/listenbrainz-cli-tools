@@ -1965,7 +1965,7 @@ dependencies = [
 [[package]]
 name = "musicbrainz-db-lite"
 version = "0.1.0"
-source = "git+https://github.com/RustyNova016/musicbrainz_db_lite.git?branch=develop#3373ddf8c70fdde9ada0ccd0b58f177197ad320c"
+source = "git+https://github.com/RustyNova016/musicbrainz_db_lite.git?branch=develop#31d5f806eb198b65a42d0771fb8a2f3aa1db9d30"
 dependencies = [
  "async-fn-stream",
  "async-trait",
@@ -1988,7 +1988,7 @@ dependencies = [
 [[package]]
 name = "musicbrainz_db_lite_macros"
 version = "0.1.0"
-source = "git+https://github.com/RustyNova016/musicbrainz_db_lite.git?branch=develop#3373ddf8c70fdde9ada0ccd0b58f177197ad320c"
+source = "git+https://github.com/RustyNova016/musicbrainz_db_lite.git?branch=develop#31d5f806eb198b65a42d0771fb8a2f3aa1db9d30"
 dependencies = [
  "darling",
  "proc-macro2",
@@ -2000,7 +2000,7 @@ dependencies = [
 [[package]]
 name = "musicbrainz_db_lite_schema"
 version = "0.1.1"
-source = "git+https://github.com/RustyNova016/musicbrainz_db_lite.git?branch=develop#3373ddf8c70fdde9ada0ccd0b58f177197ad320c"
+source = "git+https://github.com/RustyNova016/musicbrainz_db_lite.git?branch=develop#31d5f806eb198b65a42d0771fb8a2f3aa1db9d30"
 dependencies = [
  "sqlx",
 ]
