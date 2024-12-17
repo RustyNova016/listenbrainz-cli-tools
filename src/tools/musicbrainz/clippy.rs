@@ -12,8 +12,9 @@ use crate::models::clippy::MbClippyLint;
 use crate::utils::cli::await_next;
 use crate::utils::cli::display::MainEntityExt;
 use crate::utils::println_cli;
+use crate::utils::whitelist_blacklist::WhitelistBlacklist;
 
-pub async fn mb_clippy(start_mbid: &str, new_first: bool) {
+pub async fn mb_clippy(start_mbid: &str, new_first: bool, filter: &WhitelistBlacklist<String>) {
     let mut conn = get_conn().await;
 
     let start_node = Recording::fetch_and_save(&mut conn, start_mbid)
@@ -38,8 +39,8 @@ pub async fn mb_clippy(start_mbid: &str, new_first: bool) {
             .await
             .expect("Couldn't fetch entity");
 
-        check_lint::<MissingWorkLint>(&mut conn, &mut entity).await;
-        check_lint::<MissingBarcodeLint>(&mut conn, &mut entity).await;
+        check_lint::<MissingWorkLint>(&mut conn, &mut entity, filter).await;
+        check_lint::<MissingBarcodeLint>(&mut conn, &mut entity, filter).await;
 
         println!(
             "Checked {}",
@@ -68,7 +69,16 @@ fn get_new_element(queue: &mut VecDeque<MainEntity>, new_first: bool) -> Option<
     }
 }
 
-async fn check_lint<L: MbClippyLint>(conn: &mut sqlx::SqliteConnection, entity: &mut MainEntity) {
+async fn check_lint<L: MbClippyLint>(
+    conn: &mut sqlx::SqliteConnection,
+    entity: &mut MainEntity,
+    filter: &WhitelistBlacklist<String>,
+) {
+    // Check if the lint is allowed
+    if !filter.is_allowed(&L::get_name().to_string()) {
+        return;
+    }
+
     let Some(lint) = L::check(conn, entity)
         .await
         .expect("Error while processing lint")
