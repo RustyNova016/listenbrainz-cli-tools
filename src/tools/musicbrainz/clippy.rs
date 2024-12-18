@@ -12,6 +12,7 @@ use crate::datastructures::clippy::missing_work::MissingWorkLint;
 use crate::models::clippy::MbClippyLint;
 use crate::utils::cli::await_next;
 use crate::utils::cli::display::MainEntityExt;
+use crate::utils::extensions::owo_colors_ext::AlistralColors;
 use crate::utils::println_cli;
 use crate::utils::whitelist_blacklist::WhitelistBlacklist;
 
@@ -88,7 +89,13 @@ async fn check_lint<L: MbClippyLint>(
         return;
     };
 
-    println!("{}", format!("\n {} ", L::get_name()).on_yellow().black());
+    println!(
+        "{}",
+        format!("\n {} ", L::get_name())
+            .on_truecolor_tup(lint.get_severity().get_color())
+            .black()
+            .bold()
+    );
     println!();
     println!(
         "{}",

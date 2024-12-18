@@ -1,3 +1,4 @@
+pub mod db_lite_ext;
 pub mod owo_colors_ext;
 use chrono::DateTime;
 use chrono::TimeZone;
