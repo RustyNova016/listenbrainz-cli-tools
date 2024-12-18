@@ -11,7 +11,7 @@ impl LintSeverity {
             Self::MissingData => (32, 117, 191),
             Self::MissingRelation => (141, 102, 226),
             Self::WrongData => (191, 45, 32),
-            Self::StyleIssue => (232, 182, 32),
+            Self::StyleIssue => (232, 133, 58),
         }
     }
 }

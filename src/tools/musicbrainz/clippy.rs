@@ -10,6 +10,7 @@ use crate::datastructures::clippy::missing_release_barcode::MissingBarcodeLint;
 use crate::datastructures::clippy::missing_remix_rel::MissingRemixRelLint;
 use crate::datastructures::clippy::missing_remixer_rel::MissingRemixerRelLint;
 use crate::datastructures::clippy::missing_work::MissingWorkLint;
+use crate::datastructures::clippy::soundtrack_without_disambiguation::SoundtrackWithoutDisambiguationLint;
 use crate::models::clippy::MbClippyLint;
 use crate::utils::cli::await_next;
 use crate::utils::cli::display::MainEntityExt;
@@ -46,6 +47,7 @@ pub async fn mb_clippy(start_mbid: &str, new_first: bool, filter: &WhitelistBlac
         check_lint::<MissingBarcodeLint>(&mut conn, &mut entity, filter).await;
         check_lint::<MissingRemixRelLint>(&mut conn, &mut entity, filter).await;
         check_lint::<MissingRemixerRelLint>(&mut conn, &mut entity, filter).await;
+        check_lint::<SoundtrackWithoutDisambiguationLint>(&mut conn, &mut entity, filter).await;
 
         println!(
             "Checked {}",
@@ -185,9 +187,15 @@ async fn get_new_nodes(
 // #[cfg(test)]
 // mod tests {
 //     use crate::tools::musicbrainz::clippy::mb_clippy;
+//     use crate::utils::whitelist_blacklist::WhitelistBlacklist;
 
 //     #[tokio::test]
 //     async fn mb_clippy_test() {
-//         mb_clippy("543bb836-fb00-470a-8a27-25941fe0294c", false).await;
+//         mb_clippy(
+//             "b67fae1f-3037-4c01-bff9-b5e877220267",
+//             false,
+//             &WhitelistBlacklist::default(),
+//         )
+//         .await;
 //     }
 // }
