@@ -1894,9 +1894,9 @@ dependencies = [
 
 [[package]]
 name = "macon"
-version = "1.2.0"
+version = "1.3.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "d4891d8c9ae24ccfa7171265e4492d78fdd71b433f7fa2be4c122b6714b7bbcd"
+checksum = "4e2360fdc60235ad3db2d65bb74539e0813c20a626f7e330ce9a64b2d4e513f0"
 dependencies = [
  "macon_api",
  "macon_derive",
@@ -1904,15 +1904,15 @@ dependencies = [
 
 [[package]]
 name = "macon_api"
-version = "1.2.0"
+version = "1.3.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "4f1b2c1498f871034a106d49170c7cfdaf67713b3f5a11dd715f845c5a4192f0"
+checksum = "2330ee9375fc537d78cc438ed16695a5d0201f0be9d977bf6bc4ac11e5b4e177"
 
 [[package]]
 name = "macon_derive"
-version = "1.2.0"
+version = "1.3.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "0eeee892592f54e656957c5bdd548b37758b14afcffc6c334671e3881c0f00c1"
+checksum = "ccd7e1436ba066ad10c8b43ac4a00d304322831b90f039f1d83815f846fee024"
 dependencies = [
  "proc-macro2",
  "quote",
