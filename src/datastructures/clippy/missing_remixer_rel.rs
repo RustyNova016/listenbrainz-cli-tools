@@ -1,7 +1,9 @@
 use musicbrainz_db_lite::models::musicbrainz::{main_entities::MainEntity, recording::Recording};
 
+use crate::models::clippy::lint_severity::LintSeverity;
 use crate::models::clippy::{MbClippyLint, MbClippyLintLink};
 use crate::utils::cli::display::RecordingExt;
+use crate::utils::extensions::db_lite_ext::RelationRecordingRecordingExt;
 
 pub struct MissingRemixerRelLint {
     recording: Recording,
@@ -23,8 +25,7 @@ impl MbClippyLint for MissingRemixerRelLint {
         let recording_rels = recording.get_recording_relations(conn).await?;
         let mut is_remix = false;
         for relation in recording_rels {
-            if relation.relation_type == "remix" {
-                println!("Remix found");
+            if relation.is_remix_of_rel(recording) {
                 is_remix = true;
             }
         }
@@ -89,5 +90,9 @@ impl MbClippyLint for MissingRemixerRelLint {
         _conn: &mut sqlx::SqliteConnection,
     ) -> Result<Vec<crate::models::clippy::MbClippyLintHint>, crate::Error> {
         Ok(Vec::new())
+    }
+
+    fn get_severity(&self) -> crate::models::clippy::lint_severity::LintSeverity {
+        LintSeverity::MissingRelation
     }
 }

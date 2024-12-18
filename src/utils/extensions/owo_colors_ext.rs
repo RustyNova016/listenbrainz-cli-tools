@@ -9,6 +9,10 @@ pub trait AlistralColors: Display {
         self.truecolor(color.0, color.1, color.2).to_string()
     }
 
+    fn on_truecolor_tup(&self, color: (u8, u8, u8)) -> String {
+        self.on_truecolor(color.0, color.1, color.2).to_string()
+    }
+
     fn alistral_green(&self) -> String {
         self.truecolor(18, 198, 121).to_string()
     }
