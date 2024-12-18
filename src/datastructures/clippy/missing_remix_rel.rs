@@ -6,13 +6,13 @@ use crate::utils::cli::display::RecordingExt;
 use crate::utils::extensions::db_lite_ext::RelationRecordingArtistExt;
 use crate::utils::extensions::db_lite_ext::RelationRecordingRecordingExt;
 
-pub struct MissingRemixerRelLint {
+pub struct MissingRemixRelLint {
     recording: Recording,
 }
 
-impl MbClippyLint for MissingRemixerRelLint {
+impl MbClippyLint for MissingRemixRelLint {
     fn get_name() -> &'static str {
-        "missing_remixer_rel"
+        "missing_remix_rel"
     }
 
     async fn check(
@@ -23,10 +23,10 @@ impl MbClippyLint for MissingRemixerRelLint {
             return Ok(None);
         };
 
-        let recording_rels = recording.get_recording_relations(conn).await?;
+        let recording_rels = recording.get_artist_relations(conn).await?;
         let mut is_remix = false;
         for relation in recording_rels {
-            if relation.is_remix_of_rel(recording) {
+            if relation.is_remixer_rel(recording) {
                 is_remix = true;
             }
         }
@@ -35,10 +35,10 @@ impl MbClippyLint for MissingRemixerRelLint {
             return Ok(None);
         }
 
-        let artist_relations = recording.get_artist_relations(conn).await?;
+        let artist_relations = recording.get_recording_relations(conn).await?;
         // Check if a remixer relationship is missing
         for relation in artist_relations {
-            if relation.is_remixer_rel(recording) {
+            if relation.is_remix_of_rel(recording) {
                 return Ok(None);
             }
         }
@@ -55,8 +55,8 @@ impl MbClippyLint for MissingRemixerRelLint {
         conn: &mut sqlx::SqliteConnection,
     ) -> Result<impl std::fmt::Display, crate::Error> {
         Ok(format!(
-            "Recording \"{}\" has a remix relationship, but no remixer relationship.
--> Add the remixer as an artist relationship",
+            "Recording \"{}\" has a remixer relationship, but no `remix of` relationship.
+-> Add the original recording as an recording relationship",
             self.recording
                 .pretty_format_with_credits(conn, false)
                 .await?
