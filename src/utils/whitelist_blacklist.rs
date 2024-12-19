@@ -14,3 +14,9 @@ impl<T> WhitelistBlacklist<T> {
         }
     }
 }
+
+impl<T> Default for WhitelistBlacklist<T> {
+    fn default() -> Self {
+        Self::BlackList(Vec::new())
+    }
+}
